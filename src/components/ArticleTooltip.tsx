@@ -4,6 +4,12 @@ import { useState, useRef, useEffect } from 'react'
 
 type Article = { title?: string; link?: string }
 
+function withUtm(url: string): string {
+  if (!url || url === '#') return url
+  const sep = url.includes('?') ? '&' : '?'
+  return `${url}${sep}utm_source=keep-substack&utm_medium=referral`
+}
+
 type Props = {
   date: number
   articles: Article[]
@@ -49,7 +55,7 @@ export default function ArticleTooltip({ date, articles, colStart }: Props) {
               {articles.map((a, i) => (
                 <li key={i}>
                   <a
-                    href={a.link ?? '#'}
+                    href={withUtm(a.link ?? '#')}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-blue-600 hover:underline block"
