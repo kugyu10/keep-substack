@@ -60,12 +60,12 @@ Plans:
   1. ダッシュボードで全メンバーのミニカレンダーが一覧表示される
   2. メンバーをクリックすると個人詳細ビューに切り替わり、そのメンバーのカレンダーが大きく表示される
   3. スマートフォンでもカレンダーとダッシュボードが見やすく表示される
-**Plans**: TBD
+**Plans**: 2 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
+- [ ] 03-01-PLAN.md — MiniCalendar コンポーネント新規作成 + ダッシュボード（page.tsx）グリッドレイアウト改修
+- [ ] 03-02-PLAN.md — 個人詳細ページ /member/[substackId]（generateStaticParams + CalendarGrid 再利用）+ ブラウザ動作確認
 
 ## Progress
 
