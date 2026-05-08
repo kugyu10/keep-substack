@@ -1,5 +1,18 @@
 # Keep Substack
 
+## Current Milestone: v1.1 Dynamic Members + Weekly View
+
+**Goal:** メンバー管理をVercel KV化し、ブラウザから追加・削除できる管理画面を実装。トップビューを50人規模対応の直近7日間ヒートマップに刷新する。
+
+**Target features:**
+- Vercel KV移行 — メンバーデータ（name, substack-id, added_at, team-id）をVercel KVで管理
+- 管理画面 `/admin` — Basic認証（ENV設定）、メンバー追加・削除UI
+- 直近7日間ヒートマップ — 直近7日 × 全メンバーのグリッド（左端列 = メンバー名）、ソート: ①7日間投稿量降順 ②added_at古い順
+- チームフィルター — team-idでヒートマップを絞り込むビュー
+- メンバー名クリック — `/member/{substack-id}` に遷移
+- リッチTooltip — 記事タイトル（20文字まで）＋サムネイル、クリックで記事へ遷移
+- ビジュアル・UX刷新 — 50人対応レイアウト、ナビゲーション改善
+
 ## What This Is
 
 Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度をカレンダーUIで可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSSで構築し、Vercelにデプロイ済み。v1.0 MVP完成・公開中。
@@ -24,22 +37,27 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - ✓ 認証なしの公開ページとして誰でもアクセスできる — v1.0
 - ✓ Vercelにデプロイして継続的に運用できる — v1.0
 
-### Active
+### Active (v1.1)
+
+- [ ] メンバーデータをVercel KVで管理する（name, substack-id, added_at, team-id）— v1.1
+- [ ] ブラウザ上でメンバーを追加・削除できる管理画面（Basic認証）— v1.1
+- [ ] トップページを直近7日間ヒートマップ（50人対応）に刷新する — v1.1
+- [ ] team-idでヒートマップをフィルタリングできる — v1.1
+- [ ] ヒートマップのTooltipでサムネイル・タイトル表示、クリックで記事遷移 — v1.1
+
+### Active (Future)
 
 - [ ] 連続投稿日数（ストリーク）を表示する
 - [ ] 月間投稿数サマリーを表示する
 - [ ] 年間ヒートマップ（GitHub草型）で長期活動を可視化する
-- [ ] ブラウザ上でフィードURLを追加・削除できる管理画面
 
 ### Out of Scope
 
-- ユーザー認証・ログイン機能 — 公開ページのため不要
-- フィード管理UI（管理画面） — v1は設定ファイルで管理、v2候補
+- ユーザー認証・ログイン機能（公開ページ） — 公開ページのため不要。管理画面はBasic認証で対応
 - リアルタイム通知 — カレンダー確認で十分
 - コメント・いいね機能 — Substack本体の機能と重複
 - モバイルアプリ — Webアプリで十分、レスポンシブ対応済み
 - ランキング・順位表示 — コミュニティの「ゆるさ」を壊す
-- データベース — 50フィード規模はISRキャッシュで十分
 - Substack以外のRSSソース — スコープを絞る。汎用化はYAGNI
 
 ## Context
@@ -90,4 +108,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-08 after v1.0 milestone*
+*Last updated: 2026-05-08 — v1.1 milestone started*
