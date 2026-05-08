@@ -58,3 +58,13 @@ export function buildArticleMap(
   }
   return map
 }
+
+/**
+ * SubstackフィードURLからサブドメイン（substackId）を抽出する。
+ * 例: "https://uojun.substack.com/feed" -> "uojun"
+ * Substack形式でないURLはnullを返す。
+ */
+export function extractSubstackId(feedUrl: string): string | null {
+  const m = feedUrl.match(/^https?:\/\/([^.]+)\.substack\.com/)
+  return m ? m[1] : null
+}
