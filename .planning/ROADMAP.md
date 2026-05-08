@@ -48,7 +48,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 02-01-PLAN.md — カレンダーグリッドUI基盤（calendarUtils + CalendarGrid + page.tsx更新）
+- [x] 02-01-PLAN.md — カレンダーグリッドUI基盤（calendarUtils + CalendarGrid + page.tsx更新）
 - [ ] 02-02-PLAN.md — ホバー/クリックツールチップ実装 + 全メンバー表示
 
 ### Phase 3: ダッシュボードとUX仕上げ
@@ -75,5 +75,5 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. プロジェクト基盤とデータ層 | 2/2 | Complete | 2026-05-08 |
-| 2. カレンダーUI | 0/2 | Planning complete | - |
+| 2. カレンダーUI | 1/2 | In progress | - |
 | 3. ダッシュボードとUX仕上げ | 0/2 | Not started | - |
