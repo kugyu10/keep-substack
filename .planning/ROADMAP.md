@@ -44,12 +44,12 @@ Plans:
   1. 月別カレンダーグリッドに記事公開日が色付きセルで表示される
   2. 色付きセルにホバーすると記事タイトルと元記事へのリンクが表示される
   3. 前月/次月ボタンで過去の活動月に遷移できる
-**Plans**: TBD
+**Plans**: 2 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md — カレンダーグリッドUI基盤（calendarUtils + CalendarGrid + page.tsx更新）
+- [ ] 02-02-PLAN.md — ホバー/クリックツールチップ実装 + 全メンバー表示
 
 ### Phase 3: ダッシュボードとUX仕上げ
 **Goal**: メンバー全員の活動を一覧で俯瞰でき、個人の詳細も確認でき、モバイルでも快適に使える
@@ -75,5 +75,5 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. プロジェクト基盤とデータ層 | 2/2 | Complete | 2026-05-08 |
-| 2. カレンダーUI | 0/2 | Not started | - |
+| 2. カレンダーUI | 0/2 | Planning complete | - |
 | 3. ダッシュボードとUX仕上げ | 0/2 | Not started | - |

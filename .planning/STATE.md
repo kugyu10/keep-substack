@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in_progress
-stopped_at: Phase 1 complete, ready for Phase 2
-last_updated: "2026-05-08T09:10:00.000Z"
-last_activity: 2026-05-08 -- Plan 01-02 executed (ISR設定済みメインページ実装 + Vercelデプロイ) — Phase 1 完了
+stopped_at: Phase 2 planned, ready for execution
+last_updated: "2026-05-08T10:00:00.000Z"
+last_activity: 2026-05-08 -- Phase 2 plans created (02-01: カレンダーグリッドUI基盤, 02-02: ツールチップ実装)
 progress:
   total_phases: 3
   completed_phases: 1
-  total_plans: 2
+  total_plans: 4
   completed_plans: 2
   percent: 33
 ---
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 2: カレンダーUI
+**Current focus:** Phase 2: カレンダーUI — 実行フェーズ
 
 ## Current Position
 
 Phase: 2 of 3 (カレンダーUI)
-Plan: 0 of TBD in current phase
+Plan: 0 of 2 in current phase
 Status: In progress
-Last activity: 2026-05-08 -- Phase 1 complete (ISR設定済みメインページ + Vercelデプロイ)
+Last activity: 2026-05-08 -- Phase 2 plans created (Wave 1: カレンダーグリッドUI基盤, Wave 2: ツールチップ統合)
 
 Progress: [███░░░░░░░] 33%
 
@@ -65,6 +65,10 @@ Recent decisions affecting current work:
 - unstable_cache で rss-parser 呼び出しをラップし、REVALIDATE_SECONDS 環境変数で revalidate を動的制御するパターンを確立
 - export const dynamic = 'force-static' を採用（export const revalidate はリテラル値のみ有効なため、動的な環境変数参照には使えない）
 - .gitignore の .env* パターンが .env.example も対象にするため git add --force で追加
+- Phase 2: 月ナビゲーションは useState で管理（searchParams は force-static と競合するため使わない）
+- Phase 2: ArticleMap（Map型）はシリアライズ不可なため Server→Client 渡しは Array.from(map.entries()) で配列変換する
+- Phase 2: 月初めの曜日オフセットは style={{ gridColumnStart: n }} で設定（Tailwind 動的クラス col-start-${n} は JIT で検知されないリスクあり）
+- Phase 2: ツールチップはホバー+クリック両対応、外クリックまたは×ボタンで閉じる（D-01, D-02, D-03 per 02-CONTEXT.md）
 
 ### Pending Todos
 
@@ -76,6 +80,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-08T09:10:00Z
-Stopped at: Phase 1 complete. Next: Phase 2 (カレンダーUI)
+Last session: 2026-05-08T10:00:00Z
+Stopped at: Phase 2 planning complete. Next: Execute Phase 2 (/gsd-execute-phase 02-calendar-ui)
 Resume file: None
