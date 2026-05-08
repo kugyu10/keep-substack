@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: プロジェクト基盤とデータ層** - Next.jsプロジェクト初期化、JSON設定ファイル、RSSフィード取得・解析、ISR設定、Vercelデプロイ
 - [x] **Phase 2: カレンダーUI** - 月別カレンダーグリッド、記事公開日ハイライト、ホバーツールチップ、月ナビゲーション
-- [ ] **Phase 3: ダッシュボードとUX仕上げ** - メンバー一覧ダッシュボード、個人詳細ビュー、レスポンシブデザイン
+- [x] **Phase 3: ダッシュボードとUX仕上げ** - メンバー一覧ダッシュボード、個人詳細ビュー、レスポンシブデザイン
 
 ## Phase Details
 
@@ -65,7 +65,7 @@ Plans:
 
 Plans:
 - [x] 03-01-PLAN.md — MiniCalendar コンポーネント新規作成 + ダッシュボード（page.tsx）グリッドレイアウト改修
-- [ ] 03-02-PLAN.md — 個人詳細ページ /member/[substackId]（generateStaticParams + CalendarGrid 再利用）+ ブラウザ動作確認
+- [x] 03-02-PLAN.md — 個人詳細ページ /member/[substackId]（generateStaticParams + CalendarGrid 再利用）+ ブラウザ動作確認
 
 ## Progress
 
@@ -76,4 +76,4 @@ Phases execute in numeric order: 1 -> 2 -> 3
 |-------|----------------|--------|-----------|
 | 1. プロジェクト基盤とデータ層 | 2/2 | Complete | 2026-05-08 |
 | 2. カレンダーUI | 2/2 | Complete | 2026-05-08 |
-| 3. ダッシュボードとUX仕上げ | 1/2 | In progress | - |
+| 3. ダッシュボードとUX仕上げ | 2/2 | Complete | 2026-05-08 |
