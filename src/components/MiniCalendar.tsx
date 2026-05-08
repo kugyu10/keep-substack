@@ -21,14 +21,17 @@ export default function MiniCalendar({ memberName, articleMap }: Props) {
       <div className="grid grid-cols-7 gap-0.5">
         {days.map((day) => {
           const key = `${year}-${String(month).padStart(2, '0')}-${String(day.date).padStart(2, '0')}`
-          const hasArticle = (map.get(key) ?? []).length > 0
+          const count = (map.get(key) ?? []).length
+          const intensity =
+            count === 0 ? 'bg-gray-100 text-gray-400'
+            : count === 1 ? 'bg-green-200 text-green-800'
+            : count === 2 ? 'bg-green-400 text-white'
+            : 'bg-green-600 text-white'
           return (
             <div
               key={day.date}
               style={day.colStart ? { gridColumnStart: day.colStart } : undefined}
-              className={`aspect-square rounded-sm text-xs flex items-center justify-center ${
-                hasArticle ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400'
-              }`}
+              className={`aspect-square rounded-sm text-xs flex items-center justify-center ${intensity}`}
             >
               {day.date}
             </div>
