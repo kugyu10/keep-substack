@@ -29,11 +29,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. 一部のフィード取得が失敗しても、他のメンバーのデータは正常に表示される
   4. Vercelにデプロイされ、公開URLでアクセスできる
   5. ISRにより、revalidate間隔で自動的にデータが更新される
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [x] 01-01-PLAN.md — Next.jsプロジェクト初期化 + メンバー設定JSON + RSS取得ロジック（D-01〜D-04, D-06）
+- [ ] 01-02-PLAN.md — ISR設定 + 最小表示ページ + Vercelデプロイ（D-05, D-07）
 
 ### Phase 2: カレンダーUI
 **Goal**: メンバーの記事公開日を月別カレンダーグリッドで視覚的に確認でき、記事の詳細にもアクセスできる
@@ -74,6 +74,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. プロジェクト基盤とデータ層 | 0/2 | Not started | - |
+| 1. プロジェクト基盤とデータ層 | 1/2 | In progress | - |
 | 2. カレンダーUI | 0/2 | Not started | - |
 | 3. ダッシュボードとUX仕上げ | 0/2 | Not started | - |
