@@ -24,9 +24,11 @@ export default function MiniCalendar({ memberName, articleMap }: Props) {
           const count = (map.get(key) ?? []).length
           const intensity =
             count === 0 ? 'bg-gray-100 text-gray-400'
-            : count === 1 ? 'bg-green-200 text-green-800'
-            : count === 2 ? 'bg-green-400 text-white'
-            : 'bg-green-600 text-white'
+            : count === 1 ? 'bg-green-100 text-green-700'
+            : count === 2 ? 'bg-green-200 text-green-800'
+            : count === 3 ? 'bg-green-300 text-green-900'
+            : count === 4 ? 'bg-green-500 text-white'
+            : 'bg-green-700 text-white'
           return (
             <div
               key={day.date}
