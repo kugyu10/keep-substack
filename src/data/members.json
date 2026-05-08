@@ -1,0 +1,14 @@
+[
+  {
+    "name": "メンバーA",
+    "feedUrl": "https://memberA.substack.com/feed"
+  },
+  {
+    "name": "メンバーB",
+    "feedUrl": "https://memberB.substack.com/feed"
+  },
+  {
+    "name": "メンバーC",
+    "feedUrl": "https://memberC.substack.com/feed"
+  }
+]
