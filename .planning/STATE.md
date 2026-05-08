@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in_progress
-stopped_at: Phase 3 プラン作成完了。次: Phase 3 実行（/gsd-execute-phase 03-dashboard-ux）
-last_updated: "2026-05-08T01:00:00.000Z"
-last_activity: 2026-05-08 -- Phase 3 plans created
+stopped_at: Plan 03-01 完了。次: Plan 03-02（個人詳細ページ）実行
+last_updated: "2026-05-08T11:18:00.000Z"
+last_activity: 2026-05-08 -- Plan 03-01 completed (ミニカレンダーグリッドダッシュボード)
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 6
-  completed_plans: 4
-  percent: 67
+  completed_plans: 5
+  percent: 83
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-08)
 ## Current Position
 
 Phase: 3 of 3 (ダッシュボードとUX仕上げ)
-Plan: 0 of 2 in current phase
-Status: In progress (plans created, ready to execute)
-Last activity: 2026-05-08 -- Phase 3 plans created
+Plan: 1 of 2 in current phase
+Status: In progress (03-01 complete, 03-02 next)
+Last activity: 2026-05-08 -- Plan 03-01 completed (ミニカレンダーグリッドダッシュボード)
 
-Progress: [███████░░░] 67%
+Progress: [████████░░] 83%
 
 ## Performance Metrics
 
@@ -46,10 +46,11 @@ Progress: [███████░░░] 67%
 |-------|-------|-------|----------|
 | 01-project-foundation-data-layer | 2 | 13 min | 6.5 min |
 | 02-calendar-ui | 1 | 15 min | 15 min |
+| 03-dashboard-ux | 1 | 6 min | 6 min |
 
 **Recent Trend:**
 
-- Last 5 plans: 01-01 (3 min), 01-02 (10 min)
+- Last 5 plans: 01-01 (3 min), 01-02 (10 min), 03-01 (6 min)
 - Trend: -
 
 *Updated after each plan completion*
@@ -73,6 +74,8 @@ Recent decisions affecting current work:
 - Phase 3 計画: MiniCalendar は CalendarGrid に mini prop を追加せず、新規 Server Component として独立させる（KISS、単一責任）
 - Phase 3 計画: /member/[substackId] は generateStaticParams + dynamicParams=false + force-static で全パスをビルド時静的生成
 - Phase 3 計画: 個人詳細ページのデータ取得は fetchAllFeedsCached 全件取得 → filter で統一（キャッシュキー ['all-feeds'] を共有して効率化）
+- Phase 3 実装 03-01: extractSubstackId は Substack 形式でない URL に null を返す（page.tsx 側で除外）
+- Phase 3 実装 03-01: MiniCalendar にツールチップなし（詳細ページへのクリックナビゲーション設計、YAGNI）
 
 ### Pending Todos
 
@@ -84,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-08T01:00:00Z
-Stopped at: Phase 3 プラン（03-01, 03-02）作成完了。次: /gsd-execute-phase 03-dashboard-ux
+Last session: 2026-05-08T11:18:00Z
+Stopped at: Plan 03-01 完了。次: Plan 03-02（/member/[substackId] 個人詳細ページ）実行
 Resume file: None

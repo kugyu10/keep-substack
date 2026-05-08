@@ -64,7 +64,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 03-01-PLAN.md — MiniCalendar コンポーネント新規作成 + ダッシュボード（page.tsx）グリッドレイアウト改修
+- [x] 03-01-PLAN.md — MiniCalendar コンポーネント新規作成 + ダッシュボード（page.tsx）グリッドレイアウト改修
 - [ ] 03-02-PLAN.md — 個人詳細ページ /member/[substackId]（generateStaticParams + CalendarGrid 再利用）+ ブラウザ動作確認
 
 ## Progress
@@ -76,4 +76,4 @@ Phases execute in numeric order: 1 -> 2 -> 3
 |-------|----------------|--------|-----------|
 | 1. プロジェクト基盤とデータ層 | 2/2 | Complete | 2026-05-08 |
 | 2. カレンダーUI | 2/2 | Complete | 2026-05-08 |
-| 3. ダッシュボードとUX仕上げ | 0/2 | Not started | - |
+| 3. ダッシュボードとUX仕上げ | 1/2 | In progress | - |
