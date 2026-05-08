@@ -1,14 +1,10 @@
 [
   {
-    "name": "メンバーA",
-    "feedUrl": "https://memberA.substack.com/feed"
+    "name": "キャリア孔明",
+    "feedUrl": "https://careerkoumei.substack.com/feed"
   },
   {
-    "name": "メンバーB",
-    "feedUrl": "https://memberB.substack.com/feed"
-  },
-  {
-    "name": "メンバーC",
-    "feedUrl": "https://memberC.substack.com/feed"
+    "name": "うおじゅん",
+    "feedUrl": "https://uojun.substack.com/feed"
   }
 ]
