@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { buildDayGrid } from '@/lib/calendarUtils'
+import ArticleTooltip from '@/components/ArticleTooltip'
 
 type Article = { title?: string; link?: string }
 
@@ -72,18 +73,23 @@ export default function CalendarGrid({ memberName, articleMap }: Props) {
         ))}
 
         {days.map((day) => {
-          const key = `${year}-${String(month).padStart(2, '0')}-${String(day.date).padStart(2, '0')}`
-          const hasArticle = map.has(key)
+          const dateKey = `${year}-${String(month).padStart(2, '0')}-${String(day.date).padStart(2, '0')}`
+          const articles = map.get(dateKey) ?? []
+          if (articles.length > 0) {
+            return (
+              <ArticleTooltip
+                key={day.date}
+                date={day.date}
+                articles={articles}
+                colStart={day.colStart}
+              />
+            )
+          }
           return (
             <div
               key={day.date}
               style={day.colStart ? { gridColumnStart: day.colStart } : undefined}
-              className={
-                'aspect-square flex items-center justify-center text-sm w-full h-full rounded ' +
-                (hasArticle
-                  ? 'bg-green-500 text-white font-semibold hover:bg-green-600 transition-colors'
-                  : 'text-gray-500 hover:bg-gray-100')
-              }
+              className="aspect-square flex items-center justify-center text-sm w-full h-full rounded text-gray-500 hover:bg-gray-100"
             >
               {day.date}
             </div>
