@@ -33,31 +33,33 @@ export default function ArticleTooltip({ date, articles, colStart }: Props) {
     >
       {open && (
         <div
-          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-10 bg-white border border-gray-200 rounded shadow-lg p-2 min-w-max max-w-xs"
+          className="absolute bottom-full left-1/2 -translate-x-1/2 pb-2 z-10"
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
         >
-          <button
-            className="absolute top-1 right-1 text-gray-400 hover:text-gray-600 text-xs"
-            onClick={() => setOpen(false)}
-            aria-label="閉じる"
-          >
-            ×
-          </button>
-          <ul className="space-y-1 pr-4">
-            {articles.map((a, i) => (
-              <li key={i}>
-                <a
-                  href={a.link ?? '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-blue-600 hover:underline block"
-                >
-                  {a.title ?? '(タイトルなし)'}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <div className="bg-white border border-gray-200 rounded shadow-lg p-2 min-w-max max-w-xs">
+            <button
+              className="absolute top-1 right-1 text-gray-400 hover:text-gray-600 text-xs"
+              onClick={() => setOpen(false)}
+              aria-label="閉じる"
+            >
+              ×
+            </button>
+            <ul className="space-y-1 pr-4">
+              {articles.map((a, i) => (
+                <li key={i}>
+                  <a
+                    href={a.link ?? '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-600 hover:underline block"
+                  >
+                    {a.title ?? '(タイトルなし)'}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
       <button
