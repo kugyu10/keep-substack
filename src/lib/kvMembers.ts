@@ -7,3 +7,21 @@ export async function getMembers(): Promise<Member[]> {
   const members = await redis.get<Member[]>('members')
   return members ?? []
 }
+
+// D-07: addedAt はサーバー側で付与する
+// D-15: 重複substackIdはErrorをthrow（useActionStateでのエラーハンドリング用）
+export async function addMember(member: Omit<Member, 'addedAt'>): Promise<void> {
+  const members = await getMembers()
+  if (members.some((m) => m.substackId === member.substackId)) {
+    throw new Error(`substackId "${member.substackId}" は既に登録されています`)
+  }
+  const newMember: Member = { ...member, addedAt: new Date().toISOString() }
+  await redis.set('members', [...members, newMember])
+}
+
+// 存在しないsubstackIdを削除しようとしても静かに成功する
+export async function deleteMember(substackId: string): Promise<void> {
+  const members = await getMembers()
+  const updated = members.filter((m) => m.substackId !== substackId)
+  await redis.set('members', updated)
+}
