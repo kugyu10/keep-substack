@@ -29,7 +29,9 @@ export default function AdminMemberList({ members }: Props) {
               <td className="border px-3 py-2">{m.name}</td>
               <td className="border px-3 py-2">{m.substackId}</td>
               <td className="border px-3 py-2">{m.teamId}</td>
-              <td className="border px-3 py-2 text-xs text-gray-500">{m.addedAt}</td>
+              <td className="border px-3 py-2 text-xs text-gray-500">
+                {new Date(m.addedAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
+              </td>
               <td className="border px-3 py-2">
                 <button
                   onClick={() => handleDelete(m.substackId)}
