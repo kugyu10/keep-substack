@@ -2,14 +2,13 @@
 
 import { useState } from 'react'
 import { buildDayGrid } from '@/lib/calendarUtils'
-import ArticleTooltip from '@/components/ArticleTooltip'
-
-type Article = { title?: string; link?: string }
+import { getIntensityClass } from '@/lib/heatmapUtils'
+import type { HeatmapArticle } from '@/lib/heatmapUtils'
+import HeatmapTooltip from '@/components/HeatmapTooltip'
 
 type Props = {
   memberName: string
-  articleMap: [string, Article[]][]
-  // Map はシリアライズ不可のため Server→Client 渡しは配列で行う
+  articleMap: [string, HeatmapArticle[]][]
 }
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土']
@@ -75,21 +74,26 @@ export default function CalendarGrid({ memberName, articleMap }: Props) {
         {days.map((day) => {
           const dateKey = `${year}-${String(month).padStart(2, '0')}-${String(day.date).padStart(2, '0')}`
           const articles = map.get(dateKey) ?? []
-          if (articles.length > 0) {
+          const count = articles.length
+
+          if (count > 0) {
             return (
-              <ArticleTooltip
+              <div
                 key={day.date}
-                date={day.date}
-                articles={articles}
-                colStart={day.colStart}
-              />
+                style={day.colStart ? { gridColumnStart: day.colStart } : undefined}
+              >
+                <HeatmapTooltip articles={articles} colorClass={getIntensityClass(count)}>
+                  <span className="text-xs font-semibold">{day.date}</span>
+                </HeatmapTooltip>
+              </div>
             )
           }
+
           return (
             <div
               key={day.date}
               style={day.colStart ? { gridColumnStart: day.colStart } : undefined}
-              className="aspect-square flex items-center justify-center text-sm w-full h-full rounded text-gray-500 hover:bg-gray-100"
+              className="aspect-square flex items-center justify-center text-sm text-gray-400"
             >
               {day.date}
             </div>

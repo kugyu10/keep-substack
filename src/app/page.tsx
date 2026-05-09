@@ -10,7 +10,7 @@ export default async function Home() {
   const sorted = sortByWeeklyCount(results, dates)
 
   return (
-    <main className="max-w-6xl mx-auto p-6">
+    <main className="max-w-[600px] mx-auto p-6 pb-64">
       <h1 className="text-2xl font-semibold mb-6">Keep Substack</h1>
       <WeeklyHeatmapGrid results={sorted} dates={dates} />
     </main>

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
-import { buildArticleMap } from '@/lib/calendarUtils'
+import { buildHeatmapArticleMap } from '@/lib/heatmapUtils'
 import CalendarGrid from '@/components/CalendarGrid'
 import { getMembers } from '@/lib/kvMembers'
 
@@ -20,11 +20,11 @@ export default async function MemberPage({
 
   if (!memberResult) notFound()
 
-  const map = buildArticleMap(memberResult.items)
+  const map = buildHeatmapArticleMap(memberResult.items)
   const articleMapEntries = Array.from(map.entries())
 
   return (
-    <main className="max-w-2xl mx-auto p-6">
+    <main className="max-w-[600px] mx-auto p-6 pb-64">
       <Link
         href="/"
         className="text-sm text-gray-500 hover:text-gray-800 mb-4 inline-block"

@@ -26,12 +26,7 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates }: Hea
           const articles = articleMap.get(date) ?? []
           const count = articles.length
           if (count === 0) {
-            return (
-              <div
-                key={date}
-                className={`aspect-square rounded-sm cursor-default ${getIntensityClass(0)}`}
-              />
-            )
+            return <div key={date} className="aspect-square" />
           }
           return (
             <HeatmapTooltip

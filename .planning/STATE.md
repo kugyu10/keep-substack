@@ -5,7 +5,7 @@ milestone_name: Dynamic Members + Weekly View
 status: executing
 stopped_at: ""
 last_updated: "2026-05-09T00:00:00.000Z"
-last_activity: 2026-05-09 -- Phase 4 execution complete (2/2 plans done)
+last_activity: 2026-05-09 -- Phase 5 execution complete (2/2 plans done)
 progress:
   total_phases: 3
   completed_phases: 0
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-05-08 for v1.1 milestone)
 
 ## Current Position
 
-Phase: 4 of 6 (KVデータ層移行) — COMPLETE
-Plan: 04-02 (Wave 2 — done)
-Status: Phase complete (2/2 plans)
-Last activity: 2026-05-09 — Phase 4 execution complete. Upstash KV基盤確立、全メンバーデータ移行済み。
+Phase: 5 of 6 (WeeklyHeatmap + リッチTooltip) — COMPLETE (checkpoint:human-verify 待ち)
+Plan: 05-02 (Wave 2 — done)
+Status: Phase complete (2/2 plans) — devサーバーでの目視確認待ち
+Last activity: 2026-05-09 — Phase 5 execution complete. WeeklyHeatmapGrid実装・トップページ刷新完了。
 
 Progress: [███░░░░░░░] 33%
 

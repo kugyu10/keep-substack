@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import type { ReactNode } from 'react'
 
 type HeatmapTooltipProps = {
   articles: { title?: string; link?: string; thumbnail?: string }[]
   colorClass: string
+  children?: ReactNode
 }
 
 function withUtm(url: string): string {
@@ -13,7 +15,7 @@ function withUtm(url: string): string {
   return `${url}${sep}utm_source=keep-substack&utm_medium=referral`
 }
 
-export default function HeatmapTooltip({ articles, colorClass }: HeatmapTooltipProps) {
+export default function HeatmapTooltip({ articles, colorClass, children }: HeatmapTooltipProps) {
   const [open, setOpen] = useState(false)
   const cellRef = useRef<HTMLDivElement>(null)
 
@@ -29,25 +31,26 @@ export default function HeatmapTooltip({ articles, colorClass }: HeatmapTooltipP
   }, [open])
 
   return (
-    <div ref={cellRef} className="relative">
+    <div
+      ref={cellRef}
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={(e) => {
+        if (cellRef.current && !cellRef.current.contains(e.relatedTarget as Node)) {
+          setOpen(false)
+        }
+      }}
+    >
       <button
-        className={`aspect-square w-full rounded-sm ${colorClass}`}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={(e) => {
-          if (cellRef.current && !cellRef.current.contains(e.relatedTarget as Node)) {
-            setOpen(false)
-          }
-        }}
+        className={`aspect-square w-full rounded-full ${colorClass} flex items-center justify-center`}
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
-      />
+      >
+        {children}
+      </button>
       {open && (
-        <div
-          className="absolute bottom-full left-1/2 -translate-x-1/2 pb-2 z-10"
-          onMouseEnter={() => setOpen(true)}
-          onMouseLeave={() => setOpen(false)}
-        >
-          <div className="bg-white border border-gray-200 rounded shadow-lg p-2 max-w-xs relative">
+        <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-10">
+          <div className="bg-white border border-gray-200 rounded shadow-lg p-2 min-w-[220px] max-w-xs relative">
             <button
               onClick={() => setOpen(false)}
               aria-label="閉じる"
