@@ -8,8 +8,12 @@ export type FeedItem = {
 
 export type Member = {
   name: string
-  feedUrl: string
+  substackId: string
+  teamId: string
+  addedAt: string  // ISO 8601
 }
+
+// Phase 4 KV移行後のスキーマ（D-03）。フィードURLは substackId から動的生成する（D-08）
 
 // Plan 01-02 の page.tsx が使う集約型
 export type MemberFeedResult = {
