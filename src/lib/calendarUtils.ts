@@ -64,7 +64,7 @@ export function buildArticleMap(
  * 例: "https://uojun.substack.com/feed" -> "uojun"
  * Substack形式でないURLはnullを返す。
  */
-export function extractSubstackId(feedUrl: string): string | null {
-  const m = feedUrl.match(/^https?:\/\/([^.]+)\.substack\.com/)
+export function extractSubstackId(url: string): string | null {
+  const m = url.match(/^https?:\/\/([^.]+)\.substack\.com/)
   return m ? m[1] : null
 }
