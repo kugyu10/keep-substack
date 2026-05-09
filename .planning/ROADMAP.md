@@ -50,10 +50,12 @@ Plans:
   1. トップページに直近7日間 x 全メンバーのグリッドが表示され、50人でもレイアウトが崩れない
   2. ヒートマップは7日間投稿量降順・同数はaddedAt昇順でソートされている
   3. 左端列のメンバー名をクリックすると `/member/{substackId}` に遷移できる
-  4. 記事ありセルにホバーするとTooltip（タイトル20文字以内 + サムネイル）が表示される
-  5. Tooltipをクリックすると該当記事ページへ遷移でき、サムネイルなしの場合はプレースホルダーが表示される
-**Plans**: TBD
-**UI hint**: yes
+  4. 記事ありセルにホバーするとTooltip（タイトル全文 + サムネイル）が表示される（D-05により全文表示）
+  5. Tooltipをクリックすると該当記事ページへ遷移でき、サムネイルなしの場合はサムネイル領域を省略（D-06）
+**Plans**: 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — データ層基盤（types.ts更新 + fetchFeed.ts customFields + heatmapUtils.ts新設）
+- [ ] 05-02-PLAN.md — UIコンポーネント実装とページ刷新（HeatmapTooltip + HeatmapRow + WeeklyHeatmapGrid + page.tsx）
 
 ### Phase 6: 管理画面 + チームフィルター
 **Goal**: Basic認証で保護された `/admin` でメンバーの追加・削除ができ、team-idでヒートマップを絞り込めるURLパラメータが機能する
@@ -74,5 +76,5 @@ Plans:
 | 2. カレンダーUI | v1.0 | 2/2 | Complete | 2026-05-08 |
 | 3. ダッシュボードとUX仕上げ | v1.0 | 2/2 | Complete | 2026-05-08 |
 | 4. KVデータ層移行 | v1.1 | 2/2 | Complete | 2026-05-09 |
-| 5. WeeklyHeatmap + リッチTooltip | v1.1 | 0/? | Not started | - |
+| 5. WeeklyHeatmap + リッチTooltip | v1.1 | 0/2 | Not started | - |
 | 6. 管理画面 + チームフィルター | v1.1 | 0/? | Not started | - |
