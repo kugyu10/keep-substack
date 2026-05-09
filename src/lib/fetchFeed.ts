@@ -9,15 +9,15 @@ const RETRY_DELAY_MS = 1000 // D-01: リトライ前の待機時間
 const MAX_ARTICLES = 30     // D-04: 直近30件まで
 
 // D-01: フィード取得失敗時は1秒待ってリトライ、それでもダメなら空配列を返す
-async function fetchWithRetry(feedUrl: string): Promise<FeedItem[]> {
+async function fetchWithRetry(url: string): Promise<FeedItem[]> {
   try {
-    const feed = await parser.parseURL(feedUrl)
+    const feed = await parser.parseURL(url)
     return feed.items.slice(0, MAX_ARTICLES) as FeedItem[]
   } catch {
     // 1秒待ってリトライ
     await new Promise((r) => setTimeout(r, RETRY_DELAY_MS))
     try {
-      const feed = await parser.parseURL(feedUrl)
+      const feed = await parser.parseURL(url)
       return feed.items.slice(0, MAX_ARTICLES) as FeedItem[]
     } catch {
       return [] // 非表示（D-01: ダメなら空配列）

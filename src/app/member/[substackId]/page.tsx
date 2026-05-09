@@ -1,20 +1,9 @@
-export const dynamic = 'force-static'
-export const dynamicParams = false
-
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
-import { buildArticleMap, extractSubstackId } from '@/lib/calendarUtils'
+import { buildArticleMap } from '@/lib/calendarUtils'
 import CalendarGrid from '@/components/CalendarGrid'
-import members from '@/data/members.json'
-import type { Member } from '@/lib/types'
-
-export function generateStaticParams() {
-  return (members as Member[])
-    .map((m) => extractSubstackId(m.feedUrl))
-    .filter((id): id is string => id !== null)
-    .map((substackId) => ({ substackId }))
-}
+import { getMembers } from '@/lib/kvMembers'
 
 export default async function MemberPage({
   params,
@@ -23,9 +12,10 @@ export default async function MemberPage({
 }) {
   const { substackId } = await params
 
-  const results = await fetchAllFeedsCached(members as Member[])
+  const members = await getMembers()
+  const results = await fetchAllFeedsCached(members)
   const memberResult = results.find(
-    (r) => extractSubstackId(r.member.feedUrl) === substackId
+    (r) => r.member.substackId === substackId
   )
 
   if (!memberResult) notFound()
