@@ -4,6 +4,7 @@ export type FeedItem = {
   link?: string
   pubDate?: string
   isoDate?: string // rss-parserが自動付与するISO 8601形式
+  contentEncoded?: string  // rss-parser customFieldsで取得。サムネイル抽出用
 }
 
 export type Member = {

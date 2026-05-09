@@ -3,7 +3,12 @@ import { unstable_cache } from 'next/cache'
 import type { FeedItem, Member, MemberFeedResult } from './types'
 
 // D-03: タイムアウト5秒（rss-parserの組み込みtimeoutオプション）
-const parser = new Parser({ timeout: 5000 })
+const parser = new Parser({
+  timeout: 5000,
+  customFields: {
+    item: [['content:encoded', 'contentEncoded']]
+  }
+})
 
 const RETRY_DELAY_MS = 1000 // D-01: リトライ前の待機時間
 const MAX_ARTICLES = 30     // D-04: 直近30件まで
