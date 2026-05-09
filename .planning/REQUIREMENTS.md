@@ -59,8 +59,16 @@
 
 | REQ-ID | Phase | Plan |
 |--------|-------|------|
-| KV-01, KV-02 | TBD | TBD |
-| ADM-01, ADM-02, ADM-03 | TBD | TBD |
-| HEAT-01, HEAT-02, HEAT-03, HEAT-04 | TBD | TBD |
-| TIP-01, TIP-02, TIP-03 | TBD | TBD |
-| UX-01 | TBD | TBD |
+| KV-01 | Phase 4 | TBD |
+| KV-02 | Phase 4 | TBD |
+| ADM-01 | Phase 6 | TBD |
+| ADM-02 | Phase 6 | TBD |
+| ADM-03 | Phase 6 | TBD |
+| HEAT-01 | Phase 5 | TBD |
+| HEAT-02 | Phase 5 | TBD |
+| HEAT-03 | Phase 5 | TBD |
+| HEAT-04 | Phase 6 | TBD |
+| TIP-01 | Phase 5 | TBD |
+| TIP-02 | Phase 5 | TBD |
+| TIP-03 | Phase 5 | TBD |
+| UX-01 | Phase 5 | TBD |

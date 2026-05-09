@@ -4,10 +4,10 @@ milestone: v1.1
 milestone_name: Dynamic Members + Weekly View
 status: planning
 stopped_at: ""
-last_updated: "2026-05-08T13:00:00.000Z"
-last_activity: 2026-05-08 -- Milestone v1.1 started
+last_updated: "2026-05-09T00:00:00.000Z"
+last_activity: 2026-05-09 -- ROADMAP.md created for v1.1 (Phases 4-6)
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,34 +21,50 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08 for v1.1 milestone)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** v1.1 — Dynamic Members + Weekly View
+**Current focus:** Phase 4 — KVデータ層移行
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-05-08 — Milestone v1.1 started
+Phase: 4 of 6 (KVデータ層移行)
+Plan: — (Ready to plan)
+Status: Ready to plan
+Last activity: 2026-05-09 — v1.1 ROADMAP.md作成完了。Phase 4から着手可能。
+
+Progress: [░░░░░░░░░░] 0%
+
+## Performance Metrics
+
+**Velocity:**
+- Total plans completed: 6 (v1.0 全6プラン)
+- Average duration: —
+- Total execution time: —
+
+**By Phase:**
+
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| v1.0 Phases 1-3 | 6 | — | — |
+
+*Updated after each plan completion*
 
 ## Accumulated Context
 
-### Established Patterns
+### Key Architecture Decisions (v1.1)
 
-- `unstable_cache` + `export const dynamic = 'force-static'` + `REVALIDATE_SECONDS` 環境変数でISR制御
-- Server→Client props での Map シリアライズ: `Array.from(map.entries())` → Client側で `new Map()` 再構築
-- Tailwind 動的クラスはJIT非検知のため `style={{ gridColumnStart }}` を使用
-- `generateStaticParams` + `dynamicParams=false` で静的生成 + 未知パス自動404
+- feedUrl は保存せず `https://{substackId}.substack.com/feed` で動的生成
+- `@upstash/redis` を使用 (`@vercel/kv` は2024年12月廃止)
+- Next.js 16 では `src/proxy.ts` + `export function proxy`（middleware.tsは使わない）
+- Server Actions + `revalidateTag('members')` でAPI Routes不要
+- トップページは `force-static` を除去して `?team=teamId` searchParamsを受け取れるようにする
+- サムネイルは RSS `content:encoded` からregexで取得（OGPフェッチ不使用）
+- Vercel環境変数: UPSTASH_REDIS_REST_URL をBuildスコープにも設定すること
 
-### Key Files
+### Key Files (v1.0ベース)
 
-- `src/data/members.json` — メンバー設定（name, feedUrl）← v1.1でVercel KVへ移行予定
+- `src/data/members.json` — メンバー設定 ← Phase 4でKV移行後は参照元が変わる
 - `src/lib/fetchFeed.ts` — fetchAllFeedsCached（並列取得 + unstable_cache）
-- `src/lib/calendarUtils.ts` — parseIsoDate, buildDayGrid, buildArticleMap, extractSubstackId
-- `src/components/CalendarGrid.tsx` — 月ナビ付きカレンダー Client Component
-- `src/components/ArticleTooltip.tsx` — hover+click対応ツールチップ
-- `src/components/MiniCalendar.tsx` — ダッシュボード用ミニカレンダー Server Component
-- `src/app/page.tsx` — ダッシュボード（全メンバーMiniCalendarグリッド）← v1.1でヒートマップに刷新
-- `src/app/member/[substackId]/page.tsx` — 個人詳細ページ
+- `src/lib/calendarUtils.ts` — parseIsoDate, buildDayGrid, buildArticleMap
+- `src/app/page.tsx` — ダッシュボード ← Phase 5でヒートマップに刷新
 
 ### Pending Todos
 
@@ -60,7 +76,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-08
-Stopped at: Milestone v1.1 planning started. Defining requirements.
+Last session: 2026-05-09
+Stopped at: v1.1 ROADMAP.md作成完了。
 Resume file: None
-Next step: Define REQUIREMENTS.md then create ROADMAP.md
+Next step: `/gsd-plan-phase 4` でPhase 4のプランニングを開始する
