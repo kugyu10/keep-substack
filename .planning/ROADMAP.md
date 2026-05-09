@@ -24,7 +24,7 @@ Full archive: `.planning/milestones/v1.0-ROADMAP.md`
 
 - [ ] **Phase 4: KVデータ層移行** — Upstash Redisでメンバーデータを管理する基盤を確立する
 - [ ] **Phase 5: WeeklyHeatmap + リッチTooltip** — トップページをヒートマップUIに刷新し、記事サムネイル付きTooltipを実装する
-- [ ] **Phase 6: 管理画面 + チームフィルター** — Basic認証付き管理UIとteam-idフィルタリングを実装して運用可能な状態にする
+- [x] **Phase 6: 管理画面 + チームフィルター** — Basic認証付き管理UIとteam-idフィルタリングを実装して運用可能な状態にする
 
 ## Phase Details
 
@@ -66,7 +66,10 @@ Plans:
   2. `/admin` でname + substackId + teamIdを入力してメンバーを追加できる
   3. `/admin` でメンバーを削除でき、削除後すぐにKVから消える
   4. `/?team=teamId` でアクセスするとそのteamに属するメンバーのみのヒートマップが表示される
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 06-01-PLAN.md — データ層基盤 + 認証（kvMembers.ts拡張 + middleware.ts新設 + .env.example更新）
+- [ ] 06-02-PLAN.md — 管理UIとチームフィルター（/admin pages + Server Actions + page.tsxタブUI）
 
 ## Progress
 
@@ -77,4 +80,4 @@ Plans:
 | 3. ダッシュボードとUX仕上げ | v1.0 | 2/2 | Complete | 2026-05-08 |
 | 4. KVデータ層移行 | v1.1 | 2/2 | Complete | 2026-05-09 |
 | 5. WeeklyHeatmap + リッチTooltip | v1.1 | 0/2 | Not started | - |
-| 6. 管理画面 + チームフィルター | v1.1 | 0/? | Not started | - |
+| 6. 管理画面 + チームフィルター | v1.1 | 2/2 | Complete | 2026-05-10 |
