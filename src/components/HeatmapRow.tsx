@@ -17,7 +17,7 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates }: Hea
     <div className="flex items-center border-b border-gray-100 py-1">
       <Link
         href={`/member/${member.substackId}`}
-        className="w-32 shrink-0 truncate text-sm font-semibold pr-2 hover:underline"
+        className="w-32 shrink-0 text-xs font-semibold pr-2 hover:underline leading-snug line-clamp-2"
       >
         {member.name}
       </Link>
