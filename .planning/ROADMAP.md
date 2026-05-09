@@ -73,6 +73,6 @@ Plans:
 | 1. プロジェクト基盤とデータ層 | v1.0 | 2/2 | Complete | 2026-05-08 |
 | 2. カレンダーUI | v1.0 | 2/2 | Complete | 2026-05-08 |
 | 3. ダッシュボードとUX仕上げ | v1.0 | 2/2 | Complete | 2026-05-08 |
-| 4. KVデータ層移行 | v1.1 | 0/2 | Planned | - |
+| 4. KVデータ層移行 | v1.1 | 2/2 | Complete | 2026-05-09 |
 | 5. WeeklyHeatmap + リッチTooltip | v1.1 | 0/? | Not started | - |
 | 6. 管理画面 + チームフィルター | v1.1 | 0/? | Not started | - |
