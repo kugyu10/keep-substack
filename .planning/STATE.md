@@ -5,7 +5,7 @@ milestone_name: Dynamic Members + Weekly View
 status: planning
 stopped_at: ""
 last_updated: "2026-05-09T00:00:00.000Z"
-last_activity: 2026-05-09 -- ROADMAP.md created for v1.1 (Phases 4-6)
+last_activity: 2026-05-09 -- Phase 4 planning complete (2 plans: 04-01, 04-02)
 progress:
   total_phases: 3
   completed_phases: 0
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08 for v1.1 milestone)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 4 — KVデータ層移行
+**Current focus:** Phase 4 — KVデータ層移行（プランニング完了、実行待ち）
 
 ## Current Position
 
 Phase: 4 of 6 (KVデータ層移行)
-Plan: — (Ready to plan)
-Status: Ready to plan
-Last activity: 2026-05-09 — v1.1 ROADMAP.md作成完了。Phase 4から着手可能。
+Plan: 04-01 (Wave 1 — ready to execute)
+Status: Planned (2 plans ready)
+Last activity: 2026-05-09 — Phase 4 planning complete. 04-01-PLAN.md, 04-02-PLAN.md created.
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -79,4 +79,4 @@ None.
 Last session: 2026-05-09
 Stopped at: v1.1 ROADMAP.md作成完了。
 Resume file: None
-Next step: `/gsd-plan-phase 4` でPhase 4のプランニングを開始する
+Next step: `/gsd-execute-phase 4` でPhase 4の実行を開始する
