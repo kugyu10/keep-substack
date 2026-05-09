@@ -37,7 +37,10 @@ Full archive: `.planning/milestones/v1.0-ROADMAP.md`
   2. 移行スクリプトを実行すると、members.jsonの全メンバーがUpstash KVに登録される
   3. KVから取得したメンバーデータに name, substackId, teamId, addedAt が含まれる
   4. feedUrl は substackId から動的生成され、コードベースにfeedUrlのハードコードが存在しない
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 04-01-PLAN.md — KVデータ層基盤（依存インストール + types.ts更新 + redis.ts/kvMembers.ts新設）
+- [ ] 04-02-PLAN.md — アプリ切り替えとシードスクリプト（fetchFeed.ts/page.tsx更新 + seed-kv.ts新設）
 
 ### Phase 5: WeeklyHeatmap + リッチTooltip
 **Goal**: トップページが直近7日間 x 全メンバーのヒートマップに刷新され、記事ありセルにサムネイル付きTooltipが表示される
@@ -70,6 +73,6 @@ Full archive: `.planning/milestones/v1.0-ROADMAP.md`
 | 1. プロジェクト基盤とデータ層 | v1.0 | 2/2 | Complete | 2026-05-08 |
 | 2. カレンダーUI | v1.0 | 2/2 | Complete | 2026-05-08 |
 | 3. ダッシュボードとUX仕上げ | v1.0 | 2/2 | Complete | 2026-05-08 |
-| 4. KVデータ層移行 | v1.1 | 0/? | Not started | - |
+| 4. KVデータ層移行 | v1.1 | 0/2 | Not started | - |
 | 5. WeeklyHeatmap + リッチTooltip | v1.1 | 0/? | Not started | - |
 | 6. 管理画面 + チームフィルター | v1.1 | 0/? | Not started | - |
