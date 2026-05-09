@@ -28,7 +28,9 @@ async function fetchWithRetry(feedUrl: string): Promise<FeedItem[]> {
 // D-02: Promise.allSettled で全フィードを並列取得
 async function fetchAllFeeds(members: Member[]): Promise<MemberFeedResult[]> {
   const results = await Promise.allSettled(
-    members.map((member) => fetchWithRetry(member.feedUrl))
+    members.map((member) =>
+      fetchWithRetry(`https://${member.substackId}.substack.com/feed`)
+    )
   )
   return members.map((member, i) => ({
     member,
