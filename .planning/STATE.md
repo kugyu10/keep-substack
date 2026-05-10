@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Dynamic Members + Weekly View
-status: idle
+milestone: v1.2
+milestone_name: UX Polish + Member Edit
+status: planning
 stopped_at: ""
-last_updated: "2026-05-10T00:00:00.000Z"
-last_activity: 2026-05-10 -- v1.1 milestone complete. 次期v1.2計画中。
+last_updated: "2026-05-11T00:00:00.000Z"
+last_activity: 2026-05-11 -- Milestone v1.2 started
 progress:
-  total_phases: 3
+  total_phases: 0
   completed_phases: 0
-  total_plans: 2
-  completed_plans: 2
-  percent: 33
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -25,11 +25,12 @@ See: .planning/PROJECT.md (updated 2026-05-08 for v1.1 milestone)
 
 ## Current Position
 
-Milestone: v1.1 — SHIPPED 2026-05-10
-Status: All 6 phases complete. Awaiting v1.2 planning.
-Last activity: 2026-05-10 — v1.1 milestone archived. 次期v1.2の計画を開始する場合は /gsd-new-milestone を実行。
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-11 — Milestone v1.2 started
 
-Progress: [███░░░░░░░] 33%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 

@@ -1,6 +1,17 @@
 # Keep Substack
 
-## Current Milestone: v1.2（次期計画中）
+## Current Milestone: v1.2 UX Polish + Member Edit
+
+**Goal:** 管理画面の編集機能追加・Substackアイコン表示・各種UX改善で使い勝手と視認性を向上させる
+
+**Target features:**
+- 管理画面でメンバーを編集できる（addedAt・name・teamId等を直接更新）
+- channel.image.url を使ってトップ・メンバーカレンダーにSubstackアイコン表示
+- トップビューをレスポンシブ対応（スマホ: アイコンのみ / PC: アイコン+名前）
+- メンバー詳細の戻りリンクを「メンバー一覧」に変更し、自チームビュー（/?team=xxx）へ戻る
+- Tooltipの画像にも記事のhrefを貼ってクリック可能にする
+- Tooltip内の記事間にスペースを追加して視認性を改善
+- フッター追加（参加案内 → https://uojun.substack.com/p/5d4）
 
 ## What This Is
 
@@ -102,4 +113,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-10 — v1.1 milestone complete*
+*Last updated: 2026-05-11 — v1.2 milestone started*
