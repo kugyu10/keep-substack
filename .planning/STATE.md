@@ -7,9 +7,9 @@ stopped_at: ""
 last_updated: "2026-05-11T00:00:00.000Z"
 last_activity: 2026-05-11 -- Milestone v1.2 started
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
-  total_plans: 0
+  total_plans: 3
   completed_plans: 0
   percent: 0
 ---
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-05-08 for v1.1 milestone)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Phase 7 — UI小改善バッチ（Tooltip・ナビ・フッター）
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-11 — Milestone v1.2 started
+Status: Ready to plan Phase 7
+Last activity: 2026-05-11 — Milestone v1.2 roadmap created (3 phases)
 
 Progress: [░░░░░░░░░░] 0%
 

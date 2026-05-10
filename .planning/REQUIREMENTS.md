@@ -50,20 +50,20 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ADMIN-01 | — | Pending |
-| ICON-01 | — | Pending |
-| ICON-02 | — | Pending |
-| ICON-03 | — | Pending |
-| NAV-01 | — | Pending |
-| NAV-02 | — | Pending |
-| TOOLTIP-01 | — | Pending |
-| TOOLTIP-02 | — | Pending |
-| FOOTER-01 | — | Pending |
+| TOOLTIP-01 | Phase 7 | Pending |
+| TOOLTIP-02 | Phase 7 | Pending |
+| NAV-01 | Phase 7 | Pending |
+| NAV-02 | Phase 7 | Pending |
+| FOOTER-01 | Phase 7 | Pending |
+| ICON-01 | Phase 8 | Pending |
+| ICON-02 | Phase 8 | Pending |
+| ICON-03 | Phase 8 | Pending |
+| ADMIN-01 | Phase 9 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 9 total
-- Mapped to phases: 0
-- Unmapped: 9 ⚠️ (will be mapped in roadmap)
+- Mapped to phases: 9
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-11*
