@@ -47,8 +47,21 @@ async function fetchAllFeeds(members: Member[]): Promise<MemberFeedResult[]> {
 // export const revalidate はリテラルのみ有効なため unstable_cache でラップする
 const REVALIDATE_SECONDS = parseInt(process.env.REVALIDATE_SECONDS ?? '300') // D-05: デフォルト300秒
 
-export const fetchAllFeedsCached = unstable_cache(
-  async (members: Member[]) => fetchAllFeeds(members),
-  ['all-feeds'],
-  { revalidate: REVALIDATE_SECONDS, tags: ['feeds'] }
-)
+// 全メンバーを一括キャッシュすると contentEncoded を含む合計が 2MB を超えるため
+// メンバー単位でキャッシュして各エントリを小さく保つ
+async function fetchMemberFeedCached(member: Member): Promise<FeedItem[]> {
+  const cached = unstable_cache(
+    () => fetchWithRetry(`https://${member.substackId}.substack.com/feed`),
+    [`feed-${member.substackId}`],
+    { revalidate: REVALIDATE_SECONDS, tags: ['feeds'] }
+  )
+  return cached()
+}
+
+export async function fetchAllFeedsCached(members: Member[]): Promise<MemberFeedResult[]> {
+  const results = await Promise.allSettled(members.map(fetchMemberFeedCached))
+  return members.map((member, i) => ({
+    member,
+    items: results[i].status === 'fulfilled' ? results[i].value : [],
+  }))
+}
