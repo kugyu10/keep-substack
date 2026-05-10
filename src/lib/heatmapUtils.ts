@@ -1,4 +1,4 @@
-import { parseIsoDate } from './calendarUtils'
+import { isoToJSTDateKey } from './calendarUtils'
 import type { FeedItem, MemberFeedResult } from './types'
 
 export type HeatmapArticle = {
@@ -24,13 +24,13 @@ export function getIntensityClass(count: number): string {
 
 export function getRecentDays(): string[] {
   const days: string[] = []
-  const now = new Date()
+  // JST（UTC+9）の現在日時を基準にする
+  const nowJST = new Date(Date.now() + 9 * 60 * 60 * 1000)
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(now)
-    d.setDate(d.getDate() - i)
-    const year = d.getFullYear()
-    const month = String(d.getMonth() + 1).padStart(2, '0')
-    const day = String(d.getDate()).padStart(2, '0')
+    const d = new Date(nowJST.getTime() - i * 24 * 60 * 60 * 1000)
+    const year = d.getUTCFullYear()
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0')
+    const day = String(d.getUTCDate()).padStart(2, '0')
     days.push(`${year}-${month}-${day}`)
   }
   return days
@@ -42,9 +42,8 @@ export function buildHeatmapArticleMap(
   const map = new Map<string, HeatmapArticle[]>()
   for (const item of items) {
     if (!item.isoDate) continue
-    const parsed = parseIsoDate(item.isoDate)
-    if (!parsed) continue
-    const key = `${parsed.year}-${String(parsed.month).padStart(2, '0')}-${String(parsed.day).padStart(2, '0')}`
+    const key = isoToJSTDateKey(item.isoDate)
+    if (!key) continue
     const existing = map.get(key) ?? []
     existing.push({
       title: item.title,
@@ -59,10 +58,8 @@ export function buildHeatmapArticleMap(
 function countArticlesInDates(items: FeedItem[], dateSet: Set<string>): number {
   return items.filter((item) => {
     if (!item.isoDate) return false
-    const parsed = parseIsoDate(item.isoDate)
-    if (!parsed) return false
-    const key = `${parsed.year}-${String(parsed.month).padStart(2, '0')}-${String(parsed.day).padStart(2, '0')}`
-    return dateSet.has(key)
+    const key = isoToJSTDateKey(item.isoDate)
+    return key !== null && dateSet.has(key)
   }).length
 }
 

@@ -22,6 +22,20 @@ export function parseIsoDate(
 }
 
 /**
+ * UTC の isoDate 文字列を JST（UTC+9）の "YYYY-MM-DD" に変換する。
+ * RSS の isoDate は UTC のため、+9h して日付を求める。
+ */
+export function isoToJSTDateKey(isoDate: string): string | null {
+  const ms = Date.parse(isoDate)
+  if (isNaN(ms)) return null
+  const jst = new Date(ms + 9 * 60 * 60 * 1000)
+  const year = jst.getUTCFullYear()
+  const month = String(jst.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(jst.getUTCDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+/**
  * 指定した年月の日付グリッド（DayInfo[]）を返す。
  * 1日目に colStart（曜日オフセット）をセットする。
  */
@@ -49,9 +63,8 @@ export function buildArticleMap(
   const map: ArticleMap = new Map()
   for (const item of items) {
     if (!item.isoDate) continue
-    const parsed = parseIsoDate(item.isoDate)
-    if (!parsed) continue
-    const key = `${parsed.year}-${String(parsed.month).padStart(2, '0')}-${String(parsed.day).padStart(2, '0')}`
+    const key = isoToJSTDateKey(item.isoDate)
+    if (!key) continue
     const existing = map.get(key) ?? []
     existing.push({ title: item.title, link: item.link })
     map.set(key, existing)
