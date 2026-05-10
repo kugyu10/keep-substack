@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server'
 export function middleware(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
   const adminPassword = process.env.ADMIN_PASSWORD ?? ''
-  const encoded = Buffer.from(`:${adminPassword}`).toString('base64')
+  const encoded = btoa(`:${adminPassword}`)
 
   if (authHeader !== `Basic ${encoded}`) {
     return new NextResponse('Unauthorized', {
