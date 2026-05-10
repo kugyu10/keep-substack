@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Dynamic Members + Weekly View
-status: executing
+status: idle
 stopped_at: ""
 last_updated: "2026-05-10T00:00:00.000Z"
-last_activity: 2026-05-10 -- Phase 6 execution complete (2/2 plans done)
+last_activity: 2026-05-10 -- v1.1 milestone complete. 次期v1.2計画中。
 progress:
   total_phases: 3
   completed_phases: 0
@@ -25,10 +25,9 @@ See: .planning/PROJECT.md (updated 2026-05-08 for v1.1 milestone)
 
 ## Current Position
 
-Phase: 6 of 6 (管理画面 + チームフィルター) — COMPLETE (checkpoint:human-verify 待ち)
-Plan: 06-02 (Wave 2 — done)
-Status: Phase complete (2/2 plans) — devサーバーでの目視確認待ち
-Last activity: 2026-05-10 — Phase 6 execution complete. 管理画面・Basic認証・チームフィルター実装完了。
+Milestone: v1.1 — SHIPPED 2026-05-10
+Status: All 6 phases complete. Awaiting v1.2 planning.
+Last activity: 2026-05-10 — v1.1 milestone archived. 次期v1.2の計画を開始する場合は /gsd-new-milestone を実行。
 
 Progress: [███░░░░░░░] 33%
 

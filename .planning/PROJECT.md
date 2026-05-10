@@ -1,21 +1,10 @@
 # Keep Substack
 
-## Current Milestone: v1.1 Dynamic Members + Weekly View
-
-**Goal:** メンバー管理をVercel KV化し、ブラウザから追加・削除できる管理画面を実装。トップビューを50人規模対応の直近7日間ヒートマップに刷新する。
-
-**Target features:**
-- Vercel KV移行 — メンバーデータ（name, substack-id, added_at, team-id）をVercel KVで管理
-- 管理画面 `/admin` — Basic認証（ENV設定）、メンバー追加・削除UI
-- 直近7日間ヒートマップ — 直近7日 × 全メンバーのグリッド（左端列 = メンバー名）、ソート: ①7日間投稿量降順 ②added_at古い順
-- チームフィルター — team-idでヒートマップを絞り込むビュー
-- メンバー名クリック — `/member/{substack-id}` に遷移
-- リッチTooltip — 記事タイトル（20文字まで）＋サムネイル、クリックで記事へ遷移
-- ビジュアル・UX刷新 — 50人対応レイアウト、ナビゲーション改善
+## Current Milestone: v1.2（次期計画中）
 
 ## What This Is
 
-Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度をカレンダーUIで可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSSで構築し、Vercelにデプロイ済み。v1.0 MVP完成・公開中。
+Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度をヒートマップUIで可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSS + Upstash Redisで構築し、Vercelにデプロイ済み。v1.1でUpstash KV移行・管理画面・チームフィルター・直近7日間ヒートマップを実装。
 
 ## Core Value
 
@@ -37,13 +26,13 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - ✓ 認証なしの公開ページとして誰でもアクセスできる — v1.0
 - ✓ Vercelにデプロイして継続的に運用できる — v1.0
 
-### Active (v1.1)
+### Validated (v1.1)
 
-- [ ] メンバーデータをVercel KVで管理する（name, substack-id, added_at, team-id）— v1.1
-- [ ] ブラウザ上でメンバーを追加・削除できる管理画面（Basic認証）— v1.1
-- [ ] トップページを直近7日間ヒートマップ（50人対応）に刷新する — v1.1
-- [ ] team-idでヒートマップをフィルタリングできる — v1.1
-- [ ] ヒートマップのTooltipでサムネイル・タイトル表示、クリックで記事遷移 — v1.1
+- ✓ メンバーデータをUpstash Redisで管理する（name, substackId, addedAt, teamId）— v1.1
+- ✓ ブラウザ上でメンバーを追加・削除できる管理画面（Basic認証）— v1.1
+- ✓ トップページを直近7日間ヒートマップ（50人対応）に刷新する — v1.1
+- ✓ team-idでヒートマップをフィルタリングできる — v1.1
+- ✓ ヒートマップのTooltipでサムネイル・タイトル表示、クリックで記事遷移 — v1.1
 
 ### Active (Future)
 
@@ -67,8 +56,9 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - 初期段階で最大50フィード程度を想定
 - Substackの記事更新頻度は1日1回程度が多い
 - v1.0 MVP 公開済み: https://keep-substack.vercel.app/
-- コードベース: 472行 TypeScript/TSX（Next.js App Router + Tailwind CSS）
-- Tech Stack: Next.js 16.2.6, React 19.2.4, rss-parser 3.13.0, TypeScript 5, Tailwind CSS 4
+- コードベース: 約1,200行 TypeScript/TSX（Next.js App Router + Tailwind CSS）
+- Tech Stack: Next.js 16.2.6, React 19.2.4, rss-parser 3.13.0, @upstash/redis 1.38.0, TypeScript 5, Tailwind CSS 4
+- v1.1公開済み: https://keep-substack.vercel.app/
 
 ## Constraints
 
@@ -89,6 +79,10 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 | export const dynamic = 'force-static' | export const revalidate はリテラルのみ有効。動的な環境変数参照には使えない | ✓ Good — unstable_cache との組み合わせで解決 |
 | MiniCalendarをCalendarGridから独立 | KISS原則。月ナビ不要なミニ版に単一責任を持たせる | ✓ Good — シンプルなServer Componentとして実装 |
 | dynamicParams=false | 未知のsubstackIdを自動404に。セキュリティ対応 | ✓ Good — generateStaticParamsの外はすべて404 |
+| @upstash/redis採用 | @vercel/kvは2024年12月廃止。Redis互換で移行リスク低 | ✓ Good — v1.1で安定稼働 |
+| メンバー単位のunstable_cache | 全体一括キャッシュは2MB上限に抵触。個別キャッシュで回避 | ✓ Good — チームフィルターとも相性よし |
+| src/middleware.ts配置 | Next.js 16はappDirの親(src/)でmiddlewareを検索 | ✓ Good — Edge Runtimeも btoa()で対応 |
+| RSS isoDateをJST変換 | UTC isoDateを+9hしてから日付キー生成。サーバーTZ非依存 | ✓ Good — JST 07:00投稿が正しい日付でカウントされる |
 
 ## Evolution
 
@@ -108,4 +102,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-08 — v1.1 milestone started*
+*Last updated: 2026-05-10 — v1.1 milestone complete*
