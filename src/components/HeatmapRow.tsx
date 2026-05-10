@@ -13,6 +13,8 @@ type HeatmapRowProps = {
 export default function HeatmapRow({ member, articlesByDateEntries, dates }: HeatmapRowProps) {
   const articleMap = new Map(articlesByDateEntries)
 
+  const totalCount = dates.reduce((sum, date) => sum + (articleMap.get(date)?.length ?? 0), 0)
+
   return (
     <div className="flex items-center border-b border-gray-100 py-1">
       <Link
@@ -36,6 +38,9 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates }: Hea
             />
           )
         })}
+      </div>
+      <div className="w-10 shrink-0 text-xs text-right text-gray-500 font-semibold pr-1">
+        {totalCount > 0 ? totalCount : ''}
       </div>
     </div>
   )

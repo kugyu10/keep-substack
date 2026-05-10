@@ -22,6 +22,7 @@ export default function WeeklyHeatmapGrid({ results, dates }: WeeklyHeatmapGridP
             )
           })}
         </div>
+        <div className="w-10 shrink-0 text-xs text-right text-gray-400 pr-1">計</div>
       </div>
       {results.map(({ member, items }) => (
         <HeatmapRow
