@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import topLogo from '@/data/top_logo.jpg'
+import topLogo from '@/data/top_logo.png'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://keep-substack.vercel.app'),

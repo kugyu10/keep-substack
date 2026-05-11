@@ -2,7 +2,7 @@ import { getMembers } from '@/lib/kvMembers'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { getRecentDays, sortByWeeklyCount } from '@/lib/heatmapUtils'
 import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'
-import topLogo from '@/data/top_logo.jpg'
+import topLogo from '@/data/top_logo.png'
 
 type Props = {
   searchParams: Promise<{ team?: string }>
@@ -48,7 +48,7 @@ export default async function Home({ searchParams }: Props) {
       )}
 
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={topLogo.src} alt="Keep Substack" className="w-full h-auto object-contain mb-4 rounded" />
+      <img src={topLogo.src} alt="Keep Substack" className="w-full h-auto object-contain mb-8 rounded" />
 
       <WeeklyHeatmapGrid results={sorted} dates={dates} />
     </main>
