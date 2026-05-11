@@ -8,7 +8,7 @@ export async function getMembers(): Promise<Member[]> {
   if (!members) return []
   return members.map((m) => ({
     ...m,
-    teamName: m.teamName ?? m.teamId ?? '',
+    teamNames: m.teamNames ?? (m.teamName ? [m.teamName] : []),
   }))
 }
 
