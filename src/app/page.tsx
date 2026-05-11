@@ -12,8 +12,8 @@ export default async function Home({ searchParams }: Props) {
   const { team } = await searchParams
   const allMembers = await getMembers()
 
-  const teams = [...new Set(allMembers.map((m) => m.teamName).filter(Boolean))]
-  const filteredMembers = team ? allMembers.filter((m) => m.teamName === team) : allMembers
+  const teams = [...new Set(allMembers.flatMap((m) => m.teamNames).filter(Boolean))]
+  const filteredMembers = team ? allMembers.filter((m) => m.teamNames.includes(team)) : allMembers
 
   const results = await fetchAllFeedsCached(filteredMembers)
   const dates = getRecentDays()
