@@ -84,7 +84,10 @@ Plans:
 3. 保存後にメンバー一覧が最新データで更新される
 4. 無効な値（空のname等）でバリデーションエラーが表示される
 
-**Plans:** — (not started)
+**Plans:** 1 plan
+
+Plans:
+- [ ] 09-01-PLAN.md — teamId→teamNameリネーム + updateMember実装 + インライン編集UI（ADMIN-01）
 
 ---
 
