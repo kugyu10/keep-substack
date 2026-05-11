@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Data Persistence + Multi-Team
-status: in-progress
-stopped_at: ""
-last_updated: "2026-05-11T09:00:00.000Z"
-last_activity: 2026-05-11 -- Phase 11 Plan 01 completed
+status: completed
+stopped_at: Phase 12 context gathered
+last_updated: "2026-05-11T23:03:40.794Z"
+last_activity: 2026-05-11 — Phase 11 Plan 01 complete
 progress:
-  total_phases: 2
-  completed_phases: 1
+  total_phases: 3
+  completed_phases: 2
   total_plans: 2
   completed_plans: 2
   percent: 100
@@ -35,6 +35,7 @@ Progress: [██████████] 100%
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 9 (v1.0: 6プラン + v1.1: 6プラン + v1.2: 3プラン)
 
 **By Milestone:**
@@ -46,6 +47,10 @@ Progress: [██████████] 100%
 | v1.2 UX Polish | 3 | 3 | 1日 |
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 12 added: chameleon-hidden-team — シークレットチーム "chameleon" 定義（All ビュー・タブから非表示）
 
 ### Key Architecture Decisions (v1.3 / Phase 11)
 
@@ -81,7 +86,9 @@ Progress: [██████████] 100%
 ### Pending Todos
 
 1件あり:
+
 - Supabase移行（将来）
+
 （解決済み: 過去記事の消失問題 → Phase 10、多対多チーム所属 → Phase 11）
 
 ### Blockers/Concerns
@@ -90,7 +97,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-11
-Stopped at: Phase 11 Plan 01 completed（human-verify approved）
-Resume file: None
+Last session: 2026-05-11T23:03:40.783Z
+Stopped at: Phase 12 context gathered
+Resume file: .planning/phases/12-chameleon-hidden-team/12-CONTEXT.md
 Next step: v1.3 マイルストーン完了。次のマイルストーン計画へ。
