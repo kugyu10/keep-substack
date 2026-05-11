@@ -33,7 +33,7 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
         ) : (
           <span className="w-10 h-10 rounded-full shrink-0 bg-gray-200 inline-block" aria-hidden="true" />
         )}
-        <span className="hidden sm:block text-xs font-semibold leading-snug line-clamp-2">
+        <span className="hidden sm:block text-xs font-semibold leading-snug line-clamp-2 min-w-0">
           {member.name}
         </span>
       </Link>
