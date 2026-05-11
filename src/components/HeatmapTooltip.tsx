@@ -37,7 +37,7 @@ export default function HeatmapTooltip({ articles, colorClass, imageUrl, childre
       className="relative"
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={(e) => {
-        if (cellRef.current && !cellRef.current.contains(e.relatedTarget as Node)) {
+        if (cellRef.current && !(e.relatedTarget instanceof Node && cellRef.current.contains(e.relatedTarget))) {
           setOpen(false)
         }
       }}
