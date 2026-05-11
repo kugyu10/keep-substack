@@ -66,7 +66,9 @@ Plans:
   1. KVに保存されるメンバーデータが `teamNames: string[]` 形式で複数チームを持てる（既存 `teamName: string` からの後方互換移行を含む）
   2. 管理画面のメンバー編集フォームでチームをカンマ区切りテキストで入力・保存でき、複数チームが正しく反映される
   3. チームタブで「チームA」を選択したとき、チームAに所属するメンバー（単一・複数所属問わず）が全員表示される
-**Plans:** — (not started)
+**Plans:** 1 plan
+Plans:
+- [ ] 11-01-PLAN.md — types/KV後方互換/page/AdminUI/actions/memberページ 全7ファイル変更
 **UI hint**: yes
 
 ## Progress
@@ -83,4 +85,4 @@ Plans:
 | 8. Substackアイコン + レスポンシブ対応 | v1.2 | 1/1 | Complete | 2026-05-11 |
 | 9. 管理画面メンバー編集 | v1.2 | 1/1 | Complete | 2026-05-11 |
 | 10. Cron + KV記事永続化 | v1.3 | 0/1 | In Progress | - |
-| 11. チーム多対多所属 | v1.3 | 0/? | Pending | - |
+| 11. チーム多対多所属 | v1.3 | 0/1 | Pending | - |
