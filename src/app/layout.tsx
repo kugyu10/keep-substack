@@ -16,14 +16,17 @@ export default function RootLayout({
       <body>
         {children}
         <footer className="py-4 text-center">
-          <a
-            href="https://uojun.substack.com/p/5d4"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-gray-400 hover:text-gray-600"
-          >
-            コミュニティに参加する
-          </a>
+          <span className="text-xs text-gray-400">
+            このSubstack継続可視化ツールに参加したい方は{' '}
+            <a
+              href="https://uojun.substack.com/p/5d4"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-gray-600 underline"
+            >
+              コチラ
+            </a>
+          </span>
         </footer>
       </body>
     </html>
