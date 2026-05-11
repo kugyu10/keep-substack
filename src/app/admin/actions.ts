@@ -11,14 +11,17 @@ export async function addMemberAction(
 ): Promise<string | null> {
   const name = formData.get('name') as string
   const substackId = formData.get('substackId') as string
-  const teamName = formData.get('teamName') as string
+  const teamNamesRaw = formData.get('teamNames') as string
+  const teamNames = teamNamesRaw
+    ? teamNamesRaw.split(',').map((s) => s.trim()).filter(Boolean)
+    : []
 
   if (!name || !substackId) {
     return 'name と substackId は必須です'
   }
 
   try {
-    await addMember({ name, substackId, teamName: teamName ?? '' })
+    await addMember({ name, substackId, teamNames })
     // D-03: 初回フィード取得 & KV保存（失敗しても登録自体は成功扱い）
     // fetchWithRetry は失敗時に { items: [] } を返す（例外を投げない）ため
     // saveArticles に空配列が渡り、KVは空のままになる（次のCronで補填）
@@ -43,7 +46,10 @@ export async function updateMemberAction(
   formData: FormData
 ): Promise<string | null> {
   const name = formData.get('name') as string
-  const teamName = formData.get('teamName') as string
+  const teamNamesRaw = formData.get('teamNames') as string
+  const teamNames = teamNamesRaw
+    ? teamNamesRaw.split(',').map((s) => s.trim()).filter(Boolean)
+    : []
   const addedAt = formData.get('addedAt') as string
 
   if (!name) return 'name は必須です'
@@ -52,7 +58,7 @@ export async function updateMemberAction(
   }
 
   try {
-    await updateMember(substackId, { name, teamName: teamName ?? '', addedAt })
+    await updateMember(substackId, { name, teamNames, addedAt })
     revalidatePath('/admin')
     return null
   } catch (e) {
