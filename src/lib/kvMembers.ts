@@ -29,3 +29,14 @@ export async function deleteMember(substackId: string): Promise<void> {
   const updated = members.filter((m) => m.substackId !== substackId)
   await redis.set('members', updated)
 }
+
+export async function updateMember(
+  substackId: string,
+  updates: Partial<Omit<Member, 'substackId'>>
+): Promise<void> {
+  const members = await getMembers()
+  const idx = members.findIndex((m) => m.substackId === substackId)
+  if (idx === -1) throw new Error(`メンバーが見つかりません: ${substackId}`)
+  members[idx] = { ...members[idx], ...updates }
+  await redis.set('members', members)
+}
