@@ -33,6 +33,7 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
         ) : (
           <span className="w-10 h-10 rounded-full shrink-0 bg-gray-200 inline-block" aria-hidden="true" />
         )}
+        {/* Tailwind v4でline-clamp-2がflex内で効かないためinline styleで対応 */}
         <div
           className="hidden sm:block text-xs font-semibold leading-snug min-w-0"
           style={{ overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2 }}
