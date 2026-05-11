@@ -86,3 +86,22 @@ Plans:
 | 9. 管理画面メンバー編集 | v1.2 | 1/1 | Complete | 2026-05-11 |
 | 10. Cron + KV記事永続化 | v1.3 | 0/1 | In Progress | - |
 | 11. チーム多対多所属 | v1.3 | 0/1 | Pending | - |
+
+### Phase 12: chameleon-hidden-team
+
+**Goal:** シークレットチーム "chameleon" を定義し、所属メンバーを All ビューおよびチームタブから非表示にする
+**Depends on:** Phase 11
+**Plans:** 0 plans
+**UI hint**: yes
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 12 to break down)
+
+### Phase 12.1: rss-isr-hybrid (INSERTED)
+
+**Goal:** RSS ISR復活 + KVのハイブリッドアーキテクチャ — 投稿後5分以内に反映されるよう、ISR（revalidate=300）でRSS直接フェッチとKV過去記事をマージして表示する
+**Depends on:** Phase 11
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 12.1 to break down)
