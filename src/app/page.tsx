@@ -48,7 +48,7 @@ export default async function Home({ searchParams }: Props) {
       )}
 
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={topLogo.src} alt="Keep Substack" className="w-full mb-4 rounded" />
+      <img src={topLogo.src} alt="Keep Substack" className="w-full h-auto object-contain mb-4 rounded" />
 
       <WeeklyHeatmapGrid results={sorted} dates={dates} />
     </main>
