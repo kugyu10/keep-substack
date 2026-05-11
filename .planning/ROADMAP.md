@@ -80,7 +80,7 @@ Plans:
 
 **Success Criteria:**
 1. 管理画面の各メンバー行に編集UIが表示される
-2. name, substackId, addedAt, teamId を変更して保存できる
+2. name, addedAt, teamName を変更して保存できる（substackIdは変更禁止・読み取り専用）
 3. 保存後にメンバー一覧が最新データで更新される
 4. 無効な値（空のname等）でバリデーションエラーが表示される
 
