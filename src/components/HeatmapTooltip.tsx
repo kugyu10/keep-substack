@@ -73,6 +73,7 @@ export default function HeatmapTooltip({ articles, colorClass, imageUrl, childre
                         src={article.thumbnail ?? imageUrl!}
                         alt=""
                         className="w-full rounded mb-1 object-cover max-h-24"
+                        style={{ maskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)' }}
                       />
                     )}
                     <span className="text-xs text-blue-600 hover:underline break-words block">
