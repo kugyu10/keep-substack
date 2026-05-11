@@ -25,12 +25,26 @@ export default async function MemberPage({
 
   return (
     <main className="max-w-[600px] mx-auto p-6 pb-64">
-      <Link
-        href={memberResult.member.teamName ? `/?team=${memberResult.member.teamName}` : '/'}
-        className="text-sm text-gray-500 hover:text-gray-800 mb-4 inline-block"
-      >
-        ← メンバー一覧
-      </Link>
+      {memberResult.member.teamNames.length > 0 ? (
+        <div className="flex gap-3 mb-4">
+          {memberResult.member.teamNames.map((t) => (
+            <Link
+              key={t}
+              href={`/?team=${encodeURIComponent(t)}`}
+              className="text-sm text-gray-500 hover:text-gray-800 inline-block"
+            >
+              ← {t}
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <Link
+          href="/"
+          className="text-sm text-gray-500 hover:text-gray-800 mb-4 inline-block"
+        >
+          ← メンバー一覧
+        </Link>
+      )}
       <CalendarGrid
         memberName={memberResult.member.name}
         articleMap={articleMapEntries}
