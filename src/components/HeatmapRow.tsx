@@ -53,6 +53,7 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
               key={date}
               articles={articles}
               colorClass={getIntensityClass(count)}
+              imageUrl={imageUrl}
             />
           )
         })}

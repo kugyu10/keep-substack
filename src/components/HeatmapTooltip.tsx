@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 type HeatmapTooltipProps = {
   articles: { title?: string; link?: string; thumbnail?: string }[]
   colorClass: string
+  imageUrl?: string
   children?: ReactNode
 }
 
@@ -15,7 +16,7 @@ function withUtm(url: string): string {
   return `${url}${sep}utm_source=keep-substack&utm_medium=referral`
 }
 
-export default function HeatmapTooltip({ articles, colorClass, children }: HeatmapTooltipProps) {
+export default function HeatmapTooltip({ articles, colorClass, imageUrl, children }: HeatmapTooltipProps) {
   const [open, setOpen] = useState(false)
   const cellRef = useRef<HTMLDivElement>(null)
 
@@ -67,9 +68,9 @@ export default function HeatmapTooltip({ articles, colorClass, children }: Heatm
                     rel="noopener noreferrer"
                     className="block"
                   >
-                    {article.thumbnail && (
+                    {(article.thumbnail || imageUrl) && (
                       <img
-                        src={article.thumbnail}
+                        src={article.thumbnail ?? imageUrl!}
                         alt=""
                         className="w-full rounded mb-1 object-cover max-h-24"
                       />
