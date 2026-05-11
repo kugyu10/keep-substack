@@ -91,11 +91,11 @@ Plans:
 
 **Goal:** シークレットチーム "chameleon" を定義し、所属メンバーを All ビューおよびチームタブから非表示にする
 **Depends on:** Phase 11
-**Plans:** 0 plans
+**Plans:** 1 plan
 **UI hint**: yes
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 12 to break down)
+- [ ] 12-01-PLAN.md — HIDDEN_TEAM 定数追加・teams フィルター・All ビュー filteredMembers フィルター
 
 ### Phase 12.1: rss-isr-hybrid (INSERTED)
 
