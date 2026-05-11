@@ -37,7 +37,7 @@ export default function AdminMemberList({ members }: Props) {
           <tr className="bg-gray-700 text-left">
             <th className="border border-gray-600 px-3 py-2">名前</th>
             <th className="border border-gray-600 px-3 py-2">substackId</th>
-            <th className="border border-gray-600 px-3 py-2">teamName</th>
+            <th className="border border-gray-600 px-3 py-2">チーム</th>
             <th className="border border-gray-600 px-3 py-2">addedAt</th>
             <th className="border border-gray-600 px-3 py-2"></th>
           </tr>
@@ -51,7 +51,7 @@ export default function AdminMemberList({ members }: Props) {
                 </td>
                 <td className="border border-gray-600 px-3 py-2 text-gray-400">{m.substackId}</td>
                 <td className="border border-gray-600 px-3 py-2">
-                  <input defaultValue={m.teamName} name="teamName" className="bg-gray-700 border border-gray-500 rounded px-1 w-full text-sm text-white" />
+                  <input defaultValue={m.teamNames.join(', ')} name="teamNames" className="bg-gray-700 border border-gray-500 rounded px-1 w-full text-sm text-white" />
                 </td>
                 <td className="border border-gray-600 px-3 py-2">
                   <input defaultValue={m.addedAt} name="addedAt" className="bg-gray-700 border border-gray-500 rounded px-1 w-56 text-sm font-mono text-white" />
@@ -76,7 +76,7 @@ export default function AdminMemberList({ members }: Props) {
               <tr key={m.substackId} className="bg-black hover:bg-gray-800">
                 <td className="border border-gray-700 px-3 py-2">{m.name}</td>
                 <td className="border border-gray-700 px-3 py-2">{m.substackId}</td>
-                <td className="border border-gray-700 px-3 py-2">{m.teamName}</td>
+                <td className="border border-gray-700 px-3 py-2">{m.teamNames.join(', ')}</td>
                 <td className="border border-gray-700 px-3 py-2 text-xs text-gray-400">
                   {new Date(m.addedAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
                 </td>
