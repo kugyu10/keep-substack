@@ -45,7 +45,7 @@ export default function AdminMemberList({ members }: Props) {
         <tbody>
           {members.map((m) =>
             editingId === m.substackId ? (
-              <tr key={m.substackId} className="hover:bg-gray-200">
+              <tr key={m.substackId} className="bg-blue-50">
                 <td className="border px-3 py-2">
                   <input defaultValue={m.name} name="name" className="border rounded px-1 w-full text-sm" />
                 </td>
@@ -73,7 +73,7 @@ export default function AdminMemberList({ members }: Props) {
                 </td>
               </tr>
             ) : (
-              <tr key={m.substackId} className="hover:bg-gray-200">
+              <tr key={m.substackId} className="odd:bg-white even:bg-gray-100 hover:bg-gray-200">
                 <td className="border px-3 py-2">{m.name}</td>
                 <td className="border px-3 py-2">{m.substackId}</td>
                 <td className="border px-3 py-2">{m.teamName}</td>
