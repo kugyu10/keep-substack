@@ -20,4 +20,5 @@ export type Member = {
 export type MemberFeedResult = {
   member: Member
   items: FeedItem[]
+  imageUrl?: string  // channel.image.url（取得失敗時 undefined）
 }
