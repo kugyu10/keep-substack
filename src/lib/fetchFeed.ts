@@ -1,7 +1,7 @@
 import Parser from 'rss-parser'
-import { unstable_cache } from 'next/cache'
 import type { FeedItem, Member, MemberFeedResult } from './types'
 import { extractThumbnail } from './heatmapUtils'
+import { getArticles } from './kvArticles'
 
 // D-03: タイムアウト5秒（rss-parserの組み込みtimeoutオプション）
 const parser = new Parser({
@@ -26,7 +26,7 @@ function toFeedItems(rawItems: RawItem[]): FeedItem[] {
 }
 
 // D-01: フィード取得失敗時は1秒待ってリトライ、それでもダメなら空配列を返す
-async function fetchWithRetry(url: string): Promise<FeedResult> {
+export async function fetchWithRetry(url: string): Promise<FeedResult> {
   try {
     const feed = await parser.parseURL(url)
     return {
@@ -47,23 +47,12 @@ async function fetchWithRetry(url: string): Promise<FeedResult> {
   }
 }
 
-// D-06: REVALIDATE_SECONDS 環境変数でrevalidateを管理（unstable_cacheを使用）
-const REVALIDATE_SECONDS = parseInt(process.env.REVALIDATE_SECONDS ?? '300')
-
-// メンバー単位でキャッシュ（全体一括は2MB上限に抵触するため）
-async function fetchMemberFeedCached(member: Member): Promise<FeedResult> {
-  const cached = unstable_cache(
-    () => fetchWithRetry(`https://${member.substackId}.substack.com/feed`),
-    [`feed-${member.substackId}`],
-    { revalidate: REVALIDATE_SECONDS, tags: ['feeds'] }
-  )
-  return cached()
-}
-
 export async function fetchAllFeedsCached(members: Member[]): Promise<MemberFeedResult[]> {
-  const results = await Promise.allSettled(members.map(fetchMemberFeedCached))
+  const results = await Promise.allSettled(
+    members.map((m) => getArticles(m.substackId))
+  )
   return members.map((member, i) => {
-    const value = results[i].status === 'fulfilled' ? results[i].value : { items: [] }
-    return { member, ...value }
+    const data = results[i].status === 'fulfilled' ? results[i].value : { items: [] }
+    return { member, items: data.items, imageUrl: data.imageUrl }
   })
 }
