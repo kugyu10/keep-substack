@@ -4,14 +4,14 @@ milestone: v1.2
 milestone_name: UX Polish + Member Edit
 status: in_progress
 stopped_at: ""
-last_updated: "2026-05-11T00:30:00.000Z"
-last_activity: 2026-05-11 -- Phase 8 Plan 01 (08-01) completed
+last_updated: "2026-05-11T00:45:00.000Z"
+last_activity: 2026-05-11 -- Phase 9 Plan 01 (09-01) completed
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 3
-  completed_plans: 2
-  percent: 67
+  completed_plans: 3
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-05-08 for v1.1 milestone)
 
 ## Current Position
 
-Phase: Phase 8 — Substackアイコン + レスポンシブ対応
-Plan: 08-01-PLAN.md 完了
-Status: Phase 8 完了
-Last activity: 2026-05-11 — Phase 8 Plan 01 (08-01) completed: Substackアイコン表示+レスポンシブ対応
+Phase: Phase 9 — 管理画面メンバー編集
+Plan: 09-01-PLAN.md 完了
+Status: Phase 9 完了 / Milestone v1.2 全フェーズ完了
+Last activity: 2026-05-11 — Phase 9 Plan 01 (09-01) completed: インライン編集UI + teamId→teamNameリネーム + KV後方互換
 
-Progress: [███████░░░] 67%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -54,6 +54,9 @@ Progress: [███████░░░] 67%
 - HeatmapTooltipのタイトル<a>を<span>に変更し親<a>でリンク構造一本化（ネストaタグ回避）
 - teamIdが空の場合は'/'にフォールバック（三項演算子のみ、追加フェッチ不要）
 - フッターをlayout.tsxのbody直下に配置し全ページ自動適用
+- teamId→teamName リネーム（全7ファイル）+ getMembers後方互換フォールバック（teamName ?? teamId ?? ''）
+- table行インライン編集はform-in-table問題回避のため button onClick + closest('tr') + FormData手動構築パターンを採用
+- 非制御コンポーネント（defaultValue）でインライン編集を実装（KISS原則）
 - <img>タグを使用し next/image は不採用（next.config.ts 変更不要、KISSに準拠）
 - HeatmapRow は Server Component のままとし、条件レンダリングで imageUrl フォールバックを実装（onError 不使用）
 - imageUrl が undefined の場合は同サイズのグレー円 span でフォールバック（レイアウト崩れ防止）
@@ -88,6 +91,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-05-11
-Stopped at: Completed 08-01-PLAN.md
+Stopped at: Completed 09-01-PLAN.md
 Resume file: None
-Next step: Phase 9 へ進む（v1.2 最終フェーズ）
+Next step: Milestone v1.2 全フェーズ完了
