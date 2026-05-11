@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Data Persistence + Multi-Team
-status: completed
-stopped_at: Phase 12 context gathered
-last_updated: "2026-05-11T23:03:40.794Z"
-last_activity: 2026-05-11 — Phase 11 Plan 01 complete
+status: in_progress
+stopped_at: Phase 12 Plan 01 checkpoint — awaiting human verification
+last_updated: "2026-05-12T00:00:00.000Z"
+last_activity: 2026-05-12 — Phase 12 Plan 01 tasks complete (checkpoint)
 progress:
-  total_phases: 3
-  completed_phases: 2
-  total_plans: 2
-  completed_plans: 2
-  percent: 100
+  total_phases: 4
+  completed_phases: 3
+  total_plans: 4
+  completed_plans: 3
+  percent: 75
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-05-11 for v1.3 milestone)
 
 ## Current Position
 
-Phase: 11-multi-team-membership
-Plan: 01 (completed)
-Status: Phase 11 Plan 01 complete — チーム多対多所属（teamNames: string[]）実装済み
-Last activity: 2026-05-11 — Phase 11 Plan 01 complete
+Phase: 12-chameleon-hidden-team
+Plan: 01 (checkpoint — awaiting human verification)
+Status: Phase 12 Plan 01 tasks complete — chameleon 非表示ロジック実装済み、ブラウザ確認待ち
+Last activity: 2026-05-12 — Phase 12 Plan 01 tasks complete
 
-Progress: [██████████] 100%
+Progress: [███████░░░] 75%
 
 ## Performance Metrics
 
@@ -51,6 +51,13 @@ Progress: [██████████] 100%
 ### Roadmap Evolution
 
 - Phase 12 added: chameleon-hidden-team — シークレットチーム "chameleon" 定義（All ビュー・タブから非表示）
+
+### Key Architecture Decisions (v1.3 / Phase 12)
+
+- HIDDEN_TEAM = 'chameleon' 定数を src/lib/types.ts に export 定数として定義（KISS/YAGNI）
+- teams フィルタ: .filter(t => t !== HIDDEN_TEAM) で chameleon タブ非表示
+- filteredMembers: All ビュー時のみ !m.teamNames.includes(HIDDEN_TEAM) で除外（D-01）
+- /?team=chameleon 直打ち許可・管理画面は変更なし（D-02, D-03）
 
 ### Key Architecture Decisions (v1.3 / Phase 11)
 
@@ -97,7 +104,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-11T23:03:40.783Z
-Stopped at: Phase 12 context gathered
-Resume file: .planning/phases/12-chameleon-hidden-team/12-CONTEXT.md
-Next step: v1.3 マイルストーン完了。次のマイルストーン計画へ。
+Last session: 2026-05-12T00:00:00.000Z
+Stopped at: Phase 12 Plan 01 checkpoint — ブラウザ確認待ち
+Resume file: .planning/phases/12-chameleon-hidden-team/12-01-SUMMARY.md
+Next step: ブラウザ確認（D-01, D-02, D-03）後、Phase 12 Plan 01 完了とする。
