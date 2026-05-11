@@ -34,7 +34,7 @@ export default function AdminMemberList({ members }: Props) {
     <div className="overflow-x-auto">
       <table className="w-full text-sm border-collapse">
         <thead>
-          <tr className="bg-gray-100 text-left">
+          <tr className="bg-gray-300 text-left">
             <th className="border px-3 py-2">名前</th>
             <th className="border px-3 py-2">substackId</th>
             <th className="border px-3 py-2">teamName</th>
@@ -54,7 +54,7 @@ export default function AdminMemberList({ members }: Props) {
                   <input defaultValue={m.teamName} name="teamName" className="border rounded px-1 w-full text-sm" />
                 </td>
                 <td className="border px-3 py-2">
-                  <input defaultValue={m.addedAt} name="addedAt" className="border rounded px-1 w-full text-sm font-mono text-xs" />
+                  <input defaultValue={m.addedAt} name="addedAt" className="border rounded px-1 w-56 text-sm font-mono text-xs" />
                 </td>
                 <td className="border px-3 py-2">
                   <button
