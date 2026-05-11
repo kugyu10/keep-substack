@@ -26,12 +26,12 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
           <img
             src={imageUrl}
             alt=""
-            width={20}
-            height={20}
-            className="w-5 h-5 rounded-full shrink-0 object-cover"
+            width={40}
+            height={40}
+            className="w-10 h-10 rounded-full shrink-0 object-cover"
           />
         ) : (
-          <span className="w-5 h-5 rounded-full shrink-0 bg-gray-200 inline-block" aria-hidden="true" />
+          <span className="w-10 h-10 rounded-full shrink-0 bg-gray-200 inline-block" aria-hidden="true" />
         )}
         <span className="hidden sm:block text-xs font-semibold leading-snug line-clamp-2">
           {member.name}
