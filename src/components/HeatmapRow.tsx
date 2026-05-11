@@ -20,7 +20,7 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
     <div className="flex items-center border-b border-gray-100 py-1">
       <Link
         href={`/member/${member.substackId}`}
-        className="w-12 sm:w-52 shrink-0 pr-2 hover:underline flex items-center gap-1.5"
+        className="w-12 sm:w-52 shrink-0 pr-2 hover:underline flex items-center gap-1.5 overflow-hidden"
       >
         {imageUrl ? (
           <img
@@ -33,9 +33,9 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
         ) : (
           <span className="w-10 h-10 rounded-full shrink-0 bg-gray-200 inline-block" aria-hidden="true" />
         )}
-        <span className="hidden sm:block text-xs font-semibold leading-snug line-clamp-2 min-w-0">
+        <div className="hidden sm:block text-xs font-semibold leading-snug line-clamp-2 min-w-0">
           {member.name}
-        </span>
+        </div>
       </Link>
       <div className="grid grid-cols-7 gap-1 flex-1">
         {dates.map((date) => {
