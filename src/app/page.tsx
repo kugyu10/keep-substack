@@ -1,6 +1,7 @@
 import { getMembers } from '@/lib/kvMembers'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { getRecentDays, sortByWeeklyCount } from '@/lib/heatmapUtils'
+import { HIDDEN_TEAM } from '@/lib/types'
 import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'
 import topLogo from '@/data/top_logo.png'
 
@@ -12,8 +13,12 @@ export default async function Home({ searchParams }: Props) {
   const { team } = await searchParams
   const allMembers = await getMembers()
 
-  const teams = [...new Set(allMembers.flatMap((m) => m.teamNames).filter(Boolean))]
-  const filteredMembers = team ? allMembers.filter((m) => m.teamNames.includes(team)) : allMembers
+  const teams = [...new Set(allMembers.flatMap((m) => m.teamNames).filter(Boolean))].filter(
+    (t) => t !== HIDDEN_TEAM
+  )
+  const filteredMembers = team
+    ? allMembers.filter((m) => m.teamNames.includes(team))
+    : allMembers.filter((m) => !m.teamNames.includes(HIDDEN_TEAM))
 
   const results = await fetchAllFeedsCached(filteredMembers)
   const dates = getRecentDays()
