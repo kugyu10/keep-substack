@@ -34,6 +34,7 @@ export default async function MemberPage({
       <CalendarGrid
         memberName={memberResult.member.name}
         articleMap={articleMapEntries}
+        imageUrl={memberResult.imageUrl}
       />
     </main>
   )

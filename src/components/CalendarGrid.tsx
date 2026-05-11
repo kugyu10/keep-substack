@@ -9,11 +9,12 @@ import HeatmapTooltip from '@/components/HeatmapTooltip'
 type Props = {
   memberName: string
   articleMap: [string, HeatmapArticle[]][]
+  imageUrl?: string
 }
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土']
 
-export default function CalendarGrid({ memberName, articleMap }: Props) {
+export default function CalendarGrid({ memberName, articleMap, imageUrl }: Props) {
   const now = new Date()
   const [year, setYear] = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth() + 1)
@@ -41,7 +42,20 @@ export default function CalendarGrid({ memberName, articleMap }: Props) {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-2">{memberName}</h2>
+      <div className="flex items-center gap-2 mb-2">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt=""
+            width={32}
+            height={32}
+            className="w-8 h-8 rounded-full object-cover shrink-0"
+          />
+        ) : (
+          <span className="w-8 h-8 rounded-full bg-gray-200 inline-block shrink-0" aria-hidden="true" />
+        )}
+        <h2 className="text-lg font-semibold">{memberName}</h2>
+      </div>
 
       <div className="flex items-center justify-between mb-3">
         <button
