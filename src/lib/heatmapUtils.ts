@@ -48,7 +48,7 @@ export function buildHeatmapArticleMap(
     existing.push({
       title: item.title,
       link: item.link,
-      thumbnail: extractThumbnail(item.contentEncoded),
+      thumbnail: item.thumbnail,
     })
     map.set(key, existing)
   }
