@@ -4,14 +4,14 @@ milestone: v1.3
 milestone_name: Data Persistence + Multi-Team
 status: in-progress
 stopped_at: ""
-last_updated: "2026-05-11T08:30:00.000Z"
-last_activity: 2026-05-11 -- Phase 10 Plan 01 completed
+last_updated: "2026-05-11T09:00:00.000Z"
+last_activity: 2026-05-11 -- Phase 11 Plan 01 completed
 progress:
   total_phases: 2
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
-  percent: 50
+  completed_plans: 2
+  percent: 100
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-11 for v1.3 milestone)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 10 — 記事永続化（Cron+KV）
+**Current focus:** Phase 11 — チーム多対多所属（完了）
 
 ## Current Position
 
-Phase: 10-cron-kv-persistence
+Phase: 11-multi-team-membership
 Plan: 01 (completed)
-Status: Phase 10 Plan 01 complete — Cron+KV記事永続化実装済み
-Last activity: 2026-05-11 — Phase 10 Plan 01 complete
+Status: Phase 11 Plan 01 complete — チーム多対多所属（teamNames: string[]）実装済み
+Last activity: 2026-05-11 — Phase 11 Plan 01 complete
 
-Progress: [█████░░░░░] 50%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -46,6 +46,14 @@ Progress: [█████░░░░░] 50%
 | v1.2 UX Polish | 3 | 3 | 1日 |
 
 ## Accumulated Context
+
+### Key Architecture Decisions (v1.3 / Phase 11)
+
+- Member.teamName: string → teamNames: string[] に型変更（Phase 11 D-01）
+- KV後方互換フォールバック: m.teamNames ?? (m.teamName ? [m.teamName] : [])（読み込み時変換、DBマイグレーション不要）
+- teams生成: flatMap + Set 重複除去 / フィルタリング: includes（多対多対応）
+- 管理画面はカンマ区切りテキスト入力 → Server Actions で split(',').map().filter() 変換
+- 複数チーム戻りリンク: flex gap-3 横並び + encodeURIComponent
 
 ### Key Architecture Decisions (v1.3 / Phase 10)
 
@@ -72,10 +80,9 @@ Progress: [█████░░░░░] 50%
 
 ### Pending Todos
 
-3件あり（/gsd-capture --list で確認）:
-- 過去記事の消失問題（→ Phase 10でResolve）
-- 多対多チーム所属（→ Phase 11でResolve）
+1件あり:
 - Supabase移行（将来）
+（解決済み: 過去記事の消失問題 → Phase 10、多対多チーム所属 → Phase 11）
 
 ### Blockers/Concerns
 
@@ -84,6 +91,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-05-11
-Stopped at: Phase 10 Plan 01 completed
+Stopped at: Phase 11 Plan 01 completed（human-verify approved）
 Resume file: None
-Next step: Phase 10 完了確認 → Phase 11（多対多チーム所属）へ
+Next step: v1.3 マイルストーン完了。次のマイルストーン計画へ。
