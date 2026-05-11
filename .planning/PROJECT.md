@@ -1,5 +1,14 @@
 # Keep Substack
 
+## Current Milestone: v1.3 Data Persistence + Multi-Team
+
+**Goal:** 過去記事の永続化とチーム多対多所属でデータの信頼性を高める
+
+**Target features:**
+- Vercel Cron + KV累積保存（過去記事消失の解消）
+- メンバー登録時の初回フィード取得
+- teamNames配列化（1人が複数チームに所属可能）
+
 ## What This Is
 
 Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度をヒートマップUIで可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSS + Upstash Redisで構築し、Vercelにデプロイ済み。v1.2でSubstackアイコン表示・UX改善・管理画面メンバー編集を実装。

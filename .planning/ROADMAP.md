@@ -5,6 +5,7 @@
 - ✅ **v1.0 MVP** — Phases 1-3 (shipped 2026-05-08)
 - ✅ **v1.1 Dynamic Members + Weekly View** — Phases 4-6 (shipped 2026-05-10)
 - ✅ **v1.2 UX Polish + Member Edit** — Phases 7-9 (shipped 2026-05-11)
+- 📋 **v1.3 Data Persistence + Multi-Team** — Phases 10-11 (planning)
 
 ## Phases
 
@@ -41,6 +42,31 @@ Full archive: `.planning/milestones/v1.2-ROADMAP.md`
 
 </details>
 
+## v1.3 Phase Details
+
+### Phase 10: Cron + KV記事永続化
+**Goal:** Vercel Cronによる1日1回のRSS取得とKV累積保存で、過去記事が消えずカレンダー・ヒートマップに利用できる状態にする
+**Depends on:** Phase 9 (v1.2完了済み)
+**Requirements:** PERSIST-01, PERSIST-02, PERSIST-03
+**Success Criteria** (what must be TRUE):
+  1. Vercel Cronが1日1回実行され、全メンバーのRSSフィードをKVに累積保存する（既存記事を上書きせず追記できる）
+  2. 管理画面でメンバーを新規登録した直後に、そのメンバーの過去記事がKVに保存されている
+  3. トップページのヒートマップがリアルタイムRSS取得ではなくKV保存済みデータを参照して表示される
+  4. メンバー詳細カレンダーページがKV保存済みデータを参照して過去記事を表示できる
+**Plans:** — (not started)
+**UI hint**: yes
+
+### Phase 11: チーム多対多所属
+**Goal:** 1人のメンバーが複数チームに所属でき、管理画面で設定・チームフィルターで正しく絞り込める状態にする
+**Depends on:** Phase 10
+**Requirements:** TEAM-01, TEAM-02, TEAM-03
+**Success Criteria** (what must be TRUE):
+  1. KVに保存されるメンバーデータが `teamNames: string[]` 形式で複数チームを持てる（既存 `teamName: string` からの後方互換移行を含む）
+  2. 管理画面のメンバー編集フォームでチームをカンマ区切りテキストで入力・保存でき、複数チームが正しく反映される
+  3. チームタブで「チームA」を選択したとき、チームAに所属するメンバー（単一・複数所属問わず）が全員表示される
+**Plans:** — (not started)
+**UI hint**: yes
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -54,3 +80,5 @@ Full archive: `.planning/milestones/v1.2-ROADMAP.md`
 | 7. UI小改善バッチ（Tooltip・ナビ・フッター） | v1.2 | 1/1 | Complete | 2026-05-11 |
 | 8. Substackアイコン + レスポンシブ対応 | v1.2 | 1/1 | Complete | 2026-05-11 |
 | 9. 管理画面メンバー編集 | v1.2 | 1/1 | Complete | 2026-05-11 |
+| 10. Cron + KV記事永続化 | v1.3 | 0/? | Pending | - |
+| 11. チーム多対多所属 | v1.3 | 0/? | Pending | - |

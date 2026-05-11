@@ -1,43 +1,41 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.2
-milestone_name: UX Polish + Member Edit
-status: complete
+milestone: v1.3
+milestone_name: Data Persistence + Multi-Team
+status: planning
 stopped_at: ""
-last_updated: "2026-05-11T03:00:00.000Z"
-last_activity: 2026-05-11 -- Milestone v1.2 archived
+last_updated: "2026-05-11T05:00:00.000Z"
+last_activity: 2026-05-11 -- Milestone v1.3 started
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 3
-  completed_plans: 3
-  percent: 100
+  total_phases: 2
+  completed_phases: 0
+  total_plans: 2
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-11 after v1.2 milestone)
+See: .planning/PROJECT.md (updated 2026-05-11 for v1.3 milestone)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Milestone v1.2 完了 → 次のマイルストーン計画へ
+**Current focus:** Phase 10 — 記事永続化（Cron+KV）
 
 ## Current Position
 
-Phase: —
+Phase: Not started (defining requirements)
 Plan: —
-Status: Milestone v1.2 アーカイブ完了
-Last activity: 2026-05-11 — Milestone v1.2 (Phases 7-9) すべて完了・アーカイブ済み
+Status: Defining requirements
+Last activity: 2026-05-11 — Milestone v1.3 started
 
-Progress: [██████████] 100%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 9 (v1.0: 6プラン + v1.1: 6プラン + v1.2: 3プラン)
-- Average duration: —
-- Total execution time: —
 
 **By Milestone:**
 
@@ -51,17 +49,25 @@ Progress: [██████████] 100%
 
 ### Key Architecture Decisions (v1.2)
 
-- HeatmapTooltipのタイトル<a>を<span>に変更し親<a>でリンク構造一本化（ネストaタグ回避）
-- teamId→teamName リネーム（全7ファイル）+ getMembers後方互換フォールバック（teamName ?? teamId ?? ''）
-- table行インライン編集はform-in-table問題回避のため button onClick + closest('tr') + FormData手動構築パターンを採用
-- 非制御コンポーネント（defaultValue）でインライン編集を実装（KISS原則）
-- <img>タグを使用し next/image は不採用（next.config.ts 変更不要、KISSに準拠）
-- HeatmapRow は Server Component のままとし、条件レンダリングで imageUrl フォールバックを実装（onError 不使用）
-- Tailwind v4でline-clamp-2がflex内で効かないためinline styleで対応（コメントで理由記録済み）
+- teamId→teamName リネーム（全7ファイル）+ getMembers後方互換フォールバック
+- form-in-table問題回避: button onClick + closest('tr') + FormData手動構築
+- <img>タグ使用でnext/image不採用（next.config.ts変更不要、KISS）
+- Tailwind v4でline-clamp-2がflex内で効かないためinline styleで対応
+
+### Key Architecture Decisions (v1.1)
+
+- feedUrl は保存せず `https://{substackId}.substack.com/feed` で動的生成
+- `@upstash/redis` を使用 (`@vercel/kv` は2024年12月廃止)
+- Server Actions + `revalidateTag('members')` でAPI Routes不要
+- サムネイルは RSS content:encoded からregexで取得（フェッチ時に抽出・HTML捨てる）
+- Vercel環境変数: UPSTASH_REDIS_REST_URL をBuildスコープにも設定すること
 
 ### Pending Todos
 
-None.
+3件あり（/gsd-capture --list で確認）:
+- 過去記事の消失問題（→ Phase 10でResolve）
+- 多対多チーム所属（→ Phase 11でResolve）
+- Supabase移行（将来）
 
 ### Blockers/Concerns
 
@@ -70,6 +76,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-05-11
-Stopped at: Milestone v1.2 完了・アーカイブ
+Stopped at: Milestone v1.3 要件定義完了
 Resume file: None
-Next step: `/gsd-new-milestone` で次のマイルストーン計画を開始
+Next step: `/gsd-plan-phase 10` でPhase 10（Cron+KV永続化）の計画へ
