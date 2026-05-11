@@ -53,7 +53,9 @@ Full archive: `.planning/milestones/v1.2-ROADMAP.md`
   2. 管理画面でメンバーを新規登録した直後に、そのメンバーの過去記事がKVに保存されている
   3. トップページのヒートマップがリアルタイムRSS取得ではなくKV保存済みデータを参照して表示される
   4. メンバー詳細カレンダーページがKV保存済みデータを参照して過去記事を表示できる
-**Plans:** — (not started)
+**Plans:** 1 plan
+Plans:
+- [ ] 10-01-PLAN.md — kvArticles新設・fetchFeed KV移行・Cronエンドポイント・addMemberAction初回取得
 **UI hint**: yes
 
 ### Phase 11: チーム多対多所属
@@ -80,5 +82,5 @@ Full archive: `.planning/milestones/v1.2-ROADMAP.md`
 | 7. UI小改善バッチ（Tooltip・ナビ・フッター） | v1.2 | 1/1 | Complete | 2026-05-11 |
 | 8. Substackアイコン + レスポンシブ対応 | v1.2 | 1/1 | Complete | 2026-05-11 |
 | 9. 管理画面メンバー編集 | v1.2 | 1/1 | Complete | 2026-05-11 |
-| 10. Cron + KV記事永続化 | v1.3 | 0/? | Pending | - |
+| 10. Cron + KV記事永続化 | v1.3 | 0/1 | In Progress | - |
 | 11. チーム多対多所属 | v1.3 | 0/? | Pending | - |
