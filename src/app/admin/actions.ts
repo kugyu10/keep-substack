@@ -9,14 +9,14 @@ export async function addMemberAction(
 ): Promise<string | null> {
   const name = formData.get('name') as string
   const substackId = formData.get('substackId') as string
-  const teamId = formData.get('teamId') as string
+  const teamName = formData.get('teamName') as string
 
   if (!name || !substackId) {
     return 'name と substackId は必須です'
   }
 
   try {
-    await addMember({ name, substackId, teamId: teamId ?? '' })
+    await addMember({ name, substackId, teamName: teamName ?? '' })
     revalidatePath('/admin')
     return null
   } catch (e) {

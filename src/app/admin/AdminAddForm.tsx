@@ -23,8 +23,8 @@ export default function AdminAddForm() {
           className="border rounded px-2 py-1 text-sm flex-1"
         />
         <input
-          name="teamId"
-          placeholder="teamId (任意)"
+          name="teamName"
+          placeholder="teamName (任意)"
           className="border rounded px-2 py-1 text-sm flex-1"
         />
         <button

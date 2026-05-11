@@ -10,7 +10,7 @@ export type FeedItem = {
 export type Member = {
   name: string
   substackId: string
-  teamId: string
+  teamName: string
   addedAt: string  // ISO 8601
 }
 

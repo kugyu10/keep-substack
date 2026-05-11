@@ -18,7 +18,7 @@ export default function AdminMemberList({ members }: Props) {
           <tr className="bg-gray-100 text-left">
             <th className="border px-3 py-2">名前</th>
             <th className="border px-3 py-2">substackId</th>
-            <th className="border px-3 py-2">teamId</th>
+            <th className="border px-3 py-2">teamName</th>
             <th className="border px-3 py-2">addedAt</th>
             <th className="border px-3 py-2"></th>
           </tr>
@@ -28,7 +28,7 @@ export default function AdminMemberList({ members }: Props) {
             <tr key={m.substackId} className="hover:bg-gray-50">
               <td className="border px-3 py-2">{m.name}</td>
               <td className="border px-3 py-2">{m.substackId}</td>
-              <td className="border px-3 py-2">{m.teamId}</td>
+              <td className="border px-3 py-2">{m.teamName}</td>
               <td className="border px-3 py-2 text-xs text-gray-500">
                 {new Date(m.addedAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
               </td>

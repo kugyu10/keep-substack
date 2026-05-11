@@ -26,7 +26,7 @@ export default async function MemberPage({
   return (
     <main className="max-w-[600px] mx-auto p-6 pb-64">
       <Link
-        href={memberResult.member.teamId ? `/?team=${memberResult.member.teamId}` : '/'}
+        href={memberResult.member.teamName ? `/?team=${memberResult.member.teamName}` : '/'}
         className="text-sm text-gray-500 hover:text-gray-800 mb-4 inline-block"
       >
         ← メンバー一覧
