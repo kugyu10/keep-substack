@@ -13,7 +13,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body>
+        {children}
+        <footer className="py-4 text-center">
+          <a
+            href="https://uojun.substack.com/p/5d4"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-gray-400 hover:text-gray-600"
+          >
+            コミュニティに参加する
+          </a>
+        </footer>
+      </body>
     </html>
   )
 }

@@ -60,21 +60,23 @@ export default function HeatmapTooltip({ articles, colorClass, children }: Heatm
             </button>
             <ul>
               {articles.map((article, i) => (
-                <li key={i} className="mb-1 last:mb-0">
-                  {article.thumbnail && (
-                    <img
-                      src={article.thumbnail}
-                      alt=""
-                      className="w-full rounded mb-1 object-cover max-h-24"
-                    />
-                  )}
+                <li key={i} className="mb-3 last:mb-0">
                   <a
                     href={withUtm(article.link ?? '#')}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-blue-600 hover:underline break-words block"
+                    className="block"
                   >
-                    {article.title}
+                    {article.thumbnail && (
+                      <img
+                        src={article.thumbnail}
+                        alt=""
+                        className="w-full rounded mb-1 object-cover max-h-24"
+                      />
+                    )}
+                    <span className="text-xs text-blue-600 hover:underline break-words block">
+                      {article.title}
+                    </span>
                   </a>
                 </li>
               ))}

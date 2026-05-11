@@ -26,10 +26,10 @@ export default async function MemberPage({
   return (
     <main className="max-w-[600px] mx-auto p-6 pb-64">
       <Link
-        href="/"
+        href={memberResult.member.teamId ? `/?team=${memberResult.member.teamId}` : '/'}
         className="text-sm text-gray-500 hover:text-gray-800 mb-4 inline-block"
       >
-        ← ダッシュボードに戻る
+        ← メンバー一覧
       </Link>
       <CalendarGrid
         memberName={memberResult.member.name}
