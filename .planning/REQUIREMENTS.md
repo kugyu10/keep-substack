@@ -11,9 +11,9 @@
 
 ### アイコン表示 (Icon)
 
-- [ ] **ICON-01**: トップビューのヒートマップ行にSubstackアイコン（channel.image.url）を表示できる
-- [ ] **ICON-02**: メンバーカレンダーページにSubstackアイコンを表示できる
-- [ ] **ICON-03**: トップビューはレスポンシブ対応（スマホ幅: アイコンのみ / PC幅: アイコン+名前）
+- [x] **ICON-01**: トップビューのヒートマップ行にSubstackアイコン（channel.image.url）を表示できる
+- [x] **ICON-02**: メンバーカレンダーページにSubstackアイコンを表示できる
+- [x] **ICON-03**: トップビューはレスポンシブ対応（スマホ幅: アイコンのみ / PC幅: アイコン+名前）
 
 ### ナビゲーション (Nav)
 
@@ -55,9 +55,9 @@
 | NAV-01 | Phase 7 | Pending |
 | NAV-02 | Phase 7 | Pending |
 | FOOTER-01 | Phase 7 | Pending |
-| ICON-01 | Phase 8 | Pending |
-| ICON-02 | Phase 8 | Pending |
-| ICON-03 | Phase 8 | Pending |
+| ICON-01 | Phase 8 | Complete |
+| ICON-02 | Phase 8 | Complete |
+| ICON-03 | Phase 8 | Complete |
 | ADMIN-01 | Phase 9 | Pending |
 
 **Coverage:**

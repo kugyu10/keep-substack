@@ -65,7 +65,10 @@ Plans:
 4. PC幅でトップビューを表示するとアイコンと名前が両方表示される
 5. アイコン取得失敗時も画面が壊れない（フォールバック対応）
 
-**Plans:** — (not started)
+**Plans:** 1 plan
+
+Plans:
+- [x] 08-01-PLAN.md — Substackアイコン表示+レスポンシブ対応（ICON-01/02/03）
 
 ---
 
@@ -96,5 +99,5 @@ Plans:
 | 5. WeeklyHeatmap + リッチTooltip | v1.1 | 2/2 | Complete | 2026-05-09 |
 | 6. 管理画面 + チームフィルター | v1.1 | 2/2 | Complete | 2026-05-10 |
 | 7. UI小改善バッチ（Tooltip・ナビ・フッター） | v1.2 | 1/1 | Complete | 2026-05-11 |
-| 8. Substackアイコン + レスポンシブ対応 | v1.2 | 0/1 | Pending | — |
+| 8. Substackアイコン + レスポンシブ対応 | v1.2 | 1/1 | Complete | 2026-05-11 |
 | 9. 管理画面メンバー編集 | v1.2 | 0/1 | Pending | — |

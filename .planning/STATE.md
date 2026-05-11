@@ -4,14 +4,14 @@ milestone: v1.2
 milestone_name: UX Polish + Member Edit
 status: in_progress
 stopped_at: ""
-last_updated: "2026-05-11T00:10:00.000Z"
-last_activity: 2026-05-11 -- Phase 7 Plan 01 (07-01) completed
+last_updated: "2026-05-11T00:30:00.000Z"
+last_activity: 2026-05-11 -- Phase 8 Plan 01 (08-01) completed
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 3
-  completed_plans: 1
-  percent: 33
+  completed_plans: 2
+  percent: 67
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-08 for v1.1 milestone)
 ## Current Position
 
 Phase: Phase 8 — Substackアイコン + レスポンシブ対応
-Plan: 08-01-PLAN.md 計画済み（実行待ち）
-Status: Ready to execute Phase 8
-Last activity: 2026-05-11 — Phase 8 planning complete（08-01-PLAN.md verified）
+Plan: 08-01-PLAN.md 完了
+Status: Phase 8 完了
+Last activity: 2026-05-11 — Phase 8 Plan 01 (08-01) completed: Substackアイコン表示+レスポンシブ対応
 
-Progress: [███░░░░░░░] 33%
+Progress: [███████░░░] 67%
 
 ## Performance Metrics
 
@@ -54,6 +54,10 @@ Progress: [███░░░░░░░] 33%
 - HeatmapTooltipのタイトル<a>を<span>に変更し親<a>でリンク構造一本化（ネストaタグ回避）
 - teamIdが空の場合は'/'にフォールバック（三項演算子のみ、追加フェッチ不要）
 - フッターをlayout.tsxのbody直下に配置し全ページ自動適用
+- <img>タグを使用し next/image は不採用（next.config.ts 変更不要、KISSに準拠）
+- HeatmapRow は Server Component のままとし、条件レンダリングで imageUrl フォールバックを実装（onError 不使用）
+- imageUrl が undefined の場合は同サイズのグレー円 span でフォールバック（レイアウト崩れ防止）
+- HeatmapRow 列幅（w-8 sm:w-32）と WeeklyHeatmapGrid ヘッダー列幅を同期してグリッドズレを防止
 
 ### Key Architecture Decisions (v1.1)
 
@@ -84,6 +88,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-05-11
-Stopped at: Completed 07-01-PLAN.md
+Stopped at: Completed 08-01-PLAN.md
 Resume file: None
-Next step: `/gsd-execute-phase 8` でPhase 8を実行
+Next step: Phase 9 へ進む（v1.2 最終フェーズ）
