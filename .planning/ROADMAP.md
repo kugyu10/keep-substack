@@ -5,7 +5,7 @@
 - ✅ **v1.0 MVP** — Phases 1-3 (shipped 2026-05-08)
 - ✅ **v1.1 Dynamic Members + Weekly View** — Phases 4-6 (shipped 2026-05-10)
 - ✅ **v1.2 UX Polish + Member Edit** — Phases 7-9 (shipped 2026-05-11)
-- 📋 **v1.3 Data Persistence + Multi-Team** — Phases 10-11 (planning)
+- 📋 **v1.3 Data Persistence + Multi-Team** — Phases 10-12.1 (planning)
 
 ## Phases
 
@@ -84,8 +84,10 @@ Plans:
 | 7. UI小改善バッチ（Tooltip・ナビ・フッター） | v1.2 | 1/1 | Complete | 2026-05-11 |
 | 8. Substackアイコン + レスポンシブ対応 | v1.2 | 1/1 | Complete | 2026-05-11 |
 | 9. 管理画面メンバー編集 | v1.2 | 1/1 | Complete | 2026-05-11 |
-| 10. Cron + KV記事永続化 | v1.3 | 0/1 | In Progress | - |
-| 11. チーム多対多所属 | v1.3 | 0/1 | Pending | - |
+| 10. Cron + KV記事永続化 | v1.3 | 1/1 | Complete | 2026-05-11 |
+| 11. チーム多対多所属 | v1.3 | 1/1 | Complete | 2026-05-11 |
+| 12. chameleon-hidden-team | v1.3 | 1/1 | Complete | 2026-05-12 |
+| 12.1. rss-isr-hybrid | v1.3 | 0/? | Pending | - |
 
 ### Phase 12: chameleon-hidden-team
 
