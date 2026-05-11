@@ -8,9 +8,10 @@ type HeatmapRowProps = {
   member: Member
   articlesByDateEntries: [string, HeatmapArticle[]][]
   dates: string[]
+  imageUrl?: string
 }
 
-export default function HeatmapRow({ member, articlesByDateEntries, dates }: HeatmapRowProps) {
+export default function HeatmapRow({ member, articlesByDateEntries, dates, imageUrl }: HeatmapRowProps) {
   const articleMap = new Map(articlesByDateEntries)
 
   const totalCount = dates.reduce((sum, date) => sum + (articleMap.get(date)?.length ?? 0), 0)
@@ -19,9 +20,22 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates }: Hea
     <div className="flex items-center border-b border-gray-100 py-1">
       <Link
         href={`/member/${member.substackId}`}
-        className="w-32 shrink-0 text-xs font-semibold pr-2 hover:underline leading-snug line-clamp-2"
+        className="w-8 sm:w-32 shrink-0 pr-2 hover:underline flex items-center gap-1.5"
       >
-        {member.name}
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt=""
+            width={20}
+            height={20}
+            className="w-5 h-5 rounded-full shrink-0 object-cover"
+          />
+        ) : (
+          <span className="w-5 h-5 rounded-full shrink-0 bg-gray-200 inline-block" aria-hidden="true" />
+        )}
+        <span className="hidden sm:block text-xs font-semibold leading-snug line-clamp-2">
+          {member.name}
+        </span>
       </Link>
       <div className="grid grid-cols-7 gap-1 flex-1">
         {dates.map((date) => {

@@ -11,7 +11,7 @@ export default function WeeklyHeatmapGrid({ results, dates }: WeeklyHeatmapGridP
   return (
     <div>
       <div className="flex mb-1">
-        <div className="w-32 shrink-0" />
+        <div className="w-8 sm:w-32 shrink-0" />
         <div className="grid grid-cols-7 gap-1 flex-1">
           {dates.map((d) => {
             const [, m, day] = d.split('-')
@@ -24,12 +24,13 @@ export default function WeeklyHeatmapGrid({ results, dates }: WeeklyHeatmapGridP
         </div>
         <div className="w-10 shrink-0 text-xs text-right text-gray-400 pr-1">計</div>
       </div>
-      {results.map(({ member, items }) => (
+      {results.map(({ member, items, imageUrl }) => (
         <HeatmapRow
           key={member.substackId}
           member={member}
           articlesByDateEntries={Array.from(buildHeatmapArticleMap(items).entries())}
           dates={dates}
+          imageUrl={imageUrl}
         />
       ))}
     </div>
