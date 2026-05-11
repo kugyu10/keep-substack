@@ -88,6 +88,48 @@
 
 ---
 
+## Milestone: v1.2 — UX Polish + Member Edit
+
+**Shipped:** 2026-05-11
+**Phases:** 3 (7-9) | **Plans:** 3 | **Sessions:** 1日
+
+### What Was Built
+- Tooltip記事カードを一体型`<a>`ブロック化（画像クリックで記事遷移、mb-3スペース追加）
+- メンバー詳細ページの戻りリンクを「← メンバー一覧」に変更、teamId条件分岐URL
+- 全ページ共通フッター（「このSubstack継続可視化ツールに参加したい方はコチラ」）
+- rss-parser feed.image?.urlからSubstackアイコン取得・全ビューに表示
+- トップビューのレスポンシブ対応（スマホ: アイコンのみ、PC: アイコン+名前、sm:640px）
+- 管理画面メンバーインライン編集（editingId state + form-in-table回避パターン）
+- teamId→teamName全体リネーム + KV後方互換フォールバック
+
+### What Worked
+- 小規模フェーズ（1フェーズ1プラン）で各機能を独立して実装・検証できた
+- UATで実際のUX問題（アイコンサイズ、列幅、テーブルカラー）を素早く発見・修正できた
+- discuss-phaseでteamId→teamNameリネームのスコープと移行方針（後方互換フォールバック）を事前確定 → 実装がスムーズ
+
+### What Was Inefficient
+- REQUIREMENTS.mdのチェックボックスが再びアーカイブ時まで未更新（v1.0/v1.1と同じ繰り返し）
+- 管理画面テーブルのカラーシステムがUAT中に数回の試行錯誤（ダークテーマ適用まで3往復）
+
+### Patterns Established
+- **rss-parser feed.image?.url**: customFields宣言不要でfeed.image.urlが標準取得可能
+- **form-in-table回避**: `<form>`不使用、`button onClick + closest('tr') + querySelectorAll('input[name]')` でFormData手動構築
+- **KV後方互換フォールバック**: `getMembers()`で `teamName ?? teamId ?? ''` マッピングにより無停止フィールドリネーム
+- **Tailwind v4 line-clamp flex問題**: flex内でline-clamp-2が効かない → inline styleで回避（コメント記録必須）
+- **管理画面ダークテーマ**: `bg-black + text-white + border-gray-700`、hover `bg-gray-800`、編集行 `bg-gray-800`
+
+### Key Lessons
+1. REQUIREMENTS.mdのチェックボックスはフェーズ完了時に更新する（3マイルストーン連続で同じ問題 → 次回はexecute-phase完了フックで自動化を検討）
+2. Tailwind v4の新機能・挙動変化は実装時に直接確認が必要（line-clamp等）
+3. UAT中のUI調整はユーザーフィードバックが正確 — 最初から完璧を目指さず仮実装→UAT→微調整サイクルが効率的
+
+### Cost Observations
+- Model mix: Sonnet 4.6 (1M context)
+- Sessions: 1日で3フェーズ（UAT・UI調整含む）完結
+- Notable: 3フェーズが各1プランの小規模構成 — UAT込みでも1日で完結
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -96,10 +138,12 @@
 |-----------|--------|-------|------------|
 | v1.0 | 3 | 6 | 初回 MVP — GSD フレームワーク初適用 |
 | v1.1 | 3 | 6 | KV移行 + ヒートマップUI刷新 — UAT中バグ4件を即時修正 |
+| v1.2 | 3 | 3 | UX改善・アイコン・管理画面編集 — 1フェーズ1プランの小規模構成で1日完結 |
 
 ### Top Lessons (Verified Across Milestones)
 
 1. KISS/YAGNI原則の徹底がシンプルで保守しやすいコードにつながる
-2. フェーズ完了時にREQUIREMENTS.mdを更新しておくとマイルストーン完了がスムーズ
+2. フェーズ完了時にREQUIREMENTS.mdを更新しておくとマイルストーン完了がスムーズ（3回連続で同じ問題）
 3. フレームワークのメジャーバージョン変更点（v15→v16等）は実装前にソースコードで直接確認する
 4. キャッシュエントリのサイズを意識した設計（全体一括 vs 個別）が重要
+5. UAT → 素早いフィードバックループが品質向上に最も効果的。完璧な初回実装より仮実装→UAT→微調整サイクルが効率的

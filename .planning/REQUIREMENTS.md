@@ -7,7 +7,7 @@
 
 ### 管理画面 (Admin)
 
-- [ ] **ADMIN-01**: 管理者が既存メンバーの各フィールド（name, substackId, addedAt, teamId）を編集・更新できる
+- [x] **ADMIN-01**: 管理者が既存メンバーの各フィールド（name, addedAt, teamName）を編集・更新できる
 
 ### アイコン表示 (Icon)
 
@@ -17,17 +17,17 @@
 
 ### ナビゲーション (Nav)
 
-- [ ] **NAV-01**: メンバー詳細ページの戻りリンクのラベルが「メンバー一覧」と表示される
-- [ ] **NAV-02**: 戻りリンクの遷移先はメンバーの所属チームビュー（/?team=xxx、未所属は/?）
+- [x] **NAV-01**: メンバー詳細ページの戻りリンクのラベルが「メンバー一覧」と表示される
+- [x] **NAV-02**: 戻りリンクの遷移先はメンバーの所属チームビュー（/?team=xxx、未所属は/）
 
 ### Tooltip (Tooltip)
 
-- [ ] **TOOLTIP-01**: Tooltip内の画像をクリックすると記事に遷移できる（hrefが画像にも付与される）
-- [ ] **TOOLTIP-02**: Tooltip内の記事と記事の間にスペースがあり、タイトルと画像の対応が視認しやすい
+- [x] **TOOLTIP-01**: Tooltip内の画像をクリックすると記事に遷移できる（hrefが画像にも付与される）
+- [x] **TOOLTIP-02**: Tooltip内の記事と記事の間にスペースがあり、タイトルと画像の対応が視認しやすい
 
 ### フッター (Footer)
 
-- [ ] **FOOTER-01**: 全ページのフッターに参加案内リンク（https://uojun.substack.com/p/5d4）が表示される
+- [x] **FOOTER-01**: 全ページのフッターに参加案内リンク（https://uojun.substack.com/p/5d4）が表示される
 
 ## Future Requirements
 
@@ -50,21 +50,20 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TOOLTIP-01 | Phase 7 | Pending |
-| TOOLTIP-02 | Phase 7 | Pending |
-| NAV-01 | Phase 7 | Pending |
-| NAV-02 | Phase 7 | Pending |
-| FOOTER-01 | Phase 7 | Pending |
+| TOOLTIP-01 | Phase 7 | Complete |
+| TOOLTIP-02 | Phase 7 | Complete |
+| NAV-01 | Phase 7 | Complete |
+| NAV-02 | Phase 7 | Complete |
+| FOOTER-01 | Phase 7 | Complete |
 | ICON-01 | Phase 8 | Complete |
 | ICON-02 | Phase 8 | Complete |
 | ICON-03 | Phase 8 | Complete |
-| ADMIN-01 | Phase 9 | Pending |
+| ADMIN-01 | Phase 9 | Complete |
 
 **Coverage:**
 - v1.2 requirements: 9 total
-- Mapped to phases: 9
-- Unmapped: 0 ✓
+- Completed: 9 ✓
 
 ---
 *Requirements defined: 2026-05-11*
-*Last updated: 2026-05-11 after initial definition*
+*Last updated: 2026-05-11 — v1.2 all requirements complete*
