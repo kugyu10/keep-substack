@@ -48,7 +48,7 @@ Full archive: `.planning/milestones/v1.1-ROADMAP.md`
 **Plans:** 1 plan
 
 Plans:
-- [ ] 07-01-PLAN.md — Tooltip・ナビ・フッターのUX改善3ファイル一括適用
+- [x] 07-01-PLAN.md — Tooltip・ナビ・フッターのUX改善3ファイル一括適用
 
 ---
 
@@ -95,6 +95,6 @@ Plans:
 | 4. KVデータ層移行 | v1.1 | 2/2 | Complete | 2026-05-09 |
 | 5. WeeklyHeatmap + リッチTooltip | v1.1 | 2/2 | Complete | 2026-05-09 |
 | 6. 管理画面 + チームフィルター | v1.1 | 2/2 | Complete | 2026-05-10 |
-| 7. UI小改善バッチ（Tooltip・ナビ・フッター） | v1.2 | 0/1 | Pending | — |
+| 7. UI小改善バッチ（Tooltip・ナビ・フッター） | v1.2 | 1/1 | Complete | 2026-05-11 |
 | 8. Substackアイコン + レスポンシブ対応 | v1.2 | 0/1 | Pending | — |
 | 9. 管理画面メンバー編集 | v1.2 | 0/1 | Pending | — |
