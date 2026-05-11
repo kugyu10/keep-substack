@@ -45,7 +45,10 @@ Full archive: `.planning/milestones/v1.1-ROADMAP.md`
 4. チーム所属メンバーの戻りリンクが `/?team=xxx` に遷移する
 5. トップページ・メンバーページのフッターに参加案内リンクが表示される
 
-**Plans:** — (not started)
+**Plans:** 1 plan
+
+Plans:
+- [ ] 07-01-PLAN.md — Tooltip・ナビ・フッターのUX改善3ファイル一括適用
 
 ---
 
