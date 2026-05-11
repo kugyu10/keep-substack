@@ -22,3 +22,6 @@ export type MemberFeedResult = {
   items: FeedItem[]
   imageUrl?: string  // channel.image.url（取得失敗時 undefined）
 }
+
+// シークレットチーム名。タブ一覧・All ビューから非表示にする（Phase 12）
+export const HIDDEN_TEAM = 'chameleon'
