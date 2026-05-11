@@ -2,6 +2,7 @@
 created: 2026-05-11T04:00:00Z
 title: 1人が複数チームに所属できる多対多 — MVPでは teamNames配列化
 area: general
+resolves_phase: 11
 files:
   - src/lib/types.ts
   - src/lib/kvMembers.ts

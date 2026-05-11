@@ -2,6 +2,7 @@
 created: 2026-05-11T03:30:00Z
 title: 過去記事の消失問題 — Cron+KV累積保存
 area: general
+resolves_phase: 10
 files:
   - src/lib/fetchFeed.ts
   - src/lib/types.ts
