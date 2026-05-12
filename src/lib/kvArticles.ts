@@ -9,6 +9,10 @@ export async function getArticles(substackId: string): Promise<StoredFeed> {
   return data ?? { items: [] }
 }
 
+export async function deleteArticles(substackId: string): Promise<void> {
+  await redis.del(`articles:${substackId}`)
+}
+
 // D-05: article.link URL でdedupe。既存KVに同じlinkがあればスキップ
 // imageUrl は毎回最新値で上書きする（アイコンURLが変わった場合に追従）
 export async function saveArticles(

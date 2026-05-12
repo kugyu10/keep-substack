@@ -3,9 +3,8 @@ import type { FeedItem, Member, MemberFeedResult } from './types'
 import { extractThumbnail } from './heatmapUtils'
 import { getArticles } from './kvArticles'
 
-// D-03: タイムアウト5秒（rss-parserの組み込みtimeoutオプション）
+// D-03: タイムアウト5秒
 const parser = new Parser({
-  timeout: 5000,
   customFields: {
     item: [['content:encoded', 'contentEncoded']]
   }
@@ -25,24 +24,34 @@ function toFeedItems(rawItems: RawItem[]): FeedItem[] {
   }))
 }
 
+// SubstackはAcceptヘッダーがないとHTMLを返すため、fetchで明示的にRSSを要求する
+async function fetchFeedXml(url: string): Promise<FeedResult> {
+  const res = await fetch(url, {
+    headers: { Accept: 'application/rss+xml, application/xml, text/xml' },
+    signal: AbortSignal.timeout(5000),
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  const xml = await res.text()
+  if (!xml.trimStart().startsWith('<')) throw new Error('Response is not XML')
+  const feed = await parser.parseString(xml)
+  return {
+    items: toFeedItems(feed.items as RawItem[]),
+    imageUrl: feed.image?.url,
+  }
+}
+
 // D-01: フィード取得失敗時は1秒待ってリトライ、それでもダメなら空配列を返す
 export async function fetchWithRetry(url: string): Promise<FeedResult> {
   try {
-    const feed = await parser.parseURL(url)
-    return {
-      items: toFeedItems(feed.items as RawItem[]),
-      imageUrl: feed.image?.url,
-    }
-  } catch {
+    return await fetchFeedXml(url)
+  } catch (err) {
+    console.error(`[fetchWithRetry] 1st attempt failed for ${url}:`, err)
     await new Promise((r) => setTimeout(r, RETRY_DELAY_MS))
     try {
-      const feed = await parser.parseURL(url)
-      return {
-        items: toFeedItems(feed.items as RawItem[]),
-        imageUrl: feed.image?.url,
-      }
-    } catch {
-      return { items: [] }
+      return await fetchFeedXml(url)
+    } catch (err2) {
+      console.error(`[fetchWithRetry] 2nd attempt failed for ${url}:`, err2)
+      throw err2
     }
   }
 }

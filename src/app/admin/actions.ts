@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { addMember, deleteMember, updateMember } from '@/lib/kvMembers'
 import { fetchWithRetry } from '@/lib/fetchFeed'
-import { saveArticles } from '@/lib/kvArticles'
+import { saveArticles, deleteArticles } from '@/lib/kvArticles'
 
 export async function addMemberAction(
   prevState: string | null,
@@ -22,22 +22,28 @@ export async function addMemberAction(
 
   try {
     await addMember({ name, substackId, teamNames })
-    // D-03: 初回フィード取得 & KV保存（失敗しても登録自体は成功扱い）
-    // fetchWithRetry は失敗時に { items: [] } を返す（例外を投げない）ため
-    // saveArticles に空配列が渡り、KVは空のままになる（次のCronで補填）
+  } catch (e) {
+    return e instanceof Error ? e.message : '追加に失敗しました'
+  }
+
+  revalidatePath('/admin')
+
+  try {
     const { items, imageUrl } = await fetchWithRetry(
       `https://${substackId}.substack.com/feed`
     )
     await saveArticles(substackId, items, imageUrl)
-    revalidatePath('/admin')
-    return null
   } catch (e) {
-    return e instanceof Error ? e.message : '追加に失敗しました'
+    const msg = e instanceof Error ? e.message : 'RSS取得に失敗しました'
+    return `メンバーを追加しましたが、RSS取得に失敗しました: ${msg}`
   }
+
+  return null
 }
 
 export async function deleteMemberAction(substackId: string): Promise<void> {
   await deleteMember(substackId)
+  await deleteArticles(substackId)
   revalidatePath('/admin')
 }
 
