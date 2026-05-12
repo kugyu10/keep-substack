@@ -49,10 +49,39 @@ export async function fetchWithRetry(url: string): Promise<FeedResult> {
 
 export async function fetchAllFeedsCached(members: Member[]): Promise<MemberFeedResult[]> {
   const results = await Promise.allSettled(
-    members.map((m) => getArticles(m.substackId))
+    members.map(async (member) => {
+      const feedUrl = `https://${member.substackId}.substack.com/feed`
+      const [liveResult, kvResult] = await Promise.allSettled([
+        fetchWithRetry(feedUrl),
+        getArticles(member.substackId),
+      ])
+
+      const live = liveResult.status === 'fulfilled' ? liveResult.value : { items: [], imageUrl: undefined }
+      const kv = kvResult.status === 'fulfilled' ? kvResult.value : { items: [] }
+
+      const imageUrl = live.imageUrl ?? kv.imageUrl
+
+      const seenLinks = new Set<string>()
+      const merged: FeedItem[] = []
+      for (const item of [...live.items, ...kv.items]) {
+        if (item.link && seenLinks.has(item.link)) continue
+        if (item.link) seenLinks.add(item.link)
+        merged.push(item)
+      }
+
+      merged.sort((a, b) => {
+        if (!a.isoDate && !b.isoDate) return 0
+        if (!a.isoDate) return 1
+        if (!b.isoDate) return -1
+        return b.isoDate.localeCompare(a.isoDate)
+      })
+
+      return { member, items: merged, imageUrl }
+    })
   )
-  return members.map((member, i) => {
-    const data = results[i].status === 'fulfilled' ? results[i].value : { items: [] }
-    return { member, items: data.items, imageUrl: data.imageUrl }
+
+  return results.map((result, i) => {
+    if (result.status === 'fulfilled') return result.value
+    return { member: members[i], items: [], imageUrl: undefined }
   })
 }
