@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Data Persistence + Multi-Team
 status: completed
-stopped_at: Phase 12 Plan 01 complete
-last_updated: "2026-05-12T00:10:00.000Z"
-last_activity: 2026-05-12 — Phase 12 Plan 01 complete
+stopped_at: Phase 12.1 Plan 01 — checkpoint:human-verify (Task 3 awaiting browser verification)
+last_updated: "2026-05-12T00:05:00.000Z"
+last_activity: 2026-05-12 — Phase 12.1 Plan 01 Task 2 complete, awaiting checkpoint
 progress:
   total_phases: 4
   completed_phases: 4
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-11 for v1.3 milestone)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 12 — chameleon hidden team（完了）
+**Current focus:** Phase 12.1 — RSS ISR + KV ハイブリッドアーキテクチャ（実装完了・ブラウザ確認待ち）
 
 ## Current Position
 
-Phase: 12-chameleon-hidden-team
-Plan: 01 (completed)
-Status: Phase 12 Plan 01 complete — chameleon 非表示ロジック実装・ブラウザ確認済み
-Last activity: 2026-05-12 — Phase 12 Plan 01 complete
+Phase: 12.1-rss-isr-hybrid
+Plan: 01 (checkpoint:human-verify)
+Status: Task 1-2 完了 — ハイブリッドフェッチ実装・revalidate=300追加、ブラウザ確認待ち
+Last activity: 2026-05-12 — Phase 12.1 Plan 01 Task 2 complete
 
 Progress: [██████████] 100%
 
@@ -51,6 +51,14 @@ Progress: [██████████] 100%
 ### Roadmap Evolution
 
 - Phase 12 added: chameleon-hidden-team — シークレットチーム "chameleon" 定義（All ビュー・タブから非表示）
+
+### Key Architecture Decisions (v1.3 / Phase 12.1)
+
+- fetchAllFeedsCached: Promise.allSettled 二重並列（外側:メンバー、内側:RSS/KV）
+- フォールバック: live 失敗時は kv のみで応答（KV書き込みなし、D-03）
+- dedupe: link による Set、undefined link 記事はすべて含む（Set.has(undefined) 問題回避）
+- imageUrl: live.imageUrl ?? kv.imageUrl（ライブRSS優先）
+- revalidate=300: page.tsx・member/[substackId]/page.tsx 両ページに設定（5分ISR）
 
 ### Key Architecture Decisions (v1.3 / Phase 12)
 
@@ -104,7 +112,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-12T00:10:00.000Z
-Stopped at: Phase 12 Plan 01 complete
-Resume file: None
-Next step: v1.3 マイルストーン完了。次のマイルストーン計画へ。
+Last session: 2026-05-12T00:05:00.000Z
+Stopped at: Phase 12.1 Plan 01 — checkpoint:human-verify (Task 3)
+Resume file: .planning/phases/12.1-rss-isr-hybrid/12.1-01-SUMMARY.md
+Next step: ブラウザ確認後、"approved" で Phase 12.1 Plan 01 完了。
