@@ -5,6 +5,8 @@ import { buildHeatmapArticleMap } from '@/lib/heatmapUtils'
 import CalendarGrid from '@/components/CalendarGrid'
 import { getMembers } from '@/lib/kvMembers'
 
+export const revalidate = 300
+
 export default async function MemberPage({
   params,
 }: {

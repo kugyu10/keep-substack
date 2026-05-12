@@ -5,6 +5,8 @@ import { HIDDEN_TEAM } from '@/lib/types'
 import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'
 import topLogo from '@/data/top_logo.png'
 
+export const revalidate = 300
+
 type Props = {
   searchParams: Promise<{ team?: string }>
 }
