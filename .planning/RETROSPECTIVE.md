@@ -130,6 +130,47 @@
 
 ---
 
+## Milestone: v1.3 — Data Persistence + Multi-Team
+
+**Shipped:** 2026-05-12
+**Phases:** 4 (10-12.1) | **Plans:** 4 | **Sessions:** 2日
+
+### What Was Built
+- Vercel Cron（UTC 20:00）+ kvArticles.ts でRSS記事をKVに累積保存（過去記事消失解消）
+- addMemberAction 登録直後に初回フィード取得・KV保存（即時閲覧可能）
+- Member.teamNames: string[] 多対多所属 + KV後方互換フォールバック（DBマイグレーション不要）
+- シークレットチーム "chameleon" の非表示ロジック（HIDDEN_TEAM 定数パターン）
+- ISR (revalidate=300) + ライブRSSとKVのハイブリッドフェッチで最大5分以内反映
+
+### What Worked
+- fetchAllFeedsCached シグネチャを3フェーズ（10→12.1）で維持したことで呼び出し元変更ゼロ
+- KV後方互換フォールバック（getMembers内のmap変換）でDBマイグレーション不要の移行を3回実施
+- HIDDEN_TEAM 定数パターンでシークレットチーム機能を2ファイル変更のみで実装（KISS徹底）
+- Phase 12.1 でISR + KVハイブリッドを「fetchAllFeedsCached の内部実装変更のみ」で実現
+
+### What Was Inefficient
+- REQUIREMENTS.mdのチェックボックスが今回もアーカイブ時まで未更新（4マイルストーン連続の同じ問題 → 解決が必要）
+- plan-checker が RESEARCH.md のコードサンプルとPLAN.mdのactionに矛盾を発見（BLOCKER）→ 修正後に再検証が必要だった
+
+### Patterns Established
+- **StoredFeed KVパターン**: `articles:{substackId}` → `{ items: FeedItem[], imageUrl?: string }` — imageUrl も KV に保存して即時表示
+- **Vercel Cron Bearer認証**: `!cronSecret` チェック先行 → CRON_SECRET未設定時の認証バイパスを防止
+- **HIDDEN_TEAM 定数パターン**: 予約チーム名を types.ts に export 定数で定義 → page.tsx から import して使用（inline 定数より再利用性あり）
+- **ISR + KV ハイブリッド**: `Promise.allSettled` 二重並列（外側:メンバー、内側:RSS/KV）+ link dedupe（undefined link は除外しない）+ isoDate 降順ソート
+
+### Key Lessons
+1. REQUIREMENTS.mdのチェックボックスは依然として自動更新されていない — execute-phase フックか discuss-phase テンプレートに組み込むべき（5マイルストーン目の課題にしない）
+2. RESEARCH.md のコードサンプルと PLAN.md のタスク action は同じロジックを独立して記述するため矛盾しやすい — plan-checker が有効に機能した
+3. fetchAllFeedsCached シグネチャを変えないという決定（D-04）が Phase 10→12.1 の全フェーズで一貫して効いた — 初期決定の価値
+4. `Set.has(undefined)` は true を返す — link が undefined の記事を dedupe キーにする際は `if (item.link && ...)` ガードが必須
+
+### Cost Observations
+- Model mix: Sonnet 4.6 (1M context)
+- Sessions: 2日で4フェーズ（bonus phase 2本含む）完結
+- Notable: Phase 12 と 12.1 は当初スコープ外だったが、シンプルな実装で素早く追加できた
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -139,11 +180,14 @@
 | v1.0 | 3 | 6 | 初回 MVP — GSD フレームワーク初適用 |
 | v1.1 | 3 | 6 | KV移行 + ヒートマップUI刷新 — UAT中バグ4件を即時修正 |
 | v1.2 | 3 | 3 | UX改善・アイコン・管理画面編集 — 1フェーズ1プランの小規模構成で1日完結 |
+| v1.3 | 4 | 4 | KV永続化・多対多チーム・ISRハイブリッド — bonus phase 2本を含む |
 
 ### Top Lessons (Verified Across Milestones)
 
 1. KISS/YAGNI原則の徹底がシンプルで保守しやすいコードにつながる
-2. フェーズ完了時にREQUIREMENTS.mdを更新しておくとマイルストーン完了がスムーズ（3回連続で同じ問題）
+2. フェーズ完了時にREQUIREMENTS.mdを更新しておくとマイルストーン完了がスムーズ（4回連続で同じ問題 → 次回は必ず解決）
 3. フレームワークのメジャーバージョン変更点（v15→v16等）は実装前にソースコードで直接確認する
 4. キャッシュエントリのサイズを意識した設計（全体一括 vs 個別）が重要
 5. UAT → 素早いフィードバックループが品質向上に最も効果的。完璧な初回実装より仮実装→UAT→微調整サイクルが効率的
+6. 関数シグネチャを変えないという初期決定が複数フェーズにわたって呼び出し元への影響をゼロに保つ（fetchAllFeedsCached: 3フェーズ連続で内部実装変更・シグネチャ維持）
+7. plan-checker による RESEARCH.md vs PLAN.md の矛盾検出は有効 — 同じロジックを2箇所に記述する際は必ずチェックを通す

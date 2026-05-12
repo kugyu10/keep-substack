@@ -53,3 +53,22 @@
 ---
 
 *See individual milestone archives for full phase details.*
+
+---
+
+## v1.3 Data Persistence + Multi-Team — ✅ SHIPPED 2026-05-12
+
+**Phases:** 10-12.1 | **Plans:** 4 | **Timeline:** 2026-05-11〜2026-05-12 (2 days)
+
+**Delivered:** Vercel Cron + KV累積保存で過去記事を永続化、多対多チーム所属、シークレットチーム機能、ISR + KVハイブリッドアーキテクチャで投稿後5分以内反映を実現。
+
+**Key Accomplishments:**
+1. Vercel Cron（UTC 20:00）+ KV累積保存で過去記事消失問題を解消（PERSIST-01）
+2. メンバー登録時の初回フィード取得でKVに即時保存（PERSIST-02）
+3. `teamNames: string[]` 多対多所属 + KV後方互換フォールバック（DBマイグレーション不要）（TEAM-01〜03）
+4. シークレットチーム "chameleon" の非表示ロジック（All ビュー・タブ除外、URL直打ち・管理画面は通常表示）
+5. ISR (revalidate=300) + KVハイブリッドで最大24時間 → 最大5分の反映遅延改善
+
+**Archive:**
+- `.planning/milestones/v1.3-ROADMAP.md`
+- `.planning/milestones/v1.3-REQUIREMENTS.md`

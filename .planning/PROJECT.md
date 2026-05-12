@@ -1,17 +1,12 @@
 # Keep Substack
 
-## Current Milestone: v1.3 Data Persistence + Multi-Team
+## Current State: v1.3 SHIPPED — Planning v1.4
 
-**Goal:** 過去記事の永続化とチーム多対多所属でデータの信頼性を高める
-
-**Target features:**
-- Vercel Cron + KV累積保存（過去記事消失の解消）
-- メンバー登録時の初回フィード取得
-- teamNames配列化（1人が複数チームに所属可能）
+**Shipped:** 2026-05-12 — Vercel Cron + KV永続化 + 多対多チーム + ISRハイブリッド完了
 
 ## What This Is
 
-Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度をヒートマップUIで可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSS + Upstash Redisで構築し、Vercelにデプロイ済み。v1.2でSubstackアイコン表示・UX改善・管理画面メンバー編集を実装。
+Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度をヒートマップUIで可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSS + Upstash Redisで構築し、Vercelにデプロイ済み。v1.3でKV永続化・多対多チーム・シークレットチーム・ISRハイブリッドを実装。
 
 ## Core Value
 
@@ -45,6 +40,12 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - ✓ メンバーカレンダーページにSubstackアイコンが表示される — v1.2
 - ✓ トップビューはレスポンシブ対応（スマホ: アイコンのみ / PC: アイコン+名前）— v1.2
 - ✓ 管理画面でメンバーのname・addedAt・teamNameをインライン編集・保存できる — v1.2
+- ✓ Vercel Cron（1日1回）でRSSフィードを取得しKVに記事データを累積保存できる — v1.3
+- ✓ メンバー登録時に初回フィード取得を実行してKVに保存する — v1.3
+- ✓ 1人のメンバーが複数チームに所属できる（teamNames: string[]） — v1.3
+- ✓ 管理画面でメンバーの所属チームをカンマ区切りで複数設定・更新できる — v1.3
+- ✓ チームフィルターで複数チーム所属のメンバーがどのチームでも表示される — v1.3
+- ✓ ISR (revalidate=300) + KVハイブリッドで投稿後5分以内に反映される — v1.3
 
 ### Active (Future)
 
@@ -67,9 +68,11 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - メンバーは成長前提（現時点は少人数だが増える可能性あり）
 - 初期段階で最大50フィード程度を想定
 - Substackの記事更新頻度は1日1回程度が多い
-- v1.2公開済み: https://keep-substack.vercel.app/
-- コードベース: 約1,112行 TypeScript/TSX（Next.js App Router + Tailwind CSS）
+- v1.3公開済み: https://keep-substack.vercel.app/
+- コードベース: 約1,300行 TypeScript/TSX（Next.js App Router + Tailwind CSS）
 - Tech Stack: Next.js 16.2.6, React 19.2.4, rss-parser 3.13.0, @upstash/redis 1.38.0, TypeScript 5, Tailwind CSS 4
+- v1.3追加: kvArticles.ts（KV累積保存）、api/cron（Vercel Cron）、vercel.json（スケジュール）
+- 記事反映遅延: 最大24時間（v1.2以前）→ 最大5分（v1.3 ISRハイブリッド）
 
 ## Constraints
 
@@ -94,6 +97,11 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 | teamId→teamNameリネーム | より意味が明確なフィールド名 | ✓ Good — KV後方互換フォールバックで無停止移行 |
 | form-in-table回避（onClick+FormData手動構築） | HTML仕様上`<form>`は`<tr>`内不可 | ✓ Good — 安定動作 |
 | line-clamp-2をinline styleで実装 | Tailwind v4でflex内line-clamp未対応 | ⚠ Revisit — Tailwind v4アップデート時に再確認 |
+| StoredFeed KVパターン（articles:{substackId}） | KV構造を型付きで管理、imageUrlも保存 | ✓ Good — Cron・初回登録・ISRハイブリッドで共用 |
+| fetchAllFeedsCached シグネチャ維持 | 呼び出し元（page.tsx等）の変更をゼロに抑える | ✓ Good — Phase 10→12.1 で3回内部実装変更したがゼロ影響 |
+| KV後方互換フォールバック（getMembers内） | DBマイグレーション不要でKV旧フォーマット対応 | ✓ Good — teamName→teamNames 無停止移行成功 |
+| HIDDEN_TEAM 定数を types.ts に export | KISS — inline 定数より再利用性あり | ✓ Good — page.tsx から import で使用 |
+| ISR + KVハイブリッドフェッチ | ライブRSS(5分キャッシュ) + KV過去記事のマージ | ✓ Good — CronとISRが補完しあう設計 |
 
 ## Evolution
 
@@ -113,4 +121,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-11 after v1.2 milestone*
+*Last updated: 2026-05-12 after v1.3 milestone*
