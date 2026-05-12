@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Data Persistence + Multi-Team
 status: completed
-stopped_at: Phase 12.1 Plan 01 — checkpoint:human-verify (Task 3 awaiting browser verification)
-last_updated: "2026-05-12T00:05:00.000Z"
-last_activity: 2026-05-12 — Phase 12.1 Plan 01 Task 2 complete, awaiting checkpoint
+stopped_at: Phase 12.1 Plan 01 complete
+last_updated: "2026-05-12T00:10:00.000Z"
+last_activity: 2026-05-12 — Phase 12.1 Plan 01 complete（ブラウザ確認承認済み）
 progress:
   total_phases: 4
   completed_phases: 4
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-11 for v1.3 milestone)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 12.1 — RSS ISR + KV ハイブリッドアーキテクチャ（実装完了・ブラウザ確認待ち）
+**Current focus:** Phase 12.1 — RSS ISR + KV ハイブリッドアーキテクチャ（完了）
 
 ## Current Position
 
 Phase: 12.1-rss-isr-hybrid
-Plan: 01 (checkpoint:human-verify)
-Status: Task 1-2 完了 — ハイブリッドフェッチ実装・revalidate=300追加、ブラウザ確認待ち
-Last activity: 2026-05-12 — Phase 12.1 Plan 01 Task 2 complete
+Plan: 01 (completed)
+Status: Phase 12.1 Plan 01 complete — ハイブリッドフェッチ実装・revalidate=300追加・ブラウザ確認済み
+Last activity: 2026-05-12 — Phase 12.1 Plan 01 complete
 
 Progress: [██████████] 100%
 
@@ -36,7 +36,7 @@ Progress: [██████████] 100%
 
 **Velocity:**
 
-- Total plans completed: 9 (v1.0: 6プラン + v1.1: 6プラン + v1.2: 3プラン)
+- Total plans completed: 10 (v1.0: 6プラン + v1.1: 6プラン + v1.2: 3プラン + v1.3: 1プラン)
 
 **By Milestone:**
 
@@ -51,6 +51,7 @@ Progress: [██████████] 100%
 ### Roadmap Evolution
 
 - Phase 12 added: chameleon-hidden-team — シークレットチーム "chameleon" 定義（All ビュー・タブから非表示）
+- Phase 12.1 added: rss-isr-hybrid — ライブRSS + KVハイブリッドフェッチ + ISR revalidate=300
 
 ### Key Architecture Decisions (v1.3 / Phase 12.1)
 
@@ -112,7 +113,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-12T00:05:00.000Z
-Stopped at: Phase 12.1 Plan 01 — checkpoint:human-verify (Task 3)
-Resume file: .planning/phases/12.1-rss-isr-hybrid/12.1-01-SUMMARY.md
-Next step: ブラウザ確認後、"approved" で Phase 12.1 Plan 01 完了。
+Last session: 2026-05-12T00:10:00.000Z
+Stopped at: Phase 12.1 Plan 01 complete
+Resume file: None
+Next step: Phase 12.1 完了。次のフェーズへ。
