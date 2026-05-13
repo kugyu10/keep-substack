@@ -22,12 +22,13 @@ export function getIntensityClass(count: number): string {
   return 'bg-green-700 text-white'
 }
 
-export function getRecentDays(): string[] {
+export function getRecentDays(weekOffset = 0): string[] {
   const days: string[] = []
   // JST（UTC+9）の現在日時を基準にする
   const nowJST = new Date(Date.now() + 9 * 60 * 60 * 1000)
+  const offsetMs = weekOffset * 7 * 24 * 60 * 60 * 1000
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(nowJST.getTime() - i * 24 * 60 * 60 * 1000)
+    const d = new Date(nowJST.getTime() + offsetMs - i * 24 * 60 * 60 * 1000)
     const year = d.getUTCFullYear()
     const month = String(d.getUTCMonth() + 1).padStart(2, '0')
     const day = String(d.getUTCDate()).padStart(2, '0')

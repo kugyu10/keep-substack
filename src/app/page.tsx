@@ -1,6 +1,5 @@
 import { getMembers } from '@/lib/kvMembers'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
-import { getRecentDays, sortByWeeklyCount } from '@/lib/heatmapUtils'
 import { HIDDEN_TEAM } from '@/lib/types'
 import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'
 import topLogo from '@/data/top_logo.png'
@@ -23,8 +22,6 @@ export default async function Home({ searchParams }: Props) {
     : allMembers.filter((m) => !m.teamNames.includes(HIDDEN_TEAM))
 
   const results = await fetchAllFeedsCached(filteredMembers)
-  const dates = getRecentDays()
-  const sorted = sortByWeeklyCount(results, dates)
 
   return (
     <main className="max-w-[600px] mx-auto p-6 pb-64">
@@ -57,7 +54,7 @@ export default async function Home({ searchParams }: Props) {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={topLogo.src} alt="Keep Substack" className="w-full h-auto object-contain mb-8 rounded" />
 
-      <WeeklyHeatmapGrid results={sorted} dates={dates} />
+      <WeeklyHeatmapGrid results={results} />
     </main>
   )
 }

@@ -45,13 +45,13 @@ export async function fetchWithRetry(url: string): Promise<FeedResult> {
   try {
     return await fetchFeedXml(url)
   } catch (err) {
-    console.error(`[fetchWithRetry] 1st attempt failed for ${url}:`, err)
+    console.warn(`[fetchWithRetry] 1st attempt failed for ${url}:`, err)
     await new Promise((r) => setTimeout(r, RETRY_DELAY_MS))
     try {
       return await fetchFeedXml(url)
     } catch (err2) {
-      console.error(`[fetchWithRetry] 2nd attempt failed for ${url}:`, err2)
-      throw err2
+      console.warn(`[fetchWithRetry] 2nd attempt failed for ${url}:`, err2)
+      return { items: [], imageUrl: undefined }
     }
   }
 }

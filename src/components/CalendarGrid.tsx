@@ -96,7 +96,7 @@ export default function CalendarGrid({ memberName, articleMap, imageUrl }: Props
                 key={day.date}
                 style={day.colStart ? { gridColumnStart: day.colStart } : undefined}
               >
-                <HeatmapTooltip articles={articles} colorClass={getIntensityClass(count)}>
+                <HeatmapTooltip articles={articles} colorClass={getIntensityClass(count)} imageUrl={imageUrl}>
                   <span className="text-xs font-semibold">{day.date}</span>
                 </HeatmapTooltip>
               </div>

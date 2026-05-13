@@ -1,30 +1,60 @@
+'use client'
+
+import { useState } from 'react'
 import type { MemberFeedResult } from '@/lib/types'
-import { buildHeatmapArticleMap } from '@/lib/heatmapUtils'
+import { buildHeatmapArticleMap, getRecentDays, sortByWeeklyCount } from '@/lib/heatmapUtils'
 import HeatmapRow from './HeatmapRow'
 
 type WeeklyHeatmapGridProps = {
   results: MemberFeedResult[]
-  dates: string[]
 }
 
-export default function WeeklyHeatmapGrid({ results, dates }: WeeklyHeatmapGridProps) {
+export default function WeeklyHeatmapGrid({ results }: WeeklyHeatmapGridProps) {
+  const [weekOffset, setWeekOffset] = useState(0)
+  const dates = getRecentDays(weekOffset)
+  const sorted = sortByWeeklyCount(results, dates)
+
   return (
     <div>
+      <div className="flex justify-between items-center mb-1 text-xs text-gray-500">
+        <button
+          onClick={() => setWeekOffset((w) => w - 1)}
+          className="px-2 py-0.5 hover:text-gray-800 hover:bg-gray-100 rounded"
+        >
+          ＜
+        </button>
+        <span>
+          {dates[0].slice(5).replace('-', '/')} 〜 {dates[6].slice(5).replace('-', '/')}
+        </span>
+        {weekOffset < 0 ? (
+          <button
+            onClick={() => setWeekOffset((w) => w + 1)}
+            className="px-2 py-0.5 hover:text-gray-800 hover:bg-gray-100 rounded"
+          >
+            ＞
+          </button>
+        ) : (
+          <span className="px-2 py-0.5 invisible">＞</span>
+        )}
+      </div>
       <div className="flex mb-1">
         <div className="w-12 sm:w-52 shrink-0" />
         <div className="grid grid-cols-7 gap-1 flex-1">
           {dates.map((d) => {
-            const [, m, day] = d.split('-')
+            const [y, m, day] = d.split('-').map(Number)
+            const dow = new Date(y, m - 1, day).getDay()
+            const colorClass =
+              dow === 6 ? 'text-cyan-500' : dow === 0 ? 'text-orange-500' : 'text-gray-500'
             return (
-              <div key={d} className="text-xs text-center text-gray-500">
-                {`${parseInt(m)}/${parseInt(day)}`}
+              <div key={d} className={`text-xs text-center ${colorClass}`}>
+                {`${m}/${day}`}
               </div>
             )
           })}
         </div>
         <div className="w-10 shrink-0 text-xs text-right text-gray-400 pr-1">計</div>
       </div>
-      {results.map(({ member, items, imageUrl }) => (
+      {sorted.map(({ member, items, imageUrl }) => (
         <HeatmapRow
           key={member.substackId}
           member={member}
