@@ -25,14 +25,17 @@ export default async function Home({ searchParams }: Props) {
 
   return (
     <main className="max-w-[600px] mx-auto p-6 pb-64">
-      <h1 className="text-2xl font-semibold mb-4">Keep Substack</h1>
+      <h1 className="text-2xl mb-4" style={{ fontFamily: 'Georgia, serif', fontWeight: 900 }}>Keep Substack</h1>
+
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={topLogo.src} alt="Keep Substack" className="w-full h-auto object-contain mb-8 rounded" />
 
       {teams.length > 0 && (
         <div className="flex gap-2 mb-6 flex-wrap">
           <a
             href="/"
             className={`px-3 py-1 rounded text-sm border ${
-              !team ? 'bg-gray-800 text-white border-gray-800' : 'text-gray-600 border-gray-300 hover:bg-gray-50'
+              !team ? 'bg-gray-800 text-white border-gray-800' : 'text-gray-600 border-gray-600 hover:bg-gray-50'
             }`}
           >
             All
@@ -42,7 +45,7 @@ export default async function Home({ searchParams }: Props) {
               key={t}
               href={`/?team=${encodeURIComponent(t)}`}
               className={`px-3 py-1 rounded text-sm border ${
-                team === t ? 'bg-gray-800 text-white border-gray-800' : 'text-gray-600 border-gray-300 hover:bg-gray-50'
+                team === t ? 'bg-gray-800 text-white border-gray-800' : 'text-gray-600 border-gray-600 hover:bg-gray-50'
               }`}
             >
               {t}
@@ -50,9 +53,6 @@ export default async function Home({ searchParams }: Props) {
           ))}
         </div>
       )}
-
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={topLogo.src} alt="Keep Substack" className="w-full h-auto object-contain mb-8 rounded" />
 
       <WeeklyHeatmapGrid results={results} />
     </main>
