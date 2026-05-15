@@ -20,7 +20,7 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
     <div className="flex items-center border-b border-gray-100 py-1">
       <Link
         href={`/member/${member.substackId}`}
-        className="w-28 sm:w-52 shrink-0 pr-2 flex items-center gap-1 overflow-hidden"
+        className="w-16 sm:w-52 shrink-0 pr-2 flex items-center gap-1 overflow-hidden"
       >
         {imageUrl ? (
           <img
