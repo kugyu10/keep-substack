@@ -18,8 +18,16 @@ function withUtm(url: string): string {
 
 export default function HeatmapTooltip({ articles, colorClass, imageUrl, children }: HeatmapTooltipProps) {
   const [open, setOpen] = useState(false)
+  const [ripples, setRipples] = useState<{ x: number; y: number; id: number }[]>([])
   const cellRef = useRef<HTMLDivElement>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
+
+  function handleRipple(e: React.MouseEvent<HTMLButtonElement>) {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const id = Date.now()
+    setRipples(prev => [...prev, { x: e.clientX - rect.left, y: e.clientY - rect.top, id }])
+    setTimeout(() => setRipples(prev => prev.filter(r => r.id !== id)), 600)
+  }
 
   // ビューポートからはみ出ないよう水平位置を補正する
   useEffect(() => {
@@ -65,10 +73,13 @@ export default function HeatmapTooltip({ articles, colorClass, imageUrl, childre
       }}
     >
       <button
-        className={`aspect-square w-full rounded-full ${colorClass} flex items-center justify-center`}
-        onClick={() => setOpen((prev) => !prev)}
+        className={`aspect-square w-full rounded-full ${colorClass} flex items-center justify-center relative overflow-hidden`}
+        onClick={(e) => { handleRipple(e); setOpen((prev) => !prev) }}
         aria-expanded={open}
       >
+        {ripples.map(r => (
+          <span key={r.id} className="ripple-effect" style={{ left: r.x, top: r.y }} />
+        ))}
         {children}
       </button>
       {open && (

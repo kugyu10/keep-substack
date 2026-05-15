@@ -28,3 +28,17 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes ripple {
+  from { width: 0; height: 0; opacity: 0.5; }
+  to { width: 180%; height: 180%; opacity: 0; }
+}
+
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  transform: translate(-50%, -50%);
+  animation: ripple 0.55s ease-out forwards;
+  pointer-events: none;
+}
