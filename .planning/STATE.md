@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: UI/UX Refresh
-status: in-progress
-stopped_at: Phase 16 Plan 01 complete
-last_updated: "2026-05-15T07:00:00.000Z"
-last_activity: 2026-05-15 — Phase 16-01 完了 (ポップオーバーダーク化・横並びレイアウト・touchstart対応)
+status: complete
+stopped_at: Phase 16 complete — Milestone v1.4 complete
+last_updated: "2026-05-15T07:30:00.000Z"
+last_activity: 2026-05-15 — Phase 16 検証完了・Milestone v1.4 完了
 progress:
   total_phases: 4
   completed_phases: 4
@@ -18,17 +18,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-15 — v1.4 UI/UX Refresh started)
+See: .planning/PROJECT.md (updated 2026-05-15 — v1.4 UI/UX Refresh 完了)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 16 — 次フェーズ（未着手）
+**Current focus:** Milestone v1.4 完了 — 次マイルストーン計画待ち
 
 ## Current Position
 
-Phase: 16 of 16 — **complete**
-Plan: 16-01 完了
-Status: Phase 16 完了 → Milestone v1.4 完了
-Last activity: 2026-05-15 — Phase 16 完了 (ポップオーバーダーク化・横並びレイアウト・touchstart対応)
+Phase: 16 of 16 — **verified complete**
+Plan: 16-01 完了 + 16-VERIFICATION.md 作成
+Status: Phase 16 検証完了 → Milestone v1.4 完了
+Last activity: 2026-05-15 — Phase 16 検証完了 (ポップオーバーダーク化・横並びレイアウト・touchstart対応、全6件 VERIFIED)
 
 Progress: [██████████] 100%
 
@@ -36,7 +36,7 @@ Progress: [██████████] 100%
 
 **Velocity:**
 
-- Total plans completed: 14 (v1.0: 6プラン + v1.1: 6プラン + v1.2: 3プラン + v1.3: 1プラン + v1.4: 4プラン)
+- Total plans completed: 16 (v1.0: 6プラン + v1.1: 6プラン + v1.2: 3プラン + v1.3: 4プラン + v1.4: 4プラン)
 
 **By Milestone:**
 
@@ -96,7 +96,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-15T07:00:00.000Z
-Stopped at: Phase 16 Plan 01 complete
-Resume file: .planning/phases/16-popover-redesign/16-01-SUMMARY.md
-Next step: Milestone v1.4 完了
+Last session: 2026-05-15T07:30:00.000Z
+Stopped at: Phase 16 verified — Milestone v1.4 complete
+Resume file: .planning/phases/16-popover-redesign/16-VERIFICATION.md
+Next step: 次マイルストーン（v1.5）計画
