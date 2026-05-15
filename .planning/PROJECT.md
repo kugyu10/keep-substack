@@ -1,8 +1,14 @@
 # Keep Substack
 
-## Current State: v1.3 SHIPPED — Planning v1.4
+## Current Milestone: v1.4 UI/UX Refresh
 
-**Shipped:** 2026-05-12 — Vercel Cron + KV永続化 + 多対多チーム + ISRハイブリッド完了
+**Goal:** モバイルファーストを軸に、ファーストビュー・ヒートマップ・ポップオーバーのUIを刷新してユーザー体験を向上させる
+
+**Target features:**
+- ヒーローバナー削除/縮小 + モバイルファースト化
+- ユーザーリスト: 名前1行・シェブロン・タブコントラスト強調
+- ヒートマップ: Substackオレンジ濃淡・点線丸・44pxタッチターゲット
+- ポップオーバー: 横並びリスト・ダークモード化・Click Outside対応
 
 ## What This Is
 
@@ -121,4 +127,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-12 after v1.3 milestone*
+*Last updated: 2026-05-15 — v1.4 UI/UX Refresh started*
