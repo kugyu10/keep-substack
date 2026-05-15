@@ -15,7 +15,7 @@ export function extractThumbnail(contentEncoded?: string): string | undefined {
 
 export function getIntensityClass(count: number): string {
   if (count === 1) return 'bg-primary/60 text-white'
-  if (count === 2) return 'bg-primary text-white'
+  if (count === 2) return 'bg-primary/80 text-white'
   return 'bg-primary text-white [filter:saturate(2)_brightness(1.05)]'
 }
 
