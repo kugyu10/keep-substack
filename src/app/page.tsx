@@ -23,7 +23,7 @@ export default async function Home({ searchParams }: Props) {
   const results = await fetchAllFeedsCached(filteredMembers)
 
   return (
-    <main className="max-w-[600px] mx-auto p-6 pb-64">
+    <main className="max-w-[600px] mx-auto px-3 py-4 pb-16">
       <h1 className="text-2xl mb-4" style={{ fontFamily: 'Georgia, serif', fontWeight: 900 }}>Keep Substack</h1>
 
 {teams.length > 0 && (
