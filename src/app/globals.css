@@ -8,9 +8,12 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-primary: #FF6719; /* Substack brand orange */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+@theme {
+  --color-primary: #FF6719; /* Substack brand orange */
 }
 
 @media (prefers-color-scheme: dark) {
