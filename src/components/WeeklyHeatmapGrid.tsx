@@ -19,7 +19,7 @@ export default function WeeklyHeatmapGrid({ results }: WeeklyHeatmapGridProps) {
       <div className="flex justify-between items-center mb-1 text-xs text-gray-500">
         <button
           onClick={() => setWeekOffset((w) => w - 1)}
-          className="px-2 py-0.5 hover:text-gray-800 hover:bg-gray-100 rounded"
+          className="px-2 py-0.5 hover:text-white hover:bg-gray-700 rounded"
         >
           ＜
         </button>
@@ -29,7 +29,7 @@ export default function WeeklyHeatmapGrid({ results }: WeeklyHeatmapGridProps) {
         {weekOffset < 0 ? (
           <button
             onClick={() => setWeekOffset((w) => w + 1)}
-            className="px-2 py-0.5 hover:text-gray-800 hover:bg-gray-100 rounded"
+            className="px-2 py-0.5 hover:text-white hover:bg-gray-700 rounded"
           >
             ＞
           </button>

@@ -29,7 +29,7 @@ export default function RootLayout({
               href="https://uojun.substack.com/p/5d4"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-gray-600 underline"
+              className="hover:text-gray-200 underline"
             >
               コチラ
             </a>
