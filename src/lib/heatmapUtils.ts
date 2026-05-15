@@ -14,12 +14,11 @@ export function extractThumbnail(contentEncoded?: string): string | undefined {
 }
 
 export function getIntensityClass(count: number): string {
-  if (count === 0) return 'bg-gray-100 text-gray-400'
-  if (count === 1) return 'bg-green-100 text-green-700'
-  if (count === 2) return 'bg-green-200 text-green-800'
-  if (count === 3) return 'bg-green-300 text-green-900'
-  if (count === 4) return 'bg-green-500 text-white'
-  return 'bg-green-700 text-white'
+  if (count === 1) return 'bg-orange-200 text-orange-950'
+  if (count === 2) return 'bg-orange-300 text-orange-950'
+  if (count === 3) return 'bg-[#FF6719] text-white'
+  if (count === 4) return 'bg-orange-600 text-white'
+  return 'bg-orange-800 text-white'
 }
 
 export function getRecentDays(weekOffset = 0): string[] {

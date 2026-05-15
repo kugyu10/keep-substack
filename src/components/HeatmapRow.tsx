@@ -43,7 +43,7 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
           const articles = articleMap.get(date) ?? []
           const count = articles.length
           if (count === 0) {
-            return <div key={date} className="aspect-square" />
+            return <div key={date} className="aspect-square rounded-full border border-dashed border-gray-300" />
           }
           return (
             <HeatmapTooltip
@@ -51,7 +51,9 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
               articles={articles}
               colorClass={getIntensityClass(count)}
               imageUrl={imageUrl}
-            />
+            >
+              {count >= 2 ? <span className="text-xs font-bold leading-none">{count}</span> : null}
+            </HeatmapTooltip>
           )
         })}
       </div>
