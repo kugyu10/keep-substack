@@ -27,7 +27,7 @@ export default async function Home({ searchParams }: Props) {
       <h1 className="text-2xl mb-2" style={{ fontFamily: 'Georgia, serif', fontWeight: 900 }}>Keep Substack</h1>
 
 {teams.length > 0 && (
-        <div className="flex gap-2 mb-6 flex-wrap">
+        <div className="flex gap-2 mb-4 flex-wrap">
           <a
             href="/"
             className={`px-3 py-1 rounded text-sm border ${
