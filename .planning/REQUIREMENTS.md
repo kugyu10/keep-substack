@@ -25,7 +25,6 @@
 
 - [ ] **HEATMAP-01**: Substackオレンジ（#FF6719系）の濃淡で投稿数を表現する
 - [ ] **HEATMAP-02**: 投稿なしは点線丸、投稿ありはオレンジベタ塗り（複数投稿は数字表示）
-- [ ] **HEATMAP-03**: 丸のタッチターゲットを44px以上に確保する
 
 ### POPOVER — ポップオーバー（記事詳細）
 
@@ -59,15 +58,14 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| LAYOUT-01 | TBD | Pending |
-| LAYOUT-02 | TBD | Pending |
-| LIST-01 | TBD | Pending |
-| LIST-02 | TBD | Pending |
-| LIST-03 | TBD | Pending |
-| HEATMAP-01 | TBD | Pending |
-| HEATMAP-02 | TBD | Pending |
-| HEATMAP-03 | TBD | Pending |
-| POPOVER-01 | TBD | Pending |
-| POPOVER-02 | TBD | Pending |
-| POPOVER-03 | TBD | Pending |
-| POPOVER-04 | TBD | Pending |
+| LAYOUT-01 | Phase 13 | Pending |
+| LAYOUT-02 | Phase 13 | Pending |
+| LIST-01 | Phase 14 | Pending |
+| LIST-02 | Phase 14 | Pending |
+| LIST-03 | Phase 14 | Pending |
+| HEATMAP-01 | Phase 15 | Pending |
+| HEATMAP-02 | Phase 15 | Pending |
+| POPOVER-01 | Phase 16 | Pending |
+| POPOVER-02 | Phase 16 | Pending |
+| POPOVER-03 | Phase 16 | Pending |
+| POPOVER-04 | Phase 16 | Pending |
