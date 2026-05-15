@@ -22,13 +22,18 @@ export default function HeatmapTooltip({ articles, colorClass, imageUrl, childre
 
   useEffect(() => {
     if (!open) return
-    function handleClickOutside(e: MouseEvent) {
-      if (cellRef.current && !cellRef.current.contains(e.target as Node)) {
+    function handleClickOutside(e: MouseEvent | TouchEvent) {
+      const target = e instanceof TouchEvent ? e.touches[0]?.target : (e as MouseEvent).target
+      if (cellRef.current && target instanceof Node && !cellRef.current.contains(target)) {
         setOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('mousedown', handleClickOutside as EventListener)
+    document.addEventListener('touchstart', handleClickOutside as EventListener)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside as EventListener)
+      document.removeEventListener('touchstart', handleClickOutside as EventListener)
+    }
   }, [open])
 
   return (
@@ -51,32 +56,34 @@ export default function HeatmapTooltip({ articles, colorClass, imageUrl, childre
       </button>
       {open && (
         <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-10">
-          <div className="bg-white border border-gray-200 rounded shadow-lg p-2 min-w-[220px] max-w-xs relative">
+          <div className="bg-zinc-800 rounded shadow-2xl p-2 min-w-[220px] max-w-xs relative">
             <button
               onClick={() => setOpen(false)}
               aria-label="閉じる"
-              className="absolute top-1 right-1 text-gray-400 hover:text-gray-600 text-xs"
+              className="absolute top-1 right-1 text-zinc-400 hover:text-white text-xs"
             >
               ×
             </button>
             <ul>
               {articles.map((article, i) => (
-                <li key={i} className="mb-3 last:mb-0">
+                <li key={i} className="mb-2 last:mb-0">
                   <a
                     href={withUtm(article.link ?? '#')}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block"
+                    className="flex items-start gap-2"
                   >
                     {(article.thumbnail || imageUrl) && (
                       <img
                         src={article.thumbnail ?? imageUrl!}
                         alt=""
-                        className="w-full rounded mb-1 object-cover max-h-24"
-                        style={!article.thumbnail ? { maskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)' } : undefined}
+                        className="w-12 h-12 rounded object-cover shrink-0"
                       />
                     )}
-                    <span className="text-xs text-blue-600 hover:underline break-words block">
+                    <span
+                      className="text-xs text-white hover:underline flex-1 min-w-0"
+                      style={{ overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2 }}
+                    >
                       {article.title}
                     </span>
                   </a>
