@@ -33,7 +33,7 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
         ) : (
           <span className="w-10 h-10 rounded-full shrink-0 bg-gray-200 inline-block" aria-hidden="true" />
         )}
-        <div className="flex-1 min-w-0 text-xs font-semibold leading-snug underline truncate hidden sm:block">
+        <div className="flex-1 min-w-0 text-xs font-semibold leading-snug truncate hidden sm:block">
           {member.name}
         </div>
         <span className="shrink-0 text-gray-400 text-sm" aria-hidden="true">›</span>
@@ -53,8 +53,8 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
               imageUrl={imageUrl}
             >
               {count === 1
-                ? <span className="text-xs leading-none opacity-60 underline">1</span>
-                : <span className="text-xs font-bold leading-none underline">{count}</span>
+                ? <span className="text-xs leading-none opacity-60">1</span>
+                : <span className="text-xs font-bold leading-none">{count}</span>
               }
             </HeatmapTooltip>
           )
