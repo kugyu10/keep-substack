@@ -19,6 +19,23 @@ function withUtm(url: string): string {
 export default function HeatmapTooltip({ articles, colorClass, imageUrl, children }: HeatmapTooltipProps) {
   const [open, setOpen] = useState(false)
   const cellRef = useRef<HTMLDivElement>(null)
+  const popoverRef = useRef<HTMLDivElement>(null)
+
+  // ビューポートからはみ出ないよう水平位置を補正する
+  useEffect(() => {
+    if (!open || !popoverRef.current) return
+    const el = popoverRef.current
+    el.style.transform = 'translateX(-50%)'
+    const rect = el.getBoundingClientRect()
+    const margin = 8
+    if (rect.right > window.innerWidth - margin) {
+      const shift = rect.right - (window.innerWidth - margin)
+      el.style.transform = `translateX(calc(-50% - ${shift}px))`
+    } else if (rect.left < margin) {
+      const shift = margin - rect.left
+      el.style.transform = `translateX(calc(-50% + ${shift}px))`
+    }
+  }, [open])
 
   useEffect(() => {
     if (!open) return
@@ -55,7 +72,7 @@ export default function HeatmapTooltip({ articles, colorClass, imageUrl, childre
         {children}
       </button>
       {open && (
-        <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-10">
+        <div ref={popoverRef} className="absolute top-full left-1/2 pt-2 z-10" style={{ transform: 'translateX(-50%)' }}>
           <div className="bg-zinc-800 rounded shadow-2xl p-2 min-w-[220px] max-w-xs relative">
             <button
               onClick={() => setOpen(false)}
