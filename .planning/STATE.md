@@ -94,9 +94,15 @@ Progress: [██████████] 100%
 
 None.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260515-mx8 | 白背景を黒にしてみて　現在白字で溶けちゃうテキストは黒くして | 2026-05-15 | 95b1501 | [260515-mx8-white-bg-to-black-fix-text](.planning/quick/260515-mx8-white-bg-to-black-fix-text/) |
+
 ## Session Continuity
 
 Last session: 2026-05-15T07:30:00.000Z
-Stopped at: Phase 16 verified — Milestone v1.4 complete
+Stopped at: Completed quick task 260515-mx8: 白背景を黒にしてみて　現在白字で溶けちゃうテキストは黒くして
 Resume file: .planning/phases/16-popover-redesign/16-VERIFICATION.md
 Next step: 次マイルストーン（v1.5）計画
