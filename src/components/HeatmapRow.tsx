@@ -20,7 +20,7 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
     <div className="flex items-center border-b border-gray-100 py-1">
       <Link
         href={`/member/${member.substackId}`}
-        className="w-12 sm:w-52 shrink-0 pr-2 hover:underline flex items-center gap-1.5 overflow-hidden"
+        className="w-28 sm:w-52 shrink-0 pr-2 flex items-center gap-1 overflow-hidden"
       >
         {imageUrl ? (
           <img
@@ -33,13 +33,10 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
         ) : (
           <span className="w-10 h-10 rounded-full shrink-0 bg-gray-200 inline-block" aria-hidden="true" />
         )}
-        {/* Tailwind v4でline-clamp-2がflex内で効かないためinline styleで対応 */}
-        <div
-          className="hidden sm:block text-xs font-semibold leading-snug min-w-0 underline"
-          style={{ overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2 }}
-        >
+        <div className="flex-1 min-w-0 text-xs font-semibold leading-snug underline truncate hidden sm:block">
           {member.name}
         </div>
+        <span className="shrink-0 text-gray-400 text-xs" aria-hidden="true">›</span>
       </Link>
       <div className="grid grid-cols-7 gap-1 flex-1">
         {dates.map((date) => {
