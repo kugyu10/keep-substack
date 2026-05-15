@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: UI/UX Refresh
 status: in-progress
-stopped_at: Phase 15 Plan 01 complete
-last_updated: "2026-05-15T02:23:00.000Z"
-last_activity: 2026-05-15 — Phase 15-01 完了 (ヒートマップ Substackオレンジ化・点線丸・投稿数バッジ) / Build PASSED
+stopped_at: Phase 16 Plan 01 complete
+last_updated: "2026-05-15T07:00:00.000Z"
+last_activity: 2026-05-15 — Phase 16-01 完了 (ポップオーバーダーク化・横並びレイアウト・touchstart対応)
 progress:
   total_phases: 4
-  completed_phases: 2
-  total_plans: 3
-  completed_plans: 3
-  percent: 62
+  completed_phases: 4
+  total_plans: 4
+  completed_plans: 4
+  percent: 100
 ---
 
 # Project State
@@ -21,22 +21,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-15 — v1.4 UI/UX Refresh started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 15 — 次フェーズ（未着手）
+**Current focus:** Phase 16 — 次フェーズ（未着手）
 
 ## Current Position
 
-Phase: 15 of 16 — **in-progress** (Plan 01 complete)
-Plan: 15-01 完了
-Status: Phase 15 Plan 01 完了 → 次プランまたはフェーズへ進む
-Last activity: 2026-05-15 — Phase 15-01 完了 (ヒートマップ Substackオレンジ化・点線丸・投稿数バッジ実装済み、Build PASSED)
+Phase: 16 of 16 — **complete**
+Plan: 16-01 完了
+Status: Phase 16 完了 → Milestone v1.4 完了
+Last activity: 2026-05-15 — Phase 16 完了 (ポップオーバーダーク化・横並びレイアウト・touchstart対応)
 
-Progress: [████░░░░░░] 50%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 13 (v1.0: 6プラン + v1.1: 6プラン + v1.2: 3プラン + v1.3: 1プラン + v1.4: 3プラン)
+- Total plans completed: 14 (v1.0: 6プラン + v1.1: 6プラン + v1.2: 3プラン + v1.3: 1プラン + v1.4: 4プラン)
 
 **By Milestone:**
 
@@ -46,7 +46,7 @@ Progress: [████░░░░░░] 50%
 | v1.1 Dynamic Members | 3 | 6 | 2日 |
 | v1.2 UX Polish | 3 | 3 | 1日 |
 | v1.3 Data Persistence | 4 | 4 | 2日 |
-| v1.4 UI/UX Refresh | 2 (完了) / 4 | 3 | 1日 |
+| v1.4 UI/UX Refresh | 4 / 4 (完了) | 4 | 1日 |
 
 ## Accumulated Context
 
@@ -78,6 +78,12 @@ Progress: [████░░░░░░] 50%
 - bg-[#FF6719] を count===3 に割り当て（Substack公式オレンジ、Tailwind v4 arbitrary value）
 - HeatmapTooltip は変更なし（既に children?: ReactNode 実装済み）
 
+### Key Architecture Decisions (v1.4 / Phase 16)
+
+- WebkitLineClamp 2行truncate は inline style で実装（Tailwind v4 flex内 line-clamp-2 既知問題の再確認）
+- maskImage gradient style は横並びレイアウトでは不要なため削除
+- TouchEvent の target は e.touches[0]?.target で取得（タッチ開始時の座標）
+
 ### Pending Todos
 
 1件あり:
@@ -90,7 +96,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-15T02:23:00.000Z
-Stopped at: Phase 15 Plan 01 complete (Build PASSED)
-Resume file: .planning/phases/15-heatmap-coloring/15-01-SUMMARY.md
-Next step: Phase 15 次プランへ進む（または Phase 16 へ）
+Last session: 2026-05-15T07:00:00.000Z
+Stopped at: Phase 16 Plan 01 complete
+Resume file: .planning/phases/16-popover-redesign/16-01-SUMMARY.md
+Next step: Milestone v1.4 完了
