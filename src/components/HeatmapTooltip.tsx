@@ -25,14 +25,14 @@ export default function HeatmapTooltip({ articles, colorClass, imageUrl, childre
   useEffect(() => {
     if (!open || !popoverRef.current) return
     const el = popoverRef.current
-    el.style.transform = 'translateX(-50%)'
     const rect = el.getBoundingClientRect()
+    const vw = document.documentElement.clientWidth
     const margin = 8
-    if (rect.right > window.innerWidth - margin) {
-      const shift = rect.right - (window.innerWidth - margin)
+    if (rect.right > vw - margin) {
+      const shift = Math.ceil(rect.right - (vw - margin))
       el.style.transform = `translateX(calc(-50% - ${shift}px))`
     } else if (rect.left < margin) {
-      const shift = margin - rect.left
+      const shift = Math.ceil(margin - rect.left)
       el.style.transform = `translateX(calc(-50% + ${shift}px))`
     }
   }, [open])
