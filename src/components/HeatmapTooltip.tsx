@@ -73,7 +73,7 @@ export default function HeatmapTooltip({ articles, colorClass, imageUrl, childre
       }}
     >
       <button
-        className={`aspect-square w-full rounded-full ${colorClass} flex items-center justify-center relative overflow-hidden`}
+        className={`aspect-square w-full rounded-full ${colorClass} flex items-center justify-center relative overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.3)]`}
         onClick={(e) => { handleRipple(e); setOpen((prev) => !prev) }}
         aria-expanded={open}
       >
