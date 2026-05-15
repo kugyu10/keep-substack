@@ -17,7 +17,7 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
   const totalCount = dates.reduce((sum, date) => sum + (articleMap.get(date)?.length ?? 0), 0)
 
   return (
-    <div className="flex items-center border-b border-gray-100 py-1">
+    <div className="flex items-center border-b border-gray-800 py-1">
       <Link
         href={`/member/${member.substackId}`}
         className="w-16 sm:w-52 shrink-0 pr-2 flex items-center gap-1 overflow-hidden"
