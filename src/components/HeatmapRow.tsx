@@ -53,8 +53,8 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
               imageUrl={imageUrl}
             >
               {count === 1
-                ? <span className="text-xs leading-none opacity-60">1</span>
-                : <span className="text-xs font-bold leading-none">{count}</span>
+                ? <span className="text-xs leading-none opacity-60 underline">1</span>
+                : <span className="text-xs font-bold leading-none underline">{count}</span>
               }
             </HeatmapTooltip>
           )
