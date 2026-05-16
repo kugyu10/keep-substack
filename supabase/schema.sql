@@ -11,8 +11,11 @@ CREATE TABLE IF NOT EXISTS members (
   name        TEXT        NOT NULL,
   substack_id TEXT        UNIQUE NOT NULL,
   image_url   TEXT,
-  added_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+  added_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  user_id     UUID        REFERENCES auth.users(id) UNIQUE
 );
+-- 既存Supabaseインスタンスへの適用:
+-- ALTER TABLE members ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) UNIQUE;
 
 CREATE TABLE IF NOT EXISTS teams (
   id   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
