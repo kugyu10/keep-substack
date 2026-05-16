@@ -4,11 +4,22 @@ import { revalidatePath } from 'next/cache'
 import { addMember, deleteMember, updateMember } from '@/lib/members'
 import { fetchWithRetry } from '@/lib/fetchFeed'
 import { saveArticles, deleteArticles } from '@/lib/articles'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
+
+async function requireAdmin(): Promise<void> {
+  const supabase = await createSupabaseServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user || user.app_metadata?.role !== 'admin') {
+    throw new Error('Unauthorized')
+  }
+}
 
 export async function addMemberAction(
   prevState: string | null,
   formData: FormData
 ): Promise<string | null> {
+  try { await requireAdmin() } catch { return '権限がありません' }
+
   const name = formData.get('name') as string
   const publicationId = formData.get('publicationId') as string
   const teamNames = formData.getAll('teamNames') as string[]
@@ -39,6 +50,7 @@ export async function addMemberAction(
 }
 
 export async function deleteMemberAction(publicationId: string): Promise<void> {
+  await requireAdmin()
   await deleteMember(publicationId)
   await deleteArticles(publicationId)
   revalidatePath('/admin')
@@ -48,6 +60,8 @@ export async function updateMemberAction(
   publicationId: string,
   formData: FormData
 ): Promise<string | null> {
+  try { await requireAdmin() } catch { return '権限がありません' }
+
   const name = formData.get('name') as string
   const teamNames = formData.getAll('teamNames') as string[]
   const addedAt = formData.get('addedAt') as string
