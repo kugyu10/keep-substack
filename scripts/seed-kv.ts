@@ -9,13 +9,13 @@ import membersJson from '../src/data/members.json'
 const redis = Redis.fromEnv()
 
 // 旧スキーマ: { name: string, feedUrl: string }
-// 新スキーマ (D-03): { name: string, substackId: string, teamId: string, addedAt: string }
+// 新スキーマ (D-03): { name: string, publicationId: string, teamId: string, addedAt: string }
 function migrate(old: { name: string; feedUrl: string }) {
   const m = old.feedUrl.match(/^https?:\/\/([^.]+)\.substack\.com/)
-  if (!m) throw new Error(`feedUrl から substackId を抽出できません: ${old.feedUrl}`)
+  if (!m) throw new Error(`feedUrl から publicationId を抽出できません: ${old.feedUrl}`)
   return {
     name: old.name,
-    substackId: m[1],
+    publicationId: m[1],
     teamId: 'default',
     addedAt: new Date().toISOString(),
   }
@@ -27,7 +27,7 @@ async function main() {
   // D-02: @upstash/redis の自動シリアライズを使用（手動での文字列化は不要）
   await redis.set('members', members)
   console.log(`Seeded ${members.length} members:`)
-  members.forEach((m) => console.log(`  - ${m.name} (${m.substackId})`))
+  members.forEach((m) => console.log(`  - ${m.name} (${m.publicationId})`))
 }
 
 main().catch((err) => {

@@ -20,16 +20,16 @@ async function main() {
   // --- members.sql ---
   const membersLines = members.map((m) => {
     const name = escapeSql(m.name)
-    const substackId = escapeSql(m.substackId)
+    const publicationId = escapeSql(m.substackId)
     const addedAt = escapeSql(m.addedAt)
     // imageUrlはarticlesフェッチ後に更新するためNULLで初期挿入
-    return `  (gen_random_uuid(), ${name}, ${substackId}, NULL, ${addedAt})`
+    return `  (gen_random_uuid(), ${name}, ${publicationId}, NULL, ${addedAt})`
   })
   const membersSql = [
     '-- members INSERT（Supabase SQL Editor で実行: 1番目）',
-    'INSERT INTO members (id, name, substack_id, image_url, added_at) VALUES',
+    'INSERT INTO members (id, name, publication_id, image_url, added_at) VALUES',
     membersLines.join(',\n'),
-    'ON CONFLICT (substack_id) DO NOTHING;',
+    'ON CONFLICT (publication_id) DO NOTHING;',
   ].join('\n')
   await writeFile(`${OUTPUT_DIR}/members.sql`, membersSql)
   console.log('members.sql を生成しました')
@@ -54,7 +54,7 @@ async function main() {
       memberTeamsLines.push(
         `INSERT INTO member_teams (member_id, team_id)\n` +
         `  SELECT m.id, t.id FROM members m, teams t\n` +
-        `  WHERE m.substack_id = ${escapeSql(m.substackId)} AND t.name = ${escapeSql(teamName)}\n` +
+        `  WHERE m.publication_id = ${escapeSql(m.substackId)} AND t.name = ${escapeSql(teamName)}\n` +
         `  ON CONFLICT DO NOTHING;`
       )
     }
@@ -77,13 +77,13 @@ async function main() {
     if (feed.imageUrl) {
       imageUrlUpdates.push(
         `UPDATE members SET image_url = ${escapeSql(feed.imageUrl)}\n` +
-        `  WHERE substack_id = ${escapeSql(m.substackId)};`
+        `  WHERE publication_id = ${escapeSql(m.substackId)};`
       )
     }
 
     for (const item of feed.items) {
       if (!item.link) continue
-      const substackId = escapeSql(m.substackId)
+      const publicationId = escapeSql(m.substackId)
       const title = escapeSql(item.title)
       const link = escapeSql(item.link)
       const pubDate = item.isoDate
@@ -92,7 +92,7 @@ async function main() {
           ? escapeSql(item.pubDate)
           : 'NULL'
       articlesLines.push(
-        `  (gen_random_uuid(), ${substackId}, ${title}, ${link}, ${pubDate})`
+        `  (gen_random_uuid(), ${publicationId}, ${title}, ${link}, ${pubDate})`
       )
     }
   }
@@ -102,7 +102,7 @@ async function main() {
     ...(imageUrlUpdates.length > 0
       ? ['-- members.image_url の更新', ...imageUrlUpdates, '']
       : []),
-    'INSERT INTO articles (id, substack_id, title, link, pub_date) VALUES',
+    'INSERT INTO articles (id, publication_id, title, link, pub_date) VALUES',
     articlesLines.join(',\n'),
     'ON CONFLICT (link) DO NOTHING;',
   ].join('\n')
