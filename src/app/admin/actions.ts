@@ -10,15 +10,15 @@ export async function addMemberAction(
   formData: FormData
 ): Promise<string | null> {
   const name = formData.get('name') as string
-  const substackId = formData.get('substackId') as string
+  const publicationId = formData.get('publicationId') as string
   const teamNames = formData.getAll('teamNames') as string[]
 
-  if (!name || !substackId) {
-    return 'name と substackId は必須です'
+  if (!name || !publicationId) {
+    return 'name と publicationId は必須です'
   }
 
   try {
-    await addMember({ name, substackId, teamNames })
+    await addMember({ name, publicationId, teamNames })
   } catch (e) {
     return e instanceof Error ? e.message : '追加に失敗しました'
   }
@@ -27,9 +27,9 @@ export async function addMemberAction(
 
   try {
     const { items, imageUrl } = await fetchWithRetry(
-      `https://${substackId}.substack.com/feed`
+      `https://${publicationId}.substack.com/feed`
     )
-    await saveArticles(substackId, items, imageUrl)
+    await saveArticles(publicationId, items, imageUrl)
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'RSS取得に失敗しました'
     return `メンバーを追加しましたが、RSS取得に失敗しました: ${msg}`
@@ -38,14 +38,14 @@ export async function addMemberAction(
   return null
 }
 
-export async function deleteMemberAction(substackId: string): Promise<void> {
-  await deleteMember(substackId)
-  await deleteArticles(substackId)
+export async function deleteMemberAction(publicationId: string): Promise<void> {
+  await deleteMember(publicationId)
+  await deleteArticles(publicationId)
   revalidatePath('/admin')
 }
 
 export async function updateMemberAction(
-  substackId: string,
+  publicationId: string,
   formData: FormData
 ): Promise<string | null> {
   const name = formData.get('name') as string
@@ -58,7 +58,7 @@ export async function updateMemberAction(
   }
 
   try {
-    await updateMember(substackId, { name, teamNames, addedAt })
+    await updateMember(publicationId, { name, teamNames, addedAt })
     revalidatePath('/admin')
     return null
   } catch (e) {

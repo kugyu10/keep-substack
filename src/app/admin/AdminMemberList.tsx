@@ -10,12 +10,12 @@ export default function AdminMemberList({ members, teams }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editError, setEditError] = useState<string | null>(null)
 
-  async function handleDelete(substackId: string) {
-    if (!window.confirm(`"${substackId}" を削除しますか？`)) return
-    await deleteMemberAction(substackId)
+  async function handleDelete(publicationId: string) {
+    if (!window.confirm(`"${publicationId}" を削除しますか？`)) return
+    await deleteMemberAction(publicationId)
   }
 
-  async function handleUpdate(substackId: string, e: React.MouseEvent<HTMLButtonElement>) {
+  async function handleUpdate(publicationId: string, e: React.MouseEvent<HTMLButtonElement>) {
     const tr = e.currentTarget.closest('tr')
     if (!tr) return
     const formData = new FormData()
@@ -29,7 +29,7 @@ export default function AdminMemberList({ members, teams }: Props) {
       (cb) => formData.append(cb.name, cb.value)
     )
 
-    const error = await updateMemberAction(substackId, formData)
+    const error = await updateMemberAction(publicationId, formData)
     if (error) {
       setEditError(error)
     } else {
@@ -44,7 +44,7 @@ export default function AdminMemberList({ members, teams }: Props) {
         <thead>
           <tr className="bg-gray-700 text-left">
             <th className="border border-gray-600 px-3 py-2">名前</th>
-            <th className="border border-gray-600 px-3 py-2">substackId</th>
+            <th className="border border-gray-600 px-3 py-2">publicationId</th>
             <th className="border border-gray-600 px-3 py-2">チーム</th>
             <th className="border border-gray-600 px-3 py-2">addedAt</th>
             <th className="border border-gray-600 px-3 py-2"></th>
@@ -52,8 +52,8 @@ export default function AdminMemberList({ members, teams }: Props) {
         </thead>
         <tbody>
           {members.map((m) =>
-            editingId === m.substackId ? (
-              <tr key={m.substackId} className="bg-gray-800">
+            editingId === m.publicationId ? (
+              <tr key={m.publicationId} className="bg-gray-800">
                 <td className="border border-gray-600 px-3 py-2">
                   <input
                     defaultValue={m.name}
@@ -61,7 +61,7 @@ export default function AdminMemberList({ members, teams }: Props) {
                     className="bg-gray-700 border border-gray-500 rounded px-1 w-full text-sm text-white"
                   />
                 </td>
-                <td className="border border-gray-600 px-3 py-2 text-gray-400">{m.substackId}</td>
+                <td className="border border-gray-600 px-3 py-2 text-gray-400">{m.publicationId}</td>
                 <td className="border border-gray-600 px-3 py-2">
                   <div className="flex flex-col gap-1">
                     {teams.map((team) => (
@@ -86,7 +86,7 @@ export default function AdminMemberList({ members, teams }: Props) {
                 </td>
                 <td className="border border-gray-600 px-3 py-2">
                   <button
-                    onClick={(e) => handleUpdate(m.substackId, e)}
+                    onClick={(e) => handleUpdate(m.publicationId, e)}
                     className="text-blue-400 hover:underline text-xs mr-2"
                   >
                     保存
@@ -101,22 +101,22 @@ export default function AdminMemberList({ members, teams }: Props) {
                 </td>
               </tr>
             ) : (
-              <tr key={m.substackId} className="bg-black hover:bg-gray-800">
+              <tr key={m.publicationId} className="bg-black hover:bg-gray-800">
                 <td className="border border-gray-700 px-3 py-2">{m.name}</td>
-                <td className="border border-gray-700 px-3 py-2">{m.substackId}</td>
+                <td className="border border-gray-700 px-3 py-2">{m.publicationId}</td>
                 <td className="border border-gray-700 px-3 py-2">{m.teamNames.join(', ')}</td>
                 <td className="border border-gray-700 px-3 py-2 text-xs text-gray-400">
                   {new Date(m.addedAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
                 </td>
                 <td className="border border-gray-700 px-3 py-2">
                   <button
-                    onClick={() => { setEditingId(m.substackId); setEditError(null) }}
+                    onClick={() => { setEditingId(m.publicationId); setEditError(null) }}
                     className="text-blue-400 hover:underline text-xs mr-2"
                   >
                     編集
                   </button>
                   <button
-                    onClick={() => handleDelete(m.substackId)}
+                    onClick={() => handleDelete(m.publicationId)}
                     className="text-red-400 hover:underline text-xs"
                   >
                     削除

@@ -18,9 +18,9 @@ export async function GET(request: NextRequest) {
   await Promise.allSettled(
     members.map(async (m) => {
       const { items, imageUrl } = await fetchWithRetry(
-        `https://${m.substackId}.substack.com/feed`
+        `https://${m.publicationId}.substack.com/feed`
       )
-      await saveArticles(m.substackId, items, imageUrl)
+      await saveArticles(m.publicationId, items, imageUrl)
     })
   )
 

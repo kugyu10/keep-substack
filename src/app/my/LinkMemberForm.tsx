@@ -9,17 +9,17 @@ export default function LinkMemberForm() {
   return (
     <div>
       <p className="text-sm text-gray-600 mb-4">
-        管理者から登録してもらった Substack ID を入力して、アカウントと紐付けてください。
+        管理者から登録してもらった Publication ID を入力して、アカウントと紐付けてください。
       </p>
       <form action={action} className="space-y-4">
         {state && <p className="text-sm text-red-600">{state}</p>}
         <div>
-          <label htmlFor="substackId" className="block text-sm font-medium mb-1">
-            Substack ID
+          <label htmlFor="publicationId" className="block text-sm font-medium mb-1">
+            Publication ID
           </label>
           <input
-            id="substackId"
-            name="substackId"
+            id="publicationId"
+            name="publicationId"
             type="text"
             required
             className="w-full border rounded px-3 py-2 text-sm"

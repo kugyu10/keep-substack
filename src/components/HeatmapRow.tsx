@@ -19,7 +19,7 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
   return (
     <div className="flex items-center border-b border-[#ebebeb] py-1">
       <Link
-        href={`/member/${member.substackId}`}
+        href={`/member/${member.publicationId}`}
         className="w-16 sm:w-52 shrink-0 pr-2 flex items-center gap-1 overflow-hidden"
       >
         {imageUrl ? (

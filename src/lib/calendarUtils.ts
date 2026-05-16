@@ -73,7 +73,7 @@ export function buildArticleMap(
 }
 
 /**
- * SubstackフィードURLからサブドメイン（substackId）を抽出する。
+ * SubstackフィードURLからサブドメイン（publicationId）を抽出する。
  * 例: "https://uojun.substack.com/feed" -> "uojun"
  * Substack形式でないURLはnullを返す。
  */

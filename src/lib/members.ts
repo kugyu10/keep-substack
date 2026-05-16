@@ -7,7 +7,7 @@ export async function getMembers(): Promise<Member[]> {
     .from('members')
     .select(`
       name,
-      substack_id,
+      publication_id,
       added_at,
       member_teams (
         teams (name)
@@ -17,7 +17,7 @@ export async function getMembers(): Promise<Member[]> {
   if (!data) return []
   return data.map((m: any) => ({
     name: m.name,
-    substackId: m.substack_id,
+    publicationId: m.publication_id,
     teamNames: (m.member_teams as any[])
       .map((mt: any) => mt.teams?.name)
       .filter((n: unknown): n is string => typeof n === 'string'),
@@ -31,17 +31,17 @@ export async function addMember(member: Omit<Member, 'addedAt'>): Promise<void> 
   const { data: existing } = await supabase
     .from('members')
     .select('id')
-    .eq('substack_id', member.substackId)
+    .eq('publication_id', member.publicationId)
     .maybeSingle()
   if (existing) {
-    throw new Error(`substackId "${member.substackId}" は既に登録されています`)
+    throw new Error(`publicationId "${member.publicationId}" は既に登録されています`)
   }
 
   const { data: newMember, error: insertError } = await supabase
     .from('members')
     .insert({
       name: member.name,
-      substack_id: member.substackId,
+      publication_id: member.publicationId,
       added_at: new Date().toISOString(),
     })
     .select('id')
@@ -63,29 +63,29 @@ export async function addMember(member: Omit<Member, 'addedAt'>): Promise<void> 
   }
 }
 
-// 存在しない substackId を削除しようとしても静かに成功する（既存動作を維持）
-export async function deleteMember(substackId: string): Promise<void> {
+// 存在しない publicationId を削除しようとしても静かに成功する（既存動作を維持）
+export async function deleteMember(publicationId: string): Promise<void> {
   const supabase = createSupabaseAdminClient()
   const { error } = await supabase
     .from('members')
     .delete()
-    .eq('substack_id', substackId)
+    .eq('publication_id', publicationId)
   if (error) throw error
 }
 
 export async function updateMember(
-  substackId: string,
-  updates: Partial<Omit<Member, 'substackId'>>
+  publicationId: string,
+  updates: Partial<Omit<Member, 'publicationId'>>
 ): Promise<void> {
   const supabase = createSupabaseAdminClient()
 
   const { data: member, error: findError } = await supabase
     .from('members')
     .select('id')
-    .eq('substack_id', substackId)
+    .eq('publication_id', publicationId)
     .maybeSingle()
   if (findError) throw findError
-  if (!member) throw new Error(`メンバーが見つかりません: ${substackId}`)
+  if (!member) throw new Error(`メンバーが見つかりません: ${publicationId}`)
 
   const memberUpdate: Record<string, unknown> = {}
   if (updates.name !== undefined) memberUpdate.name = updates.name
@@ -94,7 +94,7 @@ export async function updateMember(
     const { error: updateError } = await supabase
       .from('members')
       .update(memberUpdate)
-      .eq('substack_id', substackId)
+      .eq('publication_id', publicationId)
     if (updateError) throw updateError
   }
 

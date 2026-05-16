@@ -59,10 +59,10 @@ export async function fetchWithRetry(url: string): Promise<FeedResult> {
 export async function fetchAllFeedsCached(members: Member[]): Promise<MemberFeedResult[]> {
   const results = await Promise.allSettled(
     members.map(async (member) => {
-      const feedUrl = `https://${member.substackId}.substack.com/feed`
+      const feedUrl = `https://${member.publicationId}.substack.com/feed`
       const [liveResult, kvResult] = await Promise.allSettled([
         fetchWithRetry(feedUrl),
-        getArticles(member.substackId),
+        getArticles(member.publicationId),
       ])
 
       const live = liveResult.status === 'fulfilled' ? liveResult.value : { items: [], imageUrl: undefined }

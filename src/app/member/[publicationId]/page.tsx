@@ -10,14 +10,14 @@ export const revalidate = 300
 export default async function MemberPage({
   params,
 }: {
-  params: Promise<{ substackId: string }>
+  params: Promise<{ publicationId: string }>
 }) {
-  const { substackId } = await params
+  const { publicationId } = await params
 
   const members = await getMembers()
   const results = await fetchAllFeedsCached(members)
   const memberResult = results.find(
-    (r) => r.member.substackId === substackId
+    (r) => r.member.publicationId === publicationId
   )
 
   if (!memberResult) notFound()

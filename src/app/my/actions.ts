@@ -8,8 +8,8 @@ export async function linkMemberAction(
   prevState: string | null,
   formData: FormData
 ): Promise<string | null> {
-  const substackId = (formData.get('substackId') as string)?.trim()
-  if (!substackId) return 'Substack ID を入力してください'
+  const publicationId = (formData.get('publicationId') as string)?.trim()
+  if (!publicationId) return 'Publication ID を入力してください'
 
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -20,16 +20,16 @@ export async function linkMemberAction(
   const { data: member } = await admin
     .from('members')
     .select('id, user_id')
-    .eq('substack_id', substackId)
+    .eq('publication_id', publicationId)
     .maybeSingle()
 
-  if (!member) return `"${substackId}" というメンバーは登録されていません`
+  if (!member) return `"${publicationId}" というメンバーは登録されていません`
   if (member.user_id) return 'このメンバーは既に別のアカウントと紐付けられています'
 
   const { error } = await admin
     .from('members')
     .update({ user_id: user.id })
-    .eq('substack_id', substackId)
+    .eq('publication_id', publicationId)
 
   if (error) {
     console.error('[linkMember]', error)

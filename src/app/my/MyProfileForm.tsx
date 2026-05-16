@@ -5,7 +5,7 @@ import { updateMyProfileAction } from './actions'
 
 type Member = {
   name: string
-  substack_id: string
+  publicationId: string
   team_names: string[]
 }
 
@@ -17,11 +17,11 @@ export default function MyProfileForm({ member }: { member: Member }) {
       {state && <p className="text-sm text-red-600">{state}</p>}
 
       <div>
-        <label className="block text-sm font-medium mb-1">Substack ID</label>
+        <label className="block text-sm font-medium mb-1">Publication ID</label>
         <p className="text-sm text-gray-700 border rounded px-3 py-2 bg-gray-50">
-          {member.substack_id}
+          {member.publicationId}
         </p>
-        <p className="text-xs text-gray-500 mt-1">Substack ID は変更できません</p>
+        <p className="text-xs text-gray-500 mt-1">Publication ID は変更できません</p>
       </div>
 
       <div>

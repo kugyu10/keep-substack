@@ -14,7 +14,7 @@ export default async function MyPage() {
     .from('members')
     .select(`
       name,
-      substack_id,
+      publication_id,
       member_teams (
         teams (name)
       )
@@ -37,7 +37,7 @@ export default async function MyPage() {
         <MyProfileForm
           member={{
             name: member.name,
-            substack_id: member.substack_id,
+            publicationId: member.publication_id,
             team_names: teamNames,
           }}
         />

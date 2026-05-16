@@ -26,9 +26,9 @@ const mockGetArticles = vi.mocked(getArticles)
 const getMockParseString = () =>
   ((Parser as unknown as Record<string, unknown>)._parseString as ReturnType<typeof vi.fn>)
 
-const makeMember = (substackId: string): Member => ({
-  name: substackId,
-  substackId,
+const makeMember = (publicationId: string): Member => ({
+  name: publicationId,
+  publicationId,
   teamNames: [],
   addedAt: '2025-01-01',
 })

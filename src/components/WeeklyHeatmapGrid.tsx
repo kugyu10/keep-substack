@@ -56,7 +56,7 @@ export default function WeeklyHeatmapGrid({ results }: WeeklyHeatmapGridProps) {
       </div>
       {sorted.map(({ member, items, imageUrl }) => (
         <HeatmapRow
-          key={member.substackId}
+          key={member.publicationId}
           member={member}
           articlesByDateEntries={Array.from(buildHeatmapArticleMap(items).entries())}
           dates={dates}

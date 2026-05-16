@@ -19,8 +19,8 @@ export default function AdminAddForm({ teams }: Props) {
           className="border rounded px-2 py-1 text-sm flex-1"
         />
         <input
-          name="substackId"
-          placeholder="substackId"
+          name="publicationId"
+          placeholder="publicationId"
           required
           className="border rounded px-2 py-1 text-sm flex-1"
         />

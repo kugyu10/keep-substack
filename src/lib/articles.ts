@@ -3,18 +3,18 @@ import type { FeedItem } from './types'
 
 type StoredFeed = { items: FeedItem[]; imageUrl?: string }
 
-export async function getArticles(substackId: string): Promise<StoredFeed> {
+export async function getArticles(publicationId: string): Promise<StoredFeed> {
   const supabase = createSupabaseAdminClient()
   const [articlesResult, memberResult] = await Promise.all([
     supabase
       .from('articles')
       .select('title, link, pub_date, image_url')
-      .eq('substack_id', substackId)
+      .eq('publication_id', publicationId)
       .order('pub_date', { ascending: false }),
     supabase
       .from('members')
       .select('image_url')
-      .eq('substack_id', substackId)
+      .eq('publication_id', publicationId)
       .maybeSingle(),
   ])
 
@@ -31,19 +31,19 @@ export async function getArticles(substackId: string): Promise<StoredFeed> {
   }
 }
 
-export async function deleteArticles(substackId: string): Promise<void> {
+export async function deleteArticles(publicationId: string): Promise<void> {
   const supabase = createSupabaseAdminClient()
   const { error } = await supabase
     .from('articles')
     .delete()
-    .eq('substack_id', substackId)
+    .eq('publication_id', publicationId)
   if (error) throw error
 }
 
 // ON CONFLICT (link) DO NOTHING で重複排除（schema.sql の UNIQUE(link) 制約を利用）
 // imageUrl が渡された場合は members.image_url を更新する
 export async function saveArticles(
-  substackId: string,
+  publicationId: string,
   newItems: FeedItem[],
   imageUrl?: string
 ): Promise<void> {
@@ -53,7 +53,7 @@ export async function saveArticles(
   if (validItems.length > 0) {
     const { error } = await supabase.from('articles').upsert(
       validItems.map((item) => ({
-        substack_id: substackId,
+        publication_id: publicationId,
         title: item.title ?? null,
         link: item.link!,
         pub_date: item.isoDate ?? null,
@@ -68,7 +68,7 @@ export async function saveArticles(
     const { error } = await supabase
       .from('members')
       .update({ image_url: imageUrl })
-      .eq('substack_id', substackId)
+      .eq('publication_id', publicationId)
     if (error) throw error
   }
 }
