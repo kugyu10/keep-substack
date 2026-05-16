@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { deleteMemberAction, updateMemberAction } from './actions'
 import type { Member } from '@/lib/types'
 
-type Props = { members: Member[] }
+type Props = { members: Member[]; teams: string[] }
 
-export default function AdminMemberList({ members }: Props) {
+export default function AdminMemberList({ members, teams }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editError, setEditError] = useState<string | null>(null)
 
@@ -19,8 +19,16 @@ export default function AdminMemberList({ members }: Props) {
     const tr = e.currentTarget.closest('tr')
     if (!tr) return
     const formData = new FormData()
-    const inputs = tr.querySelectorAll<HTMLInputElement>('input[name]')
-    inputs.forEach((input) => formData.append(input.name, input.value))
+
+    // テキスト入力（name, addedAt）
+    tr.querySelectorAll<HTMLInputElement>('input[name]:not([type="checkbox"])').forEach(
+      (input) => formData.append(input.name, input.value)
+    )
+    // チェックボックス: checked のもののみ
+    tr.querySelectorAll<HTMLInputElement>('input[type="checkbox"][name]:checked').forEach(
+      (cb) => formData.append(cb.name, cb.value)
+    )
+
     const error = await updateMemberAction(substackId, formData)
     if (error) {
       setEditError(error)
@@ -47,14 +55,34 @@ export default function AdminMemberList({ members }: Props) {
             editingId === m.substackId ? (
               <tr key={m.substackId} className="bg-gray-800">
                 <td className="border border-gray-600 px-3 py-2">
-                  <input defaultValue={m.name} name="name" className="bg-gray-700 border border-gray-500 rounded px-1 w-full text-sm text-white" />
+                  <input
+                    defaultValue={m.name}
+                    name="name"
+                    className="bg-gray-700 border border-gray-500 rounded px-1 w-full text-sm text-white"
+                  />
                 </td>
                 <td className="border border-gray-600 px-3 py-2 text-gray-400">{m.substackId}</td>
                 <td className="border border-gray-600 px-3 py-2">
-                  <input defaultValue={m.teamNames.join(', ')} name="teamNames" className="bg-gray-700 border border-gray-500 rounded px-1 w-full text-sm text-white" />
+                  <div className="flex flex-col gap-1">
+                    {teams.map((team) => (
+                      <label key={team} className="flex items-center gap-1 text-sm cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="teamNames"
+                          value={team}
+                          defaultChecked={m.teamNames.includes(team)}
+                        />
+                        {team}
+                      </label>
+                    ))}
+                  </div>
                 </td>
                 <td className="border border-gray-600 px-3 py-2">
-                  <input defaultValue={m.addedAt} name="addedAt" className="bg-gray-700 border border-gray-500 rounded px-1 w-56 text-sm font-mono text-white" />
+                  <input
+                    defaultValue={m.addedAt}
+                    name="addedAt"
+                    className="bg-gray-700 border border-gray-500 rounded px-1 w-56 text-sm font-mono text-white"
+                  />
                 </td>
                 <td className="border border-gray-600 px-3 py-2">
                   <button
