@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Member Auth + Supabase Migration
-status: planning
-stopped_at: Phase 17 context gathered
-last_updated: "2026-05-16T02:47:28.425Z"
-last_activity: 2026-05-16 — v1.5 ロードマップ改訂完了（5フェーズ、12要件100%カバー）
+status: in_progress
+stopped_at: Phase 17 complete — 17-01 (schema) + 17-02 (client) + 17-03 (migration script)
+last_updated: "2026-05-16T10:00:00.000Z"
+last_activity: 2026-05-16 — Phase 17 完了（Supabaseスキーマ・クライアント・KV移行スクリプト）
 progress:
   total_phases: 9
-  completed_phases: 4
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  completed_phases: 5
+  total_plans: 3
+  completed_plans: 3
+  percent: 20
 ---
 
 # Project State
@@ -25,18 +25,18 @@ See: .planning/PROJECT.md (updated 2026-05-16 — v1.5 Member Auth + Supabase Mi
 
 ## Current Position
 
-Phase: Not started (Phase 17 ready to plan)
-Plan: —
-Status: Ready to plan
-Last activity: 2026-05-16 — v1.5 ロードマップ改訂完了（5フェーズ、12要件100%カバー）
+Phase: 17 of 21 — **complete**
+Plan: 17-03 完了（17-01 DDL + 17-02 Supabaseクライアント + 17-03 移行スクリプト）
+Status: Phase 17 完了 → Phase 18 待機
+Last activity: 2026-05-16 — Phase 17 全3プラン完了（Supabaseスキーマ + クライアント基盤 + KV移行スクリプト）
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 16 (v1.0: 6プラン + v1.1: 6プラン + v1.2: 3プラン + v1.3: 4プラン + v1.4: 4プラン)
+- Total plans completed: 19 (v1.0: 6プラン + v1.1: 6プラン + v1.2: 3プラン + v1.3: 4プラン + v1.4: 4プラン + v1.5: 3プラン)
 
 **By Milestone:**
 
@@ -47,6 +47,7 @@ Progress: [░░░░░░░░░░] 0%
 | v1.2 UX Polish | 3 | 3 | 1日 |
 | v1.3 Data Persistence | 4 | 4 | 2日 |
 | v1.4 UI/UX Refresh | 4 | 4 | 1日 |
+| v1.5 Member Auth + Supabase Migration | 1 / 5 (Phase 17完了) | 3 | 1日 |
 
 ## Accumulated Context
 
@@ -71,7 +72,7 @@ Progress: [░░░░░░░░░░] 0%
 
 ## Session Continuity
 
-Last session: 2026-05-16T02:47:28.418Z
-Stopped at: Phase 17 context gathered
-Resume file: .planning/phases/17-supabase-rls-kv/17-CONTEXT.md
-Next step: `/gsd-plan-phase 17`
+Last session: 2026-05-16T10:00:00.000Z
+Stopped at: Phase 17 complete — 17-03 (KV移行スクリプト) SUMMARY作成済み
+Resume file: .planning/phases/17-supabase-rls-kv/17-03-SUMMARY.md
+Next step: Phase 18 (データレイヤー差し替え + 長期記事履歴) を計画・実行

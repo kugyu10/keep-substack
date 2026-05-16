@@ -74,7 +74,7 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 
 **Milestone Goal:** Supabase完全移行・ログイン・メンバー自己管理を実現し、管理者依存を排除してメンバーが自律的に参加できるサービスにする
 
-- [ ] **Phase 17: Supabaseスキーマ + RLS設定 + KVデータ移行** - PostgreSQLテーブル定義・RLSポリシー・Supabaseクライアント基盤を構築し、既存Upstash RedisのデータをPostgreSQLへ一括マイグレーション
+- [x] **Phase 17: Supabaseスキーマ + RLS設定 + KVデータ移行** - PostgreSQLテーブル定義・RLSポリシー・Supabaseクライアント基盤を構築し、KV→SQL移行スクリプトを作成（completed 2026-05-16）
 - [ ] **Phase 18: データレイヤー差し替え + 長期記事履歴** - 読み書きをSupabaseに切り替え、Cronを長期累積保存に対応、proxy.tsリネーム
 - [ ] **Phase 19: Supabase Auth + メンバー自己管理** - Magic Linkログイン・/myページ・既存メンバー自己リンク・adminロール制御
 - [ ] **Phase 20: 管理画面チームチェックボックス** - Supabase teamsテーブルを前提に、チームをカンマ区切り入力からチェックボックスUIで選択できるよう改善
@@ -211,7 +211,7 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 | 14. ユーザーリスト + チームタブ UI | v1.4 | 1/1 | Complete | 2026-05-15 |
 | 15. ヒートマップ カラーリング | v1.4 | 1/1 | Complete | 2026-05-15 |
 | 16. ポップオーバー刷新 | v1.4 | 1/1 | Complete | 2026-05-15 |
-| 17. Supabaseスキーマ + RLS設定 + KVデータ移行 | v1.5 | 0/3 | Not started | - |
+| 17. Supabaseスキーマ + RLS設定 + KVデータ移行 | v1.5 | 3/3 | Complete | 2026-05-16 |
 | 18. データレイヤー差し替え + 長期記事履歴 | v1.5 | 0/TBD | Not started | - |
 | 19. Supabase Auth + メンバー自己管理 | v1.5 | 0/TBD | Not started | - |
 | 20. 管理画面チームチェックボックス | v1.5 | 0/TBD | Not started | - |
