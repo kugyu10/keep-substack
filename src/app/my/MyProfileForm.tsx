@@ -18,7 +18,7 @@ export default function MyProfileForm({ member }: { member: Member }) {
 
       <div>
         <label className="block text-sm font-medium mb-1">パブリケーションID</label>
-        <p className="text-sm text-gray-700 border rounded px-3 py-2 bg-gray-50">
+        <p className="text-sm text-gray-400 border rounded px-3 py-2 bg-gray-100">
           {member.publicationId}
         </p>
         <p className="text-xs text-gray-500 mt-1">パブリケーションID は変更できません</p>
