@@ -1,213 +1,230 @@
-# Feature Landscape — v1.1 Weekly Heatmap + Admin UI
+# Feature Research: v1.5
 
-**Domain:** RSS feed activity visualization — multi-member weekly heatmap + member management
-**Researched:** 2026-05-08
-**Milestone:** v1.1 (existing v1.0 features already built — this file covers NEW features only)
-
----
-
-## Context: What Already Exists (v1.0)
-
-Do NOT re-research or re-plan these:
-- Monthly calendar UI per member with 6-level color density
-- Hover+click ArticleTooltip (title + link)
-- All-member MiniCalendar dashboard grid
-- Individual member detail page `/member/[substackId]`
-- ISR-based RSS feed fetching via `fetchAllFeedsCached`
-- Member data in `members.json` (type: `{ name, feedUrl }`)
+**Domain:** Substack継続コミュニティ向けRSS活動可視化ツール
+**Milestone:** v1.5 Member Auth + Supabase Migration
+**Researched:** 2026-05-16
+**Overall confidence:** HIGH (Supabase公式ドキュメント + 既存コードベース実地確認)
 
 ---
 
-## Table Stakes
+## Context: 既存アーキテクチャ (再調査不要)
 
-Features users expect in v1.1. Missing = product feels incomplete or broken.
+v1.4時点の完成済み機能:
+- `Member` 型: `{ name, substackId, teamNames: string[], addedAt }` (KV JSON配列)
+- `kvMembers.ts`: `getMembers / addMember / deleteMember / updateMember`
+- `kvArticles.ts`: `saveArticles / getArticles` (key=`articles:{substackId}`)
+- 管理画面 `/admin`: Server Component + AdminAddForm + AdminMemberList (インライン編集)
+- チーム: `teamNames: string[]` (カンマ区切りテキスト入力で設定)
+- Basic Auth: `middleware.ts`（proxy.tsではなく実際にmiddleware.tsが現存）
+- データ永続化: Upstash Redis（KV）
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| 7-day heatmap grid (rows=members, cols=days) | Core new UI — 50 members on one screen. Monthly cards don't scale. | Med | CSS Grid. Fixed 7 cols + 1 name col. Replaces top-page MiniCalendar grid |
-| Sort by 7-day post count desc, then added_at asc | Must show most active members first for motivation. Tie-break is deterministic. | Low | Client-side sort on computed 7-day counts. `added_at` is new field on Member type |
-| Member name links to `/member/[substackId]` | Navigation to detail page is already in v1.0; must preserve in new view | Low | Already exists as pattern in v1.0. `Link` component reuse |
-| Cell tooltip: truncated title (20 chars) + click → article | Core interaction already expected from v1.0. Heatmap must match v1.0 quality | Med | Extend existing ArticleTooltip; add thumbnail; keep title truncation |
-| Admin form: add member (name, feedUrl, team-id) | Must be able to add members without editing code/JSON | Med | POST to Route Handler. Form with 3 fields. Inline on `/admin` page. |
-| Admin form: delete member | Must be able to remove members who leave community | Low | DELETE button per row in member list. Confirm before delete. |
-| Basic Auth protection for `/admin` | Admin must not be accessible by random visitors | Low | Next.js middleware with `Authorization` header check. ENV: `ADMIN_USER`, `ADMIN_PASSWORD` |
-| KV-backed member store | Members must persist across deployments without code changes | Med | Upstash Redis (replaces `@vercel/kv` — migrated Dec 2024). `kv.hset/hget/hdel` or JSON list |
+---
 
-## Differentiators
+## Supabase Auth + Member Self-Management
 
-Not required, but add meaningful value at 50-user scale.
+### Table Stakes
+
+メンバー自己管理を実現するために最低限必要な機能。欠けると「管理者依存から脱せない」。
+
+| Feature | Why Expected | Complexity | 既存への依存 |
+|---------|--------------|------------|------------|
+| メールアドレスでのサインアップ/ログイン | パスワードレスのMagic Linkが最もFrictionが少ない。コミュニティ向けツールでパスワード管理は不要 | Med | `@supabase/ssr` 追加、middleware.ts更新 |
+| ログイン後に自分のSubstack URLを登録/編集できるプロフィールページ | 自己管理の核心。管理者が手動でメンバー追加する運用を廃止する | Med | `kvMembers.updateMember` または Supabase profilesテーブルに移行 |
+| ログイン後に自分のチーム所属を選択/変更できる | チーム管理の自律化。管理者の負担を直接減らす | Low-Med | 既存teamNamesフィールドの編集UIをメンバー向けに提供 |
+| ログアウト機能 | セッション管理の基本。公共の場でのログアウト忘れ防止 | Low | Supabase Auth signOut |
+| 未ログインユーザーはメンバー自己管理ページにアクセスできない | セキュリティの最低ライン。他人のSubstack URLを書き換えられてはならない | Low | middleware.tsのRoute保護 |
+| ログインしていない状態でも公開ページ（ヒートマップ等）は閲覧できる | 公開ページの認証なし閲覧はv1.0からの要件。壊してはならない | Low | 既存ISRページは認証不要を維持 |
+| 自分のデータのみ編集可能（他人のSubstack URLは変更不可） | 最小限のRow Level Security。substackIdと認証ユーザーの紐付けが必要 | Med | SupabaseのRLSポリシー or middleware側のチェック |
+
+### Differentiators
+
+あれば体験が向上するが、v1.5 MVPには必須でない。
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| Team filter (segmented tabs or dropdown) | Communities with sub-groups want to see "my team" view | Low-Med | URL param `?team=team-id`. Tabs if <= 5 teams (visible), dropdown if more. |
-| OGP thumbnail in tooltip | Visual richness: see article image at a glance. Motivates clicks. | Med | `fetch` OGP meta at feed-parse time or lazily. Fallback to icon/initials. 48x48px or 64x64px. |
-| Empty state messaging | When a member has 0 posts in 7 days, a clear gray cell vs ambiguous blank | Low | Gray cell = 0 posts. No special message needed; color contrast handles it. |
-| Admin: empty member list state | First-use UX — admin with no members should not look broken | Low | Simple "メンバーがいません。追加してください" message. |
+| メンバー登録申請フロー（管理者承認制） | 不正メンバー登録を防ぐ。コミュニティの「閉じた感」を維持 | High | `status: pending/approved` フィールドが必要。管理者の通知フローも必要。v1.5ではスコープ外推奨 |
+| Google/GitHub OAuthログイン | Magic Linkよりも手軽。ただし日本コミュニティではメールの方が馴染みやすい可能性 | Med | Supabase OAuth設定 + コールバックURL。メールMagic Linkで十分ならYAGNI |
+| プロフィールページでの記事統計表示（自分の投稿数等） | ログインした自分のデータを見るモチベーション | Med | 既存ヒートマップデータの再利用 |
 
-## Anti-Features
-
-Features to explicitly NOT build in v1.1.
+### Anti-Features (avoid)
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| Ranking display with positions (1st, 2nd...) | PROJECT.md explicitly rules this out — "コミュニティの「ゆるさ」を壊す" | Sort rows by activity without showing rank numbers |
-| Real-time / live update admin | YAGNI. ISR revalidation covers freshness. Live polling adds complexity. | ISR revalidate after member CRUD |
-| Multi-field inline edit for members | Complexity cost high vs benefit. Members rarely change name/URL. | Delete + re-add if needed |
-| Auth beyond Basic Auth for admin | Admin is internal tool. Full OAuth/JWT is over-engineering for 1-admin use. | ENV-based Basic Auth via middleware |
-| Thumbnail caching layer | At 50 members with 1-7 articles/week, fetch-on-demand or at parse time is fine. | Fetch OGP at RSS parse time; cache via ISR |
-| `team-id` hierarchical nesting | YAGNI. Flat team-id strings are sufficient for filter use case. | Single `team-id` string field per member |
-| Vercel KV (legacy) | Migrated to Upstash Redis in Dec 2024. Old `@vercel/kv` package is deprecated. | Use `@upstash/redis` or `@vercel/kv` adapter that wraps Upstash |
+| パスワード認証 | パスワード管理のUXコスト高。コミュニティツールでは不要。「パスワードを忘れた」サポートが管理者負担になる | Magic Link（メールOTP）のみ |
+| 管理者権限の全機能をメンバーに開放 | 他人の削除・substackId変更等は許可してはならない | RLSで自分のデータのみ編集可能に制限 |
+| 招待コードや承認フローのv1.5実装 | Complexity高。コミュニティが信頼ベースで運営されている場合は不要 | 管理者が最終的に不正ユーザーを削除できれば十分 |
+| Supabase AuthとBasic Authの二重管理 | 認証システムが2つ存在すると混乱。Basic Authは管理者専用に限定すべき | `/admin`はBasic Auth継続、メンバー自己管理は Supabase Auth |
+| メンバー自己削除機能 | コミュニティからの脱退はコミュニティ管理の問題。自動削除するとデータが消える | 管理者が削除する運用を維持 |
+
+### 依存関係と実装上の注意点
+
+```
+Supabase Auth (Magic Link)
+  → @supabase/ssr パッケージ追加
+  → middleware.ts: /member/settings/* ルート保護
+  → 認証ユーザー ↔ substackId の紐付けテーブル（Supabase profiles）
+  → プロフィール編集ページ /member/settings（新規）
+  → 既存管理者向け /admin は Basic Auth を継続
+
+データの紐付け方針（重要）:
+  - Supabase profilesテーブルに substackId を保持
+  - メンバーリスト（KV or Supabase members table）との整合性が必要
+  - v1.5スコープ: Supabase Authだけ先に導入し、membersデータはKVのまま可
+  - または Supabase完全移行（members → PostgreSQL table）と同時実施
+```
+
+**複雑度サマリー:** 全体としてMedium-High。Supabase Authの設定自体はLow-Medだが、KVとの整合性管理がボトルネック。
 
 ---
 
-## Feature Details
+## Long-term Article History
 
-### Weekly Heatmap Layout
+### Table Stakes
 
-```
-[member name] | Mon | Tue | Wed | Thu | Fri | Sat | Sun
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Alice         |  ●  |  ○  |  ●  |  ○  |  ○  |  ●  |  ○
-Bob           |  ○  |  ●  |  ○  |  ○  |  ●  |  ○  |  ●
-...50 rows
-```
+1ヶ月以上の累積記事履歴を保存するための必須機能。欠けると「ヒートマップが直近7日しか見れない」問題が継続する。
 
-- **Cell size:** Small enough for 50 rows without scrolling on laptop (target ~20-24px per cell).
-- **Color scale:** Reuse existing 6-level green intensity from MiniCalendar (`bg-green-100` to `bg-green-700`). No articles = `bg-gray-100`.
-- **Date header:** Show day-of-week label + date (e.g., "月 5/5"). Today column highlighted.
-- **Name column width:** Fixed, `truncate` at 8-10 chars for mobile.
+| Feature | Why Expected | Complexity | 既存への依存 |
+|---------|--------------|------------|------------|
+| 記事データを日付付きで永続保存（append-only） | 現在のKV（`articles:{substackId}`）はすでにこのパターン。Supabase移行後も維持が必要 | Med | `kvArticles.saveArticles` のSupabase版実装 |
+| 同一記事のURLによるdeduplication | 既存KV実装で解決済み（`existingLinks` SetでURL一致チェック）。PostgreSQLでもUNIQUE制約で対応 | Low | PostgreSQL UNIQUE(substackId, articleUrl) |
+| Vercel Cronによる日次フィード取得継続 | v1.3から稼働中。移行後も日次でRSSを取得してDBに追記する仕組みを維持 | Low | Cron APIルートのDB書き込み先変更のみ |
+| 月間・年間ビューの表示対応（ヒートマップ期間拡張） | 蓄積データがあれば過去1ヶ月のヒートマップが初めて実現する | Med | calendarUtils.ts の期間計算拡張 |
+| 記事の公開日時（pubDate）の保存と時刻正規化 | 日本時間でのヒートマップ表示のため、タイムゾーン正規化が必要 | Low | 既存FeedItem.isoDateを使用、DBはUTC保存・表示時JST変換 |
 
-### Sort Logic: UX Implications
+### Differentiators
 
-Sort: `7-day post count DESC`, then `added_at ASC` (tie-break = join order).
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| 年間ヒートマップ（GitHub草型） | 長期継続の可視化。PROJECT.mdの "Active (Future)" 要件として記載済み | High | 365日分のデータが必要。UIコンポーネントも新規 |
+| 月間・週次の投稿数トレンドグラフ | 個人の成長が時系列で見える | Med | recharts等のライブラリが必要 |
+| 記事タイトル全文保存（現在はKVに保存済み） | 過去記事の検索・一覧表示に必要 | Low | 現行`FeedItem.title`をDBカラムに移行するだけ |
+| ストリーク（連続投稿日数）計算と表示 | PROJECT.mdの "Active (Future)" 要件。蓄積データがあれば計算可能 | Med | 日単位の投稿有無フラグが必要。記事の日付データから算出 |
 
-UX impact:
-- Members with 0 posts naturally sink to bottom — motivates writing without explicit shaming.
-- `added_at` tie-break gives long-time members slight priority, rewarding tenure.
-- Sort is computed client-side on pre-fetched data — no additional API calls.
-- No live re-sort animation needed (ISR data, not real-time).
+### Anti-Features (avoid)
 
-Dependency: `Member` type must be extended from `{ name, feedUrl }` to `{ name, feedUrl, substackId, teamId, addedAt }`.
+| Anti-Feature | Why Avoid | What to Do Instead |
+|--------------|-----------|-------------------|
+| 記事本文（content:encoded）のフル保存 | データ量が膨大。Supabase無料枠（500MB）をすぐに消費する | タイトル・URL・pubDate・サムネURLのみ保存 |
+| リアルタイム同期（WebSocket/Realtime） | ISR + Cronで十分。コミュニティツールに「今まさに書いた」の即時反映は不要 | Vercel Cron日次 + ISR 5分が継続 |
+| 記事の全文検索インデックス | PostgreSQLのfull-text searchはYAGNI。ヒートマップは日付ベースの可視化であり検索は不要 | 日付インデックスのみ（pubDate列にINDEX） |
+| Supabase Realtimeサブスクリプション | Vercel Cronとの二重管理になる。YAGNI | Cronが日次でbatchinsertする設計を維持 |
+| 記事データの履歴削除機能 | append-onlyがこの機能の価値。削除すると過去ヒートマップが壊れる | 削除は管理者がメンバーごとDBを直接操作（運用対応） |
 
-### Team Filter UX
+### データスキーマ（参考）
 
-**Recommendation: segmented tabs (not dropdown) when teams <= 6, dropdown when > 6.**
+```sql
+-- Supabase PostgreSQL想定スキーマ
+CREATE TABLE articles (
+  id           BIGSERIAL PRIMARY KEY,
+  substack_id  TEXT NOT NULL,          -- 例: "careerkoumei"
+  title        TEXT,
+  link         TEXT NOT NULL,
+  pub_date     TIMESTAMPTZ NOT NULL,   -- UTC保存。表示時にJSTへ変換
+  thumbnail    TEXT,                   -- content:encodedから抽出済みのURL
+  created_at   TIMESTAMPTZ DEFAULT NOW()
+);
 
-Rationale from research: tabs are better when options are few and need to be immediately visible. Dropdown is space-efficient for longer lists. For this community (sub-groups within ~50 people), expect 2-5 teams — tabs are the right choice.
-
-URL param pattern: `?team=teamId` — enables link-sharing of filtered views (important for team-specific channels like Slack/Discord).
-
-"All" tab always shown first. No team-id (i.e., members without team) shown under "All" only, or a configurable "その他" group.
-
-### Rich Tooltip: Thumbnail + Title
-
-Current ArticleTooltip shows title + link (text only). v1.1 adds:
-- **Thumbnail:** OGP image from article URL. Fetched at RSS parse time via `fetch(articleUrl)` → parse `<meta property="og:image">`. Store as `thumbnail?: string` in `FeedItem`.
-- **Size:** 64x64px (`w-16 h-16`) with `object-cover`. Compact enough for the heatmap cell hover.
-- **Fallback:** No OGP image → show first letter of member name in colored box (same initials pattern as avatars). Avoids broken image state.
-- **Title truncation:** `title.slice(0, 20)` + `…` if longer. Already specified in PROJECT.md.
-- **Click behavior:** Click cell toggles tooltip (existing behavior). Click article link navigates to Substack (existing behavior). No change to interaction model.
-
-**Complexity note:** OGP fetch adds latency at RSS parse time. At 50 members × 7 articles = 350 fetches per ISR cycle. At 300s revalidate, this is acceptable on Vercel free tier but should be fire-and-forget with graceful fallback (not blocking render).
-
-### Admin UI
-
-**Layout:** Single page `/admin`. Two sections:
-1. Member list (table: name, substackId, team-id, addedAt, delete button)
-2. Add member form (below or alongside list)
-
-**Form fields:**
-- `name` — text input, required
-- `feedUrl` — URL input, required, validate Substack RSS pattern (`https://*.substack.com/feed`)
-- `teamId` — text input, optional
-
-**Form UX pattern:** Inline form (not modal). Rationale: admin page is internal, not customer-facing; modal adds unnecessary JS complexity. Inline form is simpler and KISS-compliant.
-
-**Validation feedback:**
-- Client-side: HTML5 `required` + `type="url"` for instant feedback.
-- Server-side: Route Handler returns error JSON on invalid input. Display error message below form.
-- No complex validation library needed — Zod inline in Route Handler is sufficient.
-
-**Delete confirmation:** Confirm via `window.confirm()` before DELETE request. Simple and avoids accidental deletion. No need for a modal confirmation UI at this scale.
-
-**Empty state:** When no members exist, show "メンバーがまだ登録されていません" in the member list area.
-
-### Basic Auth (middleware)
-
-```
-middleware.ts matches /admin/**
-→ Check Authorization header (Basic base64(user:password))
-→ If missing/wrong: return 401 with WWW-Authenticate header
-→ Env vars: ADMIN_USER, ADMIN_PASSWORD
+CREATE UNIQUE INDEX articles_link_idx ON articles(link);  -- dedup用
+CREATE INDEX articles_substack_pubdate_idx ON articles(substack_id, pub_date DESC);
 ```
 
-This triggers the browser's native Basic Auth dialog — no custom login page needed. Simple, zero-dependency, secure for single-admin use.
-
-**Limitation:** Basic Auth over HTTPS is secure, but credentials are sent with every request. Acceptable for internal admin tool; not for multi-user auth.
+**既存KVとの移行方針:** `kvArticles.getArticles` の全データをPostgreSQLに一括インポート後、KVを廃止。移行スクリプトは一回限りの実行。
 
 ---
 
-## Feature Dependencies
+## Admin UI Team Management
+
+### Table Stakes
+
+チーム管理UIのカンマ区切りテキスト → チェックボックス化。管理者の操作ミスを減らす。
+
+| Feature | Why Expected | Complexity | 既存への依存 |
+|---------|--------------|------------|------------|
+| 既存チーム一覧をチェックボックスで表示 | チーム名のタイポが操作ミスの主因。選択式にすると根本解決 | Low | `getTeams()`（全メンバーからteamNamesをdedupe抽出）が必要 |
+| メンバー編集画面で複数チームをチェックボックスで選択 | `teamNames: string[]` の多対多を直感的に扱える | Low | AdminMemberList.tsx のEditモード更新 |
+| 現在の所属チームが編集開始時にチェック済みで表示 | 現在状態を正しく反映。チェックボックスのdefaultCheckedをmemberのteamNamesで初期化 | Low | `defaultChecked={m.teamNames.includes(team)}` |
+| チェックなし（チームなし）の状態を許容 | チームに属さないメンバーが存在できる。`teamNames: []`が有効な状態として維持 | Low | 既存スキーマは `string[]` なので変更不要 |
+
+### Anti-Features (avoid)
+
+| Anti-Feature | Why Avoid | What to Do Instead |
+|--------------|-----------|-------------------|
+| カンマ区切りテキスト入力のUI継続 | チーム名のタイポ・大文字小文字の不一致が発生する。v1.3から既知の問題 | 既存チーム名リストから選択するチェックボックスUIに置換 |
+| 新チーム名をここで新規作成する機能 | チーム名管理が複雑になる。YAGNI | チーム名は既存メンバーのteamNamesから自動収集。新チームは最初の1件を管理者がテキスト入力で作成し、以降はチェックボックスで選択 |
+| 動的なチェックボックスUI（全メンバーの変更を即時反映） | 管理画面はAdmin専用の内部ツール。リアルタイム同期はYAGNI | ページリロードで最新チーム一覧を反映すれば十分 |
+| チームの独立管理画面（CRUD）作成 | スコープ過剰。YAGNI | チームはメンバーのteamNamesから自動導出。専用テーブルは不要 |
+
+### 実装の詳細
 
 ```
-Member type extension (name, feedUrl, substackId, teamId, addedAt)
-  → Vercel KV / Upstash Redis store
-  → Admin CRUD Route Handlers
-  → Admin UI form + member list
+既存フロー（カンマ区切りテキスト）:
+  AdminMemberList.tsx（editingId === m.substackId の場合）
+  → <input name="teamNames" defaultValue={m.teamNames.join(', ')} />
+  → updateMemberAction → teamNames.split(',').map(s => s.trim()).filter(Boolean)
 
-7-day window computation (date math: today - 6 days)
-  → HeatmapGrid component (new, replaces top-page MiniCalendar grid)
-  → Sort logic (7-day count DESC + addedAt ASC)
-  → Team filter (filter rows before sort)
+変更後フロー（チェックボックス）:
+  → 全チーム一覧を getTeams() で取得（page.tsx or AdminMemberList props）
+  → <input type="checkbox" name="teamNames" value={team} defaultChecked={...} />
+  → HTML checkboxの formDataは同名複数値をサポート → getAll('teamNames') で string[] 取得
+  → updateMemberAction の型変更不要（teamNames: string[] のまま）
+```
 
-OGP fetch at parse time
-  → FeedItem type extension (thumbnail?: string)
-  → fetchFeed.ts update (parallel OGP fetch per item)
-  → RichTooltip component (new, extends ArticleTooltip)
+**既存の `updateMemberAction` への影響:** Server ActionのFormData解析部分を `formData.get('teamNames')` から `formData.getAll('teamNames')` に変更するのみ。KISS原則に合致した最小変更。
 
-Basic Auth middleware
-  → /admin page (protected route)
-  → Admin API routes (POST /api/members, DELETE /api/members/[id])
+---
+
+## Feature Dependencies Map
+
+```
+Supabase Auth (Magic Link)
+  → Supabase プロジェクト作成（SupabaseダッシュボードでOAuth設定）
+  → @supabase/ssr インストール
+  → middleware.ts 拡張（Basic Auth継続 + Supabase Authによる/member/settings/*保護）
+  → /member/settings ページ新規作成（プロフィール編集UI）
+  → Supabase profiles テーブル（auth.users.id ↔ substackId の紐付け）
+
+Long-term Article History
+  → Supabase PostgreSQL articles テーブル（↑とセットで同一プロジェクト）
+  → kvArticles.ts の Supabase版実装（saveArticles → upsertArticles to Supabase）
+  → Vercel Cron APIルートの書き込み先変更
+  → 既存KVデータの一括マイグレーションスクリプト（one-shot）
+  → calendarUtils.ts の期間拡張（7日間 → 任意期間）
+
+Admin UI Team Checkbox
+  → AdminMemberList.tsx のEditモード更新（テキスト入力 → チェックボックス）
+  → getTeams() ユーティリティ関数追加（全メンバーのteamNamesをdedupe）
+  → actions.ts の FormData解析を getAll('teamNames') に変更
+
+依存関係（実装順序の制約）:
+  Supabase Auth は Supabase PostgreSQL と同一プロジェクトを使う → 同時セットアップ推奨
+  Long-term Article History は Supabase DBが存在してから → Auth後またはAuth同時
+  Admin UI Team Checkbox は既存KVのまま実施可能 → 独立して先行実装できる（最も低リスク）
 ```
 
 ---
 
-## Complexity Summary by Feature
+## MVP Prioritization for v1.5
 
-| Feature | Complexity | Primary Risk |
-|---------|------------|--------------|
-| 7-day heatmap grid layout | Medium | 50-row layout fitting on screen without horizontal scroll on mobile |
-| Sort logic | Low | None — pure data transform |
-| Team filter tabs/dropdown | Low-Med | URL param sync with React state; ensure filter persists on refresh |
-| OGP thumbnail fetch | Medium | Latency per ISR cycle; Substack may block headless fetches (fallback required) |
-| Rich tooltip | Low | Extends existing component; thumbnail sizing and fallback |
-| Admin member list + delete | Low | Confirm UX; KV delete operation |
-| Admin add member form | Medium | URL validation; KV write; ISR revalidation after write |
-| Basic Auth middleware | Low | ENV var setup; redirect loop pitfall (exclude /login from matcher) |
-| Upstash Redis / KV store | Medium | Schema design for member list; `@vercel/kv` to Upstash migration path |
+**優先度高（先に実装すべき）:**
 
----
+1. Admin UI Team Checkbox — 既存KVで完結、依存なし、リスク最低。ユーザー体験の即時改善
+2. Supabase Auth + Member Self-Management — コアバリュー「管理者依存排除」の実現
+3. Long-term Article History + Supabase PostgreSQL — SupabaseプロジェクトはAuth導入時に同時作成するため、DBも同時に構築する
 
-## Dependencies on Existing Architecture
-
-| Existing Piece | v1.1 Change Required |
-|----------------|---------------------|
-| `Member` type in `types.ts` | Extend: add `substackId`, `teamId`, `addedAt` fields |
-| `members.json` | Replace with Upstash Redis KV store. Seed from existing JSON for migration. |
-| `fetchAllFeedsCached` | Add OGP fetch per item; update cache key if member list is dynamic |
-| `MiniCalendar` component | Keep as-is for `/member/[substackId]` page. NOT used on new top page. |
-| `ArticleTooltip` component | Extend or fork to `RichTooltip` for heatmap cells (adds thumbnail) |
-| Top page `page.tsx` | Replace MiniCalendar grid with HeatmapGrid. Large rewrite of this file. |
-| `calendarUtils.ts` | Add 7-day window helper: `getLast7Days(): string[]` |
+**defer（v1.5スコープ外推奨）:**
+- 年間ヒートマップ: 蓄積データが溜まってから（最低1ヶ月以上必要）
+- 承認制メンバー登録フロー: 信頼ベースのコミュニティ運用で当面不要
+- ストリーク表示: データ蓄積後にv1.6で
 
 ---
 
 ## Sources
 
-- [PROJECT.md]: v1.1 requirements, constraints, out-of-scope decisions
-- [Filter UX Design Patterns](https://blog.logrocket.com/ux-design/filtering-ux-ui-design-patterns-best-practices/) — tabs vs dropdown criteria
-- [Why Segmented Buttons Are Better Filters Than Dropdowns](https://uxmovement.com/buttons/why-segmented-buttons-are-better-filters-than-dropdowns/) — tabs for small option sets
-- [Vercel KV → Upstash Redis migration](https://vercel.com/docs/storage/vercel-kv) — `@vercel/kv` deprecated Dec 2024
-- [Inline Edit UX Pattern](https://cloudscape.design/patterns/resource-management/edit/inline-edit/) — inline vs modal for admin tables
-- [Next.js Middleware Authentication](https://www.authgear.com/post/nextjs-middleware-authentication/) — Basic Auth middleware pattern
-- Existing codebase: `ArticleTooltip.tsx`, `CalendarGrid.tsx`, `MiniCalendar.tsx`, `types.ts`, `fetchFeed.ts`
+- [Supabase Auth with Next.js App Router](https://supabase.com/docs/guides/auth/server-side/nextjs) — @supabase/ssrパッケージ、Server Components対応、Middleware設定
+- [Supabase Passwordless Email (Magic Link)](https://supabase.com/docs/guides/auth/auth-email-passwordless) — Magic Link設定、60秒レート制限、1時間有効期限
+- [Supabase User Management Tutorial with Next.js](https://supabase.com/docs/guides/getting-started/tutorials/with-nextjs) — profiles テーブルパターン、RLS設定
+- [NN/g Checkboxes Design Guidelines](https://www.nngroup.com/articles/checkboxes-design-guidelines/) — チェックボックスはオプション数が少ない（<10）場合に最適
+- [Multi-select Input Pattern — UX Patterns](https://uxpatterns.dev/patterns/forms/multi-select-input) — タグ/テキスト入力 vs チェックボックスの使い分け
+- [Supabase TimescaleDB Extension](https://supabase.com/docs/guides/database/extensions/timescaledb) — 時系列データ保存（v1.5では標準PostgreSQLで十分）
+- 既存コードベース: `src/lib/kvArticles.ts`, `src/lib/kvMembers.ts`, `src/app/admin/AdminMemberList.tsx`, `src/lib/types.ts`
+- PROJECT.md — 要件履歴、制約、Out of Scope判断

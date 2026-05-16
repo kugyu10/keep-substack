@@ -1,360 +1,255 @@
-# Domain Pitfalls
+# Pitfalls Research: v1.5
 
-**Domain:** RSS feed activity visualization calendar app — v1.1 additions to existing static site
-**Researched:** 2026-05-08
-**Scope:** Adding Vercel KV (Upstash Redis), Basic Auth middleware, OGP thumbnail fetching, admin CRUD to an existing Next.js 16 App Router fully-static ISR app.
-
----
-
-## Critical Pitfalls
-
-Mistakes that cause rewrites, security holes, or complete feature failures.
+**Domain:** RSS feed activity visualization — v1.5 additions: Supabase migration + Auth + long-term history
+**Researched:** 2026-05-16
+**Scope:** Adding Supabase PostgreSQL, Supabase Auth, and long-term article cumulative storage to an existing Next.js 16 App Router / Vercel / Upstash Redis app.
 
 ---
 
-### Pitfall V1: @vercel/kv is Deprecated — Use @upstash/redis Directly
+## Migration Pitfalls (Redis → Supabase PostgreSQL)
 
-**What goes wrong:** Developer installs `@vercel/kv` as if it is the current recommended package. Vercel KV was sunset in December 2024; existing stores were automatically migrated to Upstash Redis. New projects cannot create Vercel KV stores — only Upstash for Redis via the Vercel Marketplace.
+### Pitfall M1: デュアルライト期間なしの一括切り替え（ダウンタイム発生）
 
-**Why it happens:** Tutorials, blog posts, and even some Vercel docs still reference `@vercel/kv`. The package still exists on npm and the API appears to work, creating a false sense of safety.
+- **Risk:** Upstash Redis → Supabase PostgreSQL を「一気に切り替える」と、デプロイ瞬間にデータが空になる。メンバーリストが消えたままISRキャッシュが古いデータを返し続け、一見動いているように見えるが再ビルドで全404になる。
+- **Prevention:**
+  1. Supabase テーブル（`members`, `articles`）を先に作成・データ投入する（Redis は削除しない）
+  2. 読み取りを PostgreSQL に切り替えるPRをデプロイ（書き込みはまだ両方）
+  3. 動作確認後、Redisへの書き込みを削除するPRをデプロイ
+  4. Redis 環境変数を最後に削除
+- **Phase:** Phase 1（DB移行）で必ず段階デプロイを採用する
 
-**Consequences:** Blocked on provisioning a new store. Vendor dependency on a dead product. CI/CD breaks when Vercel removes the shim.
+### Pitfall M2: KV の JSON ブロブ構造がそのまま PostgreSQL に合わない
 
-**Prevention:**
-- Install `@upstash/redis` instead of `@vercel/kv`.
-- Provision via Vercel Marketplace → Upstash for Redis integration.
-- Environment variables become `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` (not `KV_REST_API_URL`).
-- Create a singleton client: `const redis = new Redis({ url: process.env.UPSTASH_REDIS_REST_URL, token: process.env.UPSTASH_REDIS_REST_TOKEN })`.
+- **Risk:** 現在の `articles:{substackId}` キーは `{ items: FeedItem[], imageUrl?: string }` というJSONブロブをRedisに1キーで格納している。これを PostgreSQL に移行する際に `articles` テーブルを1行1記事の正規化構造にしようとすると、既存の `saveArticles`/`getArticles` 関数のシグネチャと完全に変わるため、呼び出し元（Cronルート、ISRフェッチ）を全て修正する必要がある。
+- **Prevention:**
+  - PostgreSQL スキーマは最初から正規化（`articles(id, substack_id, link, title, pub_date, image_url)`）で設計し、`link` に UNIQUE 制約を張る
+  - `saveArticles` / `getArticles` の関数シグネチャ（インターフェース）を維持しつつ、内部実装だけ差し替える（現在の `fetchAllFeedsCached` シグネチャ維持の教訓と同じパターン）
+- **Phase:** Phase 1 設計時に確定する
 
-**Detection:** `vercel env pull` produces `KV_REST_API_URL` — this means you are on the old path. New Upstash integration produces `UPSTASH_REDIS_REST_URL`.
+### Pitfall M3: Vercel Serverless + Supabase の接続枯渇
 
-**Phase:** Must resolve before any KV work begins (Phase 1 / KV migration phase).
+- **Risk:** Vercel サーバーレス関数はリクエストごとに新しいDB接続を開く。Supabase 無料枠のPostgres直接接続上限は **25〜30接続**。トラフィックスパイク時（ISR再生成 + Cron + 管理操作が同時）に `too many connections` エラーで全APIが停止する。開発・ステージング環境では再現しないため発見が遅れる。
+- **Prevention:**
+  - 必ず **Supavisor（トランザクションモード、ポート 6543）のConnection Pooling URL** を使う。直接接続URL（ポート 5432）は Cron や管理用途の永続接続のみ
+  - `@supabase/supabase-js` の `createClient` はリクエストごとに生成せず、シングルトン（サーバー側モジュールスコープ）で管理する
+  - `DATABASE_URL` ではなく Supabase ダッシュボードの "Transaction pooler" 接続文字列を環境変数に設定する
+- **Detection:** Vercel ログに `PostgresError: sorry, too many clients already` が出始めたら赤信号
+- **Phase:** Phase 1（DB設定）で接続文字列の種類を確定する
 
-**Confidence:** HIGH — Verified via Vercel community forum and Vercel Marketplace docs.
+### Pitfall M4: generateStaticParams がマイグレーション直後に空を返す
 
----
+- **Risk:** v1.1 の Pitfall V2 の PostgreSQL 版。`generateStaticParams` がビルド時に Supabase クエリを発行するが、Vercel ビルド環境の環境変数スコープに `NEXT_PUBLIC_SUPABASE_URL` と `SUPABASE_SERVICE_ROLE_KEY` が設定されていないと空配列になり、全メンバーページが 404 になる。
+- **Prevention:**
+  - Vercel Project Settings → Environment Variables → **Build** スコープにも Supabase 環境変数を設定する
+  - `generateStaticParams` で空配列が返ったときにビルドを明示的に失敗させるガード句を入れる
+- **Phase:** Phase 1 デプロイ前に環境変数スコープを確認する
 
-### Pitfall V2: generateStaticParams + KV at Build Time Fails Silently
+### Pitfall M5: 重複記事の扱い — Redis と PostgreSQL の dedup ロジック差異
 
-**What goes wrong:** `generateStaticParams` for `/member/[substackId]` currently reads from `members.json` at build time. After migrating to KV, the function must call `redis.get()` or `redis.lrange()` at build time. If environment variables are not set in Vercel's build environment, the call returns `null` and `generateStaticParams` returns an empty array — resulting in zero static pages being generated with no build error thrown.
-
-**Why it happens:** `generateStaticParams` runs before any layout/page rendering. KV calls require `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to be available in the build environment, not just the runtime environment. Vercel distinguishes between "Build" and "Runtime" environment variable scopes in project settings.
-
-**Consequences:** Build succeeds (no errors). All `/member/[substackId]` routes return 404 in production. With `dynamicParams = false`, there is no fallback.
-
-**Prevention:**
-- In Vercel Project Settings → Environment Variables, set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` for the **Build** environment scope (not just Production/Preview/Development).
-- Add a guard in `generateStaticParams`: if KV returns empty, fall back to a hardcoded default list or throw explicitly so the build fails loudly.
-- Test with `next build` locally using `.env.local` before deploying.
-
-**Detection:** Deploy succeeds, but `/member/` routes return 404. Build logs show `generateStaticParams returned []`.
-
-**Phase:** KV migration phase — verify before removing `members.json`.
-
-**Confidence:** HIGH — Verified by Next.js generateStaticParams documentation and community discussion (vercel/next.js #49328).
-
----
-
-### Pitfall V3: CVE-2025-29927 — Middleware Auth Bypass in Next.js < 15.2.3
-
-**What goes wrong:** Next.js middleware (including Basic Auth middleware protecting `/admin`) can be completely bypassed by sending a crafted `x-middleware-subrequest` header. An attacker accesses `/admin` without credentials.
-
-**Why it happens:** A flaw in the middleware invocation chain (CVSS 9.1, critical). Patched in Next.js 12.3.5 / 13.5.9 / 14.2.25 / 15.2.3. The current project uses **Next.js 16.2.6** which is a post-patch release — the vulnerability is already fixed.
-
-**Consequences:** Full admin bypass if running a vulnerable version. Not directly applicable to v16.2.6, but relevant if the version is ever downgraded, or if self-hosting behind a proxy that strips headers differently.
-
-**Prevention:**
-- Confirm running Next.js 16.2.6 (already installed — safe).
-- Do NOT downgrade to < 15.2.3 for any reason.
-- Add a secondary check: validate the `Authorization` header in the admin route's Server Component as defense-in-depth (do not rely solely on middleware).
-
-**Detection:** `npm list next` should show 16.2.6. Check Vercel deployment logs for Next.js version.
-
-**Phase:** Basic Auth implementation phase — document this and add the secondary check.
-
-**Confidence:** HIGH — NVD CVE record, Vercel postmortem, ProjectDiscovery analysis verified.
+- **Risk:** 現在の `saveArticles` は `article.link` の Set 差分でメモリ上 dedup している。PostgreSQL 移行後に `INSERT ON CONFLICT DO NOTHING` を使わずに単純 INSERT すると、Cron が毎日同じ記事を重複挿入して記事数が膨らむ。また、既存 Redis データを PostgreSQL にエクスポートする際に重複が混入しやすい。
+- **Prevention:**
+  - `articles` テーブルの `link` カラムに `UNIQUE` 制約を設定する
+  - INSERT 時は `INSERT INTO articles (...) VALUES (...) ON CONFLICT (link) DO NOTHING` を使う
+  - Redis からのエクスポートスクリプトも同じ UPSERT パターンで実行する
+- **Phase:** Phase 1 スキーマ設計時に UNIQUE 制約を必ず含める
 
 ---
 
-### Pitfall V4: Middleware Matcher Misconfiguration Breaks Static Assets
+## Auth Pitfalls (Supabase Auth + Next.js)
 
-**What goes wrong:** Adding `middleware.ts` without a proper `matcher` causes middleware to run on every request: `/_next/static/*`, `/_next/image`, `favicon.ico`, all CSS, all JS chunks. Basic Auth challenges fire on CSS files, returning 401 HTML responses where the browser expects CSS. The site appears visually broken with a blank page after login.
+### Pitfall A1: middleware.ts の二重管理 — BasicAuth と Supabase Auth の競合
 
-**Why it happens:** Next.js middleware runs on every request by default. Developers test by loading the page, confirm the auth challenge appears, and miss that static asset requests are also being intercepted.
+- **Risk:** 現在の `middleware.ts` は `/admin` のみに BasicAuth をかけている（matcher: `['/admin', '/admin/:path*']`）。Supabase Auth を追加する際、公式ドキュメントの middleware サンプルは matcher を `/((?!_next/static|_next/image|favicon.ico).*)` という広域パターンにする。このパターンに書き換えると、Basic Auth ロジックが消えてしまうか、または両方が混在して無限 redirect ループが発生する。
+- **Prevention:**
+  - middleware.ts 内で `/admin` パスと非adminパスを明示的に分岐する
+  - Supabase のセッション refresh（`updateSession`）は全パスで実行し、`/admin` に対してだけ Basic Auth チェックを追加するシンプルな合成構造にする
+  - matcher は広域（Supabase Auth 推奨パターン）を採用し、内部でルートを分岐させる
+  ```typescript
+  // middleware.ts の構造例
+  export async function middleware(request: NextRequest) {
+    const response = await updateSession(request) // Supabase セッション refresh
+    if (request.nextUrl.pathname.startsWith('/admin')) {
+      // Basic Auth チェック（既存ロジック維持）
+    }
+    return response
+  }
+  ```
+- **Phase:** Phase 2（Auth 追加）で middleware リファクタを最初のタスクにする
 
-**Consequences:** After successful Basic Auth login, the page loads with broken styles and no JS because the browser cached 401 responses for asset requests.
+### Pitfall A2: getSession() をサーバー側で信頼する — セキュリティホール
 
-**Prevention:** Use a tight matcher that only triggers on admin routes:
+- **Risk:** `supabase.auth.getSession()` をサーバーコンポーネントや Server Action で呼び出してセッションを検証すると、クライアントから送られた Cookie を検証なしに信頼することになる。攻撃者は偽造 Cookie で認証済みのふりができる。
+- **Prevention:**
+  - サーバーサイドでのユーザー検証は **必ず `supabase.auth.getUser()`** を使う（Supabase Auth サーバーへのリモートリクエストを発行し JWT を再検証する）
+  - `getSession()` はクライアントコンポーネントでのセッション存在確認に限定する
+- **Detection:** `getSession()` が Server Component / Server Action に登場したらレビューで必ず指摘する
+- **Phase:** Phase 2 全体を通じて守るルール
 
-```typescript
-export const config = {
-  matcher: ['/admin', '/admin/:path*'],
-}
+### Pitfall A3: ISR ページに auth セッション refresh が混入 → CDN セッション漏洩
+
+- **Risk:** Supabase Auth のセッション refresh は `Set-Cookie` ヘッダーを応答に含める。もし ISR ページ（revalidate あり）でセッション refresh が起きると、その `Set-Cookie` を含んだレスポンスが Vercel Edge/CDN にキャッシュされ、次のユーザーがそのキャッシュを受け取って他人のセッションにログインしてしまう（セッション漏洩）。
+- **Prevention:**
+  - 公開ページ（`/`, `/member/[substackId]`）では絶対に Supabase Auth クライアントを使わない
+  - 認証が必要なページには `export const dynamic = 'force-dynamic'` を設定する
+  - Supabase SSR パッケージ v0.10.0+ は `Cache-Control: no-store` を自動で付与するが、**ISR と auth を同一ルートで混在させない** というアーキテクチャルールを守ることが根本的な防止策
+- **Detection:** Vercel の Analytics でユーザー間でセッションが混在する症状（別のユーザーとしてログインされる）
+- **Phase:** Phase 2 設計時に「認証ルート」と「ISRルート」を完全分離する決定を下す
+
+### Pitfall A4: cookies() の同期/非同期 API — Next.js 15/16 の互換性問題
+
+- **Risk:** Next.js 15 以降、`cookies()` は非同期 API（`await cookies()`）に移行中。`@supabase/ssr` の `createServerClient` が内部で `cookies()` を呼ぶ際に同期/非同期の扱いがバージョンによって異なり、`cookies() should be awaited` エラーが Turbopack 環境で不定期に発生する（GitHub Discussion #81445 でも未解決の報告あり）。
+- **Prevention:**
+  - `createServerClient` を呼ぶラッパー関数を async で定義し、`const cookieStore = await cookies()` を先に解決してから渡す
+  - `@supabase/ssr` は現時点で最新版（v0.10+）を使う
+  - Turbopack（`next dev --turbo`）で開発する場合は上記エラーの発生有無を必ず確認する
+- **Phase:** Phase 2 の最初のスパイクで動作確認する
+
+### Pitfall A5: Edge Runtime で Supabase クライアントが動作しない場合がある
+
+- **Risk:** middleware.ts は Edge Runtime で動く。`@supabase/ssr` の `createServerClient` は Edge Runtime で動作するが、接続先が Supabase の REST API（HTTP）であるため問題ない。ただし、将来的に ORM（Prisma など）や Node.js 専用ライブラリを middleware に混入させると Edge Runtime が壊れる。
+- **Prevention:**
+  - middleware.ts には `@supabase/ssr` と Next.js の標準 API のみを使う
+  - Node.js 専用の処理（DB クエリなど）は Route Handler や Server Action に移す
+  - `export const runtime = 'edge'` を middleware に明示してビルド時の Edge 互換チェックを有効にする
+- **Phase:** Phase 2 の middleware リファクタ時に確認する
+
+---
+
+## Long-term History Pitfalls
+
+### Pitfall H1: Cron が毎日フルスキャン → 処理時間が Vercel 10秒上限を超える
+
+- **Risk:** 現在の Cron（`/api/cron`）は全メンバーのRSSフィードを逐次フェッチして KV に保存する。メンバーが50人いると 50フィード × 平均200ms = 10秒。PostgreSQL への INSERT を追加すると SQLラウンドトリップが加わり、Vercel 無料枠のサーバーレス関数タイムアウト（**10秒**）を超えてタイムアウトする。
+- **Prevention:**
+  - Cron を Vercel Edge Function（タイムアウト 25秒→300秒）に切り替えるか、または Cron を `NEXT_PUBLIC_` ではなく Vercel Cron Jobs として定義してタイムアウト設定を拡張する
+  - フィードフェッチを並列化する（`Promise.allSettled`）が、Supabase 無料枠の接続数に注意
+  - フェッチは `MAX_DURATION = 60` を `route.ts` に設定する（Vercel Pro 相当が必要な場合は Hobby でどこまで設定できるか確認が必要）
+- **Detection:** Vercel Functions ログに `FUNCTION_INVOCATION_TIMEOUT` が出たら即対応
+- **Phase:** Phase 1（Cron の PostgreSQL 対応）で並列化とタイムアウトを同時に対処する
+
+### Pitfall H2: 記事データが際限なく増加 → Supabase 無料枠 500MB DB ストレージ圧迫
+
+- **Risk:** Supabase 無料枠のDB ストレージは **500MB**。1記事あたり平均1〜2KBとして、50メンバー × 3年分 × 週2本 = 50 × 156週 × 2 ≈ 15,600行。テキストデータのみなら容量問題は当面ないが、画像URL・本文抜粋を含めると膨らむ。より現実的な問題はインデックスサイズ増加によるクエリ速度低下。
+- **Prevention:**
+  - `articles` テーブルに保存するのは `link`（UNIQUE）, `substack_id`, `title`, `pub_date`, `image_url` の最小カラムのみ。本文は保存しない
+  - 定期的に古い記事（例: 3年以上前）を `archived_articles` テーブルに移動するか削除する POLICY を将来的に追加できるよう設計する
+  - Supabase ダッシュボードでストレージ使用量を月次モニタリングする
+- **Phase:** Phase 1 スキーマ設計で保存カラムを最小化する
+
+### Pitfall H3: Redis からのデータエクスポートで文字化けや型不一致が発生する
+
+- **Risk:** Upstash Redis は `@upstash/redis` の自動シリアライズ（JSON）で保存している。エクスポートスクリプトで `redis.get('members')` を直接呼んで JSON を取り出す場合、`teamNames` が `string[]` である保証がない（旧フォーマットは `teamName: string` 単体）。PostgreSQL に INSERT する際に型不一致でエラーが出るか、サイレントに NULL が入る。
+- **Prevention:**
+  - エクスポートスクリプトに `kvMembers.ts` の既存の後方互換フォールバックロジック（`m.teamNames ?? (m.teamName ? [m.teamName] : [])`）を必ず含める
+  - エクスポート後の PostgreSQL データを全件 SELECT して目視確認する手順を Migration runbook に含める
+  - エクスポートは本番環境へのデプロイ前日に staging/dev Supabase プロジェクトで一度テストする
+- **Phase:** Phase 1 マイグレーション実行手順に含める
+
+### Pitfall H4: メンバー削除時に記事データの孤立レコードが残る
+
+- **Risk:** PostgreSQL に移行すると `members` テーブルと `articles` テーブルが外部キーで結べる。しかし外部キー制約なしで実装すると、メンバー削除時に `articles` テーブルに孤立した記事が残り続ける。ストレージ圧迫とクエリ結果の不整合が生じる。
+- **Prevention:**
+  - `articles.substack_id` に `REFERENCES members(substack_id) ON DELETE CASCADE` を設定する
+  - または最低限、`deleteMember` に相当する PostgreSQL トランザクションで記事削除を同時実行する
+- **Phase:** Phase 1 スキーマ設計時に CASCADE 設定を含める
+
+---
+
+## Vercel Free Tier Constraints
+
+### Supabase 無料枠の制限
+
+| リソース | 無料枠上限 | v1.5 想定使用量 | 判定 |
+|---------|-----------|----------------|------|
+| DB ストレージ | 500 MB | 〜数MB（テキストのみ） | 余裕あり |
+| 月次アクティブユーザー (MAU) | 50,000 | 少人数コミュニティ | 余裕あり |
+| ファイルストレージ | 1 GB | 使用しない | 該当なし |
+| DB 接続（直接） | 最大 25〜30 | Cron + ISR で集中する可能性あり | 要 Pooler 必須 |
+| **プロジェクト一時停止** | **7日間アクティビティなしで停止** | Cron が毎日動けば回避可能 | 要確認 |
+| 同時 Realtime 接続 | 200 | 使用しない | 該当なし |
+
+**最重要制約: 7日間非アクティブで自動停止**
+
+- Supabase 無料プロジェクトは DB クエリが 7日間発生しないと自動的に一時停止される
+- ダッシュボードへのアクセスはカウントされない（DB クエリが必要）
+- Vercel Cron Job（毎日のRSS取得）が PostgreSQL にも書き込んでいれば自動的に回避できる
+- Cron が止まった場合（メンバー0人でスキップなど）は GitHub Actions などの外部 ping を設定する
+
+### Vercel 無料枠（Hobby）の制限
+
+| リソース | 制限 | v1.5 への影響 |
+|---------|------|--------------|
+| サーバーレス関数タイムアウト | **10秒** | Cron でフルフェッチ（50人）が超過リスクあり |
+| Edge Function タイムアウト | 25秒（ストリーミング継続は最大300秒） | middleware は Edge — 問題なし |
+| Cron Job 実行回数 | 1件/日（Hobby）| 毎日1回のCronで十分 |
+| 関数のメモリ | 1024 MB | 問題なし |
+| ビルド時間 | 45分 | 問題なし |
+
+### Connection Pooling の必須設定
+
+Vercel サーバーレス関数から Supabase に接続する際は以下のURLを使い分ける:
+
+| 用途 | 接続先 | ポート | 理由 |
+|------|-------|-------|------|
+| Vercel サーバーレス関数（ISR, API Routes, Server Actions） | Supabase Supavisor（Transaction モード）| **6543** | 接続を pooling して枯渇防止 |
+| Vercel Cron Job（長時間トランザクション） | Supabase Supavisor（Session モード）or 直接 | 5432 | prepared statement が必要な場合 |
+| ローカル開発 | 直接接続 | 5432 | 問題なし |
+
+環境変数の使い分け:
+```bash
+# サーバーレス関数用（Transaction Pooler）
+DATABASE_URL=postgresql://postgres:[password]@[project].supabase.co:6543/postgres?pgbouncer=true
+
+# Cron / マイグレーション用（直接または Session Pooler）
+DATABASE_URL_UNPOOLED=postgresql://postgres:[password]@[project].supabase.co:5432/postgres
 ```
-
-Never use `/:path*` without explicit exclusions. The minimal matcher for admin-only protection is the safest approach.
-
-**Detection:** Open browser DevTools → Network. After auth, CSS/JS requests show 401 or 200 with HTML bodies.
-
-**Phase:** Basic Auth implementation phase.
-
-**Confidence:** HIGH — Next.js middleware documentation, GitHub discussion #36308.
-
----
-
-### Pitfall V5: Removing force-static Causes Full Route Dynamic Rendering
-
-**What goes wrong:** The current `page.tsx` and `member/[substackId]/page.tsx` use `export const dynamic = 'force-static'`. When admin API routes or KV reads are added to the same route segments (or when middleware is introduced), developers sometimes remove `force-static` assuming dynamic rendering is now needed everywhere. This silently converts ISR pages to SSR — every user request triggers fresh RSS fetching, destroying the caching benefit and potentially hitting Vercel function limits.
-
-**Why it happens:** The relationship between `force-static`, `unstable_cache`, and middleware is not obvious. Middleware does not affect the rendering mode of pages it passes through — pages remain static unless their own segment opts out.
-
-**Consequences:** RSS feeds fetched on every request. 50 feeds × 300ms = 15s per request. Vercel free tier function timeout is 10s — pages time out.
-
-**Prevention:**
-- Keep `export const dynamic = 'force-static'` on public pages (`/`, `/member/[substackId]`).
-- Only the `/admin` route and API routes should be dynamic (no `force-static`).
-- Middleware running on `/admin` does NOT affect the `/` or `/member` routes.
-
-**Phase:** KV migration phase and Basic Auth phase — check that public pages retain `force-static` after each change.
-
-**Confidence:** HIGH — Next.js ISR documentation, confirmed in current codebase behavior.
-
----
-
-## Moderate Pitfalls
-
----
-
-### Pitfall V6: unstable_cache Tags Not Invalidated After KV Writes
-
-**What goes wrong:** After an admin adds or removes a member via the CRUD UI, the KV store is updated but the public page still shows the old member list. `unstable_cache` with tag `'feeds'` is not invalidated because the admin API route does not call `revalidateTag('feeds')`.
-
-**Why it happens:** `unstable_cache` caches the result of `fetchAllFeedsCached`. Writing to KV does not automatically invalidate this cache. The two systems are decoupled.
-
-**Consequences:** Admin adds a member, reloads the public page, sees no change for up to `REVALIDATE_SECONDS` (currently 300s).
-
-**Prevention:** In each admin API route handler (add member, delete member), call `revalidateTag('feeds')` immediately after the KV write succeeds. This triggers ISR revalidation on the next request.
-
-```typescript
-import { revalidateTag } from 'next/cache'
-// After successful kv write:
-revalidateTag('feeds')
-```
-
-**Phase:** Admin CRUD phase.
-
-**Confidence:** HIGH — Next.js `revalidateTag` documentation.
-
----
-
-### Pitfall V7: Upstash Free Tier — 500K Commands/Month is Consumed by Tooltip OGP Fetching
-
-**What goes wrong:** OGP thumbnail URLs for articles are fetched and cached in Upstash Redis as a performance optimization. With 50 members × 7 days × multiple daily visitors, cache reads accumulate rapidly. Each tooltip hover triggers a KV read if not cached at the component level.
-
-**Why it happens:** Upstash free tier limit is 500K commands/month (updated March 2025). Each `redis.get()` call counts as one command. If thumbnails are fetched per-request rather than cached in `unstable_cache`, commands multiply with traffic.
-
-**Consequences:** KV commands exhausted mid-month. All KV reads return errors. Admin UI breaks (cannot load member list). Public site degrades if member list is also stored in KV.
-
-**Prevention:**
-- Cache OGP thumbnail URLs in `unstable_cache` (not in Upstash directly) with a long TTL (e.g., 24 hours). Upstash is the source of truth for member data only.
-- Do NOT store per-article thumbnail data in Upstash — store it in Next.js data cache via `unstable_cache` with `fetch`.
-- Monitor Upstash dashboard for command count after launch.
-
-**Phase:** OGP thumbnail fetching phase.
-
-**Confidence:** MEDIUM — Upstash pricing docs verified; command count projection is estimated.
-
----
-
-### Pitfall V8: OGP Fetch from Substack — og:image May Not Exist
-
-**What goes wrong:** Not all Substack articles have an `og:image` tag. Free-tier Substack newsletters, older articles, or articles with text-only content often have no cover image. A missing `og:image` causes the thumbnail to be `undefined`, and rendering `<img src={undefined}>` produces a broken image icon in the tooltip.
-
-**Why it happens:** OGP is not mandatory — authors choose whether to upload a cover image. Substack sets `og:image` only when a cover image is explicitly set.
-
-**Consequences:** Broken image icons in all tooltips for members who do not use cover images.
-
-**Prevention:**
-- Always provide a fallback: `thumbnailUrl ?? '/placeholder-article.png'`.
-- Use a static local placeholder image rather than an external default URL (avoids another fetch).
-- When fetching OGP, check `response.ok` and gracefully return `{ title: item.title, thumbnailUrl: null }` on failure.
-
-**Phase:** OGP thumbnail fetching phase.
-
-**Confidence:** HIGH — Substack support docs confirmed that og:image is optional; rss-parser issues confirm media:thumbnail is unreliable.
-
----
-
-### Pitfall V9: OGP Fetch Performance — Blocking Tooltip Render
-
-**What goes wrong:** Fetching OGP data (HTML scrape of each article URL) at tooltip hover time introduces 200–800ms latency. The tooltip appears blank until the fetch resolves, then jumps in size when the thumbnail appears. On slow connections, users see no tooltip at all.
-
-**Why it happens:** Substack article pages are full HTML documents. Fetching them client-side for OGP parsing is slow and blocked by CORS. Fetching server-side via a Route Handler adds a round trip.
-
-**Prevention (two-tier strategy):**
-1. **RSS feed item fields first:** `rss-parser` with custom fields can extract `media:content`, `media:thumbnail`, and `enclosure` from Substack RSS items. These are available in the already-cached feed data — zero additional fetches. Use these fields as the primary thumbnail source.
-2. **HTML OGP fallback only when RSS fields are absent.** Cache the result in `unstable_cache` with a tag so it survives ISR cycles.
-3. Never fetch OGP synchronously on hover. Pre-fetch during ISR page generation.
-
-**Detection:** Tooltip flicker or blank tooltips in production. Network tab showing 200–800ms requests on hover.
-
-**Phase:** OGP thumbnail fetching phase — strategy must be decided before implementation.
-
-**Confidence:** MEDIUM — Based on rss-parser GitHub issues (#130) and general OGP scraping behavior.
-
----
-
-### Pitfall V10: members.json → KV Migration — ISR Cache Serves Stale Member List
-
-**What goes wrong:** After deploying the KV migration, the `unstable_cache` for `'all-feeds'` still has a cached result based on the old `members.json` data (or the first KV read). If a member is added to KV but the cache has not expired, the new member does not appear on the public page.
-
-**Why it happens:** `unstable_cache` caches the entire result of `fetchAllFeedsCached`. The cache key is `['all-feeds']`. Simply writing to KV does not invalidate this cache.
-
-**Consequences:** During the migration deploy, the public site shows the old member list for up to 300 seconds. More importantly, during initial KV setup if `generateStaticParams` returns fewer members than before (because KV is empty), old member routes return 404.
-
-**Prevention:**
-1. Seed KV with all current `members.json` data before removing `members.json` from the codebase.
-2. Verify KV data is correct by reading it back before deploying the removed-JSON version.
-3. After KV migration deploy, manually trigger `revalidateTag('feeds')` via a one-time admin action.
-4. Keep `members.json` as a read-only backup for one deploy cycle.
-
-**Phase:** KV migration phase — this is the migration sequence, not just a code change.
-
-**Confidence:** HIGH — Next.js `unstable_cache` documentation, current codebase structure confirmed.
-
----
-
-### Pitfall V11: Basic Auth Credentials in URL (Browser Behavior)
-
-**What goes wrong:** Some developers implement Basic Auth at the middleware level and then bookmark or share the admin URL as `https://user:pass@keep-substack.vercel.app/admin`. Modern browsers (Chrome 59+, Firefox) block inline credentials in URLs for security reasons and strip them silently. The admin page appears but shows an auth challenge.
-
-**Why it happens:** RFC 3986 allows credentials in URLs, but browser vendors deprecated this. Vercel's CDN may also strip `Authorization` headers before they reach the origin.
-
-**Prevention:**
-- Implement the admin auth check in middleware using the `Authorization` header (standard `WWW-Authenticate: Basic` challenge). This works correctly.
-- Do NOT rely on URL-embedded credentials.
-- Test auth flow in incognito mode to verify the browser challenge dialog appears correctly.
-
-**Phase:** Basic Auth implementation phase.
-
-**Confidence:** MEDIUM — Browser compatibility knowledge; Vercel header handling is inferred.
-
----
-
-## Minor Pitfalls
-
----
-
-### Pitfall V12: Upstash Redis Key Naming — No Namespace Collision Guard
-
-**What goes wrong:** Using bare key names like `"members"` or `"admin"` in Upstash Redis. If the same Upstash database is shared with other projects (unlikely but possible), keys collide. More practically, during development if you accidentally write test data to the same key, it overwrites production data.
-
-**Prevention:** Use a consistent prefix: `kv:members` for the member list, `kv:ogp:{substackId}:{articleSlug}` for OGP cache (if stored in KV at all). Document key schema in a comment near the KV client initialization.
-
-**Phase:** KV migration phase.
-
-**Confidence:** MEDIUM — Standard Redis operational practice.
-
----
-
-### Pitfall V13: Next.js next/image for External OGP Thumbnails Requires Domain Allowlist
-
-**What goes wrong:** Using `<Image>` from `next/image` to display Substack article thumbnails (hosted on `substackcdn.com` or `substack-post-media.s3.amazonaws.com`) fails with a runtime error: "hostname not configured under images in your next.config.js".
-
-**Why it happens:** `next/image` requires explicit domain or pattern allowlisting for external URLs to prevent SSRF.
-
-**Prevention:** Add to `next.config.ts`:
-```typescript
-images: {
-  remotePatterns: [
-    { protocol: 'https', hostname: '**.substackcdn.com' },
-    { protocol: 'https', hostname: 'substack-post-media.s3.amazonaws.com' },
-  ],
-},
-```
-Or use a plain `<img>` tag if image optimization is not needed for tooltip thumbnails (simpler, avoids the config).
-
-**Phase:** OGP thumbnail fetching phase.
-
-**Confidence:** HIGH — Next.js Image documentation.
-
----
-
-### Pitfall V14: rss-parser media:thumbnail Custom Fields Not Configured
-
-**What goes wrong:** Substack RSS feeds include article cover images as `<media:thumbnail>` or `<media:content>` elements. By default, `rss-parser` does not parse these fields — they appear as `undefined` on feed items. This forces unnecessary OGP scraping when the data is already in the feed.
-
-**Why it happens:** `rss-parser` only parses a subset of RSS/Atom fields by default. Custom namespace fields require explicit configuration.
-
-**Prevention:** Configure `rss-parser` with custom fields:
-```typescript
-const parser = new Parser({
-  timeout: 5000,
-  customFields: {
-    item: [
-      ['media:thumbnail', 'mediaThumbnail', { keepArray: false }],
-      ['media:content', 'mediaContent', { keepArray: false }],
-      ['enclosure', 'enclosure'],
-    ],
-  },
-})
-```
-Check `item.mediaThumbnail?.$.url` or `item.enclosure?.url` before falling back to OGP scraping. This eliminates most OGP fetches since Substack includes media fields.
-
-**Phase:** OGP thumbnail fetching phase — configure this first before building OGP fallback.
-
-**Confidence:** MEDIUM — rss-parser GitHub issue #130 confirms the pattern; Substack-specific field availability is inferred.
-
----
-
-## Pre-existing Pitfalls (v1.0 — still relevant)
-
-The following pitfalls from v1.0 remain relevant in v1.1:
-
-| Pitfall | Still Relevant | v1.1 Note |
-|---------|----------------|-----------|
-| rss-parser fetch timeout (Pitfall 1) | YES | Now also relevant for OGP fetches — apply same AbortController pattern |
-| ISR stale content (Pitfall 2) | YES | Admin writes must trigger `revalidateTag` or users see stale data |
-| Client Component creep (Pitfall 3) | YES | Heatmap grid + tooltips risk making entire view client-side |
-| RSS feed URL differences (Pitfall 4) | YES | members.json → KV migration must normalize URLs at write time |
-| Vercel function limits (Pitfall 8) | YES | Now applies to admin API routes and OGP fetch routes |
-| Config change workflow (Pitfall 9) | RESOLVED | KV replaces the deploy-to-update pattern |
 
 ---
 
 ## Phase-Specific Warnings
 
-| Phase Topic | Critical Pitfall | Mitigation |
-|-------------|-----------------|------------|
-| Package setup | V1: @vercel/kv deprecated | Use @upstash/redis from the start |
-| KV migration | V2: generateStaticParams env scope | Set Build env vars in Vercel dashboard |
-| KV migration | V10: stale ISR cache during migration | Seed KV first, verify, then redeploy |
-| KV migration | V12: key naming | Use `kv:` prefix for all keys |
-| Basic Auth setup | V4: matcher too broad | matcher: ['/admin', '/admin/:path*'] only |
-| Basic Auth setup | V3: CVE-2025-29927 | Confirm Next.js 16.2.6, add secondary check |
-| Basic Auth setup | V11: URL-embedded credentials | Use Authorization header challenge |
-| OGP thumbnails | V14: rss-parser custom fields | Configure media:thumbnail before building OGP scraper |
-| OGP thumbnails | V8: missing og:image | Always provide local fallback placeholder |
-| OGP thumbnails | V9: blocking render | Pre-fetch in ISR, never on hover |
-| OGP thumbnails | V13: next/image domain | Add substackcdn.com to remotePatterns |
-| Admin CRUD | V6: cache not invalidated | Call revalidateTag('feeds') after every KV write |
-| Admin CRUD | V5: force-static removed accidentally | Public pages retain force-static; only /admin is dynamic |
-| All KV usage | V7: Upstash command budget | Cache OGP in unstable_cache, not Upstash; member list only in KV |
+| フェーズトピック | 重大なピットフォール | 対策 |
+|---------------|------------------|------|
+| DB スキーマ設計 | M2: JSONブロブ構造がPostgreSQLに合わない | 正規化スキーマ + UNIQUE制約を最初に確定 |
+| DB スキーマ設計 | M5: dedup ロジック差異 | `link` カラムに UNIQUE 制約 + ON CONFLICT DO NOTHING |
+| DB スキーマ設計 | H4: 孤立記事レコード | `ON DELETE CASCADE` 外部キー設定 |
+| マイグレーション実行 | M1: 一括切り替えダウンタイム | 段階デプロイ（読み取り先切替→書き込み先切替の順） |
+| マイグレーション実行 | M3: 接続枯渇 | Transaction Pooler URL（ポート6543）を設定 |
+| マイグレーション実行 | M4: generateStaticParams が空 | Vercel Build スコープの環境変数設定 |
+| マイグレーション実行 | H3: エクスポートの型不一致 | 後方互換フォールバックロジックをスクリプトに含める |
+| Auth 追加 | A1: middleware競合 | middleware内でルート分岐（BasicAuth + Supabase Auth を合成） |
+| Auth 追加 | A3: ISR+Auth → セッション漏洩 | 認証ルートとISRルートを完全分離 |
+| Auth 追加 | A2: getSession() サーバー使用 | サーバー側では必ず getUser() を使う |
+| Cron 更新 | H1: タイムアウト | 並列フェッチ + maxDuration 設定を確認 |
+| Supabase 運用 | 7日間停止 | Cron がDB書き込みしていれば自然に回避できる |
+| 接続管理 | M3: 接続枯渇 | Transaction Pooler URL を環境変数に設定 |
 
 ---
 
 ## Sources
 
-- [Vercel Community: Switching from Vercel KV to Upstash KV](https://community.vercel.com/t/switching-from-vercel-kv-to-upstash-kv-questions/2660) — migration details, env var changes
-- [Upstash Redis Pricing](https://upstash.com/docs/redis/overall/pricing) — 500K commands/month free tier (updated March 2025)
-- [Vercel Redis docs](https://vercel.com/docs/redis) — Upstash as recommended KV on Vercel
-- [Next.js generateStaticParams documentation](https://nextjs.org/docs/app/api-reference/functions/generate-static-params) — build-time execution behavior
-- [vercel/next.js Discussion #49328](https://github.com/vercel/next.js/discussions/49328) — KV access from generateStaticParams
-- [CVE-2025-29927 — NVD](https://nvd.nist.gov/vuln/detail/CVE-2025-29927) — middleware bypass vulnerability details
-- [Vercel Postmortem on Next.js Middleware Bypass](https://vercel.com/blog/postmortem-on-next-js-middleware-bypass) — affected versions
-- [GitHub Discussion #36308 — middleware on /public](https://github.com/vercel/next.js/discussions/36308) — static asset middleware issue
-- [Next.js Middleware documentation](https://nextjs.org/docs/app/building-your-application/routing/middleware) — matcher configuration
-- [Next.js unstable_cache documentation](https://nextjs.org/docs/app/api-reference/functions/unstable_cache) — cache tags and revalidation
-- [rss-parser GitHub issue #130](https://github.com/rbren/rss-parser/issues/130) — media:thumbnail access
-- [Next.js Image remotePatterns](https://nextjs.org/docs/app/api-reference/components/image#remotepatterns) — external image configuration
-- PROJECT.md — current system constraints and architecture decisions
+- [Supabase Docs: Setting up Server-Side Auth for Next.js](https://supabase.com/docs/guides/auth/server-side/nextjs) — middleware セットアップ、getUser() vs getSession() の注意点
+- [Supabase Docs: Troubleshooting Next.js Auth Issues](https://supabase.com/docs/guides/troubleshooting/how-do-you-troubleshoot-nextjs---supabase-auth-issues-riMCZV) — ISR キャッシュ漏洩、CDN セッション問題
+- [Supabase Docs: Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres) — Supavisor, Transaction Mode, ポート 6543
+- [Supabase Pricing](https://supabase.com/pricing) — 無料枠: DB 500MB, MAU 50K, 7日間停止ルール
+- [Supabase: Getting max connection reached using Supavisor (Discussion #18986)](https://github.com/orgs/supabase/discussions/18986) — 接続枯渇の実例
+- [Vercel: Supabase Connection Pooling with PgBouncer (iloveblogs.blog)](https://www.iloveblogs.blog/guides/supabase-connection-pooling-vercel) — Vercel + Supabase 接続プールのベストプラクティス
+- [Vercel Functions Limitations](https://vercel.com/docs/functions/limitations) — Hobby タイムアウト 10秒, Edge 25秒
+- [GitHub: Unsolvable cookies() should be awaited Error with Next.js + Supabase SSR (Discussion #81445)](https://github.com/vercel/next.js/discussions/81445) — Next.js 15/16 + @supabase/ssr の非同期 cookies() 問題
+- [Supabase GitHub Discussion: Interaction between Supabase and Next.js middleware + PPR (#21656)](https://github.com/orgs/supabase/discussions/21656) — middleware と PPR の競合
+- [Prevent Supabase Free Tier Pausing (Medium)](https://shadhujan.medium.com/how-to-keep-supabase-free-tier-projects-active-d60fd4a17263) — 7日間停止の回避策
+- [PostgreSQL Upsert: INSERT ON CONFLICT Guide (dbvis.com)](https://www.dbvis.com/thetable/postgresql-upsert-insert-on-conflict-guide/) — ON CONFLICT DO NOTHING による dedup
+- PROJECT.md — 既存システム構成・制約・設計決定の一覧
+
+---
+
+## v1.1 以前のピットフォール（引き続き有効）
+
+v1.5 でも以下の v1.1 ピットフォールは引き続き適用される:
+
+| ピットフォール | 引き続き有効 | v1.5 での備考 |
+|-------------|------------|--------------|
+| V3: CVE-2025-29927 ミドルウェアバイパス | YES | Next.js 16.2.6 で修正済み。middleware リファクタ時にバージョンを確認する |
+| V4: matcher が広すぎて静的アセットに認証がかかる | YES | Supabase Auth 追加時に matcher を広域に変更するため再確認必須 |
+| V5: force-static の誤削除 | YES | 認証ルートを追加する際に公開ページの force-static を誤って削除しやすい |
+| V6: unstable_cache タグの非無効化 | YES | PostgreSQL 書き込み後も revalidateTag('feeds') を呼ぶ |
