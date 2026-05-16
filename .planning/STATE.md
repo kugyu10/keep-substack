@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.4
-milestone_name: UI/UX Refresh
-status: complete
-stopped_at: Phase 16 complete — Milestone v1.4 complete
-last_updated: "2026-05-15T07:30:00.000Z"
-last_activity: 2026-05-15 — Phase 16 検証完了・Milestone v1.4 完了
+milestone: v1.5
+milestone_name: Member Auth + Supabase Migration
+status: planning
+last_updated: "2026-05-16T01:49:05.155Z"
+last_activity: 2026-05-16
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -25,12 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-15 — v1.4 UI/UX Refresh 完了)
 
 ## Current Position
 
-Phase: 16 of 16 — **verified complete**
-Plan: 16-01 完了 + 16-VERIFICATION.md 作成
-Status: Phase 16 検証完了 → Milestone v1.4 完了
-Last activity: 2026-05-15 — Phase 16 検証完了 (ポップオーバーダーク化・横並びレイアウト・touchstart対応、全6件 VERIFIED)
-
-Progress: [██████████] 100%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-16 — Milestone v1.5 started
 
 ## Performance Metrics
 

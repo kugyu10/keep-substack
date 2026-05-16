@@ -1,6 +1,16 @@
 # Keep Substack
 
-## Current State: v1.4 SHIPPED — Planning v1.5
+## Current Milestone: v1.5 Member Auth + Supabase Migration
+
+**Goal:** Supabase完全移行・ログイン・メンバー自己管理を実現し、管理者依存を排除してメンバーが自律的に参加できるサービスにする
+
+**Target features:**
+- Supabase完全移行（Upstash Redis廃止 → PostgreSQL）
+- ログイン機能（Supabase Auth）+ メンバー自己管理（v1.5）
+- 長期記事履歴（1ヶ月以上）をSupabaseで累積保存
+- 管理画面チーム管理UI改善（カンマ区切り → チェックボックス）
+
+## Previous: v1.4 SHIPPED
 
 **Shipped:** v1.4 UI/UX Refresh (2026-05-15)
 - ファーストビューにヒートマップを表示（バナー削除）
@@ -135,4 +145,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-16 — v1.4 UI/UX Refresh shipped*
+*Last updated: 2026-05-16 — v1.5 Member Auth + Supabase Migration started*
