@@ -166,7 +166,7 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
   3. /myページで自分のSubstack URLと所属チームを登録・更新して保存できる
   4. 既存管理者登録済みメンバーがsubstackIdを入力すると自分のアカウントと紐付けられる
   5. /adminへのアクセスがSupabaseユーザーロール（admin role）で制御され、Basic Authが不要になる
-**Plans**: TBD
+**Plans**: 19-01, 19-02, 19-03
 **UI hint**: yes
 
 ### Phase 20: 管理画面チームチェックボックス
@@ -213,6 +213,6 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 | 16. ポップオーバー刷新 | v1.4 | 1/1 | Complete | 2026-05-15 |
 | 17. Supabaseスキーマ + RLS設定 + KVデータ移行 | v1.5 | 3/3 | Complete | 2026-05-16 |
 | 18. データレイヤー差し替え + 長期記事履歴 | v1.5 | 3/3 | Complete | 2026-05-16 |
-| 19. Supabase Auth + メンバー自己管理 | v1.5 | 0/TBD | Not started | - |
+| 19. Supabase Auth + メンバー自己管理 | v1.5 | 0/3 | Not started | - |
 | 20. 管理画面チームチェックボックス | v1.5 | 0/TBD | Not started | - |
 | 21. Redisクリーンアップ | v1.5 | 0/TBD | Not started | - |
