@@ -11,10 +11,7 @@ export async function addMemberAction(
 ): Promise<string | null> {
   const name = formData.get('name') as string
   const substackId = formData.get('substackId') as string
-  const teamNamesRaw = formData.get('teamNames') as string
-  const teamNames = teamNamesRaw
-    ? teamNamesRaw.split(',').map((s) => s.trim()).filter(Boolean)
-    : []
+  const teamNames = formData.getAll('teamNames') as string[]
 
   if (!name || !substackId) {
     return 'name と substackId は必須です'
@@ -52,10 +49,7 @@ export async function updateMemberAction(
   formData: FormData
 ): Promise<string | null> {
   const name = formData.get('name') as string
-  const teamNamesRaw = formData.get('teamNames') as string
-  const teamNames = teamNamesRaw
-    ? teamNamesRaw.split(',').map((s) => s.trim()).filter(Boolean)
-    : []
+  const teamNames = formData.getAll('teamNames') as string[]
   const addedAt = formData.get('addedAt') as string
 
   if (!name) return 'name は必須です'
