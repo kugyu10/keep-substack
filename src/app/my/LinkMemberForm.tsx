@@ -9,7 +9,7 @@ export default function LinkMemberForm() {
   return (
     <div>
       <p className="text-sm text-gray-600 mb-4">
-        管理者から登録してもらった パブリケーションID を入力して、アカウントと紐付けてください。
+        Substackの パブリケーションID を入力して、あなたと紐付けてください。
       </p>
       <form action={action} className="space-y-4">
         {state && <p className="text-sm text-red-600">{state}</p>}
@@ -26,7 +26,7 @@ export default function LinkMemberForm() {
             placeholder="yourname"
           />
           <p className="text-xs text-gray-500 mt-1">
-            例: yourname（yourname.substack.com の yourname 部分）
+            例: uojun（https://uojun.substack.com/ の uojun 部分）
           </p>
         </div>
         <button
