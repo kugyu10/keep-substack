@@ -1,4 +1,5 @@
-import 'dotenv/config'
+import dotenv from 'dotenv'
+dotenv.config({ path: '.env.local' })
 import { mkdir, writeFile } from 'fs/promises'
 import { getMembers } from '../src/lib/kvMembers'
 import { getArticles } from '../src/lib/kvArticles'
