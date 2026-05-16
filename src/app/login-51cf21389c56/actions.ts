@@ -29,6 +29,9 @@ export async function sendMagicLinkAction(
 
   if (error) {
     console.error('[sendMagicLink]', error)
+    if (error.status === 429) {
+      return '送信制限に達しました。1時間ほど待ってから再試行してください'
+    }
     return 'メールの送信に失敗しました。しばらく経ってから再試行してください'
   }
 
