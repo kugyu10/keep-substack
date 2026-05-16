@@ -70,7 +70,7 @@ Progress: [██████████] 100%
 
 ### Pending Todos
 
-- [ ] **本番ドメインのResend設定** — 現在 `keep-substack@resend.dev` で仮運用中。本番前に独自ドメインを Resend に追加し、Supabase SMTP Settings の Sender email を更新すること
+- [x] ~~本番ドメインのResend設定~~ — `kazumin0831.com` で設定済み・送信確認済み（2026-05-16）
 - [x] ~~Supabase DBマイグレーション~~ — 完了済み（`substack_id` → `publication_id`）
 
 ### Blockers/Concerns
