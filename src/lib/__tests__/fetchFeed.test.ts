@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { Member, FeedItem } from '../types'
 
-// rss-parser と kvArticles をモック
-vi.mock('../kvArticles', () => ({
+// rss-parser と articles をモック
+vi.mock('../articles', () => ({
   getArticles: vi.fn(),
 }))
 
@@ -17,7 +17,7 @@ vi.mock('rss-parser', async () => {
   return { default: Parser }
 })
 
-import { getArticles } from '../kvArticles'
+import { getArticles } from '../articles'
 import { fetchAllFeedsCached } from '../fetchFeed'
 import Parser from 'rss-parser'
 

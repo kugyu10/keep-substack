@@ -1,4 +1,4 @@
-import { getMembers } from '@/lib/kvMembers'
+import { getMembers } from '@/lib/members'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import AdminAddForm from './AdminAddForm'
 import AdminMemberList from './AdminMemberList'

@@ -1,7 +1,7 @@
 import Parser from 'rss-parser'
 import type { FeedItem, Member, MemberFeedResult } from './types'
 import { extractThumbnail } from './heatmapUtils'
-import { getArticles } from './kvArticles'
+import { getArticles } from './articles'
 
 // D-03: タイムアウト5秒
 const parser = new Parser({

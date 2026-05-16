@@ -1,9 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { addMember, deleteMember, updateMember } from '@/lib/kvMembers'
+import { addMember, deleteMember, updateMember } from '@/lib/members'
 import { fetchWithRetry } from '@/lib/fetchFeed'
-import { saveArticles, deleteArticles } from '@/lib/kvArticles'
+import { saveArticles, deleteArticles } from '@/lib/articles'
 
 export async function addMemberAction(
   prevState: string | null,

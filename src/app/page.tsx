@@ -1,4 +1,4 @@
-import { getMembers } from '@/lib/kvMembers'
+import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { HIDDEN_TEAM } from '@/lib/types'
 import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'

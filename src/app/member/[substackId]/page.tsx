@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { buildHeatmapArticleMap } from '@/lib/heatmapUtils'
 import CalendarGrid from '@/components/CalendarGrid'
-import { getMembers } from '@/lib/kvMembers'
+import { getMembers } from '@/lib/members'
 
 export const revalidate = 300
 

@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server'
-import { getMembers } from '@/lib/kvMembers'
+import { getMembers } from '@/lib/members'
 import { fetchWithRetry } from '@/lib/fetchFeed'
-import { saveArticles } from '@/lib/kvArticles'
+import { saveArticles } from '@/lib/articles'
 
 // D-04: CRON_SECRET Bearer認証（nullチェック先行でバイパス防止）
 export async function GET(request: NextRequest) {
