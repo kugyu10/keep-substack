@@ -2,6 +2,7 @@ import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { HIDDEN_TEAM } from '@/lib/types'
 import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'
+import PrBanner from '@/components/PrBanner'
 
 export const revalidate = 300
 
@@ -23,7 +24,7 @@ export default async function Home({ searchParams }: Props) {
   const results = await fetchAllFeedsCached(filteredMembers)
 
   return (
-    <main className="max-w-[600px] mx-auto px-3 py-4 pb-16">
+    <main className="max-w-[600px] mx-auto px-3 py-4">
       <h1 className="text-2xl mb-2" style={{ fontFamily: 'Georgia, serif', fontWeight: 900 }}>Keep Substack</h1>
 
       {teams.length > 0 && (
@@ -51,6 +52,7 @@ export default async function Home({ searchParams }: Props) {
       )}
 
       <WeeklyHeatmapGrid results={results} />
+      <PrBanner />
     </main>
   )
 }

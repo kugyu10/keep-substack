@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { buildHeatmapArticleMap } from '@/lib/heatmapUtils'
 import CalendarGrid from '@/components/CalendarGrid'
+import PrBanner from '@/components/PrBanner'
 import { getMembers } from '@/lib/members'
 
 export const revalidate = 300
@@ -26,7 +27,7 @@ export default async function MemberPage({
   const articleMapEntries = Array.from(map.entries())
 
   return (
-    <main className="max-w-[600px] mx-auto p-6 pb-64">
+    <main className="max-w-[600px] mx-auto p-6">
       {memberResult.member.teamNames.length > 0 ? (
         <div className="flex gap-3 mb-4">
           {memberResult.member.teamNames.map((t) => (
@@ -52,6 +53,7 @@ export default async function MemberPage({
         articleMap={articleMapEntries}
         imageUrl={memberResult.imageUrl}
       />
+      <PrBanner />
     </main>
   )
 }
