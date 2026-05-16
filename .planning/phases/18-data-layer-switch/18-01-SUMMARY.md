@@ -31,6 +31,13 @@
 - **Files modified:** package-lock.json（間接的）
 - **Commit:** 9e8951f（同コミットに含む）
 
+## Self-Check: PASSED
+
+- src/lib/kvMembers.ts: FOUND
+- .planning/phases/18-data-layer-switch/18-01-SUMMARY.md: FOUND
+- commit 9e8951f: FOUND
+- src/middleware.ts: 誤削除後に 7a03516 で復元済み
+
 ## Notes
 
 - redis.ts と @upstash/redis は Phase 21 で削除予定
