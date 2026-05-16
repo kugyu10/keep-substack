@@ -10,14 +10,20 @@ export async function sendMagicLinkAction(
   const email = formData.get('email') as string
   if (!email) return 'メールアドレスを入力してください'
 
+  const pid = (formData.get('pid') as string | null)?.trim() || null
+
   const headersList = await headers()
   const origin = headersList.get('origin') ?? ''
+
+  const callbackUrl = pid
+    ? `${origin}/auth/callback?pid=${encodeURIComponent(pid)}`
+    : `${origin}/auth/callback`
 
   const supabase = await createSupabaseServerClient()
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${origin}/auth/callback`,
+      emailRedirectTo: callbackUrl,
     },
   })
 
