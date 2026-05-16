@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Member Auth + Supabase Migration
-status: Phase 19 実行中
-stopped_at: Phase 19 Plan 19-01 完了
+status: Phase 19 完了 → Phase 20 待機
+stopped_at: Phase 19 全3プラン実行完了
 last_updated: "2026-05-16T12:00:00.000Z"
 last_activity: 2026-05-16 — Plan 19-01 完了（/login + Magic Link + /auth/callback 実装）
 progress:
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-05-16 — v1.5 Member Auth + Supabase Mi
 
 ## Current Position
 
-Phase: 19 of 21 — **in progress**
-Plan: 19-01 完了 → 19-02 実行待ち
-Status: Phase 19 実行中
-Last activity: 2026-05-16 — Plan 19-01 完了（/login + Magic Link + /auth/callback 実装、commit 1fa16b0）
+Phase: 19 of 21 — **complete**
+Plan: 19-03 完了（19-01 /login+callback + 19-02 /my+紐付け + 19-03 proxy auth移行）
+Status: Phase 19 完了 → Phase 20 待機
+Last activity: 2026-05-16 — Phase 19 全3プラン実行完了（Supabase Auth + Magic Link + admin ロール移行）
 
 Progress: [████████░░] 80%
 
