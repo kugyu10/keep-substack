@@ -7,12 +7,12 @@
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS members (
-  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  name        TEXT        NOT NULL,
-  substack_id TEXT        UNIQUE NOT NULL,
-  image_url   TEXT,
-  added_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-  user_id     UUID        REFERENCES auth.users(id) UNIQUE
+  id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  name           TEXT        NOT NULL,
+  publication_id TEXT        UNIQUE NOT NULL,
+  image_url      TEXT,
+  added_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  user_id        UUID        REFERENCES auth.users(id) UNIQUE
 );
 -- 既存Supabaseインスタンスへの適用:
 -- ALTER TABLE members ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) UNIQUE;
@@ -29,12 +29,12 @@ CREATE TABLE IF NOT EXISTS member_teams (
 );
 
 CREATE TABLE IF NOT EXISTS articles (
-  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  substack_id TEXT        NOT NULL REFERENCES members(substack_id) ON DELETE CASCADE,
-  title       TEXT,
-  link        TEXT        UNIQUE NOT NULL,
-  pub_date    TIMESTAMPTZ,
-  image_url   TEXT
+  id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  publication_id TEXT        NOT NULL REFERENCES members(publication_id) ON DELETE CASCADE,
+  title          TEXT,
+  link           TEXT        UNIQUE NOT NULL,
+  pub_date       TIMESTAMPTZ,
+  image_url      TEXT
 );
 
 -- 既存Supabaseインスタンスへの適用:
