@@ -177,7 +177,7 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
   1. 管理画面のメンバー編集欄にSupabase teamsテーブルから取得した既存チーム名の一覧がチェックボックスで表示される
   2. チェックボックスを切り替えてチームを選択し保存すると、所属チームが正しく更新される
   3. カンマ区切りテキスト入力が不要になり、タイポによるチーム名不一致が起きなくなる
-**Plans**: TBD
+**Plans**: 20-01
 **UI hint**: yes
 
 ### Phase 21: Redisクリーンアップ
@@ -214,5 +214,5 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 | 17. Supabaseスキーマ + RLS設定 + KVデータ移行 | v1.5 | 3/3 | Complete | 2026-05-16 |
 | 18. データレイヤー差し替え + 長期記事履歴 | v1.5 | 3/3 | Complete | 2026-05-16 |
 | 19. Supabase Auth + メンバー自己管理 | v1.5 | 3/3 | Complete | 2026-05-16 |
-| 20. 管理画面チームチェックボックス | v1.5 | 0/TBD | Not started | - |
+| 20. 管理画面チームチェックボックス | v1.5 | 0/1 | Not started | - |
 | 21. Redisクリーンアップ | v1.5 | 0/TBD | Not started | - |

@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Member Auth + Supabase Migration
-status: Phase 19 完了 → Phase 20 待機
-stopped_at: Phase 19 全3プラン実行完了
+status: Phase 20 計画完了 → 実行待ち
+stopped_at: Phase 20 PLAN作成完了（20-01）
 last_updated: "2026-05-16T12:00:00.000Z"
 last_activity: 2026-05-16 — Plan 19-01 完了（/login + Magic Link + /auth/callback 実装）
 progress:
