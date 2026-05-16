@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Member Auth + Supabase Migration
-status: Phase 20 完了 → Phase 21 待機
-stopped_at: Phase 20 完了
-last_updated: "2026-05-16T08:20:34.889Z"
-last_activity: 2026-05-16 — Phase 20 完了（管理画面チームチェックボックス — actions.ts/page.tsx/AdminAddForm/AdminMemberList）
+status: Milestone v1.5 全フェーズ完了
+stopped_at: Phase 21 完了（21-01）
+last_updated: "2026-05-16T15:00:00.000Z"
+last_activity: 2026-05-16 — Phase 21 完了（Redisクリーンアップ — @upstash/redis削除・kvMembers/kvArticles→members/articles リネーム）
 progress:
   total_phases: 9
   completed_phases: 9
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-05-16 — v1.5 Member Auth + Supabase Mi
 
 ## Current Position
 
-Phase: 20 of 21 — **complete**
-Plan: 20-01 完了（管理画面チームチェックボックス実装）
-Status: Phase 20 完了 → Phase 21 待機
-Last activity: 2026-05-16 — Phase 20 完了（管理画面チームチェックボックス — actions.ts/page.tsx/AdminAddForm/AdminMemberList）
+Phase: 21 of 21 — **complete**
+Plan: 21-01 完了（Redisクリーンアップ）
+Status: Milestone v1.5 全フェーズ完了
+Last activity: 2026-05-16 — Phase 21 完了（@upstash/redis削除・redis.ts削除・kvMembers→members・kvArticles→articles）
 
 Progress: [██████████] 100%
 
@@ -72,7 +72,7 @@ Progress: [██████████] 100%
 
 ## Session Continuity
 
-Last session: 2026-05-16T08:20:34.882Z
-Stopped at: Phase 20 完了
-Resume file: None
-Next step: Phase 21 実行（/gsd-execute-phase 21）— Redisクリーンアップ（@upstash/redis削除・KVファイル廃止）
+Last session: 2026-05-16T15:00:00.000Z
+Stopped at: Phase 21 完了 — Milestone v1.5 全フェーズ完了
+Resume file: .planning/phases/21-redis-cleanup/21-01-SUMMARY.md
+Next step: /gsd-complete-milestone でv1.5をアーカイブし、v1.6の計画へ

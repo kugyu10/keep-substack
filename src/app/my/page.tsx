@@ -7,7 +7,7 @@ import MyProfileForm from './MyProfileForm'
 export default async function MyPage() {
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) redirect('/login-51cf21389c56')
 
   const admin = createSupabaseAdminClient()
   const { data: member } = await admin
