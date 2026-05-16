@@ -1,8 +1,8 @@
 ---
-status: root_cause_found
+status: resolved
 trigger: ユーザー追加時にRSSが読まれない
 created: 2026-05-12
-updated: 2026-05-12
+updated: 2026-05-16
 ---
 
 # Debug Session: rss-not-fetched-on-user-add
