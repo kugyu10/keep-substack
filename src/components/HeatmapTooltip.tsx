@@ -84,11 +84,11 @@ export default function HeatmapTooltip({ articles, colorClass, imageUrl, childre
       </button>
       {open && (
         <div ref={popoverRef} className="absolute top-full left-1/2 pt-2 z-10" style={{ transform: 'translateX(-50%)' }}>
-          <div className="bg-zinc-800 rounded shadow-2xl p-2 min-w-[220px] max-w-xs relative">
+          <div className="bg-white border border-gray-200 rounded shadow-xl drop-shadow-lg p-2 min-w-[220px] max-w-xs relative">
             <button
               onClick={() => setOpen(false)}
               aria-label="閉じる"
-              className="absolute top-1 right-1 text-zinc-400 hover:text-white text-xs"
+              className="absolute top-1 right-1 text-gray-400 hover:text-gray-700 text-xs"
             >
               ×
             </button>
@@ -109,7 +109,7 @@ export default function HeatmapTooltip({ articles, colorClass, imageUrl, childre
                       />
                     )}
                     <span
-                      className="text-xs text-white hover:underline flex-1 min-w-0"
+                      className="text-xs text-gray-800 hover:underline flex-1 min-w-0"
                       style={{ overflow: 'hidden', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2 }}
                     >
                       {article.title}

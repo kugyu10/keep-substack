@@ -31,7 +31,7 @@ export default async function Home({ searchParams }: Props) {
           <a
             href="/"
             className={`px-3 py-1 rounded text-sm border ${
-              !team ? 'bg-primary text-white border-primary' : 'bg-gray-800 text-white border-gray-800 hover:bg-gray-700'
+              !team ? 'bg-primary text-white border-primary' : 'bg-white text-[#363737] border-[#ebebeb] hover:bg-[#fafafa] hover:border-[#d8d8d8]'
             }`}
           >
             All
@@ -41,7 +41,7 @@ export default async function Home({ searchParams }: Props) {
               key={t}
               href={`/?team=${encodeURIComponent(t)}`}
               className={`px-3 py-1 rounded text-sm border ${
-                team === t ? 'bg-primary text-white border-primary' : 'bg-gray-800 text-white border-gray-800 hover:bg-gray-700'
+                team === t ? 'bg-primary text-white border-primary' : 'bg-white text-[#363737] border-[#ebebeb] hover:bg-[#fafafa] hover:border-[#d8d8d8]'
               }`}
             >
               {t}
