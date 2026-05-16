@@ -5,7 +5,7 @@ milestone_name: Member Auth + Supabase Migration
 status: Milestone v1.5 全フェーズ完了
 stopped_at: Phase 21 完了（21-01）
 last_updated: "2026-05-16T15:00:00.000Z"
-last_activity: 2026-05-16 — Quick 260516-001: substackId→publicationId 全リネーム（コード21ファイル + supabase/schema.sql + マイグレーションSQL生成）
+last_activity: 2026-05-16 — Completed quick task 260516-r2r: メインブランチをmasterからmainに変更
 progress:
   total_phases: 9
   completed_phases: 9
@@ -67,6 +67,7 @@ Progress: [██████████] 100%
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260516-001 | substackId→publicationId 全リネーム（コード+スキーマ） | 2026-05-16 | 2e85688 | [260516-001-substackid-to-publicationid](.planning/quick/260516-001-substackid-to-publicationid/) |
+| 260516-r2r | メインブランチをmasterからmainに変更 | 2026-05-16 | a6efc63 | [260516-r2r-master-main](./quick/260516-r2r-master-main/) |
 
 ### Pending Todos
 
