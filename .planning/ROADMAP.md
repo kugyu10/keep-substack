@@ -143,7 +143,7 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
   5. 移行スクリプトを実行すると既存Redisのメンバーデータがmembersテーブルに全件INSERTされる
   6. 既存Redisの記事データがarticlesテーブルに全件INSERTされ、link列のUNIQUE制約で重複が排除される
   7. Supabase管理画面でメンバー数・記事数がRedis側と一致することを確認できる
-**Plans**: TBD
+**Plans**: 17-01, 17-02, 17-03
 
 ### Phase 18: データレイヤー差し替え + 長期記事履歴
 **Goal**: アプリの読み書きが完全にSupabaseを参照し、Cronが長期記事を累積保存できる状態になる
@@ -211,7 +211,7 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 | 14. ユーザーリスト + チームタブ UI | v1.4 | 1/1 | Complete | 2026-05-15 |
 | 15. ヒートマップ カラーリング | v1.4 | 1/1 | Complete | 2026-05-15 |
 | 16. ポップオーバー刷新 | v1.4 | 1/1 | Complete | 2026-05-15 |
-| 17. Supabaseスキーマ + RLS設定 + KVデータ移行 | v1.5 | 0/TBD | Not started | - |
+| 17. Supabaseスキーマ + RLS設定 + KVデータ移行 | v1.5 | 0/3 | Not started | - |
 | 18. データレイヤー差し替え + 長期記事履歴 | v1.5 | 0/TBD | Not started | - |
 | 19. Supabase Auth + メンバー自己管理 | v1.5 | 0/TBD | Not started | - |
 | 20. 管理画面チームチェックボックス | v1.5 | 0/TBD | Not started | - |
