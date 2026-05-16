@@ -8,12 +8,12 @@ vi.mock('../kvArticles', () => ({
 
 vi.mock('rss-parser', async () => {
   const { vi: viInner } = await import('vitest')
-  const parseURL = viInner.fn().mockRejectedValue(new Error('RSS fetch failed'))
+  const parseString = viInner.fn().mockRejectedValue(new Error('RSS fetch failed'))
   const Parser = viInner.fn(function () {
-    return { parseURL }
+    return { parseString }
   })
-  // parseURL を Parser に紐付けて外から参照できるようにする
-  ;(Parser as unknown as Record<string, unknown>)._parseURL = parseURL
+  // parseString を Parser に紐付けて外から参照できるようにする
+  ;(Parser as unknown as Record<string, unknown>)._parseString = parseString
   return { default: Parser }
 })
 
@@ -22,9 +22,9 @@ import { fetchAllFeedsCached } from '../fetchFeed'
 import Parser from 'rss-parser'
 
 const mockGetArticles = vi.mocked(getArticles)
-// Parser インスタンスの parseURL を取得
-const getMockParseURL = () =>
-  ((Parser as unknown as Record<string, unknown>)._parseURL as ReturnType<typeof vi.fn>)
+// Parser インスタンスの parseString を取得
+const getMockParseString = () =>
+  ((Parser as unknown as Record<string, unknown>)._parseString as ReturnType<typeof vi.fn>)
 
 const makeMember = (substackId: string): Member => ({
   name: substackId,
@@ -39,14 +39,31 @@ const makeItem = (link: string | undefined, isoDate: string): FeedItem => ({
   isoDate,
 })
 
+// fetch をモック（fetchFeed.ts は fetch → parseString を使う）
+const mockFetch = vi.fn()
+vi.stubGlobal('fetch', mockFetch)
+
+function makeFetchOk(xml = '<rss></rss>') {
+  return Promise.resolve({
+    ok: true,
+    text: () => Promise.resolve(xml),
+  } as Response)
+}
+
+function makeFetchFail() {
+  return Promise.reject(new Error('Network error'))
+}
+
 describe('fetchAllFeedsCached - ハイブリッドフェッチ', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    getMockParseURL().mockRejectedValue(new Error('RSS fetch failed'))
+    getMockParseString().mockRejectedValue(new Error('RSS fetch failed'))
+    mockFetch.mockImplementation(makeFetchFail)
   })
 
   it('ケース1: ライブRSS成功 + KV成功 → マージ・dedupe・isoDate降順で返す', async () => {
-    getMockParseURL().mockResolvedValue({
+    mockFetch.mockImplementation(() => makeFetchOk('<rss/>'))
+    getMockParseString().mockResolvedValue({
       items: [
         {
           title: 'live-new',
@@ -101,7 +118,8 @@ describe('fetchAllFeedsCached - ハイブリッドフェッチ', () => {
   })
 
   it('ケース5: link が undefined の記事は dedupe されずすべて含まれる', async () => {
-    getMockParseURL().mockResolvedValue({
+    mockFetch.mockImplementation(() => makeFetchOk('<rss/>'))
+    getMockParseString().mockResolvedValue({
       items: [
         { title: 'live-no-link', link: undefined, isoDate: '2025-02-01T00:00:00Z', contentEncoded: '' },
       ],

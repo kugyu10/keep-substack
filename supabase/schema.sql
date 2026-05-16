@@ -30,8 +30,12 @@ CREATE TABLE IF NOT EXISTS articles (
   substack_id TEXT        NOT NULL REFERENCES members(substack_id) ON DELETE CASCADE,
   title       TEXT,
   link        TEXT        UNIQUE NOT NULL,
-  pub_date    TIMESTAMPTZ
+  pub_date    TIMESTAMPTZ,
+  image_url   TEXT
 );
+
+-- 既存Supabaseインスタンスへの適用:
+-- ALTER TABLE articles ADD COLUMN IF NOT EXISTS image_url TEXT;
 
 -- ============================================================
 -- 2. Row Level Security
