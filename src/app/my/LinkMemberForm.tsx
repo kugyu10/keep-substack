@@ -9,13 +9,13 @@ export default function LinkMemberForm() {
   return (
     <div>
       <p className="text-sm text-gray-600 mb-4">
-        管理者から登録してもらった Publication ID を入力して、アカウントと紐付けてください。
+        管理者から登録してもらった パブリケーションID を入力して、アカウントと紐付けてください。
       </p>
       <form action={action} className="space-y-4">
         {state && <p className="text-sm text-red-600">{state}</p>}
         <div>
           <label htmlFor="publicationId" className="block text-sm font-medium mb-1">
-            Publication ID
+            パブリケーションID
           </label>
           <input
             id="publicationId"
