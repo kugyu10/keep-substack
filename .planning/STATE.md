@@ -70,10 +70,8 @@ Progress: [██████████] 100%
 
 ### Pending Todos
 
-⚠️ **Supabase DBマイグレーション未実行** — コードは`publication_id`に更新済みだが、DBカラムはまだ`substack_id`。デプロイ前に必ず実行すること:
-```
-supabase/migrations/20260516_rename_substack_id_to_publication_id.sql
-```
+- [ ] **本番ドメインのResend設定** — 現在 `keep-substack@resend.dev` で仮運用中。本番前に独自ドメインを Resend に追加し、Supabase SMTP Settings の Sender email を更新すること
+- [x] ~~Supabase DBマイグレーション~~ — 完了済み（`substack_id` → `publication_id`）
 
 ### Blockers/Concerns
 
