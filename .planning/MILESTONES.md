@@ -72,3 +72,28 @@
 **Archive:**
 - `.planning/milestones/v1.3-ROADMAP.md`
 - `.planning/milestones/v1.3-REQUIREMENTS.md`
+
+---
+
+*See individual milestone archives for full phase details.*
+
+---
+
+## v1.4 UI/UX Refresh — ✅ SHIPPED 2026-05-15
+
+**Phases:** 13-16 | **Plans:** 4 | **Timeline:** 2026-05-15 (1 day)
+
+**Delivered:** モバイルファーストを軸にファーストビュー・ヒートマップ・ポップオーバーのUIを刷新し、Substackオレンジ配色とリッチインタラクションで継続可視化を強化。
+
+**Key Accomplishments:**
+1. ヒーローバナー削除 + モバイル余白調整でファーストビューにヒートマップを表示（Phase 13）
+2. HeatmapRow名前列truncate1行化・シェブロン追加・Substackオレンジタブで視認性向上（Phase 14）
+3. getIntensityClass を Substackオレンジ系（/70・100%・赤）3段階に更新し点線丸・件数バッジ追加（Phase 15）
+4. HeatmapTooltip を横並びサムネイルリスト・touchstart対応・×ボタン・Click Outsideで刷新（Phase 16）
+5. Substack公式ライトテーマ（#fafafa背景・#363737テキスト・Loraフォント）に統一（Quick Task）
+
+**Known deferred items at close: 4 (see STATE.md Deferred Items)**
+
+**Archive:**
+- `.planning/milestones/v1.4-ROADMAP.md`
+- `.planning/milestones/v1.4-REQUIREMENTS.md`

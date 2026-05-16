@@ -94,6 +94,17 @@ Progress: [██████████] 100%
 
 None.
 
+## Deferred Items
+
+Items acknowledged and deferred at milestone close on 2026-05-16:
+
+| Category | Item | Status |
+|----------|------|--------|
+| quick_task | 260515-mx8-white-bg-to-black-fix-text | audit tool mismatch (実装済み) |
+| todo | article-history-persistence | deferred to v1.5 |
+| todo | multi-team-membership | deferred to v1.5 |
+| todo | supabase-migration | deferred to v1.5 |
+
 ### Quick Tasks Completed
 
 | # | Description | Date | Commit | Directory |
@@ -102,7 +113,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-15T07:30:00.000Z
-Stopped at: Completed quick task 260515-mx8: 白背景を黒にしてみて　現在白字で溶けちゃうテキストは黒くして
+Last session: 2026-05-16T00:00:00.000Z
+Stopped at: Milestone v1.4 UI/UX Refresh archived — ready for v1.5 planning
 Resume file: .planning/phases/16-popover-redesign/16-VERIFICATION.md
 Next step: 次マイルストーン（v1.5）計画

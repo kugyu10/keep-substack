@@ -65,6 +65,8 @@ Full archive: `.planning/milestones/v1.3-ROADMAP.md`
 - [x] **Phase 15: ヒートマップ カラーリング** - Substackオレンジ濃淡・点線丸/ベタ塗りセルで継続可視化を強化 — completed 2026-05-15
 - [x] **Phase 16: ポップオーバー刷新** - 横並びレイアウト・ダークモード・Click Outside・×ボタンでポップオーバーを使いやすく刷新 — completed 2026-05-15
 
+Full archive: `.planning/milestones/v1.4-ROADMAP.md`
+
 </details>
 
 ## Phase Details

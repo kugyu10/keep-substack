@@ -1,14 +1,14 @@
 # Keep Substack
 
-## Current Milestone: v1.4 UI/UX Refresh
+## Current State: v1.4 SHIPPED — Planning v1.5
 
-**Goal:** モバイルファーストを軸に、ファーストビュー・ヒートマップ・ポップオーバーのUIを刷新してユーザー体験を向上させる
+**Shipped:** v1.4 UI/UX Refresh (2026-05-15)
+- ファーストビューにヒートマップを表示（バナー削除）
+- Substackオレンジ濃淡ヒートマップ + 点線丸 + 件数バッジ
+- HeatmapTooltip 横並びリスト・Click Outside・タッチ対応
+- Substack公式ライトテーマ（#fafafa・Loraフォント）
 
-**Target features:**
-- ヒーローバナー削除/縮小 + モバイルファースト化
-- ユーザーリスト: 名前1行・シェブロン・タブコントラスト強調
-- ヒートマップ: Substackオレンジ濃淡・点線丸・44pxタッチターゲット
-- ポップオーバー: 横並びリスト・ダークモード化・Click Outside対応
+**Next milestone:** v1.5（要件定義中）
 
 ## What This Is
 
@@ -52,6 +52,11 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - ✓ 管理画面でメンバーの所属チームをカンマ区切りで複数設定・更新できる — v1.3
 - ✓ チームフィルターで複数チーム所属のメンバーがどのチームでも表示される — v1.3
 - ✓ ISR (revalidate=300) + KVハイブリッドで投稿後5分以内に反映される — v1.3
+- ✓ ヒーローバナーを削除しファーストビューにヒートマップを表示する — v1.4
+- ✓ モバイルファーストレイアウト（px-3 余白最適化）— v1.4
+- ✓ メンバー名1行truncate + シェブロン + Substackオレンジタブ — v1.4
+- ✓ Substackオレンジ（#FF6719）濃淡ヒートマップ + 点線丸 + 件数バッジ — v1.4
+- ✓ HeatmapTooltip 横並びリスト・Click Outside・×ボタン・touchstart対応 — v1.4
 
 ### Active (Future)
 
@@ -74,11 +79,11 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - メンバーは成長前提（現時点は少人数だが増える可能性あり）
 - 初期段階で最大50フィード程度を想定
 - Substackの記事更新頻度は1日1回程度が多い
-- v1.3公開済み: https://keep-substack.vercel.app/
-- コードベース: 約1,300行 TypeScript/TSX（Next.js App Router + Tailwind CSS）
-- Tech Stack: Next.js 16.2.6, React 19.2.4, rss-parser 3.13.0, @upstash/redis 1.38.0, TypeScript 5, Tailwind CSS 4
-- v1.3追加: kvArticles.ts（KV累積保存）、api/cron（Vercel Cron）、vercel.json（スケジュール）
-- 記事反映遅延: 最大24時間（v1.2以前）→ 最大5分（v1.3 ISRハイブリッド）
+- v1.4公開済み: https://keep-substack.vercel.app/
+- コードベース: 約1,441行 TypeScript/TSX（Next.js App Router + Tailwind CSS）
+- Tech Stack: Next.js 16.2.6, React 19.2.4, rss-parser 3.13.0, @upstash/redis 1.38.0, TypeScript 5, Tailwind CSS 4, Lora (Google Fonts)
+- v1.4追加: Substackライトテーマ（#fafafa・#363737・Loraフォント）、ヒートマップRipple・濃淡3段階、HeatmapTooltip刷新
+- 記事反映遅延: 最大5分（v1.3 ISRハイブリッド継続）
 
 ## Constraints
 
@@ -108,6 +113,9 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 | KV後方互換フォールバック（getMembers内） | DBマイグレーション不要でKV旧フォーマット対応 | ✓ Good — teamName→teamNames 無停止移行成功 |
 | HIDDEN_TEAM 定数を types.ts に export | KISS — inline 定数より再利用性あり | ✓ Good — page.tsx から import で使用 |
 | ISR + KVハイブリッドフェッチ | ライブRSS(5分キャッシュ) + KV過去記事のマージ | ✓ Good — CronとISRが補完しあう設計 |
+| Substackブランドカラー #FF6719 を CSS変数 --color-primary として定数化 | KISS — inline色より再利用性あり | ✓ Good — opacity modifier(/70等)が使えて濃淡表現が容易 |
+| Rippleエフェクトを純CSSで実装 | ライブラリ不要、YAGNI | ✓ Good — 軽量でタッチフィードバック向上 |
+| ポップオーバーをclick+hover両対応 | デスクトップ・モバイル共通操作 | ✓ Good — touchstart + Click Outside で安定 |
 
 ## Evolution
 
@@ -127,4 +135,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-15 — v1.4 UI/UX Refresh started*
+*Last updated: 2026-05-16 — v1.4 UI/UX Refresh shipped*
