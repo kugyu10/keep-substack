@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Member Auth + Supabase Migration
-status: Phase 17 完了 → Phase 18 待機
-stopped_at: Phase 18 context gathered
-last_updated: "2026-05-16T05:35:17.823Z"
-last_activity: 2026-05-16 — Phase 17 全3プラン完了（Supabaseスキーマ + クライアント基盤 + KV移行スクリプト）
+status: Phase 18 計画完了 → 実行待ち
+stopped_at: Phase 18 PLAN作成完了
+last_updated: "2026-05-16T05:54:58.160Z"
+last_activity: 2026-05-16 — Phase 18 全3プラン作成完了（kvMembers差し替え + kvArticles差し替え + middleware→proxy リネーム）
 progress:
   total_phases: 9
   completed_phases: 5
-  total_plans: 7
-  completed_plans: 7
-  percent: 100
+  total_plans: 10
+  completed_plans: 8
+  percent: 80
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-05-16 — v1.5 Member Auth + Supabase Mi
 
 ## Current Position
 
-Phase: 17 of 21 — **complete**
-Plan: 17-03 完了（17-01 DDL + 17-02 Supabaseクライアント + 17-03 移行スクリプト）
-Status: Phase 17 完了 → Phase 18 待機
-Last activity: 2026-05-16 — Phase 17 全3プラン完了（Supabaseスキーマ + クライアント基盤 + KV移行スクリプト）
+Phase: 18 of 21 — **planned**
+Plan: 18-01/02/03 プラン作成完了 → 実行待ち
+Status: Phase 18 計画完了 → 実行待ち
+Last activity: 2026-05-16 — Phase 18 全3プラン作成完了（kvMembers差し替え + kvArticles差し替え + middleware→proxy リネーム）
 
-Progress: [██░░░░░░░░] 20%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
@@ -72,7 +72,7 @@ Progress: [██░░░░░░░░] 20%
 
 ## Session Continuity
 
-Last session: 2026-05-16T05:35:17.815Z
-Stopped at: Phase 18 context gathered
-Resume file: .planning/phases/18-data-layer-switch/18-CONTEXT.md
-Next step: Phase 18 (データレイヤー差し替え + 長期記事履歴) を計画・実行
+Last session: 2026-05-16T05:54:58.148Z
+Stopped at: Phase 18 PLAN作成完了
+Resume file: None
+Next step: Phase 18 実行（/gsd-execute-phase 18）— ただし18-02実行前にSupabase管理画面でALTER TABLEが必要
