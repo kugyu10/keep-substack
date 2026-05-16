@@ -5,7 +5,7 @@ milestone_name: Member Auth + Supabase Migration
 status: Milestone v1.5 全フェーズ完了
 stopped_at: Phase 21 完了（21-01）
 last_updated: "2026-05-16T15:00:00.000Z"
-last_activity: 2026-05-16 — Phase 21 完了（Redisクリーンアップ — @upstash/redis削除・kvMembers/kvArticles→members/articles リネーム）
+last_activity: 2026-05-16 — Quick 260516-001: substackId→publicationId 全リネーム（コード21ファイル + supabase/schema.sql + マイグレーションSQL生成）
 progress:
   total_phases: 9
   completed_phases: 9
@@ -62,9 +62,18 @@ Progress: [██████████] 100%
 - Transaction Pooler URL (port 6543) 必須 (接続枯渇防止)
 - Cron: maxDuration=60 + Promise.allSettled 並列化 (10秒タイムアウト対策)
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260516-001 | substackId→publicationId 全リネーム（コード+スキーマ） | 2026-05-16 | 2e85688 | [260516-001-substackid-to-publicationid](.planning/quick/260516-001-substackid-to-publicationid/) |
+
 ### Pending Todos
 
-なし
+⚠️ **Supabase DBマイグレーション未実行** — コードは`publication_id`に更新済みだが、DBカラムはまだ`substack_id`。デプロイ前に必ず実行すること:
+```
+supabase/migrations/20260516_rename_substack_id_to_publication_id.sql
+```
 
 ### Blockers/Concerns
 
