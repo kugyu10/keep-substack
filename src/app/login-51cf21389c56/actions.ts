@@ -32,6 +32,9 @@ export async function sendMagicLinkAction(
     if (error.status === 429) {
       return '送信制限に達しました。しばらく待ってから再試行してください'
     }
+    if (error.status === 500) {
+      return 'メール送信の設定に問題があります。管理者にお問い合わせください'
+    }
     return 'メールの送信に失敗しました。しばらく経ってから再試行してください'
   }
 
