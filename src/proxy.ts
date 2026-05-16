@@ -1,23 +1,52 @@
+import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 
-// D-01: ADMIN_PASSWORD のみで認証（ユーザー名不要）
-// D-02: Next.js Edge Middleware で /admin をインターセプト
-// D-03: 認証失敗時は 401 + WWW-Authenticate ヘッダー
-export function proxy(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  const adminPassword = process.env.ADMIN_PASSWORD ?? ''
-  const encoded = btoa(`:${adminPassword}`)
+export async function proxy(request: NextRequest) {
+  let response = NextResponse.next({ request })
 
-  if (authHeader !== `Basic ${encoded}`) {
-    return new NextResponse('Unauthorized', {
-      status: 401,
-      headers: { 'WWW-Authenticate': 'Basic realm="Admin"' },
-    })
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          response = NextResponse.next({ request })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  // セッションをリフレッシュ（getUser() はサーバー側検証でセキュア）
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const { pathname } = request.nextUrl
+
+  // /admin: admin ロール必須
+  if (pathname.startsWith('/admin')) {
+    if (!user || user.app_metadata?.role !== 'admin') {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
   }
 
-  return NextResponse.next()
+  // /my: ログイン必須
+  if (pathname.startsWith('/my')) {
+    if (!user) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+  }
+
+  return response
 }
 
 export const config = {
-  matcher: ['/admin', '/admin/:path*'],
+  matcher: ['/admin', '/admin/:path*', '/my', '/my/:path*'],
 }
