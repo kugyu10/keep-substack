@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import LinkMemberForm from './LinkMemberForm'
 import MyProfileForm from './MyProfileForm'
+import LogoutButton from '@/components/LogoutButton'
 
 export default async function MyPage() {
   const supabase = await createSupabaseServerClient()
@@ -30,7 +31,10 @@ export default async function MyPage() {
 
   return (
     <main className="max-w-sm mx-auto px-4 py-8">
-      <h1 className="text-2xl font-semibold mb-6">マイページ</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-semibold">マイページ</h1>
+        <LogoutButton />
+      </div>
       {!member ? (
         <LinkMemberForm />
       ) : (
