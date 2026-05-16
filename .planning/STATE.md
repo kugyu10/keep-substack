@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Member Auth + Supabase Migration
-status: Phase 19 完了 → Phase 20 待機
-stopped_at: Phase 19 PLAN作成完了
-last_updated: "2026-05-16T08:14:07.508Z"
-last_activity: 2026-05-16 — Phase 19 全3プラン実行完了（Supabase Auth + Magic Link + admin ロール移行）
+status: Phase 20 完了 → Phase 21 待機
+stopped_at: Phase 20 完了
+last_updated: "2026-05-16T08:20:34.889Z"
+last_activity: 2026-05-16 — Phase 20 完了（管理画面チームチェックボックス — actions.ts/page.tsx/AdminAddForm/AdminMemberList）
 progress:
   total_phases: 9
-  completed_phases: 8
-  total_plans: 14
-  completed_plans: 14
+  completed_phases: 9
+  total_plans: 15
+  completed_plans: 15
   percent: 100
 ---
 
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-05-16 — v1.5 Member Auth + Supabase Mi
 
 ## Current Position
 
-Phase: 19 of 21 — **complete**
-Plan: 19-03 完了（19-01 /login+callback + 19-02 /my+紐付け + 19-03 proxy auth移行）
-Status: Phase 19 完了 → Phase 20 待機
-Last activity: 2026-05-16 — Phase 19 全3プラン実行完了（Supabase Auth + Magic Link + admin ロール移行）
+Phase: 20 of 21 — **complete**
+Plan: 20-01 完了（管理画面チームチェックボックス実装）
+Status: Phase 20 完了 → Phase 21 待機
+Last activity: 2026-05-16 — Phase 20 完了（管理画面チームチェックボックス — actions.ts/page.tsx/AdminAddForm/AdminMemberList）
 
-Progress: [████████░░] 80%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -72,7 +72,7 @@ Progress: [████████░░] 80%
 
 ## Session Continuity
 
-Last session: 2026-05-16T08:14:07.501Z
-Stopped at: Phase 19 PLAN作成完了
+Last session: 2026-05-16T08:20:34.882Z
+Stopped at: Phase 20 完了
 Resume file: None
-Next step: Phase 19 実行（/gsd-execute-phase 19）— ただしSupabase管理画面でALTER TABLE members ADD COLUMN user_id を先に実行すること
+Next step: Phase 21 実行（/gsd-execute-phase 21）— Redisクリーンアップ（@upstash/redis削除・KVファイル廃止）

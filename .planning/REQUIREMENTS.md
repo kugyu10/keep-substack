@@ -13,7 +13,7 @@ Supabase完全移行・ログイン・メンバー自己管理を実現し、管
 - [ ] **MIGRATE-01**: membersテーブル・articlesテーブルをSupabase PostgreSQLで定義し、RLSポリシーを設定できる
 - [ ] **MIGRATE-02**: 既存Upstash RedisのKVデータをSupabase PostgreSQLに一括マイグレーションできる
 - [ ] **MIGRATE-03**: getMembers()/saveArticles()等の既存関数シグネチャを変えずに内部実装をSupabaseに差し替えられる
-- [ ] **MIGRATE-04**: @upstash/redisパッケージ・kvMembers.ts・kvArticles.tsを完全削除できる
+- [x] **MIGRATE-04**: @upstash/redisパッケージ・kvMembers.ts・kvArticles.tsを完全削除できる
 
 ### AUTH — 認証・メンバー自己管理
 
@@ -70,7 +70,7 @@ Supabase完全移行・ログイン・メンバー自己管理を実現し、管
 | AUTH-03 | Phase 19 | Pending |
 | AUTH-04 | Phase 19 | Pending |
 | ADMIN-01 | Phase 20 | Complete |
-| MIGRATE-04 | Phase 21 | Pending |
+| MIGRATE-04 | Phase 21 | Complete |
 
 ---
 
