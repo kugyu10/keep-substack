@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Member Auth + Supabase Migration
-status: Phase 20 計画完了 → 実行待ち
-stopped_at: Phase 20 PLAN作成完了（20-01）
-last_updated: "2026-05-16T12:00:00.000Z"
-last_activity: 2026-05-16 — Plan 19-01 完了（/login + Magic Link + /auth/callback 実装）
+status: Phase 19 完了 → Phase 20 待機
+stopped_at: Phase 19 PLAN作成完了
+last_updated: "2026-05-16T08:14:07.508Z"
+last_activity: 2026-05-16 — Phase 19 全3プラン実行完了（Supabase Auth + Magic Link + admin ロール移行）
 progress:
   total_phases: 9
-  completed_phases: 6
-  total_plans: 13
-  completed_plans: 11
-  percent: 85
+  completed_phases: 8
+  total_plans: 14
+  completed_plans: 14
+  percent: 100
 ---
 
 # Project State
@@ -72,7 +72,7 @@ Progress: [████████░░] 80%
 
 ## Session Continuity
 
-Last session: 2026-05-16T06:20:00.000Z
+Last session: 2026-05-16T08:14:07.501Z
 Stopped at: Phase 19 PLAN作成完了
-Resume file: .planning/phases/19-supabase-auth/19-CONTEXT.md
+Resume file: None
 Next step: Phase 19 実行（/gsd-execute-phase 19）— ただしSupabase管理画面でALTER TABLE members ADD COLUMN user_id を先に実行すること

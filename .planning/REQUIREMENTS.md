@@ -30,7 +30,7 @@ Supabase完全移行・ログイン・メンバー自己管理を実現し、管
 
 ### ADMIN — 管理UI改善
 
-- [ ] **ADMIN-01**: 管理画面でメンバーの所属チームをチェックボックスUIで選択・更新できる
+- [x] **ADMIN-01**: 管理画面でメンバーの所属チームをチェックボックスUIで選択・更新できる
 
 ---
 
@@ -69,7 +69,7 @@ Supabase完全移行・ログイン・メンバー自己管理を実現し、管
 | AUTH-02 | Phase 19 | Pending |
 | AUTH-03 | Phase 19 | Pending |
 | AUTH-04 | Phase 19 | Pending |
-| ADMIN-01 | Phase 20 | Pending |
+| ADMIN-01 | Phase 20 | Complete |
 | MIGRATE-04 | Phase 21 | Pending |
 
 ---
