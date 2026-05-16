@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Member Auth + Supabase Migration
 status: planning
-last_updated: "2026-05-16T01:49:05.155Z"
+last_updated: "2026-05-16T00:00:00.000Z"
 last_activity: 2026-05-16
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -17,17 +17,19 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-15 — v1.4 UI/UX Refresh 完了)
+See: .planning/PROJECT.md (updated 2026-05-16 — v1.5 Member Auth + Supabase Migration started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Milestone v1.4 完了 — 次マイルストーン計画待ち
+**Current focus:** Milestone v1.5 — ロードマップ改訂完了（Phase 17から実装開始待ち）
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Not started (Phase 17 ready to plan)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-16 — Milestone v1.5 started
+Status: Ready to plan
+Last activity: 2026-05-16 — v1.5 ロードマップ改訂完了（5フェーズ、12要件100%カバー）
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -43,74 +45,32 @@ Last activity: 2026-05-16 — Milestone v1.5 started
 | v1.1 Dynamic Members | 3 | 6 | 2日 |
 | v1.2 UX Polish | 3 | 3 | 1日 |
 | v1.3 Data Persistence | 4 | 4 | 2日 |
-| v1.4 UI/UX Refresh | 4 / 4 (完了) | 4 | 1日 |
+| v1.4 UI/UX Refresh | 4 | 4 | 1日 |
 
 ## Accumulated Context
 
-### Key Architecture Decisions (v1.3 / Phase 12.1)
+### Key Architecture Decisions (v1.5 — 計画段階)
 
-- fetchAllFeedsCached: Promise.allSettled 二重並列（外側:メンバー、内側:RSS/KV）
-- フォールバック: live 失敗時は kv のみで応答（KV書き込みなし）
-- revalidate=300: page.tsx・member/[substackId]/page.tsx 両ページに設定（5分ISR）
-
-### Key Architecture Decisions (v1.2)
-
-- Tailwind v4でline-clamp-2がflex内で効かない → inline styleで対応（Revisit候補）
-- `<img>`タグ使用でnext/image不採用（next.config.ts変更不要、KISS）
-
-### Key Architecture Decisions (v1.4 / Phase 13)
-
-- topLogo import を page.tsx から削除、layout.tsx の OGP 参照は維持（SEO優先）
-- pb-64 → pb-16 でスクロール量を大幅削減（モバイルファースト）
-
-### Key Architecture Decisions (v1.4 / Phase 14)
-
-- hidden sm:block を名前divに付与（モバイルでは名前非表示・シェブロンのみ表示）— PLANのTask 3で明示的に採用
-- -webkit-line-clamp 廃止 → flex-1 min-w-0 + truncate に変更（Tailwind v4対応）
-- アクティブタブ: bg-gray-800 → bg-[#FF6719] (Substackオレンジ)
-
-### Key Architecture Decisions (v1.4 / Phase 15)
-
-- getIntensityClass の count===0 ケースを削除（HeatmapRow.tsx 側でガード済み、YAGNI）
-- bg-[#FF6719] を count===3 に割り当て（Substack公式オレンジ、Tailwind v4 arbitrary value）
-- HeatmapTooltip は変更なし（既に children?: ReactNode 実装済み）
-
-### Key Architecture Decisions (v1.4 / Phase 16)
-
-- WebkitLineClamp 2行truncate は inline style で実装（Tailwind v4 flex内 line-clamp-2 既知問題の再確認）
-- maskImage gradient style は横並びレイアウトでは不要なため削除
-- TouchEvent の target は e.touches[0]?.target で取得（タッチ開始時の座標）
+- Phase 17 (MIGRATE-01+02) でSupabaseスキーマ構築とKVデータ移行を一括実施 — teamsテーブルもこのフェーズで作成
+- Phase 20 (ADMIN-01) はPhase 17で作成済みのSupabase teamsテーブルをクエリする前提のため、Phase 19の後に配置
+- Supabaseクライアント3種類: server.ts (anon), client.ts (anon), admin.ts (service role)
+- サーバーサイドのユーザー確認は getUser() 必須 (getSession() 禁止 — セキュリティホール)
+- 公開ISRページ (/, /member/*) ではSupabase Authクライアントを一切使わない
+- src/middleware.ts → src/proxy.ts リネーム必須 (Next.js 16対応)
+- Transaction Pooler URL (port 6543) 必須 (接続枯渇防止)
+- Cron: maxDuration=60 + Promise.allSettled 並列化 (10秒タイムアウト対策)
 
 ### Pending Todos
 
-1件あり:
-
-- Supabase移行（将来）
+なし
 
 ### Blockers/Concerns
 
-None.
-
-## Deferred Items
-
-Items acknowledged and deferred at milestone close on 2026-05-16:
-
-| Category | Item | Status |
-|----------|------|--------|
-| quick_task | 260515-mx8-white-bg-to-black-fix-text | audit tool mismatch (実装済み) |
-| todo | article-history-persistence | deferred to v1.5 |
-| todo | multi-team-membership | deferred to v1.5 |
-| todo | supabase-migration | deferred to v1.5 |
-
-### Quick Tasks Completed
-
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 260515-mx8 | 白背景を黒にしてみて　現在白字で溶けちゃうテキストは黒くして | 2026-05-15 | 95b1501 | [260515-mx8-white-bg-to-black-fix-text](.planning/quick/260515-mx8-white-bg-to-black-fix-text/) |
+なし
 
 ## Session Continuity
 
 Last session: 2026-05-16T00:00:00.000Z
-Stopped at: Milestone v1.4 UI/UX Refresh archived — ready for v1.5 planning
-Resume file: .planning/phases/16-popover-redesign/16-VERIFICATION.md
-Next step: 次マイルストーン（v1.5）計画
+Stopped at: v1.5 ロードマップ改訂完了（Phase 17-21の5フェーズ構成）— Phase 17 計画待ち
+Resume file: None
+Next step: `/gsd-plan-phase 17`

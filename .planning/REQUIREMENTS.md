@@ -57,23 +57,21 @@ Supabase完全移行・ログイン・メンバー自己管理を実現し、管
 
 ## Traceability
 
-*(フェーズ割り当ては /gsd-roadmapper が設定)*
-
-| REQ-ID | Phase |
-|--------|-------|
-| MIGRATE-01 | TBD |
-| MIGRATE-02 | TBD |
-| MIGRATE-03 | TBD |
-| MIGRATE-04 | TBD |
-| AUTH-01 | TBD |
-| AUTH-02 | TBD |
-| AUTH-03 | TBD |
-| AUTH-04 | TBD |
-| HISTORY-01 | TBD |
-| HISTORY-02 | TBD |
-| HISTORY-03 | TBD |
-| ADMIN-01 | TBD |
+| REQ-ID | Phase | Status |
+|--------|-------|--------|
+| MIGRATE-01 | Phase 17 | Pending |
+| MIGRATE-02 | Phase 17 | Pending |
+| MIGRATE-03 | Phase 18 | Pending |
+| HISTORY-01 | Phase 18 | Pending |
+| HISTORY-02 | Phase 18 | Pending |
+| HISTORY-03 | Phase 18 | Pending |
+| AUTH-01 | Phase 19 | Pending |
+| AUTH-02 | Phase 19 | Pending |
+| AUTH-03 | Phase 19 | Pending |
+| AUTH-04 | Phase 19 | Pending |
+| ADMIN-01 | Phase 20 | Pending |
+| MIGRATE-04 | Phase 21 | Pending |
 
 ---
 
-*Last updated: 2026-05-16 — v1.5要件定義完了*
+*Last updated: 2026-05-16 — v1.5フェーズ構造改訂（Phase 17-21の5フェーズ構成に変更）*

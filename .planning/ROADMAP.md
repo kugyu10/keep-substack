@@ -7,6 +7,7 @@
 - ✅ **v1.2 UX Polish + Member Edit** — Phases 7-9 (shipped 2026-05-11)
 - ✅ **v1.3 Data Persistence + Multi-Team** — Phases 10-12.1 (shipped 2026-05-12)
 - ✅ **v1.4 UI/UX Refresh** — Phases 13-16 (shipped 2026-05-15)
+- 🚧 **v1.5 Member Auth + Supabase Migration** — Phases 17-21 (in progress)
 
 ## Phases
 
@@ -69,6 +70,16 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 
 </details>
 
+### 🚧 v1.5 Member Auth + Supabase Migration (In Progress)
+
+**Milestone Goal:** Supabase完全移行・ログイン・メンバー自己管理を実現し、管理者依存を排除してメンバーが自律的に参加できるサービスにする
+
+- [ ] **Phase 17: Supabaseスキーマ + RLS設定 + KVデータ移行** - PostgreSQLテーブル定義・RLSポリシー・Supabaseクライアント基盤を構築し、既存Upstash RedisのデータをPostgreSQLへ一括マイグレーション
+- [ ] **Phase 18: データレイヤー差し替え + 長期記事履歴** - 読み書きをSupabaseに切り替え、Cronを長期累積保存に対応、proxy.tsリネーム
+- [ ] **Phase 19: Supabase Auth + メンバー自己管理** - Magic Linkログイン・/myページ・既存メンバー自己リンク・adminロール制御
+- [ ] **Phase 20: 管理画面チームチェックボックス** - Supabase teamsテーブルを前提に、チームをカンマ区切り入力からチェックボックスUIで選択できるよう改善
+- [ ] **Phase 21: Redisクリーンアップ** - @upstash/redis削除・KVファイル廃止・コードベース整理
+
 ## Phase Details
 
 ### Phase 13: ファーストビュー + モバイルレイアウト
@@ -120,6 +131,65 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 **UI hint**: yes
 **Status**: Complete (2026-05-15)
 
+### Phase 17: Supabaseスキーマ + RLS設定 + KVデータ移行
+**Goal**: Supabase PostgreSQLのテーブル定義・RLSポリシー・クライアントライブラリが揃いアプリがSupabaseに接続できる状態になり、既存Upstash RedisのデータがPostgreSQLに過不足なく移行されている
+**Depends on**: Phase 16 (v1.4完了)
+**Requirements**: MIGRATE-01, MIGRATE-02
+**Success Criteria** (what must be TRUE):
+  1. Supabase管理画面でmembersテーブルとarticlesテーブルが正しいカラム定義で作成されている
+  2. RLSポリシーが有効化され、anon keyでは自分のデータのみ変更できることが確認できる
+  3. アプリから`@supabase/supabase-js`を使ってDB接続が成功し、membersテーブルをSELECTできる
+  4. 環境変数（NEXT_PUBLIC_SUPABASE_URL、NEXT_PUBLIC_SUPABASE_ANON_KEY、SUPABASE_SERVICE_ROLE_KEY）がVercel本番環境に設定されている
+  5. 移行スクリプトを実行すると既存Redisのメンバーデータがmembersテーブルに全件INSERTされる
+  6. 既存Redisの記事データがarticlesテーブルに全件INSERTされ、link列のUNIQUE制約で重複が排除される
+  7. Supabase管理画面でメンバー数・記事数がRedis側と一致することを確認できる
+**Plans**: TBD
+
+### Phase 18: データレイヤー差し替え + 長期記事履歴
+**Goal**: アプリの読み書きが完全にSupabaseを参照し、Cronが長期記事を累積保存できる状態になる
+**Depends on**: Phase 17
+**Requirements**: MIGRATE-03, HISTORY-01, HISTORY-02, HISTORY-03
+**Success Criteria** (what must be TRUE):
+  1. トップページと個人ページがSupabase articlesテーブルから記事データを取得して正常に表示される
+  2. Vercel Cronが実行されるとSupabase articlesテーブルに記事が書き込まれ、重複はlink列UNIQUE制約で自動排除される
+  3. getMembers()/saveArticles()等の関数シグネチャが変わらず、呼び出し元のpage.tsxに変更が不要なことを確認できる
+  4. 1ヶ月以上前の記事がarticlesテーブルに蓄積されており、ヒートマップに反映される
+**Plans**: TBD
+
+### Phase 19: Supabase Auth + メンバー自己管理
+**Goal**: メンバーがMagic Linkでログインして自分のプロフィールを自己管理でき、管理者への依頼なしに参加登録できる
+**Depends on**: Phase 18
+**Requirements**: AUTH-01, AUTH-02, AUTH-03, AUTH-04
+**Success Criteria** (what must be TRUE):
+  1. /loginページでメールアドレスを入力してMagic Linkを送信できる
+  2. メール内のリンクをクリックするとログイン状態になり/myページにリダイレクトされる
+  3. /myページで自分のSubstack URLと所属チームを登録・更新して保存できる
+  4. 既存管理者登録済みメンバーがsubstackIdを入力すると自分のアカウントと紐付けられる
+  5. /adminへのアクセスがSupabaseユーザーロール（admin role）で制御され、Basic Authが不要になる
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 20: 管理画面チームチェックボックス
+**Goal**: 管理者がメンバーのチーム所属をタイポなしでチェックボックスから選択・更新できる（Phase 17で構築したSupabase teamsテーブルを利用）
+**Depends on**: Phase 19 (Supabase teamsテーブルがPhase 17で作成済みであること前提)
+**Requirements**: ADMIN-01
+**Success Criteria** (what must be TRUE):
+  1. 管理画面のメンバー編集欄にSupabase teamsテーブルから取得した既存チーム名の一覧がチェックボックスで表示される
+  2. チェックボックスを切り替えてチームを選択し保存すると、所属チームが正しく更新される
+  3. カンマ区切りテキスト入力が不要になり、タイポによるチーム名不一致が起きなくなる
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 21: Redisクリーンアップ
+**Goal**: Upstash Redis関連のコード・パッケージが完全に削除され、コードベースがSupabaseのみで動作する
+**Depends on**: Phase 20
+**Requirements**: MIGRATE-04
+**Success Criteria** (what must be TRUE):
+  1. `@upstash/redis`パッケージがpackage.jsonから削除されており、`npm install`でインストールされない
+  2. kvMembers.ts・kvArticles.tsファイルが削除されており、これらを参照するimportが存在しない
+  3. アプリが本番環境でビルド・デプロイに成功し、全機能が正常に動作する
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -141,3 +211,8 @@ Full archive: `.planning/milestones/v1.4-ROADMAP.md`
 | 14. ユーザーリスト + チームタブ UI | v1.4 | 1/1 | Complete | 2026-05-15 |
 | 15. ヒートマップ カラーリング | v1.4 | 1/1 | Complete | 2026-05-15 |
 | 16. ポップオーバー刷新 | v1.4 | 1/1 | Complete | 2026-05-15 |
+| 17. Supabaseスキーマ + RLS設定 + KVデータ移行 | v1.5 | 0/TBD | Not started | - |
+| 18. データレイヤー差し替え + 長期記事履歴 | v1.5 | 0/TBD | Not started | - |
+| 19. Supabase Auth + メンバー自己管理 | v1.5 | 0/TBD | Not started | - |
+| 20. 管理画面チームチェックボックス | v1.5 | 0/TBD | Not started | - |
+| 21. Redisクリーンアップ | v1.5 | 0/TBD | Not started | - |
