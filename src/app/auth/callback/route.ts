@@ -16,5 +16,5 @@ export async function GET(request: NextRequest) {
   }
 
   // エラー時: /login にリダイレクト
-  return NextResponse.redirect(new URL('/login-51cf21389c56', origin))
+  return NextResponse.redirect(new URL('/', origin))
 }

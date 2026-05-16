@@ -8,7 +8,7 @@ import LogoutButton from '@/components/LogoutButton'
 export default async function MyPage() {
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login-51cf21389c56')
+  if (!user) redirect('/')
 
   const admin = createSupabaseAdminClient()
   const { data: member } = await admin

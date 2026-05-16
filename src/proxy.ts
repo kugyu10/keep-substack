@@ -33,14 +33,14 @@ export async function proxy(request: NextRequest) {
   // /admin: admin ロール必須
   if (pathname.startsWith('/admin')) {
     if (!user || user.app_metadata?.role !== 'admin') {
-      return NextResponse.redirect(new URL('/login-51cf21389c56', request.url))
+      return NextResponse.redirect(new URL('/', request.url))
     }
   }
 
   // /my: ログイン必須
   if (pathname.startsWith('/my')) {
     if (!user) {
-      return NextResponse.redirect(new URL('/login-51cf21389c56', request.url))
+      return NextResponse.redirect(new URL('/', request.url))
     }
   }
 
