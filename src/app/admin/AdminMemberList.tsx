@@ -40,29 +40,29 @@ export default function AdminMemberList({ members, teams }: Props) {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm border-collapse text-white">
+      <table className="w-full text-sm border-collapse text-[#363737]">
         <thead>
-          <tr className="bg-gray-700 text-left">
-            <th className="border border-gray-600 px-3 py-2">名前</th>
-            <th className="border border-gray-600 px-3 py-2">publicationId</th>
-            <th className="border border-gray-600 px-3 py-2">チーム</th>
-            <th className="border border-gray-600 px-3 py-2">addedAt</th>
-            <th className="border border-gray-600 px-3 py-2"></th>
+          <tr className="bg-[#fafafa] text-left">
+            <th className="border border-[#ebebeb] px-3 py-2">名前</th>
+            <th className="border border-[#ebebeb] px-3 py-2">publicationId</th>
+            <th className="border border-[#ebebeb] px-3 py-2">チーム</th>
+            <th className="border border-[#ebebeb] px-3 py-2">addedAt</th>
+            <th className="border border-[#ebebeb] px-3 py-2"></th>
           </tr>
         </thead>
         <tbody>
           {members.map((m) =>
             editingId === m.publicationId ? (
-              <tr key={m.publicationId} className="bg-gray-800">
-                <td className="border border-gray-600 px-3 py-2">
+              <tr key={m.publicationId} className="bg-[#fffbf8]">
+                <td className="border border-[#ebebeb] px-3 py-2">
                   <input
                     defaultValue={m.name}
                     name="name"
-                    className="bg-gray-700 border border-gray-500 rounded px-1 w-full text-sm text-white"
+                    className="bg-white border border-[#d8d8d8] rounded px-1 w-full text-sm text-[#363737]"
                   />
                 </td>
-                <td className="border border-gray-600 px-3 py-2 text-gray-400">{m.publicationId}</td>
-                <td className="border border-gray-600 px-3 py-2">
+                <td className="border border-[#ebebeb] px-3 py-2 text-gray-400">{m.publicationId}</td>
+                <td className="border border-[#ebebeb] px-3 py-2">
                   <div className="flex flex-col gap-1">
                     {teams.map((team) => (
                       <label key={team} className="flex items-center gap-1 text-sm cursor-pointer">
@@ -77,17 +77,17 @@ export default function AdminMemberList({ members, teams }: Props) {
                     ))}
                   </div>
                 </td>
-                <td className="border border-gray-600 px-3 py-2">
+                <td className="border border-[#ebebeb] px-3 py-2">
                   <input
                     defaultValue={m.addedAt}
                     name="addedAt"
-                    className="bg-gray-700 border border-gray-500 rounded px-1 w-56 text-sm font-mono text-white"
+                    className="bg-white border border-[#d8d8d8] rounded px-1 w-56 text-sm font-mono text-[#363737]"
                   />
                 </td>
-                <td className="border border-gray-600 px-3 py-2">
+                <td className="border border-[#ebebeb] px-3 py-2">
                   <button
                     onClick={(e) => handleUpdate(m.publicationId, e)}
-                    className="text-blue-400 hover:underline text-xs mr-2"
+                    className="text-blue-600 hover:underline text-xs mr-2"
                   >
                     保存
                   </button>
@@ -97,27 +97,27 @@ export default function AdminMemberList({ members, teams }: Props) {
                   >
                     キャンセル
                   </button>
-                  {editError && <p className="text-red-400 text-xs mt-1">{editError}</p>}
+                  {editError && <p className="text-red-500 text-xs mt-1">{editError}</p>}
                 </td>
               </tr>
             ) : (
-              <tr key={m.publicationId} className="bg-black hover:bg-gray-800">
-                <td className="border border-gray-700 px-3 py-2">{m.name}</td>
-                <td className="border border-gray-700 px-3 py-2">{m.publicationId}</td>
-                <td className="border border-gray-700 px-3 py-2">{m.teamNames.join(', ')}</td>
-                <td className="border border-gray-700 px-3 py-2 text-xs text-gray-400">
+              <tr key={m.publicationId} className="bg-white hover:bg-[#fafafa]">
+                <td className="border border-[#ebebeb] px-3 py-2">{m.name}</td>
+                <td className="border border-[#ebebeb] px-3 py-2">{m.publicationId}</td>
+                <td className="border border-[#ebebeb] px-3 py-2">{m.teamNames.join(', ')}</td>
+                <td className="border border-[#ebebeb] px-3 py-2 text-xs text-gray-400">
                   {new Date(m.addedAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
                 </td>
-                <td className="border border-gray-700 px-3 py-2">
+                <td className="border border-[#ebebeb] px-3 py-2">
                   <button
                     onClick={() => { setEditingId(m.publicationId); setEditError(null) }}
-                    className="text-blue-400 hover:underline text-xs mr-2"
+                    className="text-blue-600 hover:underline text-xs mr-2"
                   >
                     編集
                   </button>
                   <button
                     onClick={() => handleDelete(m.publicationId)}
-                    className="text-red-400 hover:underline text-xs"
+                    className="text-red-500 hover:underline text-xs"
                   >
                     削除
                   </button>
