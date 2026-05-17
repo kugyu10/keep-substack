@@ -21,7 +21,7 @@ created: 2026-05-17
 | Preset | not applicable |
 | Component library | none (custom Tailwind components) |
 | Icon library | none |
-| Font | Lora (Google Fonts, weights 400/600/700) + Georgia, serif fallback |
+| Font | Lora (Google Fonts, weights 400/600) + Georgia, serif fallback |
 
 **Source:** `src/app/globals.css` — 既存トークン確認済み
 
