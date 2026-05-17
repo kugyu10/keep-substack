@@ -1,13 +1,13 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.6
-milestone_name: TBD
-status: Milestone v1.5 完了・アーカイブ済み
-stopped_at: v1.5 complete-milestone 実行（2026-05-17）
+milestone_name: Team Roles + Member Self-Service
+status: planning
+stopped_at: Phase 22 未着手
 last_updated: "2026-05-17T00:00:00.000Z"
-last_activity: 2026-05-17 — Milestone v1.5 archived
+last_activity: 2026-05-17 — Milestone v1.6 started
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -18,18 +18,19 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-17 after v1.5 milestone)
+See: .planning/PROJECT.md (updated 2026-05-17 — v1.6 Team Roles + Member Self-Service started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** v1.5 アーカイブ完了 — v1.6 計画待ち
+**Current focus:** v1.6 — Phase 22: チームステータス管理
 
 ## Current Position
 
-Phase: — (v1.5完了、v1.6未着手)
-Status: Milestone v1.5 全フェーズ完了・アーカイブ済み
-Last activity: 2026-05-17 — v1.5 complete-milestone 実行
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-17 — Milestone v1.6 started
 
-Progress: v1.6未定義
+Progress: [----------] 0%
 
 ## Performance Metrics
 
@@ -43,9 +44,20 @@ Progress: v1.6未定義
 | v1.3 Data Persistence | 4 | 4 | 2日 |
 | v1.4 UI/UX Refresh | 4 | 4 | 1日 |
 | v1.5 Member Auth + Supabase Migration | 5 | 11 | 2日 |
+| v1.6 Team Roles + Member Self-Service | 5 | TBD | - |
+
+## Accumulated Context
+
+### Key Architecture Decisions (v1.6 — 計画段階)
+
+- teams.status = 'public' | 'private' | 'hidden'（DEFAULT 'public'）
+- HIDDEN_TEAM定数廃止 → status='hidden'に統一
+- member_publications テーブル追加（member_id FK, publication_id TEXT, is_primary BOOLEAN）
+- /admin/teams/{teamName} は proxy.ts の matcher に追加
+- E2EはPlaywright + Supabaseテスト用アカウントまたはモック
 
 ## Session Continuity
 
 Last session: 2026-05-17T00:00:00.000Z
-Stopped at: v1.5 complete-milestone 完了
-Next step: /gsd-new-milestone でv1.6の計画を開始する
+Stopped at: v1.6 要件定義・ロードマップ作成完了
+Next step: /gsd-discuss-phase 22 または /gsd-plan-phase 22 で実装開始

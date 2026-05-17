@@ -8,6 +8,7 @@
 - ✅ **v1.3 Data Persistence + Multi-Team** — Phases 10-12.1 (shipped 2026-05-12)
 - ✅ **v1.4 UI/UX Refresh** — Phases 13-16 (shipped 2026-05-15)
 - ✅ **v1.5 Member Auth + Supabase Migration** — Phases 17-21 (shipped 2026-05-17)
+- 🚧 **v1.6 Team Roles + Member Self-Service** — Phases 22-26 (in progress)
 
 ## Phases
 
@@ -83,6 +84,72 @@ Full archive: `.planning/milestones/v1.5-ROADMAP.md`
 
 </details>
 
+### 🚧 v1.6 Team Roles + Member Self-Service (In Progress)
+
+**Milestone Goal:** チームステータス管理・メンバー自律参加・E2Eテストにより、コミュニティの自律性と品質を強化する
+
+- [ ] **Phase 22: チームステータス管理** - teamsテーブルにstatus（public/private/hidden）を追加し、HIDDEN_TEAM定数を廃止、管理画面で設定できるようにする
+- [ ] **Phase 23: /myページ公開チーム参加・退出** - publicチームをチェックボックスで自由参加・退出できる自律参加フローを実装する
+- [ ] **Phase 24: /admin/teams/{teamName} hiddenチームビュー** - 管理者がhiddenチームの週次ヒートマップをURL直接アクセスで確認できるページを追加する
+- [ ] **Phase 25: 複数publication_idスキーマ拡張** - member_publicationsテーブルを追加し将来の複数Substack対応の基盤を整える（UI変更なし）
+- [ ] **Phase 26: E2Eテスト（Playwright）** - Magic Linkログイン・/my操作・/admin保護をPlaywrightでE2Eテストできる環境を構築する
+
+## Phase Details
+
+### Phase 22: チームステータス管理
+**Goal**: teamsテーブルにstatus（public/private/hidden）カラムを追加し、HIDDEN_TEAM定数を廃止、管理画面でチームステータスを設定できるようにする
+**Depends on**: Phase 21 (v1.5完了)
+**Requirements**: TEAM-01, TEAM-02, TEAM-03, TEAM-04
+**Success Criteria** (what must be TRUE):
+  1. teamsテーブルにstatus TEXT NOT NULL DEFAULT 'public' カラムが存在する
+  2. 管理画面のチーム一覧にstatusドロップダウン（public/private/hidden）が表示され変更・保存できる
+  3. トップページのチームタブにstatus=publicのチームのみ表示される
+  4. HIDDEN_TEAM定数のコードがなくなり、status='hidden'で同等の動作をする
+**Plans**: TBD
+
+### Phase 23: /myページ公開チーム参加・退出
+**Goal**: ログインユーザーが/myページからstatus=publicのチームをチェックボックスで自由に参加・退出できる
+**Depends on**: Phase 22
+**Requirements**: SELF-01, SELF-02, SELF-03
+**Success Criteria** (what must be TRUE):
+  1. /myページにstatus=publicのチーム一覧がチェックボックスで表示される
+  2. チェックボックスをONにして保存するとmember_teamsに追加され、チームに参加できる
+  3. チェックボックスをOFFにして保存するとmember_teamsから削除され、チームを退出できる
+  4. status=privateのチームは/myに参加不可として表示されるか非表示になる
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 24: /admin/teams/{teamName} hiddenチームビュー
+**Goal**: 管理者が /admin/teams/{teamName} でhiddenチームの週次ヒートマップビューを確認できる
+**Depends on**: Phase 22
+**Requirements**: VIEW-01, VIEW-02
+**Success Criteria** (what must be TRUE):
+  1. /admin/teams/{teamName} にアクセスするとそのチームの週次ヒートマップが表示される
+  2. adminロール以外のユーザーが /admin/teams/{teamName} にアクセスすると / にリダイレクトされる
+  3. hiddenチームのteamNameを指定するとそのhiddenチームメンバーのデータが表示される
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 25: 複数publication_idスキーマ拡張
+**Goal**: member_publicationsテーブルを追加して1メンバーが複数のpublication_idを持てるDB構造を整える（アプリUIは1件前提のまま）
+**Depends on**: Phase 22
+**Requirements**: SCHEMA-01, SCHEMA-02
+**Success Criteria** (what must be TRUE):
+  1. member_publicationsテーブル（member_id FK, publication_id TEXT UNIQUE, is_primary BOOLEAN）が存在する
+  2. 既存のmembers.publication_idデータがmember_publicationsに移行済みのDDL/スクリプトが存在する
+  3. アプリのUIおよびデータ取得ロジックは変更なしでビルド・動作する
+**Plans**: TBD
+
+### Phase 26: E2Eテスト（Playwright）
+**Goal**: Magic Linkログインフロー・/my操作・/admin保護をPlaywrightでE2Eテストできる環境が整う
+**Depends on**: Phase 23, Phase 24
+**Requirements**: E2E-01, E2E-02, E2E-03
+**Success Criteria** (what must be TRUE):
+  1. `npx playwright test` を実行してMagic Linkログインフローのテストが通る（モックまたはテスト用アカウント使用）
+  2. /myページのpublicチーム参加・退出操作のテストが通る
+  3. /adminへの未認証アクセスが / にリダイレクトされることのテストが通る
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -109,3 +176,8 @@ Full archive: `.planning/milestones/v1.5-ROADMAP.md`
 | 19. Supabase Auth + メンバー自己管理 | v1.5 | 3/3 | Complete | 2026-05-16 |
 | 20. 管理画面チームチェックボックス | v1.5 | 1/1 | Complete | 2026-05-16 |
 | 21. Redisクリーンアップ | v1.5 | 1/1 | Complete | 2026-05-16 |
+| 22. チームステータス管理 | v1.6 | 0/? | Not started | - |
+| 23. /myページ公開チーム参加・退出 | v1.6 | 0/? | Not started | - |
+| 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 0/? | Not started | - |
+| 25. 複数publication_idスキーマ拡張 | v1.6 | 0/? | Not started | - |
+| 26. E2Eテスト（Playwright） | v1.6 | 0/? | Not started | - |

@@ -1,6 +1,17 @@
 # Keep Substack
 
-## Current State: v1.5 SHIPPED
+## Current Milestone: v1.6 Team Roles + Member Self-Service
+
+**Goal:** チームステータス管理・メンバー自律参加・E2Eテストにより、コミュニティの自律性と品質を強化する
+
+**Target features:**
+- チームステータス（public/private/hidden）をDBで管理し、HIDDEN_TEAM定数を廃止
+- /myページからpublicチームをチェックボックスで自由参加・退出
+- /admin/teams/{teamName} でhiddenチームの週次ビューを管理者が確認
+- メンバーが複数のpublication_idを持てるスキーマ拡張（UIは1件前提のまま）
+- E2Eテスト: Magic Linkログイン + /my操作 + /admin保護確認（Playwright）
+
+## Previous: v1.5 SHIPPED
 
 **Shipped:** v1.5 Member Auth + Supabase Migration (2026-05-17)
 - Supabase PostgreSQL完全移行（Upstash Redis廃止）
@@ -9,12 +20,6 @@
 - /adminをBasic Auth → Supabase authロール制御に移行
 - 管理画面チームチェックボックスUI
 - @upstash/redis完全削除・コードベースをSupabase一本化
-
-## Next Milestone Goals (v1.6 — 未定義)
-
-- 年間ヒートマップ（GitHub草型）で長期活動を可視化する
-- 連続投稿日数（ストリーク）を表示する
-- 月間投稿数サマリーを表示する
 
 ## What This Is
 
@@ -67,6 +72,14 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - ✓ メンバー名1行truncate + シェブロン + Substackオレンジタブ — v1.4
 - ✓ Substackオレンジ（#FF6719）濃淡ヒートマップ + 点線丸 + 件数バッジ — v1.4
 - ✓ HeatmapTooltip 横並びリスト・Click Outside・×ボタン・touchstart対応 — v1.4
+
+### Active
+
+- [ ] チームステータス（public/private/hidden）をDBで管理する — v1.6
+- [ ] /myページからpublicチームを自由参加・退出できる — v1.6
+- [ ] /admin/teams/{teamName} でhiddenチームの週次ビューを表示する — v1.6
+- [ ] メンバーが複数のpublication_idを持てるスキーマにする — v1.6
+- [ ] Magic Linkログインフローと/admin保護をPlaywrightでE2Eテストできる — v1.6
 
 ### Active (Future)
 
@@ -150,4 +163,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-17 after v1.5 milestone*
+*Last updated: 2026-05-17 — v1.6 Team Roles + Member Self-Service started*
