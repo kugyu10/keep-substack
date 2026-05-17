@@ -10,23 +10,23 @@ Supabase完全移行・ログイン・メンバー自己管理を実現し、管
 
 ### MIGRATE — Supabase完全移行
 
-- [ ] **MIGRATE-01**: membersテーブル・articlesテーブルをSupabase PostgreSQLで定義し、RLSポリシーを設定できる
-- [ ] **MIGRATE-02**: 既存Upstash RedisのKVデータをSupabase PostgreSQLに一括マイグレーションできる
-- [ ] **MIGRATE-03**: getMembers()/saveArticles()等の既存関数シグネチャを変えずに内部実装をSupabaseに差し替えられる
+- [x] **MIGRATE-01**: membersテーブル・articlesテーブルをSupabase PostgreSQLで定義し、RLSポリシーを設定できる
+- [x] **MIGRATE-02**: 既存Upstash RedisのKVデータをSupabase PostgreSQLに一括マイグレーションできる
+- [x] **MIGRATE-03**: getMembers()/saveArticles()等の既存関数シグネチャを変えずに内部実装をSupabaseに差し替えられる
 - [x] **MIGRATE-04**: @upstash/redisパッケージ・kvMembers.ts・kvArticles.tsを完全削除できる
 
 ### AUTH — 認証・メンバー自己管理
 
-- [ ] **AUTH-01**: メンバーがメールアドレスでMagic Linkログインできる
-- [ ] **AUTH-02**: ログイン後の/myページで自分のSubstack URLと所属チームを登録・編集できる
-- [ ] **AUTH-03**: 既存管理者登録済みメンバーがsubstackIdを入力して自分のアカウントと紐付けできる
-- [ ] **AUTH-04**: /adminへのアクセスがSupabaseユーザーロール（admin role）で制御される（Basic Auth廃止）
+- [x] **AUTH-01**: メンバーがメールアドレスでMagic Linkログインできる
+- [x] **AUTH-02**: ログイン後の/myページで自分のSubstack URLと所属チームを登録・編集できる
+- [x] **AUTH-03**: 既存管理者登録済みメンバーがsubstackIdを入力して自分のアカウントと紐付けできる
+- [x] **AUTH-04**: /adminへのアクセスがSupabaseユーザーロール（admin role）で制御される（Basic Auth廃止）
 
 ### HISTORY — 長期記事履歴
 
-- [ ] **HISTORY-01**: Supabase articlesテーブルにtitle・link・pubDate・imageUrl・substackIdを累積保存できる（linkで重複排除）
-- [ ] **HISTORY-02**: Vercel CronがSupabase articlesテーブルに書き込める
-- [ ] **HISTORY-03**: fetchAllFeedsCachedがSupabase articlesテーブルを参照できる（ISRハイブリッド継続）
+- [x] **HISTORY-01**: Supabase articlesテーブルにtitle・link・pubDate・imageUrl・substackIdを累積保存できる（linkで重複排除）
+- [x] **HISTORY-02**: Vercel CronがSupabase articlesテーブルに書き込める
+- [x] **HISTORY-03**: fetchAllFeedsCachedがSupabase articlesテーブルを参照できる（ISRハイブリッド継続）
 
 ### ADMIN — 管理UI改善
 
@@ -59,19 +59,19 @@ Supabase完全移行・ログイン・メンバー自己管理を実現し、管
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| MIGRATE-01 | Phase 17 | Pending |
-| MIGRATE-02 | Phase 17 | Pending |
-| MIGRATE-03 | Phase 18 | Pending |
-| HISTORY-01 | Phase 18 | Pending |
-| HISTORY-02 | Phase 18 | Pending |
-| HISTORY-03 | Phase 18 | Pending |
-| AUTH-01 | Phase 19 | Pending |
-| AUTH-02 | Phase 19 | Pending |
-| AUTH-03 | Phase 19 | Pending |
-| AUTH-04 | Phase 19 | Pending |
+| MIGRATE-01 | Phase 17 | Complete |
+| MIGRATE-02 | Phase 17 | Complete |
+| MIGRATE-03 | Phase 18 | Complete |
+| HISTORY-01 | Phase 18 | Complete |
+| HISTORY-02 | Phase 18 | Complete |
+| HISTORY-03 | Phase 18 | Complete |
+| AUTH-01 | Phase 19 | Complete |
+| AUTH-02 | Phase 19 | Complete |
+| AUTH-03 | Phase 19 | Complete |
+| AUTH-04 | Phase 19 | Complete |
 | ADMIN-01 | Phase 20 | Complete |
 | MIGRATE-04 | Phase 21 | Complete |
 
 ---
 
-*Last updated: 2026-05-16 — v1.5フェーズ構造改訂（Phase 17-21の5フェーズ構成に変更）*
+*Last updated: 2026-05-17 — 全要件チェックボックス更新（Phase 17-21完了）*

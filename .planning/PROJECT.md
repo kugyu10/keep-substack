@@ -1,28 +1,24 @@
 # Keep Substack
 
-## Current Milestone: v1.5 Member Auth + Supabase Migration
+## Current State: v1.5 SHIPPED
 
-**Goal:** Supabase完全移行・ログイン・メンバー自己管理を実現し、管理者依存を排除してメンバーが自律的に参加できるサービスにする
+**Shipped:** v1.5 Member Auth + Supabase Migration (2026-05-17)
+- Supabase PostgreSQL完全移行（Upstash Redis廃止）
+- Magic Linkログイン（/login-51cf21389c56/ + /auth/callback）
+- /myページでメンバー自己管理（substackId紐付け・プロフィール編集）
+- /adminをBasic Auth → Supabase authロール制御に移行
+- 管理画面チームチェックボックスUI
+- @upstash/redis完全削除・コードベースをSupabase一本化
 
-**Target features:**
-- Supabase完全移行（Upstash Redis廃止 → PostgreSQL）
-- ログイン機能（Supabase Auth）+ メンバー自己管理（v1.5）
-- 長期記事履歴（1ヶ月以上）をSupabaseで累積保存
-- 管理画面チーム管理UI改善（カンマ区切り → チェックボックス）
+## Next Milestone Goals (v1.6 — 未定義)
 
-## Previous: v1.4 SHIPPED
-
-**Shipped:** v1.4 UI/UX Refresh (2026-05-15)
-- ファーストビューにヒートマップを表示（バナー削除）
-- Substackオレンジ濃淡ヒートマップ + 点線丸 + 件数バッジ
-- HeatmapTooltip 横並びリスト・Click Outside・タッチ対応
-- Substack公式ライトテーマ（#fafafa・Loraフォント）
-
-**Next milestone:** v1.5（要件定義中）
+- 年間ヒートマップ（GitHub草型）で長期活動を可視化する
+- 連続投稿日数（ストリーク）を表示する
+- 月間投稿数サマリーを表示する
 
 ## What This Is
 
-Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度をヒートマップUIで可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSS + Upstash Redisで構築し、Vercelにデプロイ済み。v1.3でKV永続化・多対多チーム・シークレットチーム・ISRハイブリッドを実装。
+Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度をヒートマップUIで可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSS + Supabase PostgreSQLで構築し、Vercelにデプロイ済み。v1.5でSupabase完全移行・Magic Linkログイン・メンバー自己管理を実装し、管理者依存を排除した自律的なサービスになった。
 
 ## Core Value
 
@@ -32,6 +28,10 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 
 ### Validated
 
+- ✓ Supabase完全移行（PostgreSQL 4テーブル + RLS + Magic Link Auth）— v1.5
+- ✓ メンバー自己管理（/myページ・substackId紐付け・チーム選択）— v1.5
+- ✓ /adminをBasic Auth → Supabase authロール制御に移行 — v1.5
+- ✓ @upstash/redis完全廃止、コードベースをSupabase一本化 — v1.5
 - ✓ 設定ファイル（JSON）でSubstackフィードURLとメンバー名を管理できる — v1.0
 - ✓ rss-parserでサーバーサイドからRSSフィードを取得・解析できる — v1.0
 - ✓ 月別カレンダーUIでメンバーごとの記事公開日を表示できる — v1.0
@@ -76,7 +76,7 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 
 ### Out of Scope
 
-- ユーザー認証・ログイン機能（公開ページ） — 公開ページのため不要。管理画面はBasic認証で対応
+- ユーザー認証・ログイン機能（公開ページ） — ✓ v1.5でMagic Link実装済み（/myページのみ認証必須）
 - リアルタイム通知 — カレンダー確認で十分
 - コメント・いいね機能 — Substack本体の機能と重複
 - モバイルアプリ — Webアプリで十分、レスポンシブ対応済み
@@ -89,11 +89,11 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - メンバーは成長前提（現時点は少人数だが増える可能性あり）
 - 初期段階で最大50フィード程度を想定
 - Substackの記事更新頻度は1日1回程度が多い
-- v1.4公開済み: https://keep-substack.vercel.app/
-- コードベース: 約1,441行 TypeScript/TSX（Next.js App Router + Tailwind CSS）
-- Tech Stack: Next.js 16.2.6, React 19.2.4, rss-parser 3.13.0, @upstash/redis 1.38.0, TypeScript 5, Tailwind CSS 4, Lora (Google Fonts)
-- v1.4追加: Substackライトテーマ（#fafafa・#363737・Loraフォント）、ヒートマップRipple・濃淡3段階、HeatmapTooltip刷新
-- 記事反映遅延: 最大5分（v1.3 ISRハイブリッド継続）
+- v1.5公開済み: https://keep-substack.vercel.app/
+- コードベース: 約6,500行 TypeScript/TSX（v1.5でSupabase移行・認証追加により大幅増）
+- Tech Stack: Next.js 16.2.6, React 19.2.4, rss-parser 3.13.0, @supabase/supabase-js 2.x, @supabase/ssr 0.10.x, TypeScript 5, Tailwind CSS 4, Lora (Google Fonts)
+- v1.5追加: Supabase PostgreSQL（4テーブル + RLS）、Magic Linkログイン、/myページ、adminロール制御
+- 記事反映遅延: 最大5分（ISRハイブリッド継続）
 
 ## Constraints
 
@@ -126,6 +126,11 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 | Substackブランドカラー #FF6719 を CSS変数 --color-primary として定数化 | KISS — inline色より再利用性あり | ✓ Good — opacity modifier(/70等)が使えて濃淡表現が容易 |
 | Rippleエフェクトを純CSSで実装 | ライブラリ不要、YAGNI | ✓ Good — 軽量でタッチフィードバック向上 |
 | ポップオーバーをclick+hover両対応 | デスクトップ・モバイル共通操作 | ✓ Good — touchstart + Click Outside で安定 |
+| Supabaseクライアント3種類（server/client/admin）| SSR・ブラウザ・service_roleを明確に分離 | ✓ Good — getSession禁止でセキュア |
+| ログインURL難読化（/login-51cf21389c56/）| Bot・スキャン対策 | ✓ Good — Supabase Redirect URLsに登録済み |
+| proxy.tsでgetUser()使用（getSession禁止）| セキュリティホール回避（Supabase公式推奨）| ✓ Good — サーバー側検証で安全 |
+| Transaction Pooler URL (port 6543) | 接続枯渇防止（Vercel Serverless環境）| ✓ Good — .env.local.exampleに明記 |
+| kvMembers→members/kvArticles→articlesリネーム | Supabase移行完了後の命名整合性 | ✓ Good — Phase 21でimport全更新済み |
 
 ## Evolution
 
@@ -145,4 +150,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-16 — v1.5 Member Auth + Supabase Migration started*
+*Last updated: 2026-05-17 after v1.5 milestone*

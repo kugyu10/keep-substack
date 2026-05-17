@@ -1,42 +1,37 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.5
-milestone_name: Member Auth + Supabase Migration
-status: Milestone v1.5 全フェーズ完了
-stopped_at: Phase 21 完了（21-01）
-last_updated: "2026-05-16T15:00:00.000Z"
-last_activity: 2026-05-16 — Completed quick task 260516-r2r: メインブランチをmasterからmainに変更
+milestone: v1.6
+milestone_name: TBD
+status: Milestone v1.5 完了・アーカイブ済み
+stopped_at: v1.5 complete-milestone 実行（2026-05-17）
+last_updated: "2026-05-17T00:00:00.000Z"
+last_activity: 2026-05-17 — Milestone v1.5 archived
 progress:
-  total_phases: 9
-  completed_phases: 9
-  total_plans: 15
-  completed_plans: 15
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-16 — v1.5 Member Auth + Supabase Migration started)
+See: .planning/PROJECT.md (updated 2026-05-17 after v1.5 milestone)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Milestone v1.5 — ロードマップ改訂完了（Phase 17から実装開始待ち）
+**Current focus:** v1.5 アーカイブ完了 — v1.6 計画待ち
 
 ## Current Position
 
-Phase: 21 of 21 — **complete**
-Plan: 21-01 完了（Redisクリーンアップ）
-Status: Milestone v1.5 全フェーズ完了
-Last activity: 2026-05-16 — Phase 21 完了（@upstash/redis削除・redis.ts削除・kvMembers→members・kvArticles→articles）
+Phase: — (v1.5完了、v1.6未着手)
+Status: Milestone v1.5 全フェーズ完了・アーカイブ済み
+Last activity: 2026-05-17 — v1.5 complete-milestone 実行
 
-Progress: [██████████] 100%
+Progress: v1.6未定義
 
 ## Performance Metrics
-
-**Velocity:**
-
-- Total plans completed: 19 (v1.0: 6プラン + v1.1: 6プラン + v1.2: 3プラン + v1.3: 4プラン + v1.4: 4プラン + v1.5: 3プラン)
 
 **By Milestone:**
 
@@ -47,40 +42,10 @@ Progress: [██████████] 100%
 | v1.2 UX Polish | 3 | 3 | 1日 |
 | v1.3 Data Persistence | 4 | 4 | 2日 |
 | v1.4 UI/UX Refresh | 4 | 4 | 1日 |
-| v1.5 Member Auth + Supabase Migration | 1 / 5 (Phase 17完了) | 3 | 1日 |
-
-## Accumulated Context
-
-### Key Architecture Decisions (v1.5 — 計画段階)
-
-- Phase 17 (MIGRATE-01+02) でSupabaseスキーマ構築とKVデータ移行を一括実施 — teamsテーブルもこのフェーズで作成
-- Phase 20 (ADMIN-01) はPhase 17で作成済みのSupabase teamsテーブルをクエリする前提のため、Phase 19の後に配置
-- Supabaseクライアント3種類: server.ts (anon), client.ts (anon), admin.ts (service role)
-- サーバーサイドのユーザー確認は getUser() 必須 (getSession() 禁止 — セキュリティホール)
-- 公開ISRページ (/, /member/*) ではSupabase Authクライアントを一切使わない
-- src/middleware.ts → src/proxy.ts リネーム必須 (Next.js 16対応)
-- Transaction Pooler URL (port 6543) 必須 (接続枯渇防止)
-- Cron: maxDuration=60 + Promise.allSettled 並列化 (10秒タイムアウト対策)
-
-### Quick Tasks Completed
-
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 260516-001 | substackId→publicationId 全リネーム（コード+スキーマ） | 2026-05-16 | 2e85688 | [260516-001-substackid-to-publicationid](.planning/quick/260516-001-substackid-to-publicationid/) |
-| 260516-r2r | メインブランチをmasterからmainに変更 | 2026-05-16 | a6efc63 | [260516-r2r-master-main](./quick/260516-r2r-master-main/) |
-
-### Pending Todos
-
-- [x] ~~本番ドメインのResend設定~~ — `kazumin0831.com` で設定済み・送信確認済み（2026-05-16）
-- [x] ~~Supabase DBマイグレーション~~ — 完了済み（`substack_id` → `publication_id`）
-
-### Blockers/Concerns
-
-なし
+| v1.5 Member Auth + Supabase Migration | 5 | 11 | 2日 |
 
 ## Session Continuity
 
-Last session: 2026-05-16T15:00:00.000Z
-Stopped at: Phase 21 完了 — Milestone v1.5 全フェーズ完了
-Resume file: .planning/phases/21-redis-cleanup/21-01-SUMMARY.md
-Next step: /gsd-complete-milestone でv1.5をアーカイブし、v1.6の計画へ
+Last session: 2026-05-17T00:00:00.000Z
+Stopped at: v1.5 complete-milestone 完了
+Next step: /gsd-new-milestone でv1.6の計画を開始する
