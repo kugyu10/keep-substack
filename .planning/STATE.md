@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Team Roles + Member Self-Service
-status: planning
-stopped_at: Phase 22 未着手
-last_updated: "2026-05-17T00:00:00.000Z"
+status: Defining requirements
+stopped_at: Phase 22 context gathered
+last_updated: "2026-05-17T12:36:37.402Z"
 last_activity: 2026-05-17 — Milestone v1.6 started
 progress:
   total_phases: 5
@@ -58,6 +58,6 @@ Progress: [----------] 0%
 
 ## Session Continuity
 
-Last session: 2026-05-17T00:00:00.000Z
-Stopped at: v1.6 要件定義・ロードマップ作成完了
+Last session: 2026-05-17T12:36:37.395Z
+Stopped at: Phase 22 context gathered
 Next step: /gsd-discuss-phase 22 または /gsd-plan-phase 22 で実装開始
