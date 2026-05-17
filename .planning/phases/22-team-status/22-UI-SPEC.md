@@ -78,6 +78,12 @@ Accent (`#FF6719`) reserved for: アクティブなチームタブの背景・�
 
 ---
 
+## Visual Hierarchy
+
+**Focal point:** h1テキスト「チーム設定」（`text-2xl font-semibold`）が本ページの視覚的アンカーである。ページ最上部に配置し、戻りリンク・テーブルコンテンツより先に視線を誘導する。
+
+---
+
 ## Component Inventory
 
 このフェーズで使用・新規作成するコンポーネント:
@@ -89,7 +95,7 @@ Accent (`#FF6719`) reserved for: アクティブなチームタブの背景・�
 
 ### 新規作成: `src/app/admin/teams/page.tsx`
 - レイアウト: `max-w-3xl mx-auto p-6`（既存 `/admin` と同一）
-- h1: 「チーム設定」、`text-2xl font-semibold`
+- h1: 「チーム設定」、`text-2xl font-semibold`（視覚的アンカー）
 - 戻りリンク: 「← 管理画面へ」、`text-sm text-blue-600 hover:underline`
 
 ### 新規作成: `src/app/admin/teams/TeamStatusTable` (inline component)
@@ -110,8 +116,9 @@ Accent (`#FF6719`) reserved for: アクティブなチームタブの背景・�
 - スタイル: `border border-[#d8d8d8] rounded px-2 py-1 text-sm text-[#363737] bg-white`
 - オプション: `public` / `private` / `hidden`（この順序で固定）
 
-**Saveボタン:**
-- スタイル: `text-blue-600 hover:underline text-xs`（既存の「保存」ボタンと同一）
+**ステータスを保存ボタン:**
+- ラベル: 「ステータスを保存」
+- スタイル: `text-blue-600 hover:underline text-xs`（既存アクションボタンと同一）
 
 ### `/admin` メインページへの追加
 - 「チーム設定」リンク: h2セクションとして追加、`href="/admin/teams"` へ遷移
@@ -122,7 +129,7 @@ Accent (`#FF6719`) reserved for: アクティブなチームタブの背景・�
 
 ### ステータス変更フロー
 1. ユーザーが `<select>` でステータスを選択する
-2. 「保存」ボタンをクリックする
+2. 「ステータスを保存」ボタンをクリックする
 3. Server Action 実行中: ボタンを `disabled` にする（ローディング表示なし、UXシンプル優先）
 4. 成功時: ページリロード（`revalidatePath('/admin/teams')`）でテーブルが更新された状態になる
 5. エラー時: セル内に赤字テキスト（`text-red-500 text-xs`）でエラーメッセージを表示する
@@ -143,7 +150,7 @@ Accent (`#FF6719`) reserved for: アクティブなチームタブの背景・�
 
 | Element | Copy |
 |---------|------|
-| Primary CTA | 保存 |
+| Primary CTA | ステータスを保存 |
 | Page title (h1) | チーム設定 |
 | Section heading (h2) | ステータス管理 |
 | Back link | ← 管理画面へ |
