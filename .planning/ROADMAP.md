@@ -105,7 +105,13 @@ Full archive: `.planning/milestones/v1.5-ROADMAP.md`
   2. 管理画面のチーム一覧にstatusドロップダウン（public/private/hidden）が表示され変更・保存できる
   3. トップページのチームタブにstatus=publicのチームのみ表示される
   4. HIDDEN_TEAM定数のコードがなくなり、status='hidden'で同等の動作をする
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 22-01-PLAN.md — DBマイグレーション: statusカラム追加 + Supabase適用
+- [ ] 22-02-PLAN.md — Member型変更（teamNames→teams）+ getMembers()/updateMember()拡張
+- [ ] 22-03-PLAN.md — page.tsx statusフィルタリング刷新 + AdminMemberList修正
+- [ ] 22-04-PLAN.md — /admin/teams 新設（RSC+Client Component+Server Action）+ /adminリンク追加
 
 ### Phase 23: /myページ公開チーム参加・退出
 **Goal**: ログインユーザーが/myページからstatus=publicのチームをチェックボックスで自由に参加・退出できる
@@ -176,7 +182,7 @@ Full archive: `.planning/milestones/v1.5-ROADMAP.md`
 | 19. Supabase Auth + メンバー自己管理 | v1.5 | 3/3 | Complete | 2026-05-16 |
 | 20. 管理画面チームチェックボックス | v1.5 | 1/1 | Complete | 2026-05-16 |
 | 21. Redisクリーンアップ | v1.5 | 1/1 | Complete | 2026-05-16 |
-| 22. チームステータス管理 | v1.6 | 0/? | Not started | - |
+| 22. チームステータス管理 | v1.6 | 0/4 | Not started | - |
 | 23. /myページ公開チーム参加・退出 | v1.6 | 0/? | Not started | - |
 | 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 0/? | Not started | - |
 | 25. 複数publication_idスキーマ拡張 | v1.6 | 0/? | Not started | - |
