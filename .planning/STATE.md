@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Team Roles + Member Self-Service
-status: Defining requirements
-stopped_at: Phase 22 context gathered
-last_updated: "2026-05-17T12:36:37.402Z"
-last_activity: 2026-05-17 — Milestone v1.6 started
+status: executing
+stopped_at: Phase 22 UI-SPEC approved
+last_updated: "2026-05-20T03:37:52.231Z"
+last_activity: 2026-05-20 -- Phase 22 planning complete
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
+  total_plans: 4
   completed_plans: 0
   percent: 0
 ---
@@ -27,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-05-17 — v1.6 Team Roles + Member Self-
 
 Phase: Not started (defining requirements)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-17 — Milestone v1.6 started
+Status: Ready to execute
+Last activity: 2026-05-20 -- Phase 22 planning complete
 
 Progress: [----------] 0%
 
@@ -58,6 +58,6 @@ Progress: [----------] 0%
 
 ## Session Continuity
 
-Last session: 2026-05-17T12:36:37.395Z
-Stopped at: Phase 22 context gathered
+Last session: 2026-05-17T12:45:06.444Z
+Stopped at: Phase 22 UI-SPEC approved
 Next step: /gsd-discuss-phase 22 または /gsd-plan-phase 22 で実装開始
