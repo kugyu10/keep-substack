@@ -19,6 +19,11 @@ export default async function AdminPage() {
         <LogoutButton />
       </div>
       <p className="text-sm text-gray-600 mb-4">メンバー数：{members.length}</p>
+      <div className="mb-6">
+        <a href="/admin/teams" className="text-blue-600 hover:underline text-sm">
+          チーム設定
+        </a>
+      </div>
       <AdminAddForm teams={teams} />
       <AdminMemberList members={members} teams={teams} />
     </main>
