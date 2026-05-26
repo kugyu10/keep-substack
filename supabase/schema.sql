@@ -18,8 +18,9 @@ CREATE TABLE IF NOT EXISTS members (
 -- ALTER TABLE members ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) UNIQUE;
 
 CREATE TABLE IF NOT EXISTS teams (
-  id   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT UNIQUE NOT NULL
+  id     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name   TEXT UNIQUE NOT NULL,
+  status TEXT NOT NULL DEFAULT 'public'
 );
 
 CREATE TABLE IF NOT EXISTS member_teams (
