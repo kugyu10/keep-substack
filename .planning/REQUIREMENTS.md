@@ -11,7 +11,7 @@
 ### TEAM — チームステータス管理
 
 - [ ] **TEAM-01**: teamsテーブルにstatus（public/private/hidden）カラムを追加できる
-- [ ] **TEAM-02**: 管理画面でチームのstatusを設定・変更できる
+- [x] **TEAM-02**: 管理画面でチームのstatusを設定・変更できる
 - [ ] **TEAM-03**: publicチームのみがトップページのチームタブに表示される（privateもhiddenも非表示）
 - [x] **TEAM-04**: HIDDEN_TEAM定数を廃止し、teams.status='hidden'で同等の動作を実現できる
 
@@ -63,7 +63,7 @@
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
 | TEAM-01 | Phase 22 | Pending |
-| TEAM-02 | Phase 22 | Pending |
+| TEAM-02 | Phase 22 | Complete |
 | TEAM-03 | Phase 22 | Pending |
 | TEAM-04 | Phase 22 | Complete |
 | SELF-01 | Phase 23 | Pending |

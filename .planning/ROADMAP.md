@@ -122,7 +122,7 @@ Plans:
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [ ] 22-03-PLAN.md — page.tsx statusフィルタリング刷新 + AdminMemberList修正
-- [ ] 22-04-PLAN.md — /admin/teams 新設（RSC+Client Component+Server Action）+ /adminリンク追加
+- [x] 22-04-PLAN.md — /admin/teams 新設（RSC+Client Component+Server Action）+ /adminリンク追加
 
 ### Phase 23: /myページ公開チーム参加・退出
 
@@ -205,7 +205,7 @@ Plans:
 | 19. Supabase Auth + メンバー自己管理 | v1.5 | 3/3 | Complete | 2026-05-16 |
 | 20. 管理画面チームチェックボックス | v1.5 | 1/1 | Complete | 2026-05-16 |
 | 21. Redisクリーンアップ | v1.5 | 1/1 | Complete | 2026-05-16 |
-| 22. チームステータス管理 | v1.6 | 2/4 | In Progress|  |
+| 22. チームステータス管理 | v1.6 | 3/4 | In Progress|  |
 | 23. /myページ公開チーム参加・退出 | v1.6 | 0/? | Not started | - |
 | 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 0/? | Not started | - |
 | 25. 複数publication_idスキーマ拡張 | v1.6 | 0/? | Not started | - |
