@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Team Roles + Member Self-Service
 status: executing
-stopped_at: Phase 22 UI-SPEC approved
-last_updated: "2026-05-20T03:37:52.231Z"
-last_activity: 2026-05-20 -- Phase 22 planning complete
+stopped_at: Phase 22 Plan 01 complete
+last_updated: "2026-05-26T14:15:00.000Z"
+last_activity: 2026-05-26 -- Phase 22 Plan 01 executed (DB migration applied)
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 4
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 5
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-17 — v1.6 Team Roles + Member Self-Service started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** v1.6 — Phase 22: チームステータス管理
+**Current focus:** Phase 22 — team-status
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Ready to execute
-Last activity: 2026-05-20 -- Phase 22 planning complete
+Phase: 22 (team-status) — EXECUTING
+Plan: 2 of 4
+Status: Executing Phase 22 (Plan 01 complete)
+Last activity: 2026-05-26 -- Phase 22 Plan 01 executed (DB migration applied)
 
-Progress: [----------] 0%
+Progress: [>---------] 5%
 
 ## Performance Metrics
 
@@ -58,6 +58,6 @@ Progress: [----------] 0%
 
 ## Session Continuity
 
-Last session: 2026-05-17T12:45:06.444Z
-Stopped at: Phase 22 UI-SPEC approved
-Next step: /gsd-discuss-phase 22 または /gsd-plan-phase 22 で実装開始
+Last session: 2026-05-26T14:15:00.000Z
+Stopped at: Phase 22 Plan 01 complete (DB migration applied, user approved)
+Next step: Phase 22 Plan 02 を実行（types.ts・members.ts 等のコード変更）
