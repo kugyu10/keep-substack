@@ -70,7 +70,7 @@ export default function AdminMemberList({ members, teams }: Props) {
                           type="checkbox"
                           name="teamNames"
                           value={team}
-                          defaultChecked={m.teams.map(t => t.name).includes(team)}
+                          defaultChecked={m.teams.some((t) => t.name === team)}
                         />
                         {team}
                       </label>
