@@ -10,7 +10,7 @@ export type FeedItem = {
 export type Member = {
   name: string
   publicationId: string
-  teamNames: string[]  // teamName: string から変更（Phase 11 D-01）
+  teams: { name: string; status: string }[]
   addedAt: string  // ISO 8601
 }
 
@@ -22,6 +22,3 @@ export type MemberFeedResult = {
   items: FeedItem[]
   imageUrl?: string  // channel.image.url（取得失敗時 undefined）
 }
-
-// シークレットチーム名。タブ一覧・All ビューから非表示にする（Phase 12）
-export const HIDDEN_TEAM = 'chameleon'
