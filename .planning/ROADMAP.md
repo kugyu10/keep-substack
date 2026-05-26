@@ -113,11 +113,11 @@ Full archive: `.planning/milestones/v1.5-ROADMAP.md`
 Plans:
 **Wave 1**
 
-- [ ] 22-01-PLAN.md — DBマイグレーション: statusカラム追加 + Supabase適用
+- [x] 22-01-PLAN.md — DBマイグレーション: statusカラム追加 + Supabase適用
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 22-02-PLAN.md — Member型変更（teamNames→teams）+ getMembers()/updateMember()拡張
+- [x] 22-02-PLAN.md — Member型変更（teamNames→teams）+ getMembers()/updateMember()拡張
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -205,7 +205,7 @@ Plans:
 | 19. Supabase Auth + メンバー自己管理 | v1.5 | 3/3 | Complete | 2026-05-16 |
 | 20. 管理画面チームチェックボックス | v1.5 | 1/1 | Complete | 2026-05-16 |
 | 21. Redisクリーンアップ | v1.5 | 1/1 | Complete | 2026-05-16 |
-| 22. チームステータス管理 | v1.6 | 0/4 | Not started | - |
+| 22. チームステータス管理 | v1.6 | 2/4 | In Progress|  |
 | 23. /myページ公開チーム参加・退出 | v1.6 | 0/? | Not started | - |
 | 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 0/? | Not started | - |
 | 25. 複数publication_idスキーマ拡張 | v1.6 | 0/? | Not started | - |

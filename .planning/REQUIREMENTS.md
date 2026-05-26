@@ -13,7 +13,7 @@
 - [ ] **TEAM-01**: teamsテーブルにstatus（public/private/hidden）カラムを追加できる
 - [ ] **TEAM-02**: 管理画面でチームのstatusを設定・変更できる
 - [ ] **TEAM-03**: publicチームのみがトップページのチームタブに表示される（privateもhiddenも非表示）
-- [ ] **TEAM-04**: HIDDEN_TEAM定数を廃止し、teams.status='hidden'で同等の動作を実現できる
+- [x] **TEAM-04**: HIDDEN_TEAM定数を廃止し、teams.status='hidden'で同等の動作を実現できる
 
 ### SELF — メンバー自律参加
 
@@ -65,7 +65,7 @@
 | TEAM-01 | Phase 22 | Pending |
 | TEAM-02 | Phase 22 | Pending |
 | TEAM-03 | Phase 22 | Pending |
-| TEAM-04 | Phase 22 | Pending |
+| TEAM-04 | Phase 22 | Complete |
 | SELF-01 | Phase 23 | Pending |
 | SELF-02 | Phase 23 | Pending |
 | SELF-03 | Phase 23 | Pending |
