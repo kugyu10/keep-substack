@@ -29,7 +29,7 @@ const getMockParseString = () =>
 const makeMember = (publicationId: string): Member => ({
   name: publicationId,
   publicationId,
-  teamNames: [],
+  teams: [],
   addedAt: '2025-01-01',
 })
 
