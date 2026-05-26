@@ -88,7 +88,7 @@ Full archive: `.planning/milestones/v1.5-ROADMAP.md`
 
 **Milestone Goal:** チームステータス管理・メンバー自律参加・E2Eテストにより、コミュニティの自律性と品質を強化する
 
-- [ ] **Phase 22: チームステータス管理** - teamsテーブルにstatus（public/private/hidden）を追加し、HIDDEN_TEAM定数を廃止、管理画面で設定できるようにする
+- [x] **Phase 22: チームステータス管理** - teamsテーブルにstatus（public/private/hidden）を追加し、HIDDEN_TEAM定数を廃止、管理画面で設定できるようにする (completed 2026-05-26)
 - [ ] **Phase 23: /myページ公開チーム参加・退出** - publicチームをチェックボックスで自由参加・退出できる自律参加フローを実装する
 - [ ] **Phase 24: /admin/teams/{teamName} hiddenチームビュー** - 管理者がhiddenチームの週次ヒートマップをURL直接アクセスで確認できるページを追加する
 - [ ] **Phase 25: 複数publication_idスキーマ拡張** - member_publicationsテーブルを追加し将来の複数Substack対応の基盤を整える（UI変更なし）
@@ -121,7 +121,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 22-03-PLAN.md — page.tsx statusフィルタリング刷新 + AdminMemberList修正
+- [x] 22-03-PLAN.md — page.tsx statusフィルタリング刷新 + AdminMemberList修正
 - [x] 22-04-PLAN.md — /admin/teams 新設（RSC+Client Component+Server Action）+ /adminリンク追加
 
 ### Phase 23: /myページ公開チーム参加・退出
@@ -205,7 +205,7 @@ Plans:
 | 19. Supabase Auth + メンバー自己管理 | v1.5 | 3/3 | Complete | 2026-05-16 |
 | 20. 管理画面チームチェックボックス | v1.5 | 1/1 | Complete | 2026-05-16 |
 | 21. Redisクリーンアップ | v1.5 | 1/1 | Complete | 2026-05-16 |
-| 22. チームステータス管理 | v1.6 | 3/4 | In Progress|  |
+| 22. チームステータス管理 | v1.6 | 4/4 | Complete   | 2026-05-26 |
 | 23. /myページ公開チーム参加・退出 | v1.6 | 0/? | Not started | - |
 | 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 0/? | Not started | - |
 | 25. 複数publication_idスキーマ拡張 | v1.6 | 0/? | Not started | - |
