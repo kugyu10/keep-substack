@@ -13,10 +13,16 @@ export default async function Home({ searchParams }: Props) {
   const { team } = await searchParams
   const allMembers = await getMembers()
 
-  const teams = [...new Set(allMembers.flatMap((m) => m.teams.map(t => t.name)).filter(Boolean))]
+  const teams = [
+    ...new Set(
+      allMembers
+        .flatMap((m) => m.teams.filter((t) => t.status === 'public').map((t) => t.name))
+        .filter(Boolean)
+    ),
+  ]
   const filteredMembers = team
-    ? allMembers.filter((m) => m.teams.map(t => t.name).includes(team))
-    : allMembers
+    ? allMembers.filter((m) => m.teams.some((t) => t.name === team))
+    : allMembers.filter((m) => m.teams.every((t) => t.status !== 'hidden'))
 
   const results = await fetchAllFeedsCached(filteredMembers)
 
