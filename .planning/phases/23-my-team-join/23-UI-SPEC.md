@@ -21,7 +21,7 @@ created: 2026-05-27
 | Preset | not applicable |
 | Component library | none (shadcn未導入) |
 | Icon library | none (テキストラベルのみ) |
-| Font | Lora (Google Fonts: wght 400/500/600/700), fallback: Georgia, serif |
+| Font | Lora (Google Fonts: wght 400/600), fallback: Georgia, serif |
 
 Source: `src/app/globals.css`
 
@@ -54,12 +54,12 @@ Source: `src/app/my/page.tsx`, `src/app/my/MyProfileForm.tsx` より検出した
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body | 14px (text-sm) | 400 (normal) | 1.5 |
-| Label | 14px (text-sm) | 500 (medium) | 1.4 |
 | Caption | 12px (text-xs) | 400 (normal) | 1.4 |
+| Label | 14px (text-sm) | 600 (semibold) | 1.4 |
 | Heading | 24px (text-2xl) | 600 (semibold) | 1.2 |
 
 備考:
-- フォームラベル: 14px / weight 500（`text-sm font-medium`）— 既存パターン継続
+- フォームラベル: 14px / weight 600（`text-sm font-semibold`）— weight 500 (medium) から 600 (semibold) に統一。フォントウェイト上限 2 種類（400/600）に合わせて変更
 - ヘルパーテキスト・disabled ラベル: 12px / weight 400（`text-xs`）— 既存パターン継続
 - ページタイトル「マイページ」: 24px / weight 600（`text-2xl font-semibold`）— 既存パターン継続
 
@@ -88,6 +88,8 @@ Source: `src/app/globals.css`, `src/app/my/MyProfileForm.tsx`, `src/app/admin/te
 ---
 
 ## Component Inventory
+
+**Focal point:** 「保存する」ボタン（orange-500 accent、フォーム最下部に固定）が主要な視覚的アンカー。ユーザーの視線はチェックボックスリストを操作した後、自然にページ下部のオレンジボタンへ誘導される。
 
 ### 変更するコンポーネント
 
@@ -122,7 +124,7 @@ Source: `src/app/globals.css`, `src/app/my/MyProfileForm.tsx`, `src/app/admin/te
 
 #### セクションラベル:
 ```
-<label class="block text-sm font-medium mb-2">所属チーム</label>
+<label class="block text-sm font-semibold mb-2">所属チーム</label>
 ```
 
 #### チェックボックスリストコンテナ:
@@ -136,7 +138,7 @@ Source: `src/app/globals.css`, `src/app/my/MyProfileForm.tsx`, `src/app/admin/te
 
 - `パブリケーションID` readonly フィールド — そのまま継続
 - `名前` テキスト入力フィールド — そのまま継続
-- `保存する` ボタン — そのまま継続（`w-full bg-orange-500 text-white rounded px-4 py-2 text-sm font-medium disabled:opacity-50`）
+- `保存する` ボタン — そのまま継続（`w-full bg-orange-500 text-white rounded px-4 py-2 text-sm font-semibold disabled:opacity-50`）
 - `useActionState` パターン — そのまま継続
 
 ---
