@@ -141,7 +141,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 23-01-PLAN.md — updateMyProfileActionをpublicチーム限定の参加・退出に完全置き換え（SELF-02）
+- [x] 23-01-PLAN.md — updateMyProfileActionをpublicチーム限定の参加・退出に完全置き換え（SELF-02）
 - [ ] 23-02-PLAN.md — page.tsxでstatus付きJOIN＋全publicチーム取得、currentTeams/publicTeams props化（SELF-01, SELF-03）
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -216,7 +216,7 @@ Plans:
 | 20. 管理画面チームチェックボックス | v1.5 | 1/1 | Complete | 2026-05-16 |
 | 21. Redisクリーンアップ | v1.5 | 1/1 | Complete | 2026-05-16 |
 | 22. チームステータス管理 | v1.6 | 4/4 | Complete   | 2026-05-26 |
-| 23. /myページ公開チーム参加・退出 | v1.6 | 0/? | Not started | - |
+| 23. /myページ公開チーム参加・退出 | v1.6 | 1/3 | In Progress|  |
 | 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 0/? | Not started | - |
 | 25. 複数publication_idスキーマ拡張 | v1.6 | 0/? | Not started | - |
 | 26. E2Eテスト（Playwright） | v1.6 | 0/? | Not started | - |

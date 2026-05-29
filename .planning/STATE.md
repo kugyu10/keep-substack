@@ -4,13 +4,13 @@ milestone: v1.6
 milestone_name: Team Roles + Member Self-Service
 status: executing
 stopped_at: Phase 23 UI-SPEC approved
-last_updated: "2026-05-29T23:40:30.145Z"
-last_activity: 2026-05-29 -- Phase 23 planning complete
+last_updated: "2026-05-29T23:48:02.410Z"
+last_activity: 2026-05-29
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 7
-  completed_plans: 4
+  completed_plans: 5
   percent: 20
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-17 — v1.6 Team Roles + Member Self-Service started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 22 — team-status
+**Current focus:** Phase 23 — my-team-join
 
 ## Current Position
 
-Phase: 22 — COMPLETE
-Plan: 4 of 4
+Phase: 23 (my-team-join) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-05-29 -- Phase 23 planning complete
+Last activity: 2026-05-29
 
-Progress: [██████████] 100%
+Progress: [███████░░░] 71%
 
 ## Performance Metrics
 
@@ -45,6 +45,7 @@ Progress: [██████████] 100%
 | v1.4 UI/UX Refresh | 4 | 4 | 1日 |
 | v1.5 Member Auth + Supabase Migration | 5 | 11 | 2日 |
 | v1.6 Team Roles + Member Self-Service | 5 | TBD | - |
+| Phase 23 P01 | 15min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -58,6 +59,6 @@ Progress: [██████████] 100%
 
 ## Session Continuity
 
-Last session: 2026-05-27T01:51:49.645Z
+Last session: 2026-05-29T23:47:57.113Z
 Stopped at: Phase 23 UI-SPEC approved
 Next step: Phase 22 Plan 02 を実行（types.ts・members.ts 等のコード変更）
