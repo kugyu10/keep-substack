@@ -136,7 +136,17 @@ Plans:
   3. チェックボックスをOFFにして保存するとmember_teamsから削除され、チームを退出できる
   4. status=privateのチームは/myに参加不可として表示されるか非表示になる
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 23-01-PLAN.md — updateMyProfileActionをpublicチーム限定の参加・退出に完全置き換え（SELF-02）
+- [ ] 23-02-PLAN.md — page.tsxでstatus付きJOIN＋全publicチーム取得、currentTeams/publicTeams props化（SELF-01, SELF-03）
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 23-03-PLAN.md — MyProfileFormのチーム欄をチェックボックスリストに置換、privateはreadonly表示（SELF-01, SELF-03）
 **UI hint**: yes
 
 ### Phase 24: /admin/teams/{teamName} hiddenチームビュー
