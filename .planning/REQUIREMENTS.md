@@ -17,9 +17,9 @@
 
 ### SELF — メンバー自律参加
 
-- [ ] **SELF-01**: /myページにstatus=publicのチーム一覧がチェックボックスで表示される
+- [x] **SELF-01**: /myページにstatus=publicのチーム一覧がチェックボックスで表示される
 - [x] **SELF-02**: チェックボックスを操作してpublicチームへの参加・退出ができる
-- [ ] **SELF-03**: status=privateのチームは/myに参加不可として表示される（または非表示）
+- [x] **SELF-03**: status=privateのチームは/myに参加不可として表示される（または非表示）
 
 ### VIEW — 管理者hiddenチームビュー
 
@@ -66,9 +66,9 @@
 | TEAM-02 | Phase 22 | Complete |
 | TEAM-03 | Phase 22 | Complete |
 | TEAM-04 | Phase 22 | Complete |
-| SELF-01 | Phase 23 | Pending |
+| SELF-01 | Phase 23 | Complete |
 | SELF-02 | Phase 23 | Complete |
-| SELF-03 | Phase 23 | Pending |
+| SELF-03 | Phase 23 | Complete |
 | VIEW-01 | Phase 24 | Pending |
 | VIEW-02 | Phase 24 | Pending |
 | SCHEMA-01 | Phase 25 | Pending |
