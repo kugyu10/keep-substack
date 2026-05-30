@@ -203,7 +203,20 @@ Plans:
   2. /myページのpublicチーム参加・退出操作のテストが通る
   3. /adminへの未認証アクセスが / にリダイレクトされることのテストが通る
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 26-01-PLAN.md — Playwright導入 + config(playwright/vitest) + e2eハーネス(admin/session/fixtures/global-setup) + secret hardening
+
+**Wave 2** *(blocked on Wave 1; BLOCKING manual)*
+
+- [ ] 26-02-PLAN.md — [BLOCKING] テスト用Supabaseプロジェクト作成 + .env.test + supabase db pushでmigration適用
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [ ] 26-03-PLAN.md — 3つのspec(login/my-teams/admin-guard)作成 + 全スイートgreen（E2E-01/02/03）
 
 ## Progress
 
