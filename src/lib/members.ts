@@ -10,7 +10,7 @@ export async function getMembers(): Promise<Member[]> {
       publication_id,
       added_at,
       member_teams (
-        teams (name)
+        teams (name, status)
       )
     `)
   if (error) throw error
@@ -18,9 +18,11 @@ export async function getMembers(): Promise<Member[]> {
   return data.map((m: any) => ({
     name: m.name,
     publicationId: m.publication_id,
-    teamNames: (m.member_teams as any[])
-      .map((mt: any) => mt.teams?.name)
-      .filter((n: unknown): n is string => typeof n === 'string'),
+    teams: (m.member_teams as any[])
+      .map((mt: any) => mt.teams)
+      .filter((t: unknown): t is { name: string; status: string } =>
+        t !== null && typeof t === 'object' && 'name' in (t as object)
+      ),
     addedAt: m.added_at,
   }))
 }
@@ -48,7 +50,7 @@ export async function addMember(member: Omit<Member, 'addedAt'>): Promise<void> 
     .single()
   if (insertError) throw insertError
 
-  for (const teamName of member.teamNames) {
+  for (const teamName of member.teams.map(t => t.name)) {
     const { data: team, error: teamError } = await supabase
       .from('teams')
       .upsert({ name: teamName }, { onConflict: 'name' })
@@ -98,14 +100,14 @@ export async function updateMember(
     if (updateError) throw updateError
   }
 
-  if (updates.teamNames !== undefined) {
+  if (updates.teams !== undefined) {
     const { error: deleteError } = await supabase
       .from('member_teams')
       .delete()
       .eq('member_id', member.id)
     if (deleteError) throw deleteError
 
-    for (const teamName of updates.teamNames) {
+    for (const teamName of updates.teams.map(t => t.name)) {
       const { data: team, error: teamError } = await supabase
         .from('teams')
         .upsert({ name: teamName }, { onConflict: 'name' })

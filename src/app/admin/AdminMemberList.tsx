@@ -70,7 +70,7 @@ export default function AdminMemberList({ members, teams }: Props) {
                           type="checkbox"
                           name="teamNames"
                           value={team}
-                          defaultChecked={m.teamNames.includes(team)}
+                          defaultChecked={m.teams.some((t) => t.name === team)}
                         />
                         {team}
                       </label>
@@ -104,7 +104,7 @@ export default function AdminMemberList({ members, teams }: Props) {
               <tr key={m.publicationId} className="bg-white hover:bg-[#fafafa]">
                 <td className="border border-[#ebebeb] px-3 py-2">{m.name}</td>
                 <td className="border border-[#ebebeb] px-3 py-2">{m.publicationId}</td>
-                <td className="border border-[#ebebeb] px-3 py-2">{m.teamNames.join(', ')}</td>
+                <td className="border border-[#ebebeb] px-3 py-2">{m.teams.map(t => t.name).join(', ')}</td>
                 <td className="border border-[#ebebeb] px-3 py-2 text-xs text-gray-400">
                   {new Date(m.addedAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
                 </td>

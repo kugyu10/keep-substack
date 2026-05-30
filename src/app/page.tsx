@@ -1,6 +1,5 @@
 import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
-import { HIDDEN_TEAM } from '@/lib/types'
 import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'
 import PrBanner from '@/components/PrBanner'
 
@@ -14,12 +13,18 @@ export default async function Home({ searchParams }: Props) {
   const { team } = await searchParams
   const allMembers = await getMembers()
 
-  const teams = [...new Set(allMembers.flatMap((m) => m.teamNames).filter(Boolean))].filter(
-    (t) => t !== HIDDEN_TEAM
-  )
+  const teams = [
+    ...new Set(
+      allMembers
+        .flatMap((m) => m.teams.filter((t) => t.status === 'public').map((t) => t.name))
+        .filter(Boolean)
+    ),
+  ]
   const filteredMembers = team
-    ? allMembers.filter((m) => m.teamNames.includes(team))
-    : allMembers.filter((m) => !m.teamNames.includes(HIDDEN_TEAM))
+    ? allMembers.filter((m) =>
+        m.teams.some((t) => t.name === team && t.status !== 'hidden')
+      )
+    : allMembers.filter((m) => m.teams.every((t) => t.status !== 'hidden'))
 
   const results = await fetchAllFeedsCached(filteredMembers)
 

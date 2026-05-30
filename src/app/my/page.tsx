@@ -17,17 +17,30 @@ export default async function MyPage() {
       name,
       publication_id,
       member_teams (
-        teams (name)
+        teams (name, status)
       )
     `)
     .eq('user_id', user.id)
     .maybeSingle()
 
-  const teamNames: string[] = member
+  const currentTeams: { name: string; status: string }[] = member
     ? (member.member_teams as any[])
-        .map((mt: any) => mt.teams?.name)
-        .filter((n: unknown): n is string => typeof n === 'string')
+        .map((mt: any) => mt.teams)
+        .filter(
+          (t: unknown): t is { name: string; status: string } =>
+            t !== null && typeof t === 'object' && 'name' in (t as object)
+        )
     : []
+
+  const { data: publicTeamsData } = await admin
+    .from('teams')
+    .select('id, name')
+    .eq('status', 'public')
+    .order('name')
+
+  const publicTeams: { name: string }[] = (publicTeamsData ?? []).map(
+    (t: any) => ({ name: t.name })
+  )
 
   return (
     <main className="max-w-sm mx-auto px-4 py-8">
@@ -42,7 +55,8 @@ export default async function MyPage() {
           member={{
             name: member.name,
             publicationId: member.publication_id,
-            team_names: teamNames,
+            currentTeams,
+            publicTeams,
           }}
         />
       )}

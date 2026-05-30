@@ -28,15 +28,15 @@ export default async function MemberPage({
 
   return (
     <main className="max-w-[600px] mx-auto p-6">
-      {memberResult.member.teamNames.length > 0 ? (
+      {memberResult.member.teams.length > 0 ? (
         <div className="flex gap-3 mb-4">
-          {memberResult.member.teamNames.map((t) => (
+          {memberResult.member.teams.map((t) => (
             <Link
-              key={t}
-              href={`/?team=${encodeURIComponent(t)}`}
+              key={t.name}
+              href={`/?team=${encodeURIComponent(t.name)}`}
               className="text-sm text-gray-500 hover:text-gray-800 inline-block"
             >
-              ← {t}
+              ← {t.name}
             </Link>
           ))}
         </div>

@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.5
-milestone_name: Member Auth + Supabase Migration
-status: Milestone v1.5 全フェーズ完了
-stopped_at: Phase 21 完了（21-01）
-last_updated: "2026-05-16T15:00:00.000Z"
-last_activity: 2026-05-16 — Completed quick task 260516-r2r: メインブランチをmasterからmainに変更
+milestone: v1.6
+milestone_name: Team Roles + Member Self-Service
+status: Awaiting next milestone
+stopped_at: Completed 26-03-PLAN.md — Phase 26 e2e-playwright complete (3/3 plans)
+last_updated: "2026-05-30T14:41:52.528Z"
+last_activity: 2026-05-30 — Milestone v1.6 completed and archived
 progress:
-  total_phases: 9
-  completed_phases: 9
-  total_plans: 15
-  completed_plans: 15
+  total_phases: 5
+  completed_phases: 5
+  total_plans: 14
+  completed_plans: 14
   percent: 100
 ---
 
@@ -18,25 +18,19 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-16 — v1.5 Member Auth + Supabase Migration started)
+See: .planning/PROJECT.md (updated 2026-05-30 — v1.6 Team Roles + Member Self-Service shipped)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Milestone v1.5 — ロードマップ改訂完了（Phase 17から実装開始待ち）
+**Current focus:** Planning next milestone (/gsd:new-milestone)
 
 ## Current Position
 
-Phase: 21 of 21 — **complete**
-Plan: 21-01 完了（Redisクリーンアップ）
-Status: Milestone v1.5 全フェーズ完了
-Last activity: 2026-05-16 — Phase 21 完了（@upstash/redis削除・redis.ts削除・kvMembers→members・kvArticles→articles）
-
-Progress: [██████████] 100%
+Phase: Milestone v1.6 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-05-30 — Milestone v1.6 completed and archived
 
 ## Performance Metrics
-
-**Velocity:**
-
-- Total plans completed: 19 (v1.0: 6プラン + v1.1: 6プラン + v1.2: 3プラン + v1.3: 4プラン + v1.4: 4プラン + v1.5: 3プラン)
 
 **By Milestone:**
 
@@ -47,40 +41,60 @@ Progress: [██████████] 100%
 | v1.2 UX Polish | 3 | 3 | 1日 |
 | v1.3 Data Persistence | 4 | 4 | 2日 |
 | v1.4 UI/UX Refresh | 4 | 4 | 1日 |
-| v1.5 Member Auth + Supabase Migration | 1 / 5 (Phase 17完了) | 3 | 1日 |
+| v1.5 Member Auth + Supabase Migration | 5 | 11 | 2日 |
+| v1.6 Team Roles + Member Self-Service | 5 | 14 | ~5日 |
+| Phase 23 P01 | 15min | 2 tasks | 2 files |
+| Phase 23 P02 | ~5min | 2 tasks | 1 files |
+| Phase 23 P03 | ~3min | 2 tasks | 1 files |
+| Phase 24 P01 | 8min | 2 tasks | 2 files |
+| Phase 24 P02 | 4min | 1 tasks | 1 files |
+| Phase 25 P01 | 12min | 2 tasks | 2 files |
+| Phase 25 P02 | ~6min | 3 tasks | 0 src files (live DB apply + verify) |
+| Phase 26 P01 | ~10min | 3 tasks | 10 files |
+| Phase 26 P02 | ~5min | 2 tasks | 0 src files (TEST project provision + schema apply) |
+| Phase 26 P03 | ~8min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
-### Key Architecture Decisions (v1.5 — 計画段階)
+### Key Architecture Decisions (v1.6 — 計画段階)
 
-- Phase 17 (MIGRATE-01+02) でSupabaseスキーマ構築とKVデータ移行を一括実施 — teamsテーブルもこのフェーズで作成
-- Phase 20 (ADMIN-01) はPhase 17で作成済みのSupabase teamsテーブルをクエリする前提のため、Phase 19の後に配置
-- Supabaseクライアント3種類: server.ts (anon), client.ts (anon), admin.ts (service role)
-- サーバーサイドのユーザー確認は getUser() 必須 (getSession() 禁止 — セキュリティホール)
-- 公開ISRページ (/, /member/*) ではSupabase Authクライアントを一切使わない
-- src/middleware.ts → src/proxy.ts リネーム必須 (Next.js 16対応)
-- Transaction Pooler URL (port 6543) 必須 (接続枯渇防止)
-- Cron: maxDuration=60 + Promise.allSettled 並列化 (10秒タイムアウト対策)
-
-### Quick Tasks Completed
-
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 260516-001 | substackId→publicationId 全リネーム（コード+スキーマ） | 2026-05-16 | 2e85688 | [260516-001-substackid-to-publicationid](.planning/quick/260516-001-substackid-to-publicationid/) |
-| 260516-r2r | メインブランチをmasterからmainに変更 | 2026-05-16 | a6efc63 | [260516-r2r-master-main](./quick/260516-r2r-master-main/) |
-
-### Pending Todos
-
-- [x] ~~本番ドメインのResend設定~~ — `kazumin0831.com` で設定済み・送信確認済み（2026-05-16）
-- [x] ~~Supabase DBマイグレーション~~ — 完了済み（`substack_id` → `publication_id`）
-
-### Blockers/Concerns
-
-なし
+- teams.status = 'public' | 'private' | 'hidden'（DEFAULT 'public'）
+- HIDDEN_TEAM定数廃止 → status='hidden'に統一
+- member_publications テーブル追加（member_id FK, publication_id TEXT, is_primary BOOLEAN）
+- /admin/teams/{teamName} は proxy.ts の matcher に追加
+- E2EはPlaywright + Supabaseテスト用アカウントまたはモック
+- Phase 25 P01: member_publications を additive テーブル（surrogate PK）として追加。single-primary は partial unique index で保証、sync trigger は ON CONFLICT DO NOTHING・DELETE ブランチ無し（CASCADE）、backfill は migration のみ・schema.sql は durable 定義をミラー（D-01..D-09）。app code は無変更（SC#3）。
+- Phase 26 P02: Dedicated cloud TEST Supabase project provisioned (otydhiumsdsyxepnjqjp, distinct from prod xolhjcngrwwwqtklmoyk); .env.test populated + gitignored. DEVIATION (Rule 3): supabase/migrations/ are incremental diffs that cannot bootstrap a fresh empty project (`relation "articles" does not exist`), so the operator applied supabase/schema.sql (durable final-state mirror) via the SQL Editor instead — same goal achieved (teams.status, members.publication_id, member_publications all queryable; SCHEMA_OK). Canonical from-scratch bootstrap source for fresh DBs is schema.sql, not migrations/.
+- Phase 26 P01: E2E harness via session-injection — mintAuthCookies uses @supabase/ssr setSession round-trip (no hand-rolled sb-<ref>-auth-token encoding); seeded test user is NON-admin (doubles as E2E-03 negative case); vitest.config.ts scopes include to src/** to avoid Playwright collision; webServer is build+start (NEXT_PUBLIC_* are build-time inlined). Zero production-code changes. (Actual E2E run gated on Plan 02 .env.test provisioning.)
+- Phase 26 P03: Three E2E specs green against the TEST project — login.spec (E2E-01 injected session reaches /my, heading マイページ), my-teams.spec (E2E-02 public-team join → member_teams INSERT via expect.poll + scoped afterEach delete by member_id, no truncate per D-09), admin-guard.spec (E2E-03 anon /admin+/my redirect + non-admin /admin redirect via nested test.use storageState inside the anonymous project). Full Playwright suite 5 passed; vitest 24 passed (src/** only, no runner collision). Zero src/ changes. Real end-to-end (no Supabase mocking) — distinct from src/__tests__/proxy.test.ts. Stopped a stale next-server on :3000 to avoid reuseExistingServer attaching to a prod-env build (Pitfall 6). Phase 26 success criteria fully met.
 
 ## Session Continuity
 
-Last session: 2026-05-16T15:00:00.000Z
-Stopped at: Phase 21 完了 — Milestone v1.5 全フェーズ完了
-Resume file: .planning/phases/21-redis-cleanup/21-01-SUMMARY.md
-Next step: /gsd-complete-milestone でv1.5をアーカイブし、v1.6の計画へ
+Last session: 2026-05-30T12:59:30.989Z
+Stopped at: Milestone v1.6 completed and archived
+Next step: Start next milestone with /gsd:new-milestone
+
+## Deferred Items
+
+Items acknowledged and deferred at milestone close on 2026-05-30. The v1.6 audit
+confirmed all 14 requirements are functionally satisfied (6/6 integration WIRED,
+0 blockers); these are verification-artifact/bookkeeping process gaps and
+long-standing backlog ideas, not functional gaps.
+
+| Category | Item | Status |
+|----------|------|--------|
+| uat_gap | Phase 24 — 24-HUMAN-UAT.md (VIEW-01 live browser render) | partial |
+| verification_gap | Phase 17 — 17-VERIFICATION.md (predates v1.5 close) | gaps_found |
+| verification_gap | Phase 23 — 23-VERIFICATION.md | human_needed |
+| verification_gap | Phase 24 — 24-VERIFICATION.md | human_needed |
+| quick_task | 260515-mx8-white-bg-to-black-fix-text | missing |
+| quick_task | 260516-001-substackid-to-publicationid | unknown |
+| quick_task | 260516-r2r-master-main | missing |
+| quick_task | 260516-rz5-pr-component | missing |
+| todo | 2026-05-11-article-history-persistence | pending |
+| todo | 2026-05-11-multi-team-membership | pending |
+| todo | 2026-05-11-supabase-migration | pending |
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone

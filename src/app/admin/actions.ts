@@ -29,7 +29,7 @@ export async function addMemberAction(
   }
 
   try {
-    await addMember({ name, publicationId, teamNames })
+    await addMember({ name, publicationId, teams: teamNames.map((n) => ({ name: n, status: 'public' })) })
   } catch (e) {
     return e instanceof Error ? e.message : '追加に失敗しました'
   }
@@ -72,7 +72,11 @@ export async function updateMemberAction(
   }
 
   try {
-    await updateMember(publicationId, { name, teamNames, addedAt })
+    await updateMember(publicationId, {
+      name,
+      teams: teamNames.map((teamName) => ({ name: teamName, status: 'public' })),
+      addedAt,
+    })
     revalidatePath('/admin')
     return null
   } catch (e) {
