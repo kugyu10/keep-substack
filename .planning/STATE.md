@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Team Roles + Member Self-Service
 status: executing
-stopped_at: Phase 26 context gathered
-last_updated: "2026-05-30T08:26:18.372Z"
+stopped_at: Completed 26-02-PLAN.md
+last_updated: "2026-05-30T12:59:49.735Z"
 last_activity: 2026-05-30
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 14
-  completed_plans: 13
-  percent: 87
+  completed_plans: 14
+  percent: 100
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-17 — v1.6 Team Roles + Member Self-
 ## Current Position
 
 Phase: 26 (e2e-playwright) — EXECUTING
-Plan: 2 of 3 complete (next: Plan 3 — specs)
-Status: Ready to execute Plan 03
+Plan: 3 of 3 complete (next: Plan 3 — specs)
+Status: Ready to execute
 Last activity: 2026-05-30
 
-Progress: [█████████░] 87%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [█████████░] 87%
 | Phase 25 P02 | ~6min | 3 tasks | 0 src files (live DB apply + verify) |
 | Phase 26 P01 | ~10min | 3 tasks | 10 files |
 | Phase 26 P02 | ~5min | 2 tasks | 0 src files (TEST project provision + schema apply) |
+| Phase 26 P03 | ~8min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -67,9 +68,10 @@ Progress: [█████████░] 87%
 - Phase 25 P01: member_publications を additive テーブル（surrogate PK）として追加。single-primary は partial unique index で保証、sync trigger は ON CONFLICT DO NOTHING・DELETE ブランチ無し（CASCADE）、backfill は migration のみ・schema.sql は durable 定義をミラー（D-01..D-09）。app code は無変更（SC#3）。
 - Phase 26 P02: Dedicated cloud TEST Supabase project provisioned (otydhiumsdsyxepnjqjp, distinct from prod xolhjcngrwwwqtklmoyk); .env.test populated + gitignored. DEVIATION (Rule 3): supabase/migrations/ are incremental diffs that cannot bootstrap a fresh empty project (`relation "articles" does not exist`), so the operator applied supabase/schema.sql (durable final-state mirror) via the SQL Editor instead — same goal achieved (teams.status, members.publication_id, member_publications all queryable; SCHEMA_OK). Canonical from-scratch bootstrap source for fresh DBs is schema.sql, not migrations/.
 - Phase 26 P01: E2E harness via session-injection — mintAuthCookies uses @supabase/ssr setSession round-trip (no hand-rolled sb-<ref>-auth-token encoding); seeded test user is NON-admin (doubles as E2E-03 negative case); vitest.config.ts scopes include to src/** to avoid Playwright collision; webServer is build+start (NEXT_PUBLIC_* are build-time inlined). Zero production-code changes. (Actual E2E run gated on Plan 02 .env.test provisioning.)
+- Phase 26 P03: Three E2E specs green against the TEST project — login.spec (E2E-01 injected session reaches /my, heading マイページ), my-teams.spec (E2E-02 public-team join → member_teams INSERT via expect.poll + scoped afterEach delete by member_id, no truncate per D-09), admin-guard.spec (E2E-03 anon /admin+/my redirect + non-admin /admin redirect via nested test.use storageState inside the anonymous project). Full Playwright suite 5 passed; vitest 24 passed (src/** only, no runner collision). Zero src/ changes. Real end-to-end (no Supabase mocking) — distinct from src/__tests__/proxy.test.ts. Stopped a stale next-server on :3000 to avoid reuseExistingServer attaching to a prod-env build (Pitfall 6). Phase 26 success criteria fully met.
 
 ## Session Continuity
 
-Last session: 2026-05-30T08:25:50.325Z
-Stopped at: Completed 26-02-PLAN.md
-Next step: Execute Phase 26 Plan 03 (E2E specs against the provisioned TEST project).
+Last session: 2026-05-30T12:59:30.989Z
+Stopped at: Completed 26-03-PLAN.md — Phase 26 e2e-playwright complete (3/3 plans)
+Next step: Phase 26 done; all v1.6 phases complete. Verify/close milestone v1.6.

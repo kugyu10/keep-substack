@@ -92,7 +92,7 @@ Full archive: `.planning/milestones/v1.5-ROADMAP.md`
 - [x] **Phase 23: /myページ公開チーム参加・退出** - publicチームをチェックボックスで自由参加・退出できる自律参加フローを実装する (completed 2026-05-29)
 - [x] **Phase 24: /admin/teams/{teamName} hiddenチームビュー** - 管理者がhiddenチームの週次ヒートマップをURL直接アクセスで確認できるページを追加する (completed 2026-05-30)
 - [x] **Phase 25: 複数publication_idスキーマ拡張** - member_publicationsテーブルを追加し将来の複数Substack対応の基盤を整える（UI変更なし） (completed 2026-05-30)
-- [ ] **Phase 26: E2Eテスト（Playwright）** - Magic Linkログイン・/my操作・/admin保護をPlaywrightでE2Eテストできる環境を構築する
+- [x] **Phase 26: E2Eテスト（Playwright）** - Magic Linkログイン・/my操作・/admin保護をPlaywrightでE2Eテストできる環境を構築する (completed 2026-05-30)
 
 ## Phase Details
 
@@ -216,7 +216,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2)*
 
-- [ ] 26-03-PLAN.md — 3つのspec(login/my-teams/admin-guard)作成 + 全スイートgreen（E2E-01/02/03）
+- [x] 26-03-PLAN.md — 3つのspec(login/my-teams/admin-guard)作成 + 全スイートgreen（E2E-01/02/03）
 
 ## Progress
 
@@ -248,4 +248,4 @@ Plans:
 | 23. /myページ公開チーム参加・退出 | v1.6 | 3/3 | Complete   | 2026-05-29 |
 | 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 2/2 | Complete    | 2026-05-30 |
 | 25. 複数publication_idスキーマ拡張 | v1.6 | 2/2 | Complete    | 2026-05-30 |
-| 26. E2Eテスト（Playwright） | v1.6 | 2/3 | In Progress|  |
+| 26. E2Eテスト（Playwright） | v1.6 | 3/3 | Complete   | 2026-05-30 |
