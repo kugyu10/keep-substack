@@ -171,6 +171,51 @@
 
 ---
 
+## Milestone: v1.6 — Team Roles + Member Self-Service
+
+**Shipped:** 2026-05-30
+**Phases:** 5 (22-26) | **Plans:** 14 | **Sessions:** ~5日
+
+### What Was Built
+- teams.status カラム（public/private/hidden）+ HIDDEN_TEAM定数廃止 + Member型を `teams: {name, status}[]` に破壊的変更
+- /myページの公開チーム自由参加フロー（public-only scoped delete-then-insert、private/hiddenはreadonly）
+- /admin/teams/[teamName] 動的RSCでhiddenチームの週次ヒートマップ（既存proxy.tsゲートで保護）
+- member_publications additive テーブル（部分ユニークIndex + RLS + 同期トリガー、app code無変更）
+- Playwright E2Eハーネス + 本番隔離TEST Supabaseプロジェクト、3 spec（login/my-teams/admin-guard）green
+
+### What Worked
+- 破壊的型変更（teamNames→teams）を getMembers() の JOIN拡張で全リーダーに一括伝播 — status直接参照でフィルタ簡潔化
+- session-injection E2E（@supabase/ssr setSession）で実Magic Linkフローを避けつつ決定論的に実DB契約を検証、src無変更
+- member_publications を additive surrogate-PK テーブルで追加 — app/UI無変更でスキーマ拡張（SCHEMA-01/02をリスクなく達成）
+- 同一セッション内の再監査で gaps_found(10/14) → tech_debt(14/14) へ是正（traceability 3-source cross-ref + Phase 22 UAT/SECURITY/VALIDATION完了 + 6/6 integration）
+
+### What Was Inefficient
+- SUMMARY frontmatter の requirements-completed 記入漏れ（TEAM-02・SCHEMA-01/02 が `[]` のまま）— 機能完了とbookkeepingが乖離（v1.3から続く課題）
+- Phase 22 が verifier VERIFICATION.md ではなく UAT path で検証され、アーカイブ形式が不統一
+- supabase/migrations/ が空DBをbootstrapできず Phase 26 で schema.sql 適用に切替（DEVIATION）— migrations/が増分専用という前提が当初不明瞭
+- Phase 24 human UAT が partial のまま（VIEW-01 live browser render 未確認、VIEW-02はPhase 26 E2E-03でカバー）
+
+### Patterns Established
+- **status-driven team visibility**: チーム可視性をコード定数（HIDDEN_TEAM）ではなくDB列で管理 → 管理画面から変更可能
+- **public-only scoped reconcile**: 自己管理の delete-then-insert を status='public' に限定し private/hidden 所属を絶対に触らない
+- **additive surrogate-PK schema extension**: 既存列を壊さず新テーブル+同期トリガーで拡張、app code無変更
+- **session-injection E2E**: 実認証フローを避け setSession round-trip + 本番隔離TEST project で実DB検証
+- **schema.sql = fresh-DB bootstrap の正**: migrations/ は増分diff専用、新規プロビジョニングは schema.sql（durable mirror）
+
+### Key Lessons
+1. supabase migrations/ は増分diff専用 — 新規/空DBの起動は schema.sql が正（Phase 26 で確認、[[supabase-schema-provisioning]]）
+2. E2Eは実Magic Linkを避け session-injection で決定論化し、本番から隔離したTEST projectで実DB契約を検証する
+3. 破壊的型変更（Member.teams）は JOIN で一括取得すれば全リーダーへの伝播が自然に閉じる
+4. SUMMARY frontmatter の requirements-completed は依然手動記入漏れが発生 — 監査の3-source cross-referenceで吸収できたが理想は自動化
+5. 同一セッション内の再監査（traceability fix → 検証アーティファクト完成 → integration確認）で gaps_found を tech_debt に是正できた
+
+### Cost Observations
+- Model mix: Opus 4.8 (1M context) 中心
+- Sessions: ~5日で5フェーズ14プラン（91コミット）
+- Notable: Phase 25/26 は src無変更（DBスキーマ + テストハーネスのみ）で基盤を安全に拡張
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -181,6 +226,9 @@
 | v1.1 | 3 | 6 | KV移行 + ヒートマップUI刷新 — UAT中バグ4件を即時修正 |
 | v1.2 | 3 | 3 | UX改善・アイコン・管理画面編集 — 1フェーズ1プランの小規模構成で1日完結 |
 | v1.3 | 4 | 4 | KV永続化・多対多チーム・ISRハイブリッド — bonus phase 2本を含む |
+| v1.4 | 4 | 4 | UI/UX刷新（ファーストビュー・ヒートマップ配色・ポップオーバー）— モバイルファースト |
+| v1.5 | 5 | 11 | Supabase完全移行 + Magic Link認証 + /my自己管理 — 最大規模のマイルストーン |
+| v1.6 | 5 | 14 | チームステータスDB管理・/my自由参加・Playwright E2E基盤 — schema.sql bootstrap確立 |
 
 ### Top Lessons (Verified Across Milestones)
 
@@ -191,3 +239,6 @@
 5. UAT → 素早いフィードバックループが品質向上に最も効果的。完璧な初回実装より仮実装→UAT→微調整サイクルが効率的
 6. 関数シグネチャを変えないという初期決定が複数フェーズにわたって呼び出し元への影響をゼロに保つ（fetchAllFeedsCached: 3フェーズ連続で内部実装変更・シグネチャ維持）
 7. plan-checker による RESEARCH.md vs PLAN.md の矛盾検出は有効 — 同じロジックを2箇所に記述する際は必ずチェックを通す
+8. additive surrogate-PK テーブル + 同期トリガーで、既存スキーマを壊さず app code 無変更のままDB拡張できる（v1.6 member_publications）
+9. fresh/空のSupabase DBの起動は schema.sql（durable mirror）が正。migrations/ は増分diff専用で空DBをbootstrapできない（v1.6 Phase 26で確認）
+10. E2Eは実Magic Linkを避け session-injection（setSession）+ 本番隔離TEST project で決定論的に実DB契約を検証する（v1.6 Phase 26）
