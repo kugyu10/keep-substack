@@ -2,16 +2,13 @@
 status: complete
 phase: 22-team-status
 source: 22-01-SUMMARY.md, 22-02-SUMMARY.md, 22-03-SUMMARY.md, 22-04-SUMMARY.md
-started: 2026-05-26T14:49:51Z
-updated: 2026-05-26T14:49:51Z
+started: 2026-05-30T13:31:40Z
+updated: 2026-05-30T13:36:57Z
 ---
 
 ## Current Test
 
-number: 7
-name: hiddenへの変更時の確認ダイアログ
-expected: /admin/teams でチームのstatusをhiddenに変更して「ステータスを保存」をクリックすると、確認ダイアログが表示される。「キャンセル」を押すと保存されない。
-result: pass
+[testing complete]
 
 ## Tests
 
