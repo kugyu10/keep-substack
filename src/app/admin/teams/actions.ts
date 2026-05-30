@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
+const VALID_STATUSES = ['public', 'private', 'hidden'] as const
+
 async function requireAdmin(): Promise<void> {
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -17,6 +19,10 @@ export async function updateTeamStatusAction(
   status: string
 ): Promise<string | null> {
   try { await requireAdmin() } catch { return '権限がありません' }
+
+  if (!VALID_STATUSES.includes(status as (typeof VALID_STATUSES)[number])) {
+    return '不正なステータスです'
+  }
 
   const supabase = createSupabaseAdminClient()
   const { error } = await supabase

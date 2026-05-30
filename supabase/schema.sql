@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS members (
 CREATE TABLE IF NOT EXISTS teams (
   id     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name   TEXT UNIQUE NOT NULL,
-  status TEXT NOT NULL DEFAULT 'public'
+  status TEXT NOT NULL DEFAULT 'public' CHECK (status IN ('public', 'private', 'hidden'))
 );
 
 CREATE TABLE IF NOT EXISTS member_teams (
