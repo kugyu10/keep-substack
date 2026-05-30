@@ -48,3 +48,9 @@ next-env.d.ts
 
 # Migration script output
 scripts/output/
+
+# Supabase CLI local state
+supabase/.temp/
+
+# Playwright test output
+test-results/
