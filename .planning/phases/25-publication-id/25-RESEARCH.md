@@ -289,16 +289,15 @@ Append the §1 + §3 blocks to `supabase/schema.sql` (after the existing RLS blo
 | A3 | `ON CONFLICT (publication_id) DO NOTHING` is the desired collision behavior (silent) over loud failure | §4 edge cases | MEDIUM — if the user wants member inserts to fail on a publication_id already present in member_publications, omit ON CONFLICT in the trigger INSERT. Worth a one-line confirmation in planning. |
 | A4 | The DELETE trigger is truly redundant (CASCADE suffices) | Summary / Anti-Patterns | LOW — verified via FK semantics + member_teams precedent; D-08 asked planner to confirm → confirmed redundant |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Collision behavior on trigger INSERT (silent vs loud).**
-   - What we know: `ON CONFLICT DO NOTHING` keeps member inserts resilient; omitting it makes them fail on collision.
-   - What's unclear: which the user prefers (A3).
-   - Recommendation: default to `DO NOTHING` (matches "don't change app behavior" spirit); flag in plan for a quick confirm.
+1. **Collision behavior on trigger INSERT (silent vs loud).** — **RESOLVED: `ON CONFLICT (publication_id) DO NOTHING` (silent/resilient).**
+   - What we knew: `ON CONFLICT DO NOTHING` keeps member inserts resilient; omitting it makes them fail on collision.
+   - Decision: default to `DO NOTHING` (matches "don't change app behavior" spirit). Locked in plan **25-01 Task 1** (`per RESEARCH A3`).
 
-2. **Should schema.sql include the backfill?**
-   - What we know: backfill is meaningless on a fresh DB (no members yet); the trigger populates going forward.
-   - Recommendation: backfill in migration only; table+index+RLS+trigger in both files. Documented in §5.
+2. **Should schema.sql include the backfill?** — **RESOLVED: migration-only (no backfill in schema.sql).**
+   - What we knew: backfill is meaningless on a fresh DB (no members yet); the trigger populates going forward.
+   - Decision: backfill in migration only; table+index+RLS+trigger in both files. Locked in plan **25-01 Task 2**.
 
 ## Environment Availability
 
