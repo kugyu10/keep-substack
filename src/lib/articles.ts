@@ -40,7 +40,11 @@ export async function deleteArticles(publicationId: string): Promise<void> {
   if (error) throw error
 }
 
-// ON CONFLICT (link) DO NOTHING で重複排除（schema.sql の UNIQUE(link) 制約を利用）
+// schema.sql の UNIQUE(link) 制約を利用して link 単位で upsert する。
+// thumbnail がある項目は ON CONFLICT で値を更新（image_url のバックフィル）し、
+// thumbnail が無い項目は INSERT のみ（ignoreDuplicates）にして既存の image_url を
+// NULL で上書きしないようにする。これにより、過去に空で保存された古い記事も
+// live feed に残っている間に正しいサムネイルへバックフィルされる。
 // imageUrl が渡された場合は members.image_url を更新する
 export async function saveArticles(
   publicationId: string,
@@ -50,14 +54,34 @@ export async function saveArticles(
   const supabase = createSupabaseAdminClient()
 
   const validItems = newItems.filter((item) => item.link)
-  if (validItems.length > 0) {
+
+  // thumbnail あり: image_url 込みで merge-duplicates（既存行も更新＝バックフィル）
+  const withThumb = validItems.filter((item) => item.thumbnail)
+  // thumbnail なし: INSERT のみ（既存の image_url を保持し、NULL 上書きを防ぐ）
+  const withoutThumb = validItems.filter((item) => !item.thumbnail)
+
+  if (withThumb.length > 0) {
     const { error } = await supabase.from('articles').upsert(
-      validItems.map((item) => ({
+      withThumb.map((item) => ({
         publication_id: publicationId,
         title: item.title ?? null,
         link: item.link!,
         pub_date: item.isoDate ?? null,
-        image_url: item.thumbnail ?? null,
+        image_url: item.thumbnail,
+      })),
+      { onConflict: 'link' }
+    )
+    if (error) throw error
+  }
+
+  if (withoutThumb.length > 0) {
+    const { error } = await supabase.from('articles').upsert(
+      withoutThumb.map((item) => ({
+        publication_id: publicationId,
+        title: item.title ?? null,
+        link: item.link!,
+        pub_date: item.isoDate ?? null,
+        image_url: null,
       })),
       { onConflict: 'link', ignoreDuplicates: true }
     )
