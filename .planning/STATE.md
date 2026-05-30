@@ -10,8 +10,8 @@ progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 14
-  completed_plans: 12
-  percent: 80
+  completed_plans: 13
+  percent: 87
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-17 — v1.6 Team Roles + Member Self-
 ## Current Position
 
 Phase: 26 (e2e-playwright) — EXECUTING
-Plan: 2 of 3
-Status: Ready to execute
+Plan: 2 of 3 complete (next: Plan 3 — specs)
+Status: Ready to execute Plan 03
 Last activity: 2026-05-30
 
-Progress: [█████████░] 86%
+Progress: [█████████░] 87%
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: [█████████░] 86%
 | Phase 25 P01 | 12min | 2 tasks | 2 files |
 | Phase 25 P02 | ~6min | 3 tasks | 0 src files (live DB apply + verify) |
 | Phase 26 P01 | ~10min | 3 tasks | 10 files |
+| Phase 26 P02 | ~5min | 2 tasks | 0 src files (TEST project provision + schema apply) |
 
 ## Accumulated Context
 
@@ -64,10 +65,11 @@ Progress: [█████████░] 86%
 - /admin/teams/{teamName} は proxy.ts の matcher に追加
 - E2EはPlaywright + Supabaseテスト用アカウントまたはモック
 - Phase 25 P01: member_publications を additive テーブル（surrogate PK）として追加。single-primary は partial unique index で保証、sync trigger は ON CONFLICT DO NOTHING・DELETE ブランチ無し（CASCADE）、backfill は migration のみ・schema.sql は durable 定義をミラー（D-01..D-09）。app code は無変更（SC#3）。
+- Phase 26 P02: Dedicated cloud TEST Supabase project provisioned (otydhiumsdsyxepnjqjp, distinct from prod xolhjcngrwwwqtklmoyk); .env.test populated + gitignored. DEVIATION (Rule 3): supabase/migrations/ are incremental diffs that cannot bootstrap a fresh empty project (`relation "articles" does not exist`), so the operator applied supabase/schema.sql (durable final-state mirror) via the SQL Editor instead — same goal achieved (teams.status, members.publication_id, member_publications all queryable; SCHEMA_OK). Canonical from-scratch bootstrap source for fresh DBs is schema.sql, not migrations/.
 - Phase 26 P01: E2E harness via session-injection — mintAuthCookies uses @supabase/ssr setSession round-trip (no hand-rolled sb-<ref>-auth-token encoding); seeded test user is NON-admin (doubles as E2E-03 negative case); vitest.config.ts scopes include to src/** to avoid Playwright collision; webServer is build+start (NEXT_PUBLIC_* are build-time inlined). Zero production-code changes. (Actual E2E run gated on Plan 02 .env.test provisioning.)
 
 ## Session Continuity
 
 Last session: 2026-05-30T08:25:50.325Z
-Stopped at: Completed 26-01-PLAN.md
-Next step: Execute Phase 26 Plan 02 (provision TEST Supabase project, apply migrations via db push, create .env.test). Then Plan 03 (specs).
+Stopped at: Completed 26-02-PLAN.md
+Next step: Execute Phase 26 Plan 03 (E2E specs against the provisioned TEST project).
