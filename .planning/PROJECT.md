@@ -1,19 +1,22 @@
 # Keep Substack
 
-## Current Milestone: v1.6 Team Roles + Member Self-Service
+## Current State: v1.6 SHIPPED
 
-**Goal:** チームステータス管理・メンバー自律参加・E2Eテストにより、コミュニティの自律性と品質を強化する
+**Shipped:** v1.6 Team Roles + Member Self-Service (2026-05-30)
+- チームステータス（public/private/hidden）をDBで管理し、HIDDEN_TEAM定数を廃止（Member型を `teams: {name, status}[]` に刷新）
+- /myページからpublicチームをチェックボックスで自由参加・退出する自律参加フロー（private/hiddenはreadonly）
+- /admin/teams/{teamName} 動的RSCでhiddenチームの週次ヒートマップを管理者がURL直アクセスで確認（既存proxy.tsゲートで保護）
+- member_publicationsテーブルで複数publication_id対応のスキーマ基盤を整備（部分ユニークIndex+RLS+同期トリガー、UIは1件前提のまま）
+- Playwright E2Eハーネス（login/my-teams/admin-guard 3 spec）を本番隔離TEST Supabaseプロジェクトに対しgreen化
 
-**Target features:**
-- チームステータス（public/private/hidden）をDBで管理し、HIDDEN_TEAM定数を廃止
-- /myページからpublicチームをチェックボックスで自由参加・退出
-- /admin/teams/{teamName} でhiddenチームの週次ビューを管理者が確認
-- メンバーが複数のpublication_idを持てるスキーマ拡張（UIは1件前提のまま）
-- E2Eテスト: Magic Linkログイン + /my操作 + /admin保護確認（Playwright）
+## Next Milestone
 
-## Previous: v1.5 SHIPPED
+未定 — `/gsd:new-milestone` で次の方向性を定義する。候補は v1.7 の継続可視化強化（ストリーク・月間サマリー・年間ヒートマップ）。
 
-**Shipped:** v1.5 Member Auth + Supabase Migration (2026-05-17)
+<details>
+<summary>Previous milestones</summary>
+
+**v1.5 Member Auth + Supabase Migration (2026-05-17)**
 - Supabase PostgreSQL完全移行（Upstash Redis廃止）
 - Magic Linkログイン（/login-51cf21389c56/ + /auth/callback）
 - /myページでメンバー自己管理（substackId紐付け・プロフィール編集）
@@ -21,9 +24,11 @@
 - 管理画面チームチェックボックスUI
 - @upstash/redis完全削除・コードベースをSupabase一本化
 
+</details>
+
 ## What This Is
 
-Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度をヒートマップUIで可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSS + Supabase PostgreSQLで構築し、Vercelにデプロイ済み。v1.5でSupabase完全移行・Magic Linkログイン・メンバー自己管理を実装し、管理者依存を排除した自律的なサービスになった。
+Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度をヒートマップUIで可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSS + Supabase PostgreSQLで構築し、Vercelにデプロイ済み。v1.5でSupabase完全移行・Magic Linkログイン・メンバー自己管理を実装し、管理者依存を排除した自律的なサービスになった。v1.6でチームステータス（public/private/hidden）のDB管理・/myページからの公開チーム自由参加・Playwright E2Eテスト基盤を追加し、コミュニティの自律性と品質を強化した。
 
 ## Core Value
 
@@ -72,14 +77,15 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - ✓ メンバー名1行truncate + シェブロン + Substackオレンジタブ — v1.4
 - ✓ Substackオレンジ（#FF6719）濃淡ヒートマップ + 点線丸 + 件数バッジ — v1.4
 - ✓ HeatmapTooltip 横並びリスト・Click Outside・×ボタン・touchstart対応 — v1.4
+- ✓ チームステータス（public/private/hidden）をDBで管理し、HIDDEN_TEAM定数を廃止する — v1.6 (Validated in Phase 22)
+- ✓ /myページからpublicチームをチェックボックスで自由参加・退出できる（private/hiddenはreadonly）— v1.6 (Validated in Phase 23)
 - ✓ /admin/teams/{teamName} でhiddenチームの週次ビューを表示する — v1.6 (Validated in Phase 24)
 - ✓ メンバーが複数のpublication_idを持てるスキーマにする（member_publicationsテーブル、UIは1件前提のまま）— v1.6 (Validated in Phase 25)
 - ✓ Magic Linkログインフローと/admin保護をPlaywrightでE2Eテストできる — v1.6 (Validated in Phase 26)
 
 ### Active
 
-- [ ] チームステータス（public/private/hidden）をDBで管理する — v1.6
-- [ ] /myページからpublicチームを自由参加・退出できる — v1.6
+(None — v1.6 shipped. Next milestone requirements defined via `/gsd:new-milestone`.)
 
 ### Active (Future)
 
@@ -102,10 +108,11 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - メンバーは成長前提（現時点は少人数だが増える可能性あり）
 - 初期段階で最大50フィード程度を想定
 - Substackの記事更新頻度は1日1回程度が多い
-- v1.5公開済み: https://keep-substack.vercel.app/
-- コードベース: 約6,500行 TypeScript/TSX（v1.5でSupabase移行・認証追加により大幅増）
-- Tech Stack: Next.js 16.2.6, React 19.2.4, rss-parser 3.13.0, @supabase/supabase-js 2.x, @supabase/ssr 0.10.x, TypeScript 5, Tailwind CSS 4, Lora (Google Fonts)
+- v1.6公開済み: https://keep-substack.vercel.app/
+- コードベース: 約3,500行 src TypeScript/TSX（+ E2E/テストハーネス・supabase schema/migrations）
+- Tech Stack: Next.js 16.2.6, React 19.2.4, rss-parser 3.13.0, @supabase/supabase-js 2.x, @supabase/ssr 0.10.x, TypeScript 5, Tailwind CSS 4, Lora (Google Fonts), Playwright 1.60 + Vitest
 - v1.5追加: Supabase PostgreSQL（4テーブル + RLS）、Magic Linkログイン、/myページ、adminロール制御
+- v1.6追加: teams.status カラム（public/private/hidden）、member_publications テーブル、Playwright E2Eハーネス + 本番隔離TEST Supabaseプロジェクト
 - 記事反映遅延: 最大5分（ISRハイブリッド継続）
 
 ## Constraints
@@ -144,6 +151,12 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 | proxy.tsでgetUser()使用（getSession禁止）| セキュリティホール回避（Supabase公式推奨）| ✓ Good — サーバー側検証で安全 |
 | Transaction Pooler URL (port 6543) | 接続枯渇防止（Vercel Serverless環境）| ✓ Good — .env.local.exampleに明記 |
 | kvMembers→members/kvArticles→articlesリネーム | Supabase移行完了後の命名整合性 | ✓ Good — Phase 21でimport全更新済み |
+| teams.status カラム（public/private/hidden）でHIDDEN_TEAM定数を置換 | チーム可視性をコード定数ではなくDB駆動に | ✓ Good — v1.6 Phase 22、管理画面から設定変更可能 |
+| Member型を `teamNames: string[]` → `teams: {name, status}[]` に破壊的変更 | status情報を全リーダーに伝播させる | ✓ Good — JOINで一括取得、フィルタはstatus直接参照 |
+| /myの公開チーム参加は delete-then-insert を public-only にscope | private/hidden所属を絶対に触らない安全な自己管理 | ✓ Good — v1.6 Phase 23、6-caseユニットテストで保証 |
+| member_publications を additive surrogate-PKテーブルとして追加 | 既存members.publication_idを壊さず将来の複数Substack対応 | ✓ Good — v1.6 Phase 25、UI/app code無変更、同期トリガーで整合 |
+| E2Eは session-injection（@supabase/ssr setSession）+ 本番隔離TEST project | Magic Link実フローを避けつつ実DB契約を検証 | ✓ Good — v1.6 Phase 26、3 spec green、src無変更 |
+| fresh DBのbootstrapは schema.sql（migrations/ではない） | migrations/は増分diffで空DBを起動できない | ✓ Good — v1.6 Phase 26で確認、schema.sqlがdurableミラー |
 
 ## Evolution
 
@@ -163,4 +176,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-30 — Phase 26 complete (Playwright E2E harness — login/my/admin flows tested green against an isolated TEST Supabase project; last phase of v1.6)*
+*Last updated: 2026-05-30 after v1.6 milestone — Team Roles + Member Self-Service shipped (チームステータスDB管理・/my自由参加・Playwright E2E基盤)*

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Team Roles + Member Self-Service
-status: milestone_complete
-stopped_at: Milestone complete (Phase 26 was final phase)
-last_updated: 2026-05-30T13:09:04.732Z
-last_activity: 2026-05-30
+status: Awaiting next milestone
+stopped_at: Completed 26-03-PLAN.md — Phase 26 e2e-playwright complete (3/3 plans)
+last_updated: "2026-05-30T14:41:52.528Z"
+last_activity: 2026-05-30 — Milestone v1.6 completed and archived
 progress:
   total_phases: 5
   completed_phases: 5
   total_plans: 14
-  completed_plans: 29
+  completed_plans: 14
   percent: 100
 ---
 
@@ -18,19 +18,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-17 — v1.6 Team Roles + Member Self-Service started)
+See: .planning/PROJECT.md (updated 2026-05-30 — v1.6 Team Roles + Member Self-Service shipped)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Milestone complete
+**Current focus:** Planning next milestone (/gsd:new-milestone)
 
 ## Current Position
 
-Phase: 26
-Plan: Not started
-Status: Milestone complete
-Last activity: 2026-05-30
-
-Progress: [██████████] 100%
+Phase: Milestone v1.6 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-05-30 — Milestone v1.6 completed and archived
 
 ## Performance Metrics
 
@@ -44,7 +42,7 @@ Progress: [██████████] 100%
 | v1.3 Data Persistence | 4 | 4 | 2日 |
 | v1.4 UI/UX Refresh | 4 | 4 | 1日 |
 | v1.5 Member Auth + Supabase Migration | 5 | 11 | 2日 |
-| v1.6 Team Roles + Member Self-Service | 5 | TBD | - |
+| v1.6 Team Roles + Member Self-Service | 5 | 14 | ~5日 |
 | Phase 23 P01 | 15min | 2 tasks | 2 files |
 | Phase 23 P02 | ~5min | 2 tasks | 1 files |
 | Phase 23 P03 | ~3min | 2 tasks | 1 files |
@@ -73,5 +71,30 @@ Progress: [██████████] 100%
 ## Session Continuity
 
 Last session: 2026-05-30T12:59:30.989Z
-Stopped at: Completed 26-03-PLAN.md — Phase 26 e2e-playwright complete (3/3 plans)
-Next step: Phase 26 done; all v1.6 phases complete. Verify/close milestone v1.6.
+Stopped at: Milestone v1.6 completed and archived
+Next step: Start next milestone with /gsd:new-milestone
+
+## Deferred Items
+
+Items acknowledged and deferred at milestone close on 2026-05-30. The v1.6 audit
+confirmed all 14 requirements are functionally satisfied (6/6 integration WIRED,
+0 blockers); these are verification-artifact/bookkeeping process gaps and
+long-standing backlog ideas, not functional gaps.
+
+| Category | Item | Status |
+|----------|------|--------|
+| uat_gap | Phase 24 — 24-HUMAN-UAT.md (VIEW-01 live browser render) | partial |
+| verification_gap | Phase 17 — 17-VERIFICATION.md (predates v1.5 close) | gaps_found |
+| verification_gap | Phase 23 — 23-VERIFICATION.md | human_needed |
+| verification_gap | Phase 24 — 24-VERIFICATION.md | human_needed |
+| quick_task | 260515-mx8-white-bg-to-black-fix-text | missing |
+| quick_task | 260516-001-substackid-to-publicationid | unknown |
+| quick_task | 260516-r2r-master-main | missing |
+| quick_task | 260516-rz5-pr-component | missing |
+| todo | 2026-05-11-article-history-persistence | pending |
+| todo | 2026-05-11-multi-team-membership | pending |
+| todo | 2026-05-11-supabase-migration | pending |
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone

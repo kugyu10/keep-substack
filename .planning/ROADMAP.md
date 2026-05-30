@@ -8,7 +8,7 @@
 - ✅ **v1.3 Data Persistence + Multi-Team** — Phases 10-12.1 (shipped 2026-05-12)
 - ✅ **v1.4 UI/UX Refresh** — Phases 13-16 (shipped 2026-05-15)
 - ✅ **v1.5 Member Auth + Supabase Migration** — Phases 17-21 (shipped 2026-05-17)
-- 🚧 **v1.6 Team Roles + Member Self-Service** — Phases 22-26 (in progress)
+- ✅ **v1.6 Team Roles + Member Self-Service** — Phases 22-26 (shipped 2026-05-30)
 
 ## Phases
 
@@ -84,139 +84,24 @@ Full archive: `.planning/milestones/v1.5-ROADMAP.md`
 
 </details>
 
-### 🚧 v1.6 Team Roles + Member Self-Service (In Progress)
+<details>
+<summary>✅ v1.6 Team Roles + Member Self-Service (Phases 22-26) — SHIPPED 2026-05-30</summary>
 
 **Milestone Goal:** チームステータス管理・メンバー自律参加・E2Eテストにより、コミュニティの自律性と品質を強化する
 
-- [x] **Phase 22: チームステータス管理** - teamsテーブルにstatus（public/private/hidden）を追加し、HIDDEN_TEAM定数を廃止、管理画面で設定できるようにする (completed 2026-05-26)
-- [x] **Phase 23: /myページ公開チーム参加・退出** - publicチームをチェックボックスで自由参加・退出できる自律参加フローを実装する (completed 2026-05-29)
-- [x] **Phase 24: /admin/teams/{teamName} hiddenチームビュー** - 管理者がhiddenチームの週次ヒートマップをURL直接アクセスで確認できるページを追加する (completed 2026-05-30)
-- [x] **Phase 25: 複数publication_idスキーマ拡張** - member_publicationsテーブルを追加し将来の複数Substack対応の基盤を整える（UI変更なし） (completed 2026-05-30)
-- [x] **Phase 26: E2Eテスト（Playwright）** - Magic Linkログイン・/my操作・/admin保護をPlaywrightでE2Eテストできる環境を構築する (completed 2026-05-30)
+- [x] **Phase 22: チームステータス管理** (4/4 plans) — completed 2026-05-26
+- [x] **Phase 23: /myページ公開チーム参加・退出** (3/3 plans) — completed 2026-05-29
+- [x] **Phase 24: /admin/teams/{teamName} hiddenチームビュー** (2/2 plans) — completed 2026-05-30
+- [x] **Phase 25: 複数publication_idスキーマ拡張** (2/2 plans) — completed 2026-05-30
+- [x] **Phase 26: E2Eテスト（Playwright）** (3/3 plans) — completed 2026-05-30
 
-## Phase Details
+Full archive: `.planning/milestones/v1.6-ROADMAP.md`
 
-### Phase 22: チームステータス管理
+</details>
 
-**Goal**: teamsテーブルにstatus（public/private/hidden）カラムを追加し、HIDDEN_TEAM定数を廃止、管理画面でチームステータスを設定できるようにする
-**Depends on**: Phase 21 (v1.5完了)
-**Requirements**: TEAM-01, TEAM-02, TEAM-03, TEAM-04
-**Success Criteria** (what must be TRUE):
+## Phase Details (archived)
 
-  1. teamsテーブルにstatus TEXT NOT NULL DEFAULT 'public' カラムが存在する
-  2. 管理画面のチーム一覧にstatusドロップダウン（public/private/hidden）が表示され変更・保存できる
-  3. トップページのチームタブにstatus=publicのチームのみ表示される
-  4. HIDDEN_TEAM定数のコードがなくなり、status='hidden'で同等の動作をする
-
-**Plans**: 4 plans
-
-Plans:
-**Wave 1**
-
-- [x] 22-01-PLAN.md — DBマイグレーション: statusカラム追加 + Supabase適用
-
-**Wave 2** *(blocked on Wave 1 completion)*
-
-- [x] 22-02-PLAN.md — Member型変更（teamNames→teams）+ getMembers()/updateMember()拡張
-
-**Wave 3** *(blocked on Wave 2 completion)*
-
-- [x] 22-03-PLAN.md — page.tsx statusフィルタリング刷新 + AdminMemberList修正
-- [x] 22-04-PLAN.md — /admin/teams 新設（RSC+Client Component+Server Action）+ /adminリンク追加
-
-### Phase 23: /myページ公開チーム参加・退出
-
-**Goal**: ログインユーザーが/myページからstatus=publicのチームをチェックボックスで自由に参加・退出できる
-**Depends on**: Phase 22
-**Requirements**: SELF-01, SELF-02, SELF-03
-**Success Criteria** (what must be TRUE):
-
-  1. /myページにstatus=publicのチーム一覧がチェックボックスで表示される
-  2. チェックボックスをONにして保存するとmember_teamsに追加され、チームに参加できる
-  3. チェックボックスをOFFにして保存するとmember_teamsから削除され、チームを退出できる
-  4. status=privateのチームは/myに参加不可として表示されるか非表示になる
-
-**Plans**: 3 plans
-
-Plans:
-**Wave 1**
-
-- [x] 23-01-PLAN.md — updateMyProfileActionをpublicチーム限定の参加・退出に完全置き換え（SELF-02）
-- [x] 23-02-PLAN.md — page.tsxでstatus付きJOIN＋全publicチーム取得、currentTeams/publicTeams props化（SELF-01, SELF-03）
-
-**Wave 2** *(blocked on Wave 1 completion)*
-
-- [x] 23-03-PLAN.md — MyProfileFormのチーム欄をチェックボックスリストに置換、privateはreadonly表示（SELF-01, SELF-03）
-**UI hint**: yes
-
-### Phase 24: /admin/teams/{teamName} hiddenチームビュー
-
-**Goal**: 管理者が /admin/teams/{teamName} でhiddenチームの週次ヒートマップビューを確認できる
-**Depends on**: Phase 22
-**Requirements**: VIEW-01, VIEW-02
-**Success Criteria** (what must be TRUE):
-
-  1. /admin/teams/{teamName} にアクセスするとそのチームの週次ヒートマップが表示される
-  2. adminロール以外のユーザーが /admin/teams/{teamName} にアクセスすると / にリダイレクトされる
-  3. hiddenチームのteamNameを指定するとそのhiddenチームメンバーのデータが表示される
-
-**Plans**: 2 plans
-
-Plans:
-**Wave 1**
-
-- [x] 24-01-PLAN.md — 動的ルート /admin/teams/[teamName] RSC 新設（teamName完全一致フィルタ→週次ヒートマップ / 空時メッセージ, VIEW-01）
-- [x] 24-02-PLAN.md — proxy.ts が /admin/teams/{teamName} を既存ゲートでカバーすることの確認テスト（VIEW-02, confirm-only）
-
-**UI hint**: yes
-
-### Phase 25: 複数publication_idスキーマ拡張
-
-**Goal**: member_publicationsテーブルを追加して1メンバーが複数のpublication_idを持てるDB構造を整える（アプリUIは1件前提のまま）
-**Depends on**: Phase 22
-**Requirements**: SCHEMA-01, SCHEMA-02
-**Success Criteria** (what must be TRUE):
-
-  1. member_publicationsテーブル（member_id FK, publication_id TEXT UNIQUE, is_primary BOOLEAN）が存在する
-  2. 既存のmembers.publication_idデータがmember_publicationsに移行済みのDDL/スクリプトが存在する
-  3. アプリのUIおよびデータ取得ロジックは変更なしでビルド・動作する
-
-**Plans**: 2 plans
-
-Plans:
-**Wave 1**
-
-- [x] 25-01-PLAN.md — member_publications マイグレーション作成（テーブル+部分ユニークIndex+RLS+バックフィル+同期トリガー）+ schema.sql へ恒久定義をミラー（SCHEMA-01, SCHEMA-02）
-
-**Wave 2** *(blocked on Wave 1 completion)*
-
-- [x] 25-02-PLAN.md — [BLOCKING] Supabase SQL Editor でマイグレーション適用 + 適用後SQL検証（テーブル/RLS/バックフィル整合/トリガー）+ src/無変更確認（SCHEMA-01, SCHEMA-02）
-
-### Phase 26: E2Eテスト（Playwright）
-
-**Goal**: Magic Linkログインフロー・/my操作・/admin保護をPlaywrightでE2Eテストできる環境が整う
-**Depends on**: Phase 23, Phase 24
-**Requirements**: E2E-01, E2E-02, E2E-03
-**Success Criteria** (what must be TRUE):
-
-  1. `npx playwright test` を実行してMagic Linkログインフローのテストが通る（モックまたはテスト用アカウント使用）
-  2. /myページのpublicチーム参加・退出操作のテストが通る
-  3. /adminへの未認証アクセスが / にリダイレクトされることのテストが通る
-
-**Plans**: 3 plans
-
-Plans:
-**Wave 1**
-
-- [x] 26-01-PLAN.md — Playwright導入 + config(playwright/vitest) + e2eハーネス(admin/session/fixtures/global-setup) + secret hardening
-
-**Wave 2** *(blocked on Wave 1; BLOCKING manual)*
-
-- [x] 26-02-PLAN.md — [BLOCKING] テスト用Supabaseプロジェクト作成 + .env.test + supabase db pushでmigration適用
-
-**Wave 3** *(blocked on Wave 2)*
-
-- [x] 26-03-PLAN.md — 3つのspec(login/my-teams/admin-guard)作成 + 全スイートgreen（E2E-01/02/03）
+Full phase details for shipped milestones live in their archives under `.planning/milestones/`.
 
 ## Progress
 
