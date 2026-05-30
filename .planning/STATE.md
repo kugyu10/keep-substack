@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Team Roles + Member Self-Service
-status: executing
-stopped_at: Phase 25 complete (25-02 live migration applied + verified)
-last_updated: "2026-05-30T06:35:00.000Z"
+status: ready_to_plan
+stopped_at: Phase 25 complete (2/2) — ready to discuss Phase 26
+last_updated: 2026-05-30T06:41:04.488Z
 last_activity: 2026-05-30
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 11
-  completed_plans: 11
-  percent: 67
+  completed_plans: 26
+  percent: 80
 ---
 
 # Project State
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-17 — v1.6 Team Roles + Member Self-Service started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 25 — publication-id
+**Current focus:** Phase 26 — e2eテスト（playwright）
 
 ## Current Position
 
-Phase: 25 (publication-id) — COMPLETE
-Plan: 2 of 2 (complete)
-Status: COMPLETE — migration applied live (project xolhjcngrwwwqtklmoyk) + A–H verification all PASS; app unchanged & green (SC#3)
+Phase: 26
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-05-30
 
 Progress: [██████████] 100% (Phase 25)
