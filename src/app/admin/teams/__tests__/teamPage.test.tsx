@@ -4,15 +4,24 @@ import type { Member, MemberFeedResult } from '@/lib/types'
 
 // --- Module mocks: stub the high-level @/lib helpers so no real RSS/DB runs ---
 
-const mockGetMembers = vi.fn<() => Promise<Member[]>>()
+const { mockGetMembers, mockFetchAllFeedsCached } = vi.hoisted(() => ({
+  mockGetMembers: vi.fn<() => Promise<Member[]>>(),
+  mockFetchAllFeedsCached:
+    vi.fn<(members: Member[]) => Promise<MemberFeedResult[]>>(),
+}))
 vi.mock('@/lib/members', () => ({
   getMembers: mockGetMembers,
 }))
-
-const mockFetchAllFeedsCached =
-  vi.fn<(members: Member[]) => Promise<MemberFeedResult[]>>()
 vi.mock('@/lib/fetchFeed', () => ({
   fetchAllFeedsCached: mockFetchAllFeedsCached,
+}))
+
+// WeeklyHeatmapGrid is a real 'use client' component. The @/ alias is only
+// resolved by the Next build, not by vitest's default resolver, so stub it.
+// The page's import resolves to this same stubbed module, so findByType still
+// matches the element type by reference.
+vi.mock('@/components/WeeklyHeatmapGrid', () => ({
+  default: () => null,
 }))
 
 import AdminTeamPage from '../[teamName]/page'
