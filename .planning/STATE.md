@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Team Roles + Member Self-Service
-status: ready_to_plan
-stopped_at: Phase 24 complete (2/2) — ready to discuss Phase 25
-last_updated: 2026-05-30T04:37:20.384Z
+status: planning
+stopped_at: Phase 25 context gathered
+last_updated: "2026-05-30T04:56:00.092Z"
 last_activity: 2026-05-30
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 9
-  completed_plans: 24
+  completed_plans: 9
   percent: 60
 ---
 
@@ -63,6 +63,6 @@ Progress: [██████████] 100%
 
 ## Session Continuity
 
-Last session: 2026-05-30T04:29:07.970Z
-Stopped at: Phase 24 context gathered
+Last session: 2026-05-30T04:56:00.087Z
+Stopped at: Phase 25 context gathered
 Next step: Phase 22 Plan 02 を実行（types.ts・members.ts 等のコード変更）
