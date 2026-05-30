@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Team Roles + Member Self-Service
 status: verifying
-stopped_at: Phase 23 UI-SPEC approved
-last_updated: "2026-05-29T23:53:11.139Z"
+stopped_at: Phase 24 context gathered
+last_updated: "2026-05-30T02:54:27.094Z"
 last_activity: 2026-05-29
 progress:
   total_phases: 5
@@ -61,6 +61,6 @@ Progress: [██████████] 100%
 
 ## Session Continuity
 
-Last session: 2026-05-29T23:53:11.135Z
-Stopped at: Phase 23 UI-SPEC approved
+Last session: 2026-05-30T02:54:27.086Z
+Stopped at: Phase 24 context gathered
 Next step: Phase 22 Plan 02 を実行（types.ts・members.ts 等のコード変更）
