@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Team Roles + Member Self-Service
-status: ready_to_plan
-stopped_at: Phase 25 complete (2/2) — ready to discuss Phase 26
-last_updated: 2026-05-30T06:41:04.488Z
+status: planning
+stopped_at: Phase 26 context gathered
+last_updated: "2026-05-30T07:50:01.735Z"
 last_activity: 2026-05-30
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 11
-  completed_plans: 26
+  completed_plans: 11
   percent: 80
 ---
 
@@ -66,6 +66,6 @@ Progress: [██████████] 100% (Phase 25)
 
 ## Session Continuity
 
-Last session: 2026-05-30T06:35:00.000Z
-Stopped at: 25-02-PLAN.md complete. Migration applied live to Supabase (project xolhjcngrwwwqtklmoyk) — "Success. No rows returned". Verification A–H all PASS (table/columns, partial unique index, RLS+single SELECT policy, backfill parity, INSERT/UPDATE sync, DELETE cascade, single-primary enforcement). Task 3 app-unchanged gate: build/test green, src/ diff empty, member_publications absent from src/ (lint failures all pre-existing/out-of-scope).
+Last session: 2026-05-30T07:50:01.727Z
+Stopped at: Phase 26 context gathered
 Next step: Phase 25 (publication-id) is complete. Proceed to the next phase of v1.6 (see ROADMAP.md).
