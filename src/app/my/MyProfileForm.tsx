@@ -61,13 +61,27 @@ export default function MyProfileForm({ member }: { member: Member }) {
                   key={t.name}
                   className="flex items-center gap-3 min-h-[44px] cursor-pointer"
                 >
-                  <input
-                    type="checkbox"
-                    name="teams"
-                    value={t.name}
-                    defaultChecked={joinedNames.has(t.name)}
-                    className="w-4 h-4 accent-orange-500"
-                  />
+                  <span className="relative inline-flex w-4 h-4 shrink-0">
+                    <input
+                      type="checkbox"
+                      name="teams"
+                      value={t.name}
+                      defaultChecked={joinedNames.has(t.name)}
+                      className="peer w-4 h-4 appearance-none rounded border border-gray-400 cursor-pointer checked:bg-orange-500 checked:border-orange-500"
+                    />
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="pointer-events-none absolute inset-0 hidden text-white peer-checked:block"
+                    >
+                      <path d="M3.5 8.5l3 3 6-6" />
+                    </svg>
+                  </span>
                   <span className="text-sm text-[#363737]">{t.name}</span>
                 </label>
               ))}
