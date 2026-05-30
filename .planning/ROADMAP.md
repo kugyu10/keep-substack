@@ -181,7 +181,16 @@ Plans:
   2. 既存のmembers.publication_idデータがmember_publicationsに移行済みのDDL/スクリプトが存在する
   3. アプリのUIおよびデータ取得ロジックは変更なしでビルド・動作する
 
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 25-01-PLAN.md — member_publications マイグレーション作成（テーブル+部分ユニークIndex+RLS+バックフィル+同期トリガー）+ schema.sql へ恒久定義をミラー（SCHEMA-01, SCHEMA-02）
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 25-02-PLAN.md — [BLOCKING] Supabase SQL Editor でマイグレーション適用 + 適用後SQL検証（テーブル/RLS/バックフィル整合/トリガー）+ src/無変更確認（SCHEMA-01, SCHEMA-02）
 
 ### Phase 26: E2Eテスト（Playwright）
 
@@ -225,5 +234,5 @@ Plans:
 | 22. チームステータス管理 | v1.6 | 4/4 | Complete   | 2026-05-26 |
 | 23. /myページ公開チーム参加・退出 | v1.6 | 3/3 | Complete   | 2026-05-29 |
 | 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 2/2 | Complete    | 2026-05-30 |
-| 25. 複数publication_idスキーマ拡張 | v1.6 | 0/? | Not started | - |
+| 25. 複数publication_idスキーマ拡張 | v1.6 | 0/2 | Planning | - |
 | 26. E2Eテスト（Playwright） | v1.6 | 0/? | Not started | - |
