@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Team Roles + Member Self-Service
-status: verifying
-stopped_at: Phase 24 context gathered
-last_updated: "2026-05-30T04:29:11.749Z"
+status: ready_to_plan
+stopped_at: Phase 24 complete (2/2) — ready to discuss Phase 25
+last_updated: 2026-05-30T04:37:20.384Z
 last_activity: 2026-05-30
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 9
-  completed_plans: 9
+  completed_plans: 24
   percent: 60
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-17 — v1.6 Team Roles + Member Self-Service started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 24 — admin-teams-teamname-hidden
+**Current focus:** Phase 25 — 複数publication_idスキーマ拡張
 
 ## Current Position
 
-Phase: 24 (admin-teams-teamname-hidden) — EXECUTING
-Plan: 2 of 2
-Status: Phase complete — ready for verification
+Phase: 25
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-05-30
 
 Progress: [██████████] 100%
