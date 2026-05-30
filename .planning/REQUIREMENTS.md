@@ -33,9 +33,9 @@
 
 ### E2E — テスト
 
-- [ ] **E2E-01**: Magic Linkログインフロー（メール送信→/auth/callback→/myリダイレクト）をPlaywrightでテストできる
-- [ ] **E2E-02**: /myページのメンバー操作（publicチーム参加・退出）をPlaywrightでテストできる
-- [ ] **E2E-03**: /adminが未認証ユーザーおよび非adminユーザーからブロックされることをPlaywrightでテストできる
+- [x] **E2E-01**: Magic Linkログインフロー（メール送信→/auth/callback→/myリダイレクト）をPlaywrightでテストできる
+- [x] **E2E-02**: /myページのメンバー操作（publicチーム参加・退出）をPlaywrightでテストできる
+- [x] **E2E-03**: /adminが未認証ユーザーおよび非adminユーザーからブロックされることをPlaywrightでテストできる
 
 ---
 
@@ -73,9 +73,9 @@
 | VIEW-02 | Phase 24 | Complete |
 | SCHEMA-01 | Phase 25 | Complete |
 | SCHEMA-02 | Phase 25 | Complete |
-| E2E-01 | Phase 26 | Pending |
-| E2E-02 | Phase 26 | Pending |
-| E2E-03 | Phase 26 | Pending |
+| E2E-01 | Phase 26 | Complete |
+| E2E-02 | Phase 26 | Complete |
+| E2E-03 | Phase 26 | Complete |
 
 ---
 

@@ -208,7 +208,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 26-01-PLAN.md — Playwright導入 + config(playwright/vitest) + e2eハーネス(admin/session/fixtures/global-setup) + secret hardening
+- [x] 26-01-PLAN.md — Playwright導入 + config(playwright/vitest) + e2eハーネス(admin/session/fixtures/global-setup) + secret hardening
 
 **Wave 2** *(blocked on Wave 1; BLOCKING manual)*
 
@@ -248,4 +248,4 @@ Plans:
 | 23. /myページ公開チーム参加・退出 | v1.6 | 3/3 | Complete   | 2026-05-29 |
 | 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 2/2 | Complete    | 2026-05-30 |
 | 25. 複数publication_idスキーマ拡張 | v1.6 | 2/2 | Complete    | 2026-05-30 |
-| 26. E2Eテスト（Playwright） | v1.6 | 0/? | Not started | - |
+| 26. E2Eテスト（Playwright） | v1.6 | 1/3 | In Progress|  |
