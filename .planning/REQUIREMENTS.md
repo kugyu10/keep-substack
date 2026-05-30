@@ -28,8 +28,8 @@
 
 ### SCHEMA — スキーマ拡張
 
-- [ ] **SCHEMA-01**: member_publicationsテーブルを追加し、1メンバーが複数publication_idを持てる構造にできる
-- [ ] **SCHEMA-02**: 既存のmembers.publication_idをmember_publicationsに移行するスクリプトまたはDDLを用意できる（アプリUIは1件前提のまま）
+- [x] **SCHEMA-01**: member_publicationsテーブルを追加し、1メンバーが複数publication_idを持てる構造にできる
+- [x] **SCHEMA-02**: 既存のmembers.publication_idをmember_publicationsに移行するスクリプトまたはDDLを用意できる（アプリUIは1件前提のまま）
 
 ### E2E — テスト
 
@@ -71,8 +71,8 @@
 | SELF-03 | Phase 23 | Complete |
 | VIEW-01 | Phase 24 | Complete |
 | VIEW-02 | Phase 24 | Complete |
-| SCHEMA-01 | Phase 25 | Pending |
-| SCHEMA-02 | Phase 25 | Pending |
+| SCHEMA-01 | Phase 25 | Complete |
+| SCHEMA-02 | Phase 25 | Complete |
 | E2E-01 | Phase 26 | Pending |
 | E2E-02 | Phase 26 | Pending |
 | E2E-03 | Phase 26 | Pending |

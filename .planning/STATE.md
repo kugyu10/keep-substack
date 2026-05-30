@@ -4,13 +4,13 @@ milestone: v1.6
 milestone_name: Team Roles + Member Self-Service
 status: executing
 stopped_at: Phase 25 context gathered
-last_updated: "2026-05-30T05:15:10.390Z"
-last_activity: 2026-05-30 -- Phase 25 planning complete
+last_updated: "2026-05-30T05:20:48.084Z"
+last_activity: 2026-05-30
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 11
-  completed_plans: 9
+  completed_plans: 10
   percent: 60
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-17 — v1.6 Team Roles + Member Self-Service started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 25 — 複数publication_idスキーマ拡張
+**Current focus:** Phase 25 — publication-id
 
 ## Current Position
 
-Phase: 25
-Plan: Not started
+Phase: 25 (publication-id) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-05-30 -- Phase 25 planning complete
+Last activity: 2026-05-30
 
-Progress: [██████████] 100%
+Progress: [█████████░] 91%
 
 ## Performance Metrics
 
@@ -50,6 +50,7 @@ Progress: [██████████] 100%
 | Phase 23 P03 | ~3min | 2 tasks | 1 files |
 | Phase 24 P01 | 8min | 2 tasks | 2 files |
 | Phase 24 P02 | 4min | 1 tasks | 1 files |
+| Phase 25 P01 | 12min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -60,9 +61,10 @@ Progress: [██████████] 100%
 - member_publications テーブル追加（member_id FK, publication_id TEXT, is_primary BOOLEAN）
 - /admin/teams/{teamName} は proxy.ts の matcher に追加
 - E2EはPlaywright + Supabaseテスト用アカウントまたはモック
+- Phase 25 P01: member_publications を additive テーブル（surrogate PK）として追加。single-primary は partial unique index で保証、sync trigger は ON CONFLICT DO NOTHING・DELETE ブランチ無し（CASCADE）、backfill は migration のみ・schema.sql は durable 定義をミラー（D-01..D-09）。app code は無変更（SC#3）。
 
 ## Session Continuity
 
-Last session: 2026-05-30T04:56:00.087Z
-Stopped at: Phase 25 context gathered
-Next step: Phase 22 Plan 02 を実行（types.ts・members.ts 等のコード変更）
+Last session: 2026-05-30T05:20:34.579Z
+Stopped at: Completed 25-01-PLAN.md（member_publications schema + migration）
+Next step: Phase 25 Plan 02 を実行（[BLOCKING] Supabase SQL Editor でマイグレーション適用 + post-migration SQL 検証）
