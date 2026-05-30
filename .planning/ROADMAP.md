@@ -90,7 +90,7 @@ Full archive: `.planning/milestones/v1.5-ROADMAP.md`
 
 - [x] **Phase 22: チームステータス管理** - teamsテーブルにstatus（public/private/hidden）を追加し、HIDDEN_TEAM定数を廃止、管理画面で設定できるようにする (completed 2026-05-26)
 - [x] **Phase 23: /myページ公開チーム参加・退出** - publicチームをチェックボックスで自由参加・退出できる自律参加フローを実装する (completed 2026-05-29)
-- [ ] **Phase 24: /admin/teams/{teamName} hiddenチームビュー** - 管理者がhiddenチームの週次ヒートマップをURL直接アクセスで確認できるページを追加する
+- [x] **Phase 24: /admin/teams/{teamName} hiddenチームビュー** - 管理者がhiddenチームの週次ヒートマップをURL直接アクセスで確認できるページを追加する (completed 2026-05-30)
 - [ ] **Phase 25: 複数publication_idスキーマ拡張** - member_publicationsテーブルを追加し将来の複数Substack対応の基盤を整える（UI変更なし）
 - [ ] **Phase 26: E2Eテスト（Playwright）** - Magic Linkログイン・/my操作・/admin保護をPlaywrightでE2Eテストできる環境を構築する
 
@@ -166,7 +166,7 @@ Plans:
 **Wave 1**
 
 - [x] 24-01-PLAN.md — 動的ルート /admin/teams/[teamName] RSC 新設（teamName完全一致フィルタ→週次ヒートマップ / 空時メッセージ, VIEW-01）
-- [ ] 24-02-PLAN.md — proxy.ts が /admin/teams/{teamName} を既存ゲートでカバーすることの確認テスト（VIEW-02, confirm-only）
+- [x] 24-02-PLAN.md — proxy.ts が /admin/teams/{teamName} を既存ゲートでカバーすることの確認テスト（VIEW-02, confirm-only）
 
 **UI hint**: yes
 
@@ -224,6 +224,6 @@ Plans:
 | 21. Redisクリーンアップ | v1.5 | 1/1 | Complete | 2026-05-16 |
 | 22. チームステータス管理 | v1.6 | 4/4 | Complete   | 2026-05-26 |
 | 23. /myページ公開チーム参加・退出 | v1.6 | 3/3 | Complete   | 2026-05-29 |
-| 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 1/2 | In Progress|  |
+| 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 2/2 | Complete   | 2026-05-30 |
 | 25. 複数publication_idスキーマ拡張 | v1.6 | 0/? | Not started | - |
 | 26. E2Eテスト（Playwright） | v1.6 | 0/? | Not started | - |
