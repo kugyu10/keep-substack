@@ -23,7 +23,7 @@
 
 ### VIEW — 管理者hiddenチームビュー
 
-- [ ] **VIEW-01**: /admin/teams/{teamName} でhiddenチームの週次ヒートマップビューが表示される
+- [x] **VIEW-01**: /admin/teams/{teamName} でhiddenチームの週次ヒートマップビューが表示される
 - [ ] **VIEW-02**: /admin/teams/{teamName} はadminロールのユーザーのみアクセスできる（proxy.tsで制御）
 
 ### SCHEMA — スキーマ拡張
@@ -69,7 +69,7 @@
 | SELF-01 | Phase 23 | Complete |
 | SELF-02 | Phase 23 | Complete |
 | SELF-03 | Phase 23 | Complete |
-| VIEW-01 | Phase 24 | Pending |
+| VIEW-01 | Phase 24 | Complete |
 | VIEW-02 | Phase 24 | Pending |
 | SCHEMA-01 | Phase 25 | Pending |
 | SCHEMA-02 | Phase 25 | Pending |

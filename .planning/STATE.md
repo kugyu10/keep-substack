@@ -4,13 +4,13 @@ milestone: v1.6
 milestone_name: Team Roles + Member Self-Service
 status: executing
 stopped_at: Phase 24 context gathered
-last_updated: "2026-05-30T03:12:50.645Z"
-last_activity: 2026-05-30 -- Phase 24 planning complete
+last_updated: "2026-05-30T04:26:58.299Z"
+last_activity: 2026-05-30
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
   percent: 40
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-17 — v1.6 Team Roles + Member Self-Service started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 23 — my-team-join
+**Current focus:** Phase 24 — admin-teams-teamname-hidden
 
 ## Current Position
 
-Phase: 23 (my-team-join) — EXECUTING
-Plan: 3 of 3
+Phase: 24 (admin-teams-teamname-hidden) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-05-30 -- Phase 24 planning complete
+Last activity: 2026-05-30
 
-Progress: [██████████] 100%
+Progress: [█████████░] 89%
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Progress: [██████████] 100%
 | Phase 23 P01 | 15min | 2 tasks | 2 files |
 | Phase 23 P02 | ~5min | 2 tasks | 1 files |
 | Phase 23 P03 | ~3min | 2 tasks | 1 files |
+| Phase 24 P01 | 8min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -61,6 +62,6 @@ Progress: [██████████] 100%
 
 ## Session Continuity
 
-Last session: 2026-05-30T02:54:27.086Z
+Last session: 2026-05-30T04:26:43.330Z
 Stopped at: Phase 24 context gathered
 Next step: Phase 22 Plan 02 を実行（types.ts・members.ts 等のコード変更）

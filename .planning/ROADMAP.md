@@ -165,7 +165,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 24-01-PLAN.md — 動的ルート /admin/teams/[teamName] RSC 新設（teamName完全一致フィルタ→週次ヒートマップ / 空時メッセージ, VIEW-01）
+- [x] 24-01-PLAN.md — 動的ルート /admin/teams/[teamName] RSC 新設（teamName完全一致フィルタ→週次ヒートマップ / 空時メッセージ, VIEW-01）
 - [ ] 24-02-PLAN.md — proxy.ts が /admin/teams/{teamName} を既存ゲートでカバーすることの確認テスト（VIEW-02, confirm-only）
 
 **UI hint**: yes
@@ -224,6 +224,6 @@ Plans:
 | 21. Redisクリーンアップ | v1.5 | 1/1 | Complete | 2026-05-16 |
 | 22. チームステータス管理 | v1.6 | 4/4 | Complete   | 2026-05-26 |
 | 23. /myページ公開チーム参加・退出 | v1.6 | 3/3 | Complete   | 2026-05-29 |
-| 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 0/2 | Planned | - |
+| 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 1/2 | In Progress|  |
 | 25. 複数publication_idスキーマ拡張 | v1.6 | 0/? | Not started | - |
 | 26. E2Eテスト（Playwright） | v1.6 | 0/? | Not started | - |
