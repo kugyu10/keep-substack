@@ -91,7 +91,7 @@ Full archive: `.planning/milestones/v1.5-ROADMAP.md`
 - [x] **Phase 22: チームステータス管理** - teamsテーブルにstatus（public/private/hidden）を追加し、HIDDEN_TEAM定数を廃止、管理画面で設定できるようにする (completed 2026-05-26)
 - [x] **Phase 23: /myページ公開チーム参加・退出** - publicチームをチェックボックスで自由参加・退出できる自律参加フローを実装する (completed 2026-05-29)
 - [x] **Phase 24: /admin/teams/{teamName} hiddenチームビュー** - 管理者がhiddenチームの週次ヒートマップをURL直接アクセスで確認できるページを追加する (completed 2026-05-30)
-- [ ] **Phase 25: 複数publication_idスキーマ拡張** - member_publicationsテーブルを追加し将来の複数Substack対応の基盤を整える（UI変更なし）
+- [x] **Phase 25: 複数publication_idスキーマ拡張** - member_publicationsテーブルを追加し将来の複数Substack対応の基盤を整える（UI変更なし） (completed 2026-05-30)
 - [ ] **Phase 26: E2Eテスト（Playwright）** - Magic Linkログイン・/my操作・/admin保護をPlaywrightでE2Eテストできる環境を構築する
 
 ## Phase Details
@@ -190,7 +190,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 25-02-PLAN.md — [BLOCKING] Supabase SQL Editor でマイグレーション適用 + 適用後SQL検証（テーブル/RLS/バックフィル整合/トリガー）+ src/無変更確認（SCHEMA-01, SCHEMA-02）
+- [x] 25-02-PLAN.md — [BLOCKING] Supabase SQL Editor でマイグレーション適用 + 適用後SQL検証（テーブル/RLS/バックフィル整合/トリガー）+ src/無変更確認（SCHEMA-01, SCHEMA-02）
 
 ### Phase 26: E2Eテスト（Playwright）
 
@@ -234,5 +234,5 @@ Plans:
 | 22. チームステータス管理 | v1.6 | 4/4 | Complete   | 2026-05-26 |
 | 23. /myページ公開チーム参加・退出 | v1.6 | 3/3 | Complete   | 2026-05-29 |
 | 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 2/2 | Complete    | 2026-05-30 |
-| 25. 複数publication_idスキーマ拡張 | v1.6 | 1/2 | In Progress|  |
+| 25. 複数publication_idスキーマ拡張 | v1.6 | 2/2 | Complete   | 2026-05-30 |
 | 26. E2Eテスト（Playwright） | v1.6 | 0/? | Not started | - |

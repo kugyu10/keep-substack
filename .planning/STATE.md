@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Team Roles + Member Self-Service
 status: executing
-stopped_at: Phase 25 context gathered
-last_updated: "2026-05-30T05:20:48.084Z"
+stopped_at: Phase 25 complete (25-02 live migration applied + verified)
+last_updated: "2026-05-30T06:35:00.000Z"
 last_activity: 2026-05-30
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 11
-  completed_plans: 10
-  percent: 60
+  completed_plans: 11
+  percent: 67
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-05-17 — v1.6 Team Roles + Member Self-
 
 ## Current Position
 
-Phase: 25 (publication-id) — EXECUTING
-Plan: 2 of 2
-Status: Ready to execute
+Phase: 25 (publication-id) — COMPLETE
+Plan: 2 of 2 (complete)
+Status: COMPLETE — migration applied live (project xolhjcngrwwwqtklmoyk) + A–H verification all PASS; app unchanged & green (SC#3)
 Last activity: 2026-05-30
 
-Progress: [█████████░] 91%
+Progress: [██████████] 100% (Phase 25)
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Progress: [█████████░] 91%
 | Phase 24 P01 | 8min | 2 tasks | 2 files |
 | Phase 24 P02 | 4min | 1 tasks | 1 files |
 | Phase 25 P01 | 12min | 2 tasks | 2 files |
+| Phase 25 P02 | ~6min | 3 tasks | 0 src files (live DB apply + verify) |
 
 ## Accumulated Context
 
@@ -65,6 +66,6 @@ Progress: [█████████░] 91%
 
 ## Session Continuity
 
-Last session: 2026-05-30T05:20:34.579Z
-Stopped at: Completed 25-01-PLAN.md（member_publications schema + migration）
-Next step: Phase 25 Plan 02 を実行（[BLOCKING] Supabase SQL Editor でマイグレーション適用 + post-migration SQL 検証）
+Last session: 2026-05-30T06:35:00.000Z
+Stopped at: 25-02-PLAN.md complete. Migration applied live to Supabase (project xolhjcngrwwwqtklmoyk) — "Success. No rows returned". Verification A–H all PASS (table/columns, partial unique index, RLS+single SELECT policy, backfill parity, INSERT/UPDATE sync, DELETE cascade, single-primary enforcement). Task 3 app-unchanged gate: build/test green, src/ diff empty, member_publications absent from src/ (lint failures all pre-existing/out-of-scope).
+Next step: Phase 25 (publication-id) is complete. Proceed to the next phase of v1.6 (see ROADMAP.md).
