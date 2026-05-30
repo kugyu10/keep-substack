@@ -21,7 +21,9 @@ export default async function Home({ searchParams }: Props) {
     ),
   ]
   const filteredMembers = team
-    ? allMembers.filter((m) => m.teams.some((t) => t.name === team))
+    ? allMembers.filter((m) =>
+        m.teams.some((t) => t.name === team && t.status !== 'hidden')
+      )
     : allMembers.filter((m) => m.teams.every((t) => t.status !== 'hidden'))
 
   const results = await fetchAllFeedsCached(filteredMembers)
