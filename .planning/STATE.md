@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Team Roles + Member Self-Service
-status: executing
-stopped_at: Completed 26-02-PLAN.md
-last_updated: "2026-05-30T12:59:49.735Z"
+status: milestone_complete
+stopped_at: Milestone complete (Phase 26 was final phase)
+last_updated: 2026-05-30T13:09:04.732Z
 last_activity: 2026-05-30
 progress:
   total_phases: 5
   completed_phases: 5
   total_plans: 14
-  completed_plans: 14
+  completed_plans: 29
   percent: 100
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-17 — v1.6 Team Roles + Member Self-Service started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 26 — e2e-playwright
+**Current focus:** Milestone complete
 
 ## Current Position
 
-Phase: 26 (e2e-playwright) — EXECUTING
-Plan: 3 of 3 complete (next: Plan 3 — specs)
-Status: Ready to execute
+Phase: 26
+Plan: Not started
+Status: Milestone complete
 Last activity: 2026-05-30
 
 Progress: [██████████] 100%
