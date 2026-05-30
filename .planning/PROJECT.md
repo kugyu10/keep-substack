@@ -73,12 +73,12 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - ✓ Substackオレンジ（#FF6719）濃淡ヒートマップ + 点線丸 + 件数バッジ — v1.4
 - ✓ HeatmapTooltip 横並びリスト・Click Outside・×ボタン・touchstart対応 — v1.4
 - ✓ /admin/teams/{teamName} でhiddenチームの週次ビューを表示する — v1.6 (Validated in Phase 24)
+- ✓ メンバーが複数のpublication_idを持てるスキーマにする（member_publicationsテーブル、UIは1件前提のまま）— v1.6 (Validated in Phase 25)
 
 ### Active
 
 - [ ] チームステータス（public/private/hidden）をDBで管理する — v1.6
 - [ ] /myページからpublicチームを自由参加・退出できる — v1.6
-- [ ] メンバーが複数のpublication_idを持てるスキーマにする — v1.6
 - [ ] Magic Linkログインフローと/admin保護をPlaywrightでE2Eテストできる — v1.6
 
 ### Active (Future)
@@ -163,4 +163,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-30 — Phase 24 complete (/admin/teams/{teamName} hidden team view)*
+*Last updated: 2026-05-30 — Phase 25 complete (member_publications schema — multi-publication DB foundation, UI unchanged)*
