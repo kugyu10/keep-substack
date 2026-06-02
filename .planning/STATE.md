@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.6
-milestone_name: Team Roles + Member Self-Service
-status: Awaiting next milestone
-stopped_at: Completed 26-03-PLAN.md — Phase 26 e2e-playwright complete (3/3 plans)
-last_updated: "2026-05-30T14:41:52.528Z"
-last_activity: 2026-05-30 — Milestone v1.6 completed and archived
+milestone: v1.7
+milestone_name: Commit & Goal View + Substack Profile Link
+status: planning
+last_updated: "2026-06-02T12:27:48.525Z"
+last_activity: 2026-06-02
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 14
-  completed_plans: 14
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -25,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-30 — v1.6 Team Roles + Member Self-
 
 ## Current Position
 
-Phase: Milestone v1.6 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-05-30 — Milestone v1.6 completed and archived
+Status: Defining requirements
+Last activity: 2026-06-02 — Milestone v1.7 started
 
 ## Performance Metrics
 
