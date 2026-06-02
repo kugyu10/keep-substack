@@ -6,9 +6,9 @@ status: planning
 last_updated: "2026-06-02T12:27:48.525Z"
 last_activity: 2026-06-02
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
-  total_plans: 0
+  total_plans: 7
   completed_plans: 0
   percent: 0
 ---
@@ -17,17 +17,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-30 — v1.6 Team Roles + Member Self-Service shipped)
+See: .planning/PROJECT.md (updated 2026-06-02 — v1.7 Commit & Goal View + Substack Profile Link started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Planning next milestone (/gsd:new-milestone)
+**Current focus:** Phase 27 — Substack Handle DB + プロフィールリンク
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 27 — Substack Handle — DB + プロフィールリンク (0/4 phases)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-02 — Milestone v1.7 started
+Status: Ready to plan
+Last activity: 2026-06-02 — Milestone v1.7 roadmap created (4 phases, 7 plans)
 
 ## Performance Metrics
 
@@ -96,4 +96,4 @@ long-standing backlog ideas, not functional gaps.
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Plan Phase 27: `/gsd:discuss-phase 27` or `/gsd:plan-phase 27`

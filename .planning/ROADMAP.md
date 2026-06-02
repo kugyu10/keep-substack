@@ -9,6 +9,7 @@
 - ✅ **v1.4 UI/UX Refresh** — Phases 13-16 (shipped 2026-05-15)
 - ✅ **v1.5 Member Auth + Supabase Migration** — Phases 17-21 (shipped 2026-05-17)
 - ✅ **v1.6 Team Roles + Member Self-Service** — Phases 22-26 (shipped 2026-05-30)
+- 🚧 **v1.7 Commit & Goal View + Substack Profile Link** — Phases 27-30 (in progress)
 
 ## Phases
 
@@ -99,6 +100,89 @@ Full archive: `.planning/milestones/v1.6-ROADMAP.md`
 
 </details>
 
+## v1.7 Commit & Goal View + Substack Profile Link (Phases 27-30)
+
+**Milestone Goal:** コミットスケジュールの宣言と3週間の達成グリッドで「継続の意志と実績」を仲間に見せるトップビューを新設し、Substackプロフィールへの直リンクも追加する
+
+### Phase 27: Substack Handle — DB + プロフィールリンク
+
+**Goal:** `members` テーブルに `substack_handle` カラムを追加し、/my ページから登録・個人マンスリービューからプロフィールリンクを実装する
+
+**Requirements:** PROF-01, PROF-02, PROF-03
+
+**Plans:** 2
+1. DB migration (`ALTER TABLE members ADD COLUMN substack_handle TEXT`)
+2. /my ページ（@handle 入力・保存・?handle= クエリ pre-fill）+ 個人マンスリービューリンク変更
+
+**Success Criteria:**
+1. `members.substack_handle` が DB に存在し null 許容
+2. /my ページで @handle を入力・保存・再ロード後に反映される
+3. 個人マンスリービューの名前/アイコンが `substack.com/@handle` を新タブで開く
+4. `/login-…/?handle=hoge` アクセス後のログインで /my の @handle 欄が `hoge` で初期表示される
+
+**UI hint:** yes
+
+---
+
+### Phase 28: コミットスケジュール — DB + /my ページ
+
+**Goal:** `member_commit_slots` テーブルを作成し、/my ページでコミット頻度・曜日・時刻を設定できるようにする
+
+**Requirements:** SCHED-01, SCHED-02, SCHED-03
+
+**Plans:** 2
+1. DB migration (`CREATE TABLE member_commit_slots` + RLS)
+2. /my ページ（頻度セレクター + 曜日/時刻入力 + サーバーアクション）
+
+**Success Criteria:**
+1. `member_commit_slots` テーブルが存在し、RLS で本人のみ書き込み可
+2. /my ページで週1〜4の頻度を選択できる
+3. 頻度に合わせた数の曜日+時刻入力欄が動的に表示される
+4. 保存後に /my を再ロードしても設定が正しく反映される
+
+**UI hint:** yes
+
+---
+
+### Phase 29: Commit & Goal View — 新トップページ
+
+**Goal:** 現トップ（週次ヒートマップ）を `/weekly-stamp` に移動し、新トップにコミット＆ゴールビューを実装する
+
+**Requirements:** VIEW-01, VIEW-02, VIEW-03, VIEW-04, VIEW-05, VIEW-06, VIEW-07
+
+**Plans:** 2
+1. ルート移行（`/` → `/weekly-stamp`）+ データ層（メンバーごとに過去3週のコミットスロット + 記事データ取得）
+2. `CommitGoalView` + `CommitGrid` コンポーネント（3週横並び・週1〜4同幅・スマホ1週縮退・未設定グレー）
+
+**Success Criteria:**
+1. `/weekly-stamp` で旧ヒートマップが引き続き表示される
+2. `/` に Commit & Goal View が表示される
+3. Grid が3週分横並びで表示される（左古→右新）
+4. 週1〜4のメンバーの Grid 総横幅が同じになる
+5. 投稿済みスロットにサムネイルが、未投稿スロットに曜日名が表示される
+6. スマホ幅では Grid が1週表示に縮退する
+7. コミット未設定メンバーはグレーの「未コミット」セルで表示される
+
+**UI hint:** yes
+
+---
+
+### Phase 30: アチーブメント（👑 / 🔥）
+
+**Goal:** 今週全コミット達成（👑）と2週以上連続達成（🔥）のアイコンを計算して CommitGoalView に表示する
+
+**Requirements:** ACHIEV-01, ACHIEV-02
+
+**Plans:** 1
+1. アチーブメント計算ロジック（`isCurrentWeekComplete`・`consecutiveWeekStreak`）+ CommitGoalView への表示
+
+**Success Criteria:**
+1. 今週の全コミットスロットに投稿があるメンバーに 👑 が表示される
+2. 直近2週以上連続で全スロット達成しているメンバーに 🔥 が表示される
+3. 達成していないメンバーにはアイコンが表示されない
+
+---
+
 ## Phase Details (archived)
 
 Full phase details for shipped milestones live in their archives under `.planning/milestones/`.
@@ -134,3 +218,7 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 2/2 | Complete    | 2026-05-30 |
 | 25. 複数publication_idスキーマ拡張 | v1.6 | 2/2 | Complete    | 2026-05-30 |
 | 26. E2Eテスト（Playwright） | v1.6 | 3/3 | Complete    | 2026-05-30 |
+| 27. Substack Handle — DB + プロフィールリンク | v1.7 | 0/2 | Pending | — |
+| 28. コミットスケジュール — DB + /my ページ | v1.7 | 0/2 | Pending | — |
+| 29. Commit & Goal View — 新トップページ | v1.7 | 0/2 | Pending | — |
+| 30. アチーブメント（👑 / 🔥） | v1.7 | 0/1 | Pending | — |
