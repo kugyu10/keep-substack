@@ -47,6 +47,8 @@ export async function updateMyProfileAction(
   const name = (formData.get('name') as string)?.trim()
   // Field contract for Plan 02's form: checkbox inputs use name="teams".
   const checkedTeamNames = formData.getAll('teams').map(String)
+  const rawHandle = (formData.get('substack_handle') as string | null)?.trim() ?? ''
+  const substack_handle: string | null = rawHandle === '' ? null : rawHandle.startsWith('@') ? rawHandle : '@' + rawHandle
 
   if (!name) return '名前を入力してください'
 
@@ -59,7 +61,7 @@ export async function updateMyProfileAction(
   // Update the authenticated member's name, scoped to their own user_id (no member_id from client).
   const { data: member, error: updateError } = await admin
     .from('members')
-    .update({ name })
+    .update({ name, substack_handle })
     .eq('user_id', user.id)
     .select('id')
     .single()

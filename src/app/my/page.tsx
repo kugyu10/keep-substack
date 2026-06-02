@@ -5,10 +5,12 @@ import LinkMemberForm from './LinkMemberForm'
 import MyProfileForm from './MyProfileForm'
 import LogoutButton from '@/components/LogoutButton'
 
-export default async function MyPage() {
+export default async function MyPage({ searchParams }: { searchParams: Promise<{ handle?: string }> } = { searchParams: Promise.resolve({}) }) {
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/')
+
+  const { handle } = await searchParams
 
   const admin = createSupabaseAdminClient()
   const { data: member } = await admin
@@ -16,6 +18,7 @@ export default async function MyPage() {
     .select(`
       name,
       publication_id,
+      substack_handle,
       member_teams (
         teams (name, status)
       )
@@ -42,6 +45,8 @@ export default async function MyPage() {
     (t: any) => ({ name: t.name })
   )
 
+  const substackHandleDefault = (member as any)?.substack_handle ?? handle ?? undefined
+
   return (
     <main className="max-w-sm mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
@@ -58,6 +63,7 @@ export default async function MyPage() {
             currentTeams,
             publicTeams,
           }}
+          substackHandleDefault={substackHandleDefault}
         />
       )}
     </main>

@@ -78,6 +78,7 @@ function setupAdminMock(opts: {
   member?: {
     name: string
     publication_id: string
+    substack_handle?: string | null
     member_teams: MemberTeamsJoin
   } | null
   publicTeams?: { id: string; name: string }[]
@@ -206,5 +207,76 @@ describe('MyPage RSC — read path (SELF-01 / SELF-03 / T-23-05 / T-23-06)', () 
 
     expect(findByType(el, LinkMemberForm)).not.toBeNull()
     expect(findByType(el, MyProfileForm)).toBeNull()
+  })
+})
+
+describe('MyPage RSC — substackHandleDefault pre-fill (Phase 27 D-05, D-06)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockGetUser.mockResolvedValue({ data: { user: { id: USER_ID } } })
+  })
+
+  it('DB value wins: member has substack_handle, searchParams has different handle → MyProfileForm receives DB value', async () => {
+    setupAdminMock({
+      member: {
+        name: 'Tester',
+        publication_id: 'pub-1',
+        substack_handle: '@hoge',
+        member_teams: [],
+      },
+      publicTeams: [],
+    })
+
+    // Call MyPage with searchParams containing a different handle
+    const el = await (MyPage as (props: { searchParams: Promise<{ handle?: string }> }) => Promise<unknown>)({
+      searchParams: Promise.resolve({ handle: 'other' }),
+    })
+    const form = findByType(el, MyProfileForm)
+    expect(form).not.toBeNull()
+
+    const props = form!.props as { substackHandleDefault?: string }
+    expect(props.substackHandleDefault).toBe('@hoge')
+  })
+
+  it('searchParams fallback: member has substack_handle=null, searchParams has handle → MyProfileForm receives searchParams value', async () => {
+    setupAdminMock({
+      member: {
+        name: 'Tester',
+        publication_id: 'pub-1',
+        substack_handle: null,
+        member_teams: [],
+      },
+      publicTeams: [],
+    })
+
+    const el = await (MyPage as (props: { searchParams: Promise<{ handle?: string }> }) => Promise<unknown>)({
+      searchParams: Promise.resolve({ handle: 'hoge' }),
+    })
+    const form = findByType(el, MyProfileForm)
+    expect(form).not.toBeNull()
+
+    const props = form!.props as { substackHandleDefault?: string }
+    expect(props.substackHandleDefault).toBe('hoge')
+  })
+
+  it('both absent: member has substack_handle=null, no searchParams handle → MyProfileForm receives undefined', async () => {
+    setupAdminMock({
+      member: {
+        name: 'Tester',
+        publication_id: 'pub-1',
+        substack_handle: null,
+        member_teams: [],
+      },
+      publicTeams: [],
+    })
+
+    const el = await (MyPage as (props: { searchParams: Promise<{ handle?: string }> }) => Promise<unknown>)({
+      searchParams: Promise.resolve({}),
+    })
+    const form = findByType(el, MyProfileForm)
+    expect(form).not.toBeNull()
+
+    const props = form!.props as { substackHandleDefault?: string }
+    expect(props.substackHandleDefault).toBeUndefined()
   })
 })

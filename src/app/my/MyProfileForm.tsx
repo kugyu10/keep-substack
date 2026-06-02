@@ -10,7 +10,7 @@ type Member = {
   publicTeams: { name: string }[]
 }
 
-export default function MyProfileForm({ member }: { member: Member }) {
+export default function MyProfileForm({ member, substackHandleDefault }: { member: Member; substackHandleDefault?: string }) {
   const [state, action, isPending] = useActionState(updateMyProfileAction, null)
 
   const joinedNames = new Set(member.currentTeams.map((t) => t.name))
@@ -47,6 +47,19 @@ export default function MyProfileForm({ member }: { member: Member }) {
           defaultValue={member.name}
           className="w-full border rounded px-3 py-2 text-sm"
         />
+      </div>
+
+      <div>
+        <label htmlFor="substack_handle" className="block text-sm font-semibold mb-1">Substack ハンドル</label>
+        <input
+          id="substack_handle"
+          name="substack_handle"
+          type="text"
+          placeholder="@yourhandle"
+          defaultValue={substackHandleDefault}
+          className="w-full border rounded px-3 py-2 text-sm"
+        />
+        <p className="text-xs text-gray-500 mt-1">例: @yourname — 入力すると個人ページからプロフィールへのリンクが作成されます</p>
       </div>
 
       <div>
