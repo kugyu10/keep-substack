@@ -138,10 +138,16 @@ Plans:
 
 **Requirements:** SCHED-01, SCHED-02, SCHED-03
 
-**Plans:** 2
+**Plans:** 2 plans
 
-1. DB migration (`CREATE TABLE member_commit_slots` + RLS)
-2. /my ページ（頻度セレクター + 曜日/時刻入力 + サーバーアクション）
+Plans:
+**Wave 1**
+
+- [ ] 28-01-PLAN.md — DB migration: member_commit_slots テーブル作成 + RLS + schema.sql 同期 + Wave 0 テスト
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 28-02-PLAN.md — /my ページ: CommitScheduleModal + updateCommitSlotsAction + page.tsx 統合
 
 **Success Criteria:**
 
