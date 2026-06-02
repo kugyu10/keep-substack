@@ -21,7 +21,7 @@
 
 ### コミットスケジュールUI — モーダル
 - **D-03:** コミットスケジュール設定は `/my` ページにモーダルUIとして実装する。新規コンポーネント `src/app/my/CommitScheduleModal.tsx`（Client Component）として作成
-- **D-04:** スケジュール未設定時: `「コミットスケジュールを宣言する」` ボタンを表示 → クリックでモーダルを開く
+- **D-04:** スケジュール未設定時: `「投稿スケジュールを宣言する」` ボタンを表示 → クリックでモーダルを開く
 - **D-05:** スケジュール設定済み時: 「週N回 — 月曜 8:00、水曜 20:00…」のサマリーテキストをクリックして編集モーダルを開く
 - **D-06:** モーダルの開閉状態 (`isOpen`) は `CommitScheduleModal` 自身の `useState` で管理する。`/my/page.tsx` は開閉を管理しない
 - **D-07:** `/my/page.tsx` はサーバーサイドで `member_commit_slots` を SELECT し、スロット配列 + メンバー ID を props として `CommitScheduleModal` に渡す
@@ -36,7 +36,7 @@
 ### DB設計
 - **D-13:** テーブル名: `member_commit_slots`
 - **D-14:** カラム: `id` (BIGINT GENERATED ALWAYS AS IDENTITY PK), `member_id` (BIGINT, FK → members.id), `day_of_week` (INT), `hour` (INT)
-- **D-15:** `day_of_week` マッピング: 0=月, 1=火, 2=水, 3=木, 4=金, 5=土, 6=日（月スタート・日終わり）
+- **D-15:** `day_of_week` マッピング: **ISO 8601 準拠** — 1=月, 2=火, 3=水, 4=木, 5=金, 6=土, 7=日（`date-fns getISODay()` / `dayjs().isoWeekday()` と直接対応）
 - **D-16:** DB UNIQUE 制約なし（UIバリデーションのみで重複を防ぐ）
 - **D-17:** 保存戦略: `updateCommitSlotsAction` でそのメンバーの全スロットを `DELETE` してから `INSERT`（`member_teams` と同じパターン）
 - **D-18:** RLS: 本人のみ書き込み可（`member_id` = 認証済みメンバーの `id`）
