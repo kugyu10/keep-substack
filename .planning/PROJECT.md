@@ -38,7 +38,7 @@
 
 ## What This Is
 
-Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度をヒートマップUIで可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSS + Supabase PostgreSQLで構築し、Vercelにデプロイ済み。v1.5でSupabase完全移行・Magic Linkログイン・メンバー自己管理を実装し、管理者依存を排除した自律的なサービスになった。v1.6でチームステータス（public/private/hidden）のDB管理・/myページからの公開チーム自由参加・Playwright E2Eテスト基盤を追加し、コミュニティの自律性と品質を強化した。
+Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度をヒートマップUIで可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSS + Supabase PostgreSQLで構築し、Vercelにデプロイ済み。v1.5でSupabase完全移行・Magic Linkログイン・メンバー自己管理を実装し、管理者依存を排除した自律的なサービスになった。v1.6でチームステータス（public/private/hidden）のDB管理・/myページからの公開チーム自由参加・Playwright E2Eテスト基盤を追加し、コミュニティの自律性と品質を強化した。v1.7でSubstack @handleのDB登録・/myページでの編集・CalendarGridからのプロフィールリンクを実装し、メンバー同士がSubstackプロフィールに直接アクセスできるようになった。
 
 ## Core Value
 
@@ -92,11 +92,10 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - ✓ /admin/teams/{teamName} でhiddenチームの週次ビューを表示する — v1.6 (Validated in Phase 24)
 - ✓ メンバーが複数のpublication_idを持てるスキーマにする（member_publicationsテーブル、UIは1件前提のまま）— v1.6 (Validated in Phase 25)
 - ✓ Magic Linkログインフローと/admin保護をPlaywrightでE2Eテストできる — v1.6 (Validated in Phase 26)
+- ✓ 個人マンスリービューで名前/アイコンクリック → `https://substack.com/@{substack_handle}` に遷移する — v1.7 (Validated in Phase 27)
+- ✓ `/my` ページで Substack @handle を登録・更新できる — v1.7 (Validated in Phase 27)
 
 ### Active
-
-- [ ] 個人マンスリービューで名前/アイコンクリック → `https://substack.com/@{substack_handle}` に遷移する
-- [ ] `/my` ページで Substack @handle を登録・更新できる
 - [ ] `/my` ページでコミットスケジュール（週N回・曜日・時刻）を設定できる
 - [ ] 新トップページにコミット＆ゴールビューを表示する（行: アイコン+名前 / コミットGrid / アチーブメント）
 - [ ] コミットGridが3週分横並びで表示される（週1〜4で総横幅同一・達成=サムネイル / 未達成=曜日名）
