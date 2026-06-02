@@ -9,6 +9,7 @@ export async function getMembers(): Promise<Member[]> {
       name,
       publication_id,
       added_at,
+      substack_handle,
       member_teams (
         teams (name, status)
       )
@@ -24,6 +25,7 @@ export async function getMembers(): Promise<Member[]> {
         t !== null && typeof t === 'object' && 'name' in (t as object)
       ),
     addedAt: m.added_at,
+    substackHandle: m.substack_handle ?? undefined,
   }))
 }
 
