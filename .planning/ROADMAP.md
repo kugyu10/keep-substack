@@ -113,10 +113,16 @@ Full archive: `.planning/milestones/v1.6-ROADMAP.md`
 **Plans:** 2 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 27-01-PLAN.md — DB migration: substack_handle TEXT NULL カラムを members テーブルに追加
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 27-02-PLAN.md — App code: /my @handle 入力・保存・pre-fill + auth callback handle 伝搬 + CalendarGrid プロフィールリンク
 
 **Success Criteria:**
+
 1. `members.substack_handle` が DB に存在し null 許容
 2. /my ページで @handle を入力・保存・再ロード後に反映される
 3. 個人マンスリービューの名前/アイコンが `substack.com/@handle` を新タブで開く
@@ -133,10 +139,12 @@ Plans:
 **Requirements:** SCHED-01, SCHED-02, SCHED-03
 
 **Plans:** 2
+
 1. DB migration (`CREATE TABLE member_commit_slots` + RLS)
 2. /my ページ（頻度セレクター + 曜日/時刻入力 + サーバーアクション）
 
 **Success Criteria:**
+
 1. `member_commit_slots` テーブルが存在し、RLS で本人のみ書き込み可
 2. /my ページで週1〜4の頻度を選択できる
 3. 頻度に合わせた数の曜日+時刻入力欄が動的に表示される
@@ -153,10 +161,12 @@ Plans:
 **Requirements:** VIEW-01, VIEW-02, VIEW-03, VIEW-04, VIEW-05, VIEW-06, VIEW-07
 
 **Plans:** 2
+
 1. ルート移行（`/` → `/weekly-stamp`）+ データ層（メンバーごとに過去3週のコミットスロット + 記事データ取得）
 2. `CommitGoalView` + `CommitGrid` コンポーネント（3週横並び・週1〜4同幅・スマホ1週縮退・未設定グレー）
 
 **Success Criteria:**
+
 1. `/weekly-stamp` で旧ヒートマップが引き続き表示される
 2. `/` に Commit & Goal View が表示される
 3. Grid が3週分横並びで表示される（左古→右新）
@@ -176,9 +186,11 @@ Plans:
 **Requirements:** ACHIEV-01, ACHIEV-02
 
 **Plans:** 1
+
 1. アチーブメント計算ロジック（`isCurrentWeekComplete`・`consecutiveWeekStreak`）+ CommitGoalView への表示
 
 **Success Criteria:**
+
 1. 今週の全コミットスロットに投稿があるメンバーに 👑 が表示される
 2. 直近2週以上連続で全スロット達成しているメンバーに 🔥 が表示される
 3. 達成していないメンバーにはアイコンが表示されない
