@@ -110,9 +110,11 @@ Full archive: `.planning/milestones/v1.6-ROADMAP.md`
 
 **Requirements:** PROF-01, PROF-02, PROF-03
 
-**Plans:** 2
-1. DB migration (`ALTER TABLE members ADD COLUMN substack_handle TEXT`)
-2. /my ページ（@handle 入力・保存・?handle= クエリ pre-fill）+ 個人マンスリービューリンク変更
+**Plans:** 2 plans
+
+Plans:
+- [ ] 27-01-PLAN.md — DB migration: substack_handle TEXT NULL カラムを members テーブルに追加
+- [ ] 27-02-PLAN.md — App code: /my @handle 入力・保存・pre-fill + auth callback handle 伝搬 + CalendarGrid プロフィールリンク
 
 **Success Criteria:**
 1. `members.substack_handle` が DB に存在し null 許容
