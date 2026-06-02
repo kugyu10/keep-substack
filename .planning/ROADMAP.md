@@ -110,7 +110,7 @@ Full archive: `.planning/milestones/v1.6-ROADMAP.md`
 
 **Requirements:** PROF-01, PROF-02, PROF-03
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 **Wave 1**
@@ -119,7 +119,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 27-02-PLAN.md — App code: /my @handle 入力・保存・pre-fill + auth callback handle 伝搬 + CalendarGrid プロフィールリンク
+- [x] 27-02-PLAN.md — App code: /my @handle 入力・保存・pre-fill + auth callback handle 伝搬 + CalendarGrid プロフィールリンク
 
 **Success Criteria:**
 
@@ -232,7 +232,7 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 2/2 | Complete    | 2026-05-30 |
 | 25. 複数publication_idスキーマ拡張 | v1.6 | 2/2 | Complete    | 2026-05-30 |
 | 26. E2Eテスト（Playwright） | v1.6 | 3/3 | Complete    | 2026-05-30 |
-| 27. Substack Handle — DB + プロフィールリンク | v1.7 | 1/2 | In Progress|  |
+| 27. Substack Handle — DB + プロフィールリンク | v1.7 | 2/2 | Complete   | 2026-06-02 |
 | 28. コミットスケジュール — DB + /my ページ | v1.7 | 0/2 | Pending | — |
 | 29. Commit & Goal View — 新トップページ | v1.7 | 0/2 | Pending | — |
 | 30. アチーブメント（👑 / 🔥） | v1.7 | 0/1 | Pending | — |
