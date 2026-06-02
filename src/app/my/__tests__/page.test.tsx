@@ -76,6 +76,7 @@ type MemberTeamsJoin = { teams: { name: string; status: string } | null }[]
 
 function setupAdminMock(opts: {
   member?: {
+    id?: string
     name: string
     publication_id: string
     substack_handle?: string | null
@@ -101,13 +102,19 @@ function setupAdminMock(opts: {
   }))
   const teamsSelectSpy = vi.fn(() => ({ eq: teamsEqSpy }))
 
+  // member_commit_slots: .select(...).eq('member_id', id).order('day_of_week')
+  const commitSlotsOrderSpy = vi.fn(async () => ({ data: [], error: null }))
+  const commitSlotsEqSpy = vi.fn(() => ({ order: commitSlotsOrderSpy }))
+  const commitSlotsSelectSpy = vi.fn(() => ({ eq: commitSlotsEqSpy }))
+
   mockAdminFrom.mockImplementation((table: string) => {
     if (table === 'members') return { select: membersSelectSpy }
     if (table === 'teams') return { select: teamsSelectSpy }
+    if (table === 'member_commit_slots') return { select: commitSlotsSelectSpy }
     throw new Error(`unexpected table: ${table}`)
   })
 
-  return { membersSelectSpy, membersEqSpy, teamsSelectSpy, teamsEqSpy }
+  return { membersSelectSpy, membersEqSpy, teamsSelectSpy, teamsEqSpy, commitSlotsSelectSpy, commitSlotsEqSpy }
 }
 
 describe('MyPage RSC — read path (SELF-01 / SELF-03 / T-23-05 / T-23-06)', () => {
