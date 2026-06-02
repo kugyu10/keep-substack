@@ -3,7 +3,7 @@
 import { useActionState } from 'react'
 import { sendMagicLinkAction } from './actions'
 
-export default function LoginForm({ pid }: { pid?: string }) {
+export default function LoginForm({ pid, handle }: { pid?: string; handle?: string }) {
   const [state, action, isPending] = useActionState(sendMagicLinkAction, null)
 
   if (state === 'SENT') {
@@ -20,6 +20,7 @@ export default function LoginForm({ pid }: { pid?: string }) {
   return (
     <form action={action} className="space-y-4">
       {pid && <input type="hidden" name="pid" value={pid} />}
+      {handle && <input type="hidden" name="handle" value={handle} />}
       {state && state !== 'SENT' && (
         <p className="text-sm text-red-600">{state}</p>
       )}

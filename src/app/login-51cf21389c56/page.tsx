@@ -5,18 +5,18 @@ import LoginForm from './LoginForm'
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ pid?: string }>
+  searchParams: Promise<{ pid?: string; handle?: string }>
 }) {
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (user) redirect('/my')
 
-  const { pid } = await searchParams
+  const { pid, handle } = await searchParams
 
   return (
     <main className="max-w-sm mx-auto px-4 py-16">
       <h1 className="text-2xl font-semibold mb-8 text-center">ログイン</h1>
-      <LoginForm pid={pid} />
+      <LoginForm pid={pid} handle={handle} />
     </main>
   )
 }

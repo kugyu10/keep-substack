@@ -11,13 +11,21 @@ export async function sendMagicLinkAction(
   if (!email) return 'メールアドレスを入力してください'
 
   const pid = (formData.get('pid') as string | null)?.trim() || null
+  const handle = (formData.get('handle') as string | null)?.trim() || null
 
   const headersList = await headers()
   const origin = headersList.get('origin') ?? ''
 
-  const callbackUrl = pid
-    ? `${origin}/auth/callback?pid=${encodeURIComponent(pid)}`
-    : `${origin}/auth/callback`
+  let callbackUrl: string
+  if (pid && handle) {
+    callbackUrl = `${origin}/auth/callback?pid=${encodeURIComponent(pid)}&handle=${encodeURIComponent(handle)}`
+  } else if (pid) {
+    callbackUrl = `${origin}/auth/callback?pid=${encodeURIComponent(pid)}`
+  } else if (handle) {
+    callbackUrl = `${origin}/auth/callback?handle=${encodeURIComponent(handle)}`
+  } else {
+    callbackUrl = `${origin}/auth/callback`
+  }
 
   const supabase = await createSupabaseServerClient()
   const { error } = await supabase.auth.signInWithOtp({
