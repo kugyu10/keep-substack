@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Commit & Goal View + Substack Profile Link
-status: verifying
-stopped_at: Phase 27 context gathered
-last_updated: "2026-06-02T13:30:31.079Z"
+status: ready_to_plan
+stopped_at: Phase 27 complete (2/2) — ready to discuss Phase 28
+last_updated: 2026-06-02T14:00:50.476Z
 last_activity: 2026-06-02
 progress:
   total_phases: 4
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-02 — v1.7 Commit & Goal View + Substack Profile Link started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 27 — substack-handle-db
+**Current focus:** Phase 28 — コミットスケジュール — db + /my ページ
 
 ## Current Position
 
-Phase: 27 (substack-handle-db) — EXECUTING
-Plan: 2 of 2
-Status: Phase complete — ready for verification
+Phase: 28
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-06-02
 
 ## Performance Metrics

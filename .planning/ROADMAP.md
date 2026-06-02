@@ -232,7 +232,7 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 2/2 | Complete    | 2026-05-30 |
 | 25. 複数publication_idスキーマ拡張 | v1.6 | 2/2 | Complete    | 2026-05-30 |
 | 26. E2Eテスト（Playwright） | v1.6 | 3/3 | Complete    | 2026-05-30 |
-| 27. Substack Handle — DB + プロフィールリンク | v1.7 | 2/2 | Complete   | 2026-06-02 |
+| 27. Substack Handle — DB + プロフィールリンク | v1.7 | 2/2 | Complete    | 2026-06-02 |
 | 28. コミットスケジュール — DB + /my ページ | v1.7 | 0/2 | Pending | — |
 | 29. Commit & Goal View — 新トップページ | v1.7 | 0/2 | Pending | — |
 | 30. アチーブメント（👑 / 🔥） | v1.7 | 0/1 | Pending | — |
