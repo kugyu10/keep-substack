@@ -115,3 +115,65 @@ export async function updateMyProfileAction(
   revalidatePath('/my')
   return null
 }
+
+export async function updateCommitSlotsAction(
+  prevState: string | null,
+  formData: FormData
+): Promise<string | null> {
+  const rawSlots = formData.get('slots') as string | null
+  if (!rawSlots) return 'スロットデータが見つかりません'
+
+  let slots: { day_of_week: number; hour: number }[]
+  try {
+    slots = JSON.parse(rawSlots)
+  } catch {
+    return 'スロットデータが不正です'
+  }
+
+  if (!Array.isArray(slots) || slots.length > 4) return '不正なスロット数です'
+  for (const s of slots) {
+    if (s.day_of_week < 1 || s.day_of_week > 7) return '曜日の値が不正です'
+    if (s.hour < 0 || s.hour > 23) return '時刻の値が不正です'
+  }
+
+  const supabase = await createSupabaseServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return 'ログインセッションが切れました。再ログインしてください'
+
+  const admin = createSupabaseAdminClient()
+
+  const { data: member, error: memberError } = await admin
+    .from('members')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (memberError || !member) {
+    console.error('[updateCommitSlots] member lookup:', memberError)
+    return '保存に失敗しました。もう一度お試しください'
+  }
+
+  const { error: deleteError } = await admin
+    .from('member_commit_slots')
+    .delete()
+    .eq('member_id', member.id)
+
+  if (deleteError) {
+    console.error('[updateCommitSlots] delete:', deleteError)
+    return '保存に失敗しました。もう一度お試しください'
+  }
+
+  if (slots.length > 0) {
+    const { error: insertError } = await admin
+      .from('member_commit_slots')
+      .insert(slots.map(s => ({ member_id: member.id, day_of_week: s.day_of_week, hour: s.hour })))
+
+    if (insertError) {
+      console.error('[updateCommitSlots] insert:', insertError)
+      return '保存に失敗しました。もう一度お試しください'
+    }
+  }
+
+  revalidatePath('/my')
+  return null
+}
