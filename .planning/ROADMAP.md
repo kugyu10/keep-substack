@@ -110,12 +110,12 @@ Full archive: `.planning/milestones/v1.6-ROADMAP.md`
 
 **Requirements:** PROF-01, PROF-02, PROF-03
 
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 27-01-PLAN.md — DB migration: substack_handle TEXT NULL カラムを members テーブルに追加
+- [x] 27-01-PLAN.md — DB migration: substack_handle TEXT NULL カラムを members テーブルに追加
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -232,7 +232,7 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 24. /admin/teams/{teamName} hiddenチームビュー | v1.6 | 2/2 | Complete    | 2026-05-30 |
 | 25. 複数publication_idスキーマ拡張 | v1.6 | 2/2 | Complete    | 2026-05-30 |
 | 26. E2Eテスト（Playwright） | v1.6 | 3/3 | Complete    | 2026-05-30 |
-| 27. Substack Handle — DB + プロフィールリンク | v1.7 | 0/2 | Pending | — |
+| 27. Substack Handle — DB + プロフィールリンク | v1.7 | 1/2 | In Progress|  |
 | 28. コミットスケジュール — DB + /my ページ | v1.7 | 0/2 | Pending | — |
 | 29. Commit & Goal View — 新トップページ | v1.7 | 0/2 | Pending | — |
 | 30. アチーブメント（👑 / 🔥） | v1.7 | 0/1 | Pending | — |

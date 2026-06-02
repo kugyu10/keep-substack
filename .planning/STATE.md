@@ -4,13 +4,13 @@ milestone: v1.7
 milestone_name: Commit & Goal View + Substack Profile Link
 status: executing
 stopped_at: Phase 27 context gathered
-last_updated: "2026-06-02T13:15:33.060Z"
-last_activity: 2026-06-02 -- Phase 27 planning complete
+last_updated: "2026-06-02T13:19:04.125Z"
+last_activity: 2026-06-02
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 2
-  completed_plans: 0
+  completed_plans: 1
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-02 — v1.7 Commit & Goal View + Substack Profile Link started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 27 — Substack Handle DB + プロフィールリンク
+**Current focus:** Phase 27 — substack-handle-db
 
 ## Current Position
 
-Phase: 27 — Substack Handle — DB + プロフィールリンク (0/4 phases)
-Plan: —
+Phase: 27 (substack-handle-db) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-06-02 -- Phase 27 planning complete
+Last activity: 2026-06-02
 
 ## Performance Metrics
 
@@ -70,7 +70,7 @@ Last activity: 2026-06-02 -- Phase 27 planning complete
 
 ## Session Continuity
 
-Last session: 2026-06-02T12:53:57.209Z
+Last session: 2026-06-02T13:19:04.118Z
 Stopped at: Phase 27 context gathered
 Next step: Start next milestone with /gsd:new-milestone
 

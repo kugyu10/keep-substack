@@ -8,9 +8,9 @@
 
 ### Profile & Identity (PROF)
 
-- [ ] **PROF-01**: User can register and update Substack @handle from /my page
-- [ ] **PROF-02**: User can click name/icon on personal monthly view to open `https://substack.com/@{handle}` in a new tab
-- [ ] **PROF-03**: Login URL accepts `?handle=hoge` query param; after Magic Link login, /my page pre-fills the @handle input with that value
+- [x] **PROF-01**: User can register and update Substack @handle from /my page
+- [x] **PROF-02**: User can click name/icon on personal monthly view to open `https://substack.com/@{handle}` in a new tab
+- [x] **PROF-03**: Login URL accepts `?handle=hoge` query param; after Magic Link login, /my page pre-fills the @handle input with that value
 
 ### Commit Schedule (SCHED)
 
@@ -53,9 +53,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PROF-01 | Phase 27 | Pending |
-| PROF-02 | Phase 27 | Pending |
-| PROF-03 | Phase 27 | Pending |
+| PROF-01 | Phase 27 | Complete |
+| PROF-02 | Phase 27 | Complete |
+| PROF-03 | Phase 27 | Complete |
 | SCHED-01 | Phase 28 | Pending |
 | SCHED-02 | Phase 28 | Pending |
 | SCHED-03 | Phase 28 | Pending |
