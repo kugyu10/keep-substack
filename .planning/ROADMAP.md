@@ -166,10 +166,16 @@ Plans:
 
 **Requirements:** VIEW-01, VIEW-02, VIEW-03, VIEW-04, VIEW-05, VIEW-06, VIEW-07
 
-**Plans:** 2
+**Plans:** 2 plans
 
-1. ルート移行（`/` → `/weekly-stamp`）+ データ層（メンバーごとに過去3週のコミットスロット + 記事データ取得）
-2. `CommitGoalView` + `CommitGrid` コンポーネント（3週横並び・週1〜4同幅・スマホ1週縮退・未設定グレー）
+Plans:
+**Wave 1**
+
+- [ ] 29-01-PLAN.md — 基盤レイヤー: CommitSlot 型 + Member.id 拡張 + commitUtils + /weekly-stamp ルート + Wave 0 テスト
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 29-02-PLAN.md — UI コンポーネント: CommitGoalView + CommitGoalRow + CommitGrid + 新トップページ差し替え
 
 **Success Criteria:**
 
