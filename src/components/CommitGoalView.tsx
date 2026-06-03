@@ -1,20 +1,32 @@
-// Phase 29 Plan 01: Stub component — full implementation in Plan 02
-// This file satisfies the import in page.tsx and the test mock in page.test.tsx.
-// Plan 02 will replace this with the real CommitGoalView implementation.
-
+// Server Component — do NOT add 'use client'
 import type { MemberFeedResult, CommitSlot } from '@/lib/types'
+import { sortMembersForCommitView } from '@/lib/commitUtils'
+import CommitGoalRow from './CommitGoalRow'
 
 type CommitGoalViewProps = {
   results: MemberFeedResult[]
   slots: CommitSlot[]
 }
 
-export default function CommitGoalView({ results, slots: _slots }: CommitGoalViewProps) {
+export default function CommitGoalView({ results, slots }: CommitGoalViewProps) {
+  if (results.length === 0) return null
+
+  const sorted = sortMembersForCommitView(results, slots)
+
   return (
     <div>
-      {results.map(({ member }) => (
-        <div key={member.publicationId}>{member.name}</div>
-      ))}
+      {sorted.map(({ member, items, imageUrl }) => {
+        const memberSlots = slots.filter((s) => s.member_id === member.id)
+        return (
+          <CommitGoalRow
+            key={member.publicationId}
+            member={member}
+            items={items}
+            slots={memberSlots}
+            imageUrl={imageUrl}
+          />
+        )
+      })}
     </div>
   )
 }
