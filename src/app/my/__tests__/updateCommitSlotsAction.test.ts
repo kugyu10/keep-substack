@@ -134,4 +134,16 @@ describe('updateCommitSlotsAction', () => {
 
     expect(result).toBe('時刻の値が不正です')
   })
+
+  it('delete エラー時は "保存に失敗しました..." を返す', async () => {
+    setupAdminMock({ deleteError: { message: 'db error' } })
+    const result = await updateCommitSlotsAction(null, makeFormData([{ day_of_week: 1, hour: 8 }]))
+    expect(result).toBe('保存に失敗しました。もう一度お試しください')
+  })
+
+  it('insert エラー時は "保存に失敗しました..." を返す', async () => {
+    setupAdminMock({ insertError: { message: 'db error' } })
+    const result = await updateCommitSlotsAction(null, makeFormData([{ day_of_week: 1, hour: 8 }]))
+    expect(result).toBe('保存に失敗しました。もう一度お試しください')
+  })
 })
