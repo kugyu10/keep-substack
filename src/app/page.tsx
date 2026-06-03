@@ -3,6 +3,7 @@ import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import CommitGoalView from '@/components/CommitGoalView'
 import PrBanner from '@/components/PrBanner'
+import type { CommitSlot } from '@/lib/types'
 
 export const revalidate = 300
 
@@ -36,6 +37,13 @@ export default async function Home({ searchParams }: Props) {
 
   const results = await fetchAllFeedsCached(filteredMembers)
 
+  // Filter to 21-day window (3 weeks) for CommitGoalView (D-04)
+  const cutoff = new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString()
+  const results21 = results.map((r) => ({
+    ...r,
+    items: r.items.filter((item) => item.isoDate && item.isoDate >= cutoff),
+  }))
+
   return (
     <main className="max-w-[600px] mx-auto px-3 py-4">
       <h1 className="text-2xl mb-2" style={{ fontFamily: 'Georgia, serif', fontWeight: 900 }}>Keep Substack</h1>
@@ -64,7 +72,7 @@ export default async function Home({ searchParams }: Props) {
         </div>
       )}
 
-      <CommitGoalView results={results} slots={slotsData ?? []} />
+      <CommitGoalView results={results21} slots={(slotsData ?? []) as CommitSlot[]} />
       <PrBanner />
     </main>
   )
