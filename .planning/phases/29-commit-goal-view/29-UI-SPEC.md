@@ -55,7 +55,7 @@ created: 2026-06-03
 
 | 役割 | サイズ | Tailwind | ウェイト | Tailwind | 行高 |
 |------|--------|---------|---------|---------|------|
-| ページ見出し | 24px | `text-2xl` | 900（bold） | `font-black` | 1.2（`leading-tight`） |
+| ページ見出し | 24px | `text-2xl` | 600（semibold） | `font-semibold` | 1.2（`leading-tight`） |
 | メンバー名 | 12px | `text-xs` | 600（semibold） | `font-semibold` | 1.4（`leading-snug`） |
 | セル曜日ラベル | 12px | `text-xs` | 400（regular） | `font-normal` | 1.0（`leading-none`） |
 | 補助テキスト（未コミット等） | 14px | `text-sm` | 400（regular） | `font-normal` | 1.0（`leading-none`） |
@@ -102,7 +102,7 @@ created: 2026-06-03
 
 ```
 <main class="max-w-[600px] mx-auto px-3 py-4">
-  <h1>Keep Substack</h1>            ← text-2xl, font-black, Lora/Georgia
+  <h1>Keep Substack</h1>            ← text-2xl, font-semibold, Lora/Georgia
   [チームフィルタータブ]              ← 既存 page.tsx 踏襲
   <CommitGoalView results={...} />
   <PrBanner />
@@ -119,6 +119,8 @@ HeatmapRow の `flex items-center border-b border-[#ebebeb] py-1` 構造を踏�
 │ w-16 sm:w-52     │ flex-1            │ w-8           │
 └─────────────────────────────────────────────────────┘
 ```
+
+主要視覚アンカー: CommitGrid（行の flex-1 エリア）
 
 - Avatar + Name エリア: `w-16 sm:w-52 shrink-0 pr-2 flex items-center gap-1 overflow-hidden`
   - Avatar: `w-10 h-10 rounded-full shrink-0 object-cover`
