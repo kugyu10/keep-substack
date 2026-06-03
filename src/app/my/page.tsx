@@ -80,7 +80,7 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
           />
           <div className="mt-8">
             <h2 className="text-sm font-semibold mb-2">投稿スケジュール</h2>
-            <CommitScheduleModal memberId={(member as any).id} initialSlots={commitSlots} />
+            <CommitScheduleModal initialSlots={commitSlots} />
           </div>
         </>
       )}

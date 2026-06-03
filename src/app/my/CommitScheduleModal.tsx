@@ -13,7 +13,6 @@ interface Slot {
 }
 
 interface CommitScheduleModalProps {
-  memberId: string
   initialSlots: { id: number; day_of_week: number; hour: number }[]
 }
 
@@ -31,7 +30,7 @@ function makeDefaultSlots(count: number): Slot[] {
   return Array.from({ length: count }, () => ({ day_of_week: 1, hour: 8 }))
 }
 
-export default function CommitScheduleModal({ memberId: _memberId, initialSlots }: CommitScheduleModalProps) {
+export default function CommitScheduleModal({ initialSlots }: CommitScheduleModalProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [frequency, setFrequency] = useState(initialSlots.length || 1)
   const [slots, setSlots] = useState<Slot[]>(
