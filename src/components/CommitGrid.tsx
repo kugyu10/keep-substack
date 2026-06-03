@@ -20,11 +20,15 @@ const DAY_NAMES: Record<number, string> = {
 }
 
 // Static grid-cols class map — NEVER use dynamic `grid-cols-${n}` (Pitfall 2)
+// Covers all valid day_of_week values (1–7): a member can commit any day of the week.
 const COLS_CLASS: Record<number, string> = {
   1: 'grid-cols-1',
   2: 'grid-cols-2',
   3: 'grid-cols-3',
   4: 'grid-cols-4',
+  5: 'grid-cols-5',
+  6: 'grid-cols-6',
+  7: 'grid-cols-7',
 }
 
 export default function CommitGrid({ slots, items }: CommitGridProps) {
