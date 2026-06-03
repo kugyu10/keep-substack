@@ -132,6 +132,10 @@ export async function updateCommitSlotsAction(
 
   if (!Array.isArray(slots) || slots.length > 4) return '不正なスロット数です'
   for (const s of slots) {
+    if (
+      typeof s !== 'object' || s === null ||
+      !Number.isInteger(s.day_of_week) || !Number.isInteger(s.hour)
+    ) return 'スロットデータが不正です'
     if (s.day_of_week < 1 || s.day_of_week > 7) return '曜日の値が不正です'
     if (s.hour < 0 || s.hour > 23) return '時刻の値が不正です'
   }
