@@ -52,7 +52,7 @@ export default function CommitGrid({ slots, items }: CommitGridProps) {
   function renderCells(weekDates: string[]) {
     return slots.map((slot, idx) => {
       const article = matchArticleToSlot(slot, weekDates, articleDateMap)
-      if (article && article.thumbnail) {
+      if (article && article.thumbnail && article.link) {
         return (
           <a
             key={idx}
@@ -67,6 +67,21 @@ export default function CommitGrid({ slots, items }: CommitGridProps) {
               className="object-cover w-full h-full"
             />
           </a>
+        )
+      }
+      if (article && article.thumbnail) {
+        // Thumbnail exists but no link — render non-linking image cell
+        return (
+          <div
+            key={idx}
+            className="aspect-square rounded overflow-hidden block"
+          >
+            <img
+              src={article.thumbnail}
+              alt=""
+              className="object-cover w-full h-full"
+            />
+          </div>
         )
       }
       return (
