@@ -6,6 +6,7 @@ export async function getMembers(): Promise<Member[]> {
   const { data, error } = await supabase
     .from('members')
     .select(`
+      id,
       name,
       publication_id,
       added_at,
@@ -17,6 +18,7 @@ export async function getMembers(): Promise<Member[]> {
   if (error) throw error
   if (!data) return []
   return data.map((m: any) => ({
+    id: m.id,
     name: m.name,
     publicationId: m.publication_id,
     teams: (m.member_teams as any[])
