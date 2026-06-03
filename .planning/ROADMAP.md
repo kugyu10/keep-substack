@@ -132,22 +132,22 @@ Plans:
 
 ---
 
-### Phase 28: コミットスケジュール — DB + /my ページ
+### Phase 28: コミットスケジュール — DB + /my ページ ✅
 
 **Goal:** `member_commit_slots` テーブルを作成し、/my ページでコミット頻度・曜日・時刻を設定できるようにする
 
 **Requirements:** SCHED-01, SCHED-02, SCHED-03
 
-**Plans:** 2 plans
+**Plans:** 2 plans — completed 2026-06-03
 
 Plans:
 **Wave 1**
 
-- [ ] 28-01-PLAN.md — DB migration: member_commit_slots テーブル作成 + RLS + schema.sql 同期 + Wave 0 テスト
+- [x] 28-01-PLAN.md — DB migration: member_commit_slots テーブル作成 + RLS + schema.sql 同期 + Wave 0 テスト
 
-**Wave 2** *(blocked on Wave 1 completion)*
+**Wave 2**
 
-- [ ] 28-02-PLAN.md — /my ページ: CommitScheduleModal + updateCommitSlotsAction + page.tsx 統合
+- [x] 28-02-PLAN.md — /my ページ: CommitScheduleModal + updateCommitSlotsAction + page.tsx 統合
 
 **Success Criteria:**
 

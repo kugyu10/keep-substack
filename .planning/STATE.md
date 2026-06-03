@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Commit & Goal View + Substack Profile Link
 status: executing
-stopped_at: Phase 28 UI-SPEC approved
-last_updated: "2026-06-02T14:51:23.341Z"
-last_activity: 2026-06-02 -- Phase 28 planning complete
+stopped_at: Phase 28 complete
+last_updated: "2026-06-03T00:00:00.000Z"
+last_activity: 2026-06-03 -- Phase 28 complete
 progress:
   total_phases: 4
-  completed_phases: 1
-  total_plans: 4
-  completed_plans: 2
-  percent: 25
+  completed_phases: 2
+  total_plans: 6
+  completed_plans: 4
+  percent: 50
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-02 — v1.7 Commit & Goal View + Substack Profile Link started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 28 — コミットスケジュール — db + /my ページ
+**Current focus:** Phase 29 — Commit & Goal View — 新トップページ
 
 ## Current Position
 
-Phase: 28
+Phase: 29
 Plan: Not started
-Status: Ready to execute
-Last activity: 2026-06-02 -- Phase 28 planning complete
+Status: Ready to plan
+Last activity: 2026-06-03 -- Phase 28 complete
 
 ## Performance Metrics
 
@@ -98,4 +98,4 @@ long-standing backlog ideas, not functional gaps.
 
 ## Operator Next Steps
 
-- Plan Phase 27: `/gsd:discuss-phase 27` or `/gsd:plan-phase 27`
+- Plan Phase 29: `/gsd:discuss-phase 29` or `/gsd:plan-phase 29`
