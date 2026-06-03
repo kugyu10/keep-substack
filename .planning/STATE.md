@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Commit & Goal View + Substack Profile Link
 status: executing
-stopped_at: Phase 29 context gathered
-last_updated: "2026-06-03T22:54:27.563Z"
-last_activity: 2026-06-03 -- Phase 29 planning complete
+stopped_at: Phase 29 Plan 01 complete
+last_updated: "2026-06-04T08:35:00.000Z"
+last_activity: 2026-06-04 -- Phase 29 Plan 01 executed
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 5
   percent: 50
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-06-02 — v1.7 Commit & Goal View + Subs
 ## Current Position
 
 Phase: 29
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-06-03 -- Phase 29 planning complete
+Plan: 01 complete — ready for Plan 02
+Status: Executing
+Last activity: 2026-06-04 -- Phase 29 Plan 01 complete (types + commitUtils + /weekly-stamp route + tests)
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Last activity: 2026-06-03 -- Phase 29 planning complete
 | Phase 26 P02 | ~5min | 2 tasks | 0 src files (TEST project provision + schema apply) |
 | Phase 26 P03 | ~8min | 2 tasks | 3 files |
 | Phase 27 P02 | 25min | 3 tasks | 12 files |
+| Phase 29 P01 | ~25min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -67,13 +68,14 @@ Last activity: 2026-06-03 -- Phase 29 planning complete
 - Phase 25 P01: member_publications を additive テーブル（surrogate PK）として追加。single-primary は partial unique index で保証、sync trigger は ON CONFLICT DO NOTHING・DELETE ブランチ無し（CASCADE）、backfill は migration のみ・schema.sql は durable 定義をミラー（D-01..D-09）。app code は無変更（SC#3）。
 - Phase 26 P02: Dedicated cloud TEST Supabase project provisioned (otydhiumsdsyxepnjqjp, distinct from prod xolhjcngrwwwqtklmoyk); .env.test populated + gitignored. DEVIATION (Rule 3): supabase/migrations/ are incremental diffs that cannot bootstrap a fresh empty project (`relation "articles" does not exist`), so the operator applied supabase/schema.sql (durable final-state mirror) via the SQL Editor instead — same goal achieved (teams.status, members.publication_id, member_publications all queryable; SCHEMA_OK). Canonical from-scratch bootstrap source for fresh DBs is schema.sql, not migrations/.
 - Phase 26 P01: E2E harness via session-injection — mintAuthCookies uses @supabase/ssr setSession round-trip (no hand-rolled sb-<ref>-auth-token encoding); seeded test user is NON-admin (doubles as E2E-03 negative case); vitest.config.ts scopes include to src/** to avoid Playwright collision; webServer is build+start (NEXT_PUBLIC_* are build-time inlined). Zero production-code changes. (Actual E2E run gated on Plan 02 .env.test provisioning.)
+- Phase 29 P01: CommitSlot type added to types.ts; Member.id optional field added; getMembers() SELECT extended with id; DB policy "public select member_commit_slots" confirmed in schema.sql + migration (no new migration needed). commitUtils.ts: getWeekDates (JST Monday-start), matchArticleToSlot (day_of_week 1=Mon index mapping), sortMembersForCommitView (D-10 simplified: this-week count desc, addedAt asc). /weekly-stamp route: copy of old page.tsx with /weekly-stamp hrefs. CommitGoalView stub created for Plan 02. team-selected filter bug fixed (Rule 1: removed erroneous t.status !== 'hidden' check). 79 tests passing.
 - Phase 26 P03: Three E2E specs green against the TEST project — login.spec (E2E-01 injected session reaches /my, heading マイページ), my-teams.spec (E2E-02 public-team join → member_teams INSERT via expect.poll + scoped afterEach delete by member_id, no truncate per D-09), admin-guard.spec (E2E-03 anon /admin+/my redirect + non-admin /admin redirect via nested test.use storageState inside the anonymous project). Full Playwright suite 5 passed; vitest 24 passed (src/** only, no runner collision). Zero src/ changes. Real end-to-end (no Supabase mocking) — distinct from src/__tests__/proxy.test.ts. Stopped a stale next-server on :3000 to avoid reuseExistingServer attaching to a prod-env build (Pitfall 6). Phase 26 success criteria fully met.
 
 ## Session Continuity
 
-Last session: 2026-06-03T14:44:58.905Z
-Stopped at: Phase 29 context gathered
-Next step: Start next milestone with /gsd:new-milestone
+Last session: 2026-06-04T08:35:00.000Z
+Stopped at: Phase 29 Plan 01 complete — 3 tasks, 9 files, 79 tests passing
+Next step: Execute Phase 29 Plan 02 — CommitGoalView + CommitGrid component implementation
 
 ## Deferred Items
 

@@ -171,7 +171,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 29-01-PLAN.md — 基盤レイヤー: CommitSlot 型 + Member.id 拡張 + commitUtils + /weekly-stamp ルート + Wave 0 テスト
+- [x] 29-01-PLAN.md — 基盤レイヤー: CommitSlot 型 + Member.id 拡張 + commitUtils + /weekly-stamp ルート + Wave 0 テスト — completed 2026-06-04
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
