@@ -483,22 +483,22 @@ const DAY_NAMES: Record<number, string> = { 1:'月', 2:'火', 3:'水', 4:'木', 
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **`Member` 型への `id` フィールド追加範囲**
    - What we know: `getMembers()` は現在 `id` を返さない。`member_commit_slots.member_id` は UUID FK
    - What's unclear: `Member` 型を変更することによる既存テストへの影響範囲
-   - Recommendation: `getMembers()` の SELECT に `id` を追加し `Member` 型に optional `id?: string` を追加。既存テストの `member()` fixture は `id` を使わないのでデグレなし
+   - RESOLVED: `getMembers()` の SELECT に `id` を追加し `Member` 型に optional `id?: string` を追加。既存テストの `member()` fixture は `id` を使わないのでデグレなし（Plan 01 Task 1 で実装）
 
 2. **CommitGoalView が Server Component か Client Component か**
    - What we know: Phase 29 スコープにインタラクション（ページネーション、モーダル等）なし。`WeeklyHeatmapGrid` は `useState(weekOffset)` のため Client Component
    - What's unclear: `CommitGoalView` をサーバーで完結させることの実装上の利点（パフォーマンス vs コード複雑度）
-   - Recommendation: Server Component で実装。必要になったら Client に降格。'use client' を不必要に追加しない
+   - RESOLVED: Server Component で実装（Plan 02 Tasks 1-2）。'use client' 不要、Phase 29 スコープはインタラクションなし
 
 3. **既存 `page.test.tsx` の取り扱い**
    - What we know: 既存テストは `WeeklyHeatmapGrid` を `findByType` で探す設計。`page.tsx` を差し替えると壊れる
    - What's unclear: テストを削除するか `/weekly-stamp` 側に移すか、新 `page.tsx` 用に書き換えるか
-   - Recommendation: Plan 02 の一部として `page.test.tsx` を更新（`WeeklyHeatmapGrid` の参照を `CommitGoalView` 参照に変更）+ `/weekly-stamp/__tests__/page.test.tsx` を新規作成して既存ロジックを移管
+   - RESOLVED: Plan 01 Task 3 で `page.test.tsx` を更新（`WeeklyHeatmapGrid` 参照 → `CommitGoalView` 参照）+ `/weekly-stamp/__tests__/page.test.tsx` を新規作成して既存ロジックを移管
 
 ---
 
