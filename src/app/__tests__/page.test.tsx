@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { ReactElement } from 'react'
-import type { Member, MemberFeedResult } from '@/lib/types'
+import type { Member, MemberFeedResult, CommitSlot } from '@/lib/types'
 
 // --- Module mocks: stub the high-level @/lib helpers so no real RSS/DB runs ---
 
@@ -16,19 +16,28 @@ vi.mock('@/lib/fetchFeed', () => ({
   fetchAllFeedsCached: mockFetchAllFeedsCached,
 }))
 
-// WeeklyHeatmapGrid + PrBanner are real 'use client' components. The @/ alias is
-// only resolved by the Next build, not by vitest's default resolver, so stub them.
+// CommitGoalView + PrBanner are stubbed so the page renders without real data.
 // The page's import resolves to these same stubbed modules, so findByType still
 // matches the element type by reference.
-vi.mock('@/components/WeeklyHeatmapGrid', () => ({
+vi.mock('@/components/CommitGoalView', () => ({
   default: () => null,
 }))
 vi.mock('@/components/PrBanner', () => ({
   default: () => null,
 }))
 
+// Mock Supabase admin client — page.tsx calls createSupabaseAdminClient() to
+// SELECT member_commit_slots. Return a minimal no-op stub.
+vi.mock('@/lib/supabase/admin', () => ({
+  createSupabaseAdminClient: vi.fn(() => ({
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({ data: [], error: null })),
+    })),
+  })),
+}))
+
 import Home from '../page'
-import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'
+import CommitGoalView from '@/components/CommitGoalView'
 
 // --- Element-tree helpers (no jsdom: inspect the React element object tree) ---
 
@@ -154,9 +163,9 @@ describe('Home RSC — team tabs (TEAM-03) and All/team filtering (TEAM-04)', ()
 
     const el = await Home({ searchParams: Promise.resolve({}) })
 
-    const grid = findByType(el, WeeklyHeatmapGrid)
+    const grid = findByType(el, CommitGoalView)
     expect(grid).not.toBeNull()
-    const results = (grid!.props as { results: MemberFeedResult[] }).results
+    const results = (grid!.props as { results: MemberFeedResult[]; slots: CommitSlot[] }).results
     const names = results.map((r) => r.member.name).sort()
     // Alice (public) and Bob (private, not hidden) included.
     // Carol (hidden) and Dave (has hidden membership) excluded.
@@ -174,9 +183,9 @@ describe('Home RSC — team tabs (TEAM-03) and All/team filtering (TEAM-04)', ()
 
     const el = await Home({ searchParams: Promise.resolve({ team: 'Alpha' }) })
 
-    const grid = findByType(el, WeeklyHeatmapGrid)
+    const grid = findByType(el, CommitGoalView)
     expect(grid).not.toBeNull()
-    const results = (grid!.props as { results: MemberFeedResult[] }).results
+    const results = (grid!.props as { results: MemberFeedResult[]; slots: CommitSlot[] }).results
     const names = results.map((r) => r.member.name).sort()
     // Bob (Beta) excluded; Carol (Alpha/hidden) INCLUDED — status ignored.
     expect(names).toEqual(['Alice', 'Carol'])

@@ -1,7 +1,6 @@
 import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
-import { createSupabaseAdminClient } from '@/lib/supabase/admin'
-import CommitGoalView from '@/components/CommitGoalView'
+import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'
 import PrBanner from '@/components/PrBanner'
 
 export const revalidate = 300
@@ -23,16 +22,9 @@ export default async function Home({ searchParams }: Props) {
   ]
   const filteredMembers = team
     ? allMembers.filter((m) =>
-        // Team-selected view: include members of the selected team regardless of status
-        m.teams.some((t) => t.name === team)
+        m.teams.some((t) => t.name === team && t.status !== 'hidden')
       )
     : allMembers.filter((m) => m.teams.every((t) => t.status !== 'hidden'))
-
-  // Fetch all commit slots for all members (D-05)
-  const admin = createSupabaseAdminClient()
-  const { data: slotsData } = await admin
-    .from('member_commit_slots')
-    .select('member_id, day_of_week, hour')
 
   const results = await fetchAllFeedsCached(filteredMembers)
 
@@ -43,7 +35,7 @@ export default async function Home({ searchParams }: Props) {
       {teams.length > 0 && (
         <div className="flex gap-2 mb-4 flex-wrap">
           <a
-            href="/"
+            href="/weekly-stamp"
             className={`px-3 py-1 rounded text-sm border ${
               !team ? 'bg-primary text-white border-primary' : 'bg-white text-[#363737] border-[#ebebeb] hover:bg-[#fafafa] hover:border-[#d8d8d8]'
             }`}
@@ -53,7 +45,7 @@ export default async function Home({ searchParams }: Props) {
           {teams.map((t) => (
             <a
               key={t}
-              href={`/?team=${encodeURIComponent(t)}`}
+              href={`/weekly-stamp?team=${encodeURIComponent(t)}`}
               className={`px-3 py-1 rounded text-sm border ${
                 team === t ? 'bg-primary text-white border-primary' : 'bg-white text-[#363737] border-[#ebebeb] hover:bg-[#fafafa] hover:border-[#d8d8d8]'
               }`}
@@ -64,7 +56,7 @@ export default async function Home({ searchParams }: Props) {
         </div>
       )}
 
-      <CommitGoalView results={results} slots={slotsData ?? []} />
+      <WeeklyHeatmapGrid results={results} />
       <PrBanner />
     </main>
   )
