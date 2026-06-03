@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Commit & Goal View + Substack Profile Link
 status: executing
-stopped_at: Phase 29 Plan 01 complete
-last_updated: "2026-06-04T08:35:00.000Z"
-last_activity: 2026-06-04 -- Phase 29 Plan 01 executed
+stopped_at: Phase 29 Plan 02 complete
+last_updated: "2026-06-04T08:42:00.000Z"
+last_activity: 2026-06-04 -- Phase 29 Plan 02 executed
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 6
-  completed_plans: 5
-  percent: 50
+  completed_plans: 6
+  percent: 60
 ---
 
 # Project State
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-06-02 — v1.7 Commit & Goal View + Subs
 ## Current Position
 
 Phase: 29
-Plan: 01 complete — ready for Plan 02
+Plan: 02 complete — Phase 29 complete, ready for Phase 30
 Status: Executing
-Last activity: 2026-06-04 -- Phase 29 Plan 01 complete (types + commitUtils + /weekly-stamp route + tests)
+Last activity: 2026-06-04 -- Phase 29 Plan 02 complete (CommitGrid + CommitGoalRow + CommitGoalView + page.tsx 21-day filter)
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Last activity: 2026-06-04 -- Phase 29 Plan 01 complete (types + commitUtils + /w
 | Phase 26 P03 | ~8min | 2 tasks | 3 files |
 | Phase 27 P02 | 25min | 3 tasks | 12 files |
 | Phase 29 P01 | ~25min | 3 tasks | 9 files |
+| Phase 29 P02 | ~4min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -69,13 +70,14 @@ Last activity: 2026-06-04 -- Phase 29 Plan 01 complete (types + commitUtils + /w
 - Phase 26 P02: Dedicated cloud TEST Supabase project provisioned (otydhiumsdsyxepnjqjp, distinct from prod xolhjcngrwwwqtklmoyk); .env.test populated + gitignored. DEVIATION (Rule 3): supabase/migrations/ are incremental diffs that cannot bootstrap a fresh empty project (`relation "articles" does not exist`), so the operator applied supabase/schema.sql (durable final-state mirror) via the SQL Editor instead — same goal achieved (teams.status, members.publication_id, member_publications all queryable; SCHEMA_OK). Canonical from-scratch bootstrap source for fresh DBs is schema.sql, not migrations/.
 - Phase 26 P01: E2E harness via session-injection — mintAuthCookies uses @supabase/ssr setSession round-trip (no hand-rolled sb-<ref>-auth-token encoding); seeded test user is NON-admin (doubles as E2E-03 negative case); vitest.config.ts scopes include to src/** to avoid Playwright collision; webServer is build+start (NEXT_PUBLIC_* are build-time inlined). Zero production-code changes. (Actual E2E run gated on Plan 02 .env.test provisioning.)
 - Phase 29 P01: CommitSlot type added to types.ts; Member.id optional field added; getMembers() SELECT extended with id; DB policy "public select member_commit_slots" confirmed in schema.sql + migration (no new migration needed). commitUtils.ts: getWeekDates (JST Monday-start), matchArticleToSlot (day_of_week 1=Mon index mapping), sortMembersForCommitView (D-10 simplified: this-week count desc, addedAt asc). /weekly-stamp route: copy of old page.tsx with /weekly-stamp hrefs. CommitGoalView stub created for Plan 02. team-selected filter bug fixed (Rule 1: removed erroneous t.status !== 'hidden' check). 79 tests passing.
+- Phase 29 P02: CommitGrid Server Component: flex-1 week blocks (not 36-col grid), static COLS_CLASS map, DAY_NAMES, CSS-only hidden sm:flex mobile collapse. CommitGoalRow: three-column HeatmapRow analog, 未コミット fallback, w-8 placeholder. CommitGoalView: stub replaced with sortMembersForCommitView + per-member slot filter. page.tsx: 21-day cutoff filter producing results21. 88 tests passing. VIEW-01 through VIEW-07 all satisfied.
 - Phase 26 P03: Three E2E specs green against the TEST project — login.spec (E2E-01 injected session reaches /my, heading マイページ), my-teams.spec (E2E-02 public-team join → member_teams INSERT via expect.poll + scoped afterEach delete by member_id, no truncate per D-09), admin-guard.spec (E2E-03 anon /admin+/my redirect + non-admin /admin redirect via nested test.use storageState inside the anonymous project). Full Playwright suite 5 passed; vitest 24 passed (src/** only, no runner collision). Zero src/ changes. Real end-to-end (no Supabase mocking) — distinct from src/__tests__/proxy.test.ts. Stopped a stale next-server on :3000 to avoid reuseExistingServer attaching to a prod-env build (Pitfall 6). Phase 26 success criteria fully met.
 
 ## Session Continuity
 
-Last session: 2026-06-04T08:35:00.000Z
-Stopped at: Phase 29 Plan 01 complete — 3 tasks, 9 files, 79 tests passing
-Next step: Execute Phase 29 Plan 02 — CommitGoalView + CommitGrid component implementation
+Last session: 2026-06-04T08:42:00.000Z
+Stopped at: Phase 29 Plan 02 complete — 3 tasks, 5 files, 88 tests passing
+Next step: Execute Phase 30 — Achievement calculation (👑/🔥)
 
 ## Deferred Items
 

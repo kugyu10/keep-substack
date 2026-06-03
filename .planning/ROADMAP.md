@@ -175,7 +175,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 29-02-PLAN.md — UI コンポーネント: CommitGoalView + CommitGoalRow + CommitGrid + 新トップページ差し替え
+- [x] 29-02-PLAN.md — UI コンポーネント: CommitGoalView + CommitGoalRow + CommitGrid + 新トップページ差し替え — completed 2026-06-04
 
 **Success Criteria:**
 
@@ -246,5 +246,5 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 26. E2Eテスト（Playwright） | v1.6 | 3/3 | Complete    | 2026-05-30 |
 | 27. Substack Handle — DB + プロフィールリンク | v1.7 | 2/2 | Complete    | 2026-06-02 |
 | 28. コミットスケジュール — DB + /my ページ | v1.7 | 0/2 | Pending | — |
-| 29. Commit & Goal View — 新トップページ | v1.7 | 0/2 | Pending | — |
+| 29. Commit & Goal View — 新トップページ | v1.7 | 2/2 | Complete | 2026-06-04 |
 | 30. アチーブメント（👑 / 🔥） | v1.7 | 0/1 | Pending | — |
