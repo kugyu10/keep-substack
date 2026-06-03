@@ -39,6 +39,9 @@ export default function CommitScheduleModal({ memberId: _memberId, initialSlots 
       ? initialSlots.map(s => ({ day_of_week: s.day_of_week, hour: s.hour }))
       : makeDefaultSlots(1)
   )
+  const [savedSlots, setSavedSlots] = useState<Slot[]>(
+    initialSlots.map(s => ({ day_of_week: s.day_of_week, hour: s.hour }))
+  )
 
   const [state, action, isPending] = useActionState(updateCommitSlotsAction, null)
 
@@ -48,7 +51,10 @@ export default function CommitScheduleModal({ memberId: _memberId, initialSlots 
       isFirstRender.current = false
       return
     }
-    if (state === null && !isPending) setIsOpen(false)
+    if (state === null && !isPending) {
+      setSavedSlots([...slots])
+      setIsOpen(false)
+    }
   }, [state, isPending])
 
   const triggerRef = useRef<HTMLButtonElement | HTMLSpanElement | null>(null)
@@ -86,7 +92,7 @@ export default function CommitScheduleModal({ memberId: _memberId, initialSlots 
   const showDuplicateWarning = hasDuplicateDays(slots)
 
   if (!isOpen) {
-    if (initialSlots.length === 0) {
+    if (savedSlots.length === 0) {
       return (
         <button
           ref={triggerRef as React.RefObject<HTMLButtonElement>}
@@ -103,7 +109,7 @@ export default function CommitScheduleModal({ memberId: _memberId, initialSlots 
         onClick={openModal}
         className="text-sm text-[#363737] cursor-pointer underline"
       >
-        {formatSummary(initialSlots)}
+        {formatSummary(savedSlots)}
       </span>
     )
   }
@@ -203,7 +209,7 @@ export default function CommitScheduleModal({ memberId: _memberId, initialSlots 
 
           <button
             type="submit"
-            disabled={isPending}
+            disabled={isPending || showDuplicateWarning}
             className="w-full bg-orange-500 text-white rounded px-4 py-2 text-sm font-semibold disabled:opacity-50"
           >
             {isPending ? '宣言中...' : '宣言する'}
