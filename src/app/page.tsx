@@ -31,9 +31,13 @@ export default async function Home({ searchParams }: Props) {
 
   // Fetch all commit slots for all members (D-05)
   const admin = createSupabaseAdminClient()
-  const { data: slotsData } = await admin
+  const { data: slotsData, error: slotsError } = await admin
     .from('member_commit_slots')
     .select('member_id, day_of_week, hour')
+  if (slotsError) {
+    // Fail loudly so the error surfaces in Next.js error monitoring / logs.
+    throw slotsError
+  }
 
   const results = await fetchAllFeedsCached(filteredMembers)
 
