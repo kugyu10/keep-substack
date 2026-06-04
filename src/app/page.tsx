@@ -2,7 +2,6 @@ import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import CommitGoalView from '@/components/CommitGoalView'
-import PrBanner from '@/components/PrBanner'
 import type { CommitSlot } from '@/lib/types'
 
 export const revalidate = 300
@@ -83,7 +82,6 @@ export default async function Home({ searchParams }: Props) {
       </div>
 
       <CommitGoalView results={results21} slots={(slotsData ?? []) as CommitSlot[]} />
-      <PrBanner />
     </main>
   )
 }

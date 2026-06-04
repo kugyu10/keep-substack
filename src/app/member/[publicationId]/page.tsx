@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { buildHeatmapArticleMap } from '@/lib/heatmapUtils'
 import CalendarGrid from '@/components/CalendarGrid'
-import PrBanner from '@/components/PrBanner'
 import { getMembers } from '@/lib/members'
 
 export const revalidate = 300
@@ -54,7 +53,6 @@ export default async function MemberPage({
         imageUrl={memberResult.imageUrl}
         substackHandle={memberResult.member.substackHandle}
       />
-      <PrBanner />
     </main>
   )
 }

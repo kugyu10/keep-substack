@@ -1,7 +1,6 @@
 import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'
-import PrBanner from '@/components/PrBanner'
 
 export const revalidate = 300
 
@@ -63,7 +62,6 @@ export default async function Home({ searchParams }: Props) {
       </div>
 
       <WeeklyHeatmapGrid results={results} />
-      <PrBanner />
     </main>
   )
 }
