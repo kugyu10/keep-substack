@@ -56,6 +56,7 @@ export default function CommitGrid({ slots, items, imageUrl }: CommitGridProps) 
   const week1Dates = getWeekDates(-1) // middle
   const week2Dates = getWeekDates(0)  // current (most recent)
 
+  // h-full fills the fixed-height week wrapper; no aspect-square (height is set by parent)
   function renderCells(weekDates: string[]) {
     return sortedSlots.map((slot, idx) => {
       const article = matchArticleToSlot(slot, weekDates, articleDateMap)
@@ -66,43 +67,30 @@ export default function CommitGrid({ slots, items, imageUrl }: CommitGridProps) 
             href={article.link}
             target="_blank"
             rel="noreferrer"
-            className="aspect-square rounded overflow-hidden block"
+            className="h-full rounded overflow-hidden block"
           >
-            <img
-              src={article.thumbnail}
-              alt=""
-              className="object-cover w-full h-full"
-            />
+            <img src={article.thumbnail} alt="" className="object-cover w-full h-full" />
           </a>
         )
       }
       if (article && article.thumbnail) {
-        // Thumbnail exists but no link — render non-linking image cell
         return (
-          <div
-            key={idx}
-            className="aspect-square rounded overflow-hidden block"
-          >
-            <img
-              src={article.thumbnail}
-              alt=""
-              className="object-cover w-full h-full"
-            />
+          <div key={idx} className="h-full rounded overflow-hidden block">
+            <img src={article.thumbnail} alt="" className="object-cover w-full h-full" />
           </div>
         )
       }
-      const dateKey = weekDates[slot.day_of_week - 1] // 'YYYY-MM-DD'
+      const dateKey = weekDates[slot.day_of_week - 1]
       const dateLabel = dateKey
         ? `${parseInt(dateKey.slice(5, 7))}/${parseInt(dateKey.slice(8, 10))}`
         : ''
-      // Article exists but has no thumbnail (e.g. audio/text-only post) — show publication icon
       if (article) {
         const cell = imageUrl ? (
-          <div className="aspect-square rounded overflow-hidden block">
+          <div className="h-full rounded overflow-hidden block">
             <img src={imageUrl} alt="" className="object-cover w-full h-full" />
           </div>
         ) : (
-          <div className="aspect-square flex items-center justify-center rounded bg-primary/20">
+          <div className="h-full flex items-center justify-center rounded bg-primary/20">
             <span className="text-[10px] leading-none text-primary font-medium">✓</span>
           </div>
         )
@@ -113,7 +101,7 @@ export default function CommitGrid({ slots, items, imageUrl }: CommitGridProps) 
       return (
         <div
           key={idx}
-          className="aspect-square flex flex-col items-center justify-center gap-0.5 rounded border border-dashed border-gray-300"
+          className="h-full flex flex-col items-center justify-center gap-0.5 rounded border border-dashed border-gray-300"
         >
           <span className="text-[10px] leading-none text-gray-400">{DAY_NAMES[slot.day_of_week]}</span>
           <span className="text-[10px] leading-none text-gray-400">{dateLabel}</span>
@@ -122,23 +110,25 @@ export default function CommitGrid({ slots, items, imageUrl }: CommitGridProps) 
     })
   }
 
+  // Week wrapper height is fixed (h-14 = 56px). Cells use h-full to fill it.
+  // With grid-cols-N: 4 slots ≈ square cells, 1 slot ≈ 4:1 wide cell — height stays equal across all rows.
   return (
     <div className="flex flex-1 gap-2">
       {/* Week 0 (2週前): hidden on mobile */}
-      <div className="hidden sm:flex flex-1 bg-gray-50 rounded-md p-1">
-        <div className={`grid gap-1 ${colsClass} w-full`}>
+      <div className="hidden sm:flex flex-1 bg-gray-50 rounded-md p-1 h-14">
+        <div className={`grid gap-1 ${colsClass} w-full h-full`}>
           {renderCells(week0Dates)}
         </div>
       </div>
       {/* Week 1 (先週): hidden on mobile */}
-      <div className="hidden sm:flex flex-1 bg-gray-50 rounded-md p-1">
-        <div className={`grid gap-1 ${colsClass} w-full`}>
+      <div className="hidden sm:flex flex-1 bg-gray-50 rounded-md p-1 h-14">
+        <div className={`grid gap-1 ${colsClass} w-full h-full`}>
           {renderCells(week1Dates)}
         </div>
       </div>
       {/* Week 2 (今週): always visible */}
-      <div className="flex flex-1 bg-gray-50 rounded-md p-1">
-        <div className={`grid gap-1 ${colsClass} w-full`}>
+      <div className="flex flex-1 bg-gray-50 rounded-md p-1 h-14">
+        <div className={`grid gap-1 ${colsClass} w-full h-full`}>
           {renderCells(week2Dates)}
         </div>
       </div>

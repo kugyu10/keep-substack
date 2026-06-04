@@ -98,9 +98,8 @@ describe('CommitGrid VIEW-04: cell count per frequency', () => {
   it('with 1 slot: renders 3 weeks × 1 cell = 3 total cells', () => {
     const slots = [slot(1)] // Monday only
     const el = CommitGrid({ slots, items: [] })
-    // Each week block should contain 1 cell
-    // Find all unposted cells (div with aspect-square)
-    const cells = findAllByClassName(el, (cls) => cls.includes('aspect-square'))
+    // Unposted cells are identified by border-dashed (unique to unposted state)
+    const cells = findAllByClassName(el, (cls) => cls.includes('border-dashed'))
     // 3 weeks × 1 slot = 3 cells total
     expect(cells.length).toBe(3)
   })
@@ -108,7 +107,7 @@ describe('CommitGrid VIEW-04: cell count per frequency', () => {
   it('with 4 slots: renders 3 weeks × 4 cells = 12 total cells', () => {
     const slots = [slot(1), slot(2), slot(3), slot(4)]
     const el = CommitGrid({ slots, items: [] })
-    const cells = findAllByClassName(el, (cls) => cls.includes('aspect-square'))
+    const cells = findAllByClassName(el, (cls) => cls.includes('border-dashed'))
     // 3 weeks × 4 slots = 12 cells total (no articles → all unposted)
     expect(cells.length).toBe(12)
   })
