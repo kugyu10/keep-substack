@@ -160,13 +160,13 @@ Plans:
 
 ---
 
-### Phase 29: Commit & Goal View — 新トップページ
+### Phase 29: Commit & Goal View — 新トップページ ✅
 
 **Goal:** 現トップ（週次ヒートマップ）を `/weekly-stamp` に移動し、新トップにコミット＆ゴールビューを実装する
 
 **Requirements:** VIEW-01, VIEW-02, VIEW-03, VIEW-04, VIEW-05, VIEW-06, VIEW-07
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans — completed 2026-06-05
 
 Plans:
 **Wave 1**

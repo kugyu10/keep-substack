@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Commit & Goal View + Substack Profile Link
 status: executing
-stopped_at: Phase 29 Plan 02 complete
-last_updated: "2026-06-04T08:42:00.000Z"
-last_activity: 2026-06-04 -- Phase 29 Plan 02 executed
+stopped_at: Phase 29 complete
+last_updated: "2026-06-05T00:00:00.000Z"
+last_activity: 2026-06-05 -- Phase 29 complete (human UAT approved)
 progress:
   total_phases: 4
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 6
   completed_plans: 6
-  percent: 60
+  percent: 75
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-02 — v1.7 Commit & Goal View + Substack Profile Link started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 29 — Commit & Goal View — 新トップページ
+**Current focus:** Phase 30 — アチーブメント（👑 / 🔥）
 
 ## Current Position
 
-Phase: 29
-Plan: 02 complete — Phase 29 complete, ready for Phase 30
-Status: Executing
-Last activity: 2026-06-04 -- Phase 29 Plan 02 complete (CommitGrid + CommitGoalRow + CommitGoalView + page.tsx 21-day filter)
+Phase: 30
+Plan: Not started
+Status: Ready to execute
+Last activity: 2026-06-05 -- Phase 29 complete (human UAT approved)
 
 ## Performance Metrics
 
