@@ -90,6 +90,15 @@ export function isCurrentWeekComplete(
 }
 
 /**
+ * Returns true if all commit slots for the current week are fulfilled.
+ * Convenience wrapper around isCurrentWeekComplete that handles map building internally.
+ */
+export function isThisWeekComplete(slots: CommitSlot[], items: FeedItem[]): boolean {
+  if (slots.length === 0) return false
+  return isCurrentWeekComplete(slots, getWeekDates(0), buildArticleDateMap(items))
+}
+
+/**
  * Returns true if any slot's day has already passed this week (strictly before today
  * in JST) and has no article. Used to distinguish "slot day not yet arrived" from
  * "slot day passed and missed".
