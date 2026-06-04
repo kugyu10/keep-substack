@@ -94,6 +94,18 @@ export default function CommitGrid({ slots, items }: CommitGridProps) {
       const dateLabel = dateKey
         ? `${parseInt(dateKey.slice(5, 7))}/${parseInt(dateKey.slice(8, 10))}`
         : ''
+      // Article exists but has no thumbnail (e.g. audio/text-only post) — show posted indicator
+      if (article) {
+        const cell = (
+          <div className="aspect-square flex flex-col items-center justify-center gap-0.5 rounded bg-primary/20">
+            <span className="text-[10px] leading-none text-primary font-medium">✓</span>
+            <span className="text-[10px] leading-none text-primary/80">{dateLabel}</span>
+          </div>
+        )
+        return article.link
+          ? <a key={idx} href={article.link} target="_blank" rel="noreferrer">{cell}</a>
+          : <div key={idx}>{cell}</div>
+      }
       return (
         <div
           key={idx}
