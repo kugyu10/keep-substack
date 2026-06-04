@@ -1,6 +1,6 @@
 // Server Component — do NOT add 'use client'
 import type { MemberFeedResult, CommitSlot } from '@/lib/types'
-import { sortMembersForCommitView } from '@/lib/commitUtils'
+import { sortMembersForCommitView, consecutiveWeekStreak } from '@/lib/commitUtils'
 import CommitGoalRow from './CommitGoalRow'
 
 type CommitGoalViewProps = {
@@ -32,10 +32,11 @@ export default function CommitGoalView({ results, slots }: CommitGoalViewProps) 
           </div>
         </div>
         {/* Spacer matching achievement placeholder */}
-        <div className="w-8 shrink-0" />
+        <div className="w-10 shrink-0" />
       </div>
       {sorted.map(({ member, items, imageUrl }) => {
         const memberSlots = slots.filter((s) => s.member_id === member.id)
+        const streak = consecutiveWeekStreak(memberSlots, items)
         return (
           <CommitGoalRow
             key={member.publicationId}
@@ -43,6 +44,7 @@ export default function CommitGoalView({ results, slots }: CommitGoalViewProps) 
             items={items}
             slots={memberSlots}
             imageUrl={imageUrl}
+            streak={streak}
           />
         )
       })}
