@@ -3,8 +3,10 @@ import { getWeekDates, matchArticleToSlot, sortMembersForCommitView } from '../c
 import type { CommitSlot, FeedItem, Member, MemberFeedResult } from '../types'
 
 // Helper: build a minimal Member fixture
+// id is required (WR-02): use a deterministic placeholder UUID derived from the name.
 function member(name: string, addedAt = '2026-01-01T00:00:00.000Z'): Member {
   return {
+    id: `00000000-0000-0000-0000-${name.charCodeAt(0).toString(16).padStart(12, '0')}`,
     name,
     publicationId: `pub-${name}`,
     teams: [],

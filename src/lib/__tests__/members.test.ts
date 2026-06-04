@@ -31,6 +31,7 @@ describe('Member type — substackHandle field (Phase 27)', () => {
   it('Member type accepts substackHandle as optional field', () => {
     // This test will FAIL until substackHandle is added to the Member type
     const member: Member = {
+      id: '00000000-0000-0000-0000-000000000001',
       name: 'Test',
       publicationId: 'test-id',
       teams: [],
@@ -42,6 +43,7 @@ describe('Member type — substackHandle field (Phase 27)', () => {
 
   it('Member type allows substackHandle to be omitted (optional)', () => {
     const member: Member = {
+      id: '00000000-0000-0000-0000-000000000002',
       name: 'Test',
       publicationId: 'test-id',
       teams: [],

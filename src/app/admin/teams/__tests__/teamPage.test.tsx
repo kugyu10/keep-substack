@@ -75,6 +75,7 @@ function collectParagraphText(node: unknown): string[] {
 
 function member(name: string, teams: { name: string; status: string }[]): Member {
   return {
+    id: `00000000-0000-0000-0000-${name.charCodeAt(0).toString(16).padStart(12, '0')}`,
     name,
     publicationId: `pub-${name}`,
     teams,

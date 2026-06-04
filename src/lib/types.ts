@@ -8,12 +8,12 @@ export type FeedItem = {
 }
 
 export type Member = {
+  id: string  // UUID from members.id — required; use a placeholder UUID in test fixtures
   name: string
   publicationId: string
   teams: { name: string; status: string }[]
   addedAt: string  // ISO 8601
   substackHandle?: string
-  id?: string  // UUID from members.id — optional so existing fixtures without id still compile
 }
 
 // Phase 4 KV移行後のスキーマ（D-03）。フィードURLは publicationId から動的生成する（D-08）
