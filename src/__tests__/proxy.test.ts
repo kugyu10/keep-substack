@@ -38,7 +38,7 @@ describe('proxy() — /admin/teams/{teamName} authorization gate (VIEW-02)', () 
 
   it('non-admin redirect: a non-admin user is redirected to / (T-24-03)', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: 'u-1', app_metadata: { role: 'member' } } },
+      data: { user: { id: 'u-1', role: 'member' } },
     })
 
     const res = await proxy(makeRequest())
@@ -62,7 +62,7 @@ describe('proxy() — /admin/teams/{teamName} authorization gate (VIEW-02)', () 
 
   it('admin passes through: an admin user is not redirected (no location header)', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: 'u-admin', app_metadata: { role: 'admin' } } },
+      data: { user: { id: 'u-admin', role: 'admin' } },
     })
 
     const res = await proxy(makeRequest())

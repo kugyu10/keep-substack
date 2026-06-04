@@ -9,7 +9,7 @@ const VALID_STATUSES = ['public', 'private', 'hidden'] as const
 async function requireAdmin(): Promise<void> {
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.app_metadata?.role !== 'admin') {
+  if (!user || user.role !== 'admin') {
     throw new Error('Unauthorized')
   }
 }

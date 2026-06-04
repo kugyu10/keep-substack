@@ -75,7 +75,7 @@ describe('updateTeamStatusAction (TEAM-02)', () => {
   // (a) authenticated but non-admin role → unauthorized
   it('returns 権限がありません when user role is not admin', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: 'u1', app_metadata: { role: 'member' } } },
+      data: { user: { id: 'u1', role: 'member' } },
     })
 
     const result = await updateTeamStatusAction('team-1', 'hidden')
@@ -89,7 +89,7 @@ describe('updateTeamStatusAction (TEAM-02)', () => {
   // (b) admin success → null, update called with correct args, revalidate called
   it('admin: updates team status, returns null, revalidates path', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: 'admin1', app_metadata: { role: 'admin' } } },
+      data: { user: { id: 'admin1', role: 'admin' } },
     })
     mockEq.mockResolvedValue({ error: null })
 
@@ -105,7 +105,7 @@ describe('updateTeamStatusAction (TEAM-02)', () => {
   // (c) supabase error → returns error message, no revalidate
   it('admin: returns the supabase error message on failure', async () => {
     mockGetUser.mockResolvedValue({
-      data: { user: { id: 'admin1', app_metadata: { role: 'admin' } } },
+      data: { user: { id: 'admin1', role: 'admin' } },
     })
     mockEq.mockResolvedValue({ error: { message: 'update failed' } })
 
