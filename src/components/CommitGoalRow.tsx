@@ -19,6 +19,7 @@ export default function CommitGoalRow({ member, items, slots, imageUrl, streak }
         href={`/member/${member.publicationId}`}
         className="w-16 sm:w-52 shrink-0 pr-2 flex items-center gap-1 overflow-hidden"
       >
+        <span className="sr-only">{member.name}</span>
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -30,7 +31,7 @@ export default function CommitGoalRow({ member, items, slots, imageUrl, streak }
         ) : (
           <span className="w-10 h-10 rounded-full shrink-0 bg-gray-200 inline-block" aria-hidden="true" />
         )}
-        <div className="flex-1 min-w-0 text-xs font-semibold leading-snug truncate hidden sm:block">
+        <div className="flex-1 min-w-0 text-xs font-semibold leading-snug truncate hidden sm:block" aria-hidden="true">
           {member.name}
         </div>
         <span className="shrink-0 text-gray-400 text-sm" aria-hidden="true">›</span>
