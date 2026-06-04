@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { getWeekDates, matchArticleToSlot, sortMembersForCommitView } from '../commitUtils'
+import {
+  getWeekDates,
+  matchArticleToSlot,
+  sortMembersForCommitView,
+  isCurrentWeekComplete,
+  consecutiveWeekStreak,
+} from '../commitUtils'
 import type { CommitSlot, FeedItem, Member, MemberFeedResult } from '../types'
 
 // Helper: build a minimal Member fixture
@@ -163,18 +169,26 @@ describe('matchArticleToSlot', () => {
 // sortMembersForCommitView
 // ─────────────────────────────────────────────
 describe('sortMembersForCommitView', () => {
-  it('sorts member with more this-week articles first', () => {
+  it('sorts member with higher achievement rate (all slots met) first', () => {
     // Use a date from getWeekDates(0) to guarantee "this week"
     const thisWeekDates = getWeekDates(0)
-    const mondayIso = thisWeekDates[0] + 'T00:30:00.000Z' // Monday midnight JST = Sunday UTC
+    const mondayIso = thisWeekDates[0] + 'T00:30:00.000Z' // Monday midnight JST
 
-    const activeResult = result(
-      member('Active'),
-      [feedItem(mondayIso), feedItem(mondayIso)]
-    )
-    const inactiveResult = result(member('Inactive'), [])
+    const activeMember = member('Active')
+    const activeResult = result(activeMember, [feedItem(mondayIso)])
+    // Active member has 1 slot on Monday and posted this week → 100% rate
+    const activeSlots: CommitSlot[] = [
+      { member_id: activeMember.id, day_of_week: 1, hour: 10 },
+    ]
 
-    const slots: CommitSlot[] = []
+    const inactiveMember = member('Inactive')
+    const inactiveResult = result(inactiveMember, [])
+    // Inactive member has 1 slot but no articles → 0% rate
+    const inactiveSlots: CommitSlot[] = [
+      { member_id: inactiveMember.id, day_of_week: 1, hour: 10 },
+    ]
+
+    const slots = [...activeSlots, ...inactiveSlots]
     const sorted = sortMembersForCommitView([inactiveResult, activeResult], slots)
 
     expect(sorted[0].member.name).toBe('Active')
@@ -204,5 +218,94 @@ describe('sortMembersForCommitView', () => {
     sortMembersForCommitView(original, [])
     expect(original[0].member.name).toBe('A')
     expect(original[1].member.name).toBe('B')
+  })
+})
+
+// ─────────────────────────────────────────────
+// isCurrentWeekComplete
+// ─────────────────────────────────────────────
+describe('isCurrentWeekComplete', () => {
+  const weekDates = [
+    '2026-06-01', // Monday
+    '2026-06-02',
+    '2026-06-03',
+    '2026-06-04',
+    '2026-06-05',
+    '2026-06-06',
+    '2026-06-07',
+  ]
+
+  it('returns true when all slots have at least one article', () => {
+    const slots: CommitSlot[] = [
+      { member_id: 'uuid-1', day_of_week: 1, hour: 10 },
+      { member_id: 'uuid-1', day_of_week: 3, hour: 10 },
+    ]
+    const articleDateMap = new Map<string, FeedItem[]>([
+      ['2026-06-01', [feedItem('2026-06-01T01:00:00.000Z')]],
+      ['2026-06-03', [feedItem('2026-06-03T01:00:00.000Z')]],
+    ])
+    expect(isCurrentWeekComplete(slots, weekDates, articleDateMap)).toBe(true)
+  })
+
+  it('returns false when slots array is empty (vacuous truth prevention)', () => {
+    const articleDateMap = new Map<string, FeedItem[]>()
+    expect(isCurrentWeekComplete([], weekDates, articleDateMap)).toBe(false)
+  })
+
+  it('returns false when one slot is missing an article', () => {
+    const slots: CommitSlot[] = [
+      { member_id: 'uuid-1', day_of_week: 1, hour: 10 },
+      { member_id: 'uuid-1', day_of_week: 3, hour: 10 },
+    ]
+    // Only Monday has an article, Wednesday does not
+    const articleDateMap = new Map<string, FeedItem[]>([
+      ['2026-06-01', [feedItem('2026-06-01T01:00:00.000Z')]],
+    ])
+    expect(isCurrentWeekComplete(slots, weekDates, articleDateMap)).toBe(false)
+  })
+})
+
+// ─────────────────────────────────────────────
+// consecutiveWeekStreak
+// ─────────────────────────────────────────────
+describe('consecutiveWeekStreak', () => {
+  it('returns 0 when slots array is empty', () => {
+    const items: FeedItem[] = [feedItem('2026-06-01T00:30:00.000Z')]
+    expect(consecutiveWeekStreak([], items)).toBe(0)
+  })
+
+  it('returns 0 when this week is not complete', () => {
+    // Slot on Monday but no articles in items → this week not complete
+    const slots: CommitSlot[] = [
+      { member_id: 'uuid-1', day_of_week: 1, hour: 10 },
+    ]
+    const items: FeedItem[] = [] // no articles at all
+    expect(consecutiveWeekStreak(slots, items)).toBe(0)
+  })
+
+  it('returns 1 when only this week is complete', () => {
+    // Slot on Monday, article published this Monday (JST), but NOT last Monday
+    const slots: CommitSlot[] = [
+      { member_id: 'uuid-1', day_of_week: 1, hour: 10 },
+    ]
+    const thisWeekDates = getWeekDates(0)
+    const thisMonday = thisWeekDates[0]
+    // Use T00:30:00.000Z so that JST conversion → day is correct (UTC+9 → 09:30 JST same day)
+    const thisMondayIso = thisMonday + 'T00:30:00.000Z'
+    const items: FeedItem[] = [feedItem(thisMondayIso)]
+    expect(consecutiveWeekStreak(slots, items)).toBe(1)
+  })
+
+  it('returns 2 when this week and last week are both complete', () => {
+    // Slot on Monday, articles published both this Monday and last Monday
+    const slots: CommitSlot[] = [
+      { member_id: 'uuid-1', day_of_week: 1, hour: 10 },
+    ]
+    const thisWeekDates = getWeekDates(0)
+    const lastWeekDates = getWeekDates(-1)
+    const thisMondayIso = thisWeekDates[0] + 'T00:30:00.000Z'
+    const lastMondayIso = lastWeekDates[0] + 'T00:30:00.000Z'
+    const items: FeedItem[] = [feedItem(thisMondayIso), feedItem(lastMondayIso)]
+    expect(consecutiveWeekStreak(slots, items)).toBe(2)
   })
 })
