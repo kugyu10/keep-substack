@@ -54,10 +54,10 @@ export async function addMember(member: Omit<Member, 'addedAt'>): Promise<void> 
     .single()
   if (insertError) throw insertError
 
-  for (const teamName of member.teams.map(t => t.name)) {
+  for (const teamObj of member.teams) {
     const { data: team, error: teamError } = await supabase
       .from('teams')
-      .upsert({ name: teamName }, { onConflict: 'name' })
+      .upsert({ name: teamObj.name, status: teamObj.status }, { onConflict: 'name' })
       .select('id')
       .single()
     if (teamError) throw teamError
@@ -111,10 +111,10 @@ export async function updateMember(
       .eq('member_id', member.id)
     if (deleteError) throw deleteError
 
-    for (const teamName of updates.teams.map(t => t.name)) {
+    for (const teamObj of updates.teams) {
       const { data: team, error: teamError } = await supabase
         .from('teams')
-        .upsert({ name: teamName }, { onConflict: 'name' })
+        .upsert({ name: teamObj.name, status: teamObj.status }, { onConflict: 'name' })
         .select('id')
         .single()
       if (teamError) throw teamError
