@@ -56,10 +56,12 @@ Exceptions:
 |------|------|--------|-------------|
 | Body / member name | 12px (`text-xs`) | 600 (`font-semibold`) | snug (~1.375, `leading-snug`) |
 | Label / fallback text ("未コミット") | 14px (`text-sm`) | 400 (regular) | 1.5 (default) |
-| Micro / day names, date labels, week headers | 10px (`text-[10px]`) | 400 regular or 500 medium | 1 (`leading-none`) |
+| Micro / day names, date labels, week headers | 10px (`text-[10px]`) | 400 (regular) | 1 (`leading-none`) |
 | Achievement icons | 14px (`text-sm`) | — (emoji, no weight) | 1 (`leading-none`) |
 
 Achievement icon sizing rationale: `text-sm` (14px) fits within the `h-14` (56px) row height with visible impact. Use `text-xs` (12px) as minimum fallback if layout tightens. Source: CONTEXT.md Claude's Discretion + codebase pattern.
+
+Declared weights: `400` (regular) and `600` (semibold) only. Maximum 2 weights enforced.
 
 ---
 
@@ -97,7 +99,7 @@ Source: CONTEXT.md D-01, D-02
 ### Layout
 
 - Alignment: `flex items-center justify-center` within the fixed-width column
-- Gap between icons when both present: `gap-0.5` (2px) — tight coupling, not separated
+- Gap between icons when both present: `gap-1` (4px) — tight coupling, not separated
 - Font size: `text-sm` (14px) for both icons
 - `aria-label`: `"今週達成"` when streak=1; `"連続達成"` when streak≥2
 - When streak=0: render `<div className="w-8 shrink-0" aria-hidden="true" />` (unchanged placeholder)
