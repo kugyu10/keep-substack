@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { updateTeamStatusAction } from './actions'
+import { updateTeamStatusAction, addTeamAction } from './actions'
 
 type Team = { id: string; name: string; status: string }
 type Props = { teams: Team[] }
@@ -12,6 +12,23 @@ export default function TeamStatusList({ teams }: Props) {
   )
   const [saving, setSaving] = useState<Record<string, boolean>>({})
   const [errors, setErrors] = useState<Record<string, string | null>>({})
+
+  const [newName, setNewName] = useState('')
+  const [adding, setAdding] = useState(false)
+  const [addError, setAddError] = useState<string | null>(null)
+
+  async function handleAdd(e: React.FormEvent) {
+    e.preventDefault()
+    setAdding(true)
+    setAddError(null)
+    const error = await addTeamAction(newName)
+    setAdding(false)
+    if (error) {
+      setAddError(error)
+    } else {
+      setNewName('')
+    }
+  }
 
   async function handleSave(team: Team) {
     const newStatus = statuses[team.id]
@@ -28,16 +45,29 @@ export default function TeamStatusList({ teams }: Props) {
     setErrors((prev) => ({ ...prev, [team.id]: error }))
   }
 
-  if (teams.length === 0) {
-    return (
-      <div className="text-sm text-gray-400">
-        <p className="font-medium">チームがありません</p>
-        <p>Supabaseのteamsテーブルにチームを追加してください</p>
-      </div>
-    )
-  }
-
   return (
+    <div>
+      {/* Add team form */}
+      <form onSubmit={handleAdd} className="flex gap-2 mb-6 items-start">
+        <div className="flex flex-col gap-1">
+          <input
+            type="text"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            placeholder="新しいチーム名"
+            className="border border-[#d8d8d8] rounded px-3 py-1.5 text-sm text-[#363737] bg-white w-56"
+          />
+          {addError && <p className="text-red-500 text-xs">{addError}</p>}
+        </div>
+        <button
+          type="submit"
+          disabled={adding || !newName.trim()}
+          className="px-4 py-1.5 rounded text-sm bg-primary text-white disabled:opacity-50 hover:opacity-90"
+        >
+          {adding ? '追加中…' : 'チームを追加'}
+        </button>
+      </form>
+
     <div className="overflow-x-auto">
       <table className="w-full text-sm border-collapse text-[#363737]">
         <thead>
@@ -80,6 +110,11 @@ export default function TeamStatusList({ teams }: Props) {
           ))}
         </tbody>
       </table>
+    </div>
+
+    {teams.length === 0 && (
+      <p className="text-sm text-gray-400 mt-4">まだチームがありません。上のフォームで追加してください。</p>
+    )}
     </div>
   )
 }
