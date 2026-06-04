@@ -49,9 +49,9 @@ export default function CommitGoalRow({ member, items, slots, imageUrl, streak }
 
       {/* Column 3: Achievement icon (D-09 / Phase 30 ACHIEV-01/02) */}
       {streak === 0 ? (
-        <div className="w-8 shrink-0" aria-hidden="true" />
+        <div className="w-10 shrink-0" aria-hidden="true" />
       ) : streak === 1 ? (
-        <div className="w-8 shrink-0 flex items-center justify-center">
+        <div className="w-10 shrink-0 flex items-center justify-center">
           <span role="img" aria-label="今週達成" className="text-sm leading-none">👑</span>
         </div>
       ) : (
