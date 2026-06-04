@@ -30,8 +30,8 @@
 
 ### Achievements (ACHIEV)
 
-- [ ] **ACHIEV-01**: 👑 icon is shown when all commit slots for the current week have at least one article posted
-- [ ] **ACHIEV-02**: 🔥 icon is shown when the member has achieved full-slot completion in 2 or more consecutive weeks
+- [x] **ACHIEV-01**: 👑 icon is shown when all commit slots for the current week have at least one article posted
+- [x] **ACHIEV-02**: 🔥 icon is shown when the member has achieved full-slot completion in 2 or more consecutive weeks
 
 ## Future Requirements
 
@@ -66,8 +66,8 @@
 | VIEW-05 | Phase 29 | Pending |
 | VIEW-06 | Phase 29 | Pending |
 | VIEW-07 | Phase 29 | Pending |
-| ACHIEV-01 | Phase 30 | Pending |
-| ACHIEV-02 | Phase 30 | Pending |
+| ACHIEV-01 | Phase 30 | Complete |
+| ACHIEV-02 | Phase 30 | Complete |
 
 **Coverage:**
 - v1.7 requirements: 15 total
