@@ -90,12 +90,17 @@ export default function CommitGrid({ slots, items }: CommitGridProps) {
           </div>
         )
       }
+      const dateKey = weekDates[slot.day_of_week - 1] // 'YYYY-MM-DD'
+      const dateLabel = dateKey
+        ? `${parseInt(dateKey.slice(5, 7))}/${parseInt(dateKey.slice(8, 10))}`
+        : ''
       return (
         <div
           key={idx}
-          className="aspect-square flex items-center justify-center rounded border border-dashed border-gray-300"
+          className="aspect-square flex flex-col items-center justify-center gap-0.5 rounded border border-dashed border-gray-300"
         >
-          <span className="text-xs text-gray-400">{DAY_NAMES[slot.day_of_week]}</span>
+          <span className="text-[10px] leading-none text-gray-400">{DAY_NAMES[slot.day_of_week]}</span>
+          <span className="text-[10px] leading-none text-gray-400">{dateLabel}</span>
         </div>
       )
     })
