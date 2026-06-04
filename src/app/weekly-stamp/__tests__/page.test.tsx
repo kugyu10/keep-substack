@@ -168,4 +168,28 @@ describe('/weekly-stamp page (VIEW-01)', () => {
     expect(labels).toContain('Alpha')
     expect(labels).toContain('Beta')
   })
+
+  // ── TEAM-04 (divergence): /weekly-stamp excludes hidden members in team-selected view ──
+  // This is an INTENTIONAL behavioral divergence from the main page (src/app/page.tsx):
+  //   - main page (TEAM-04 b): team-selected view includes hidden-status members
+  //   - /weekly-stamp:          team-selected view excludes hidden-status members
+  // This test documents and locks in the /weekly-stamp behavior to prevent silent drift.
+  it('team-selected view: excludes hidden-status members even when they belong to the selected team', async () => {
+    mockGetMembers.mockResolvedValue([
+      member('Alice', [{ name: 'Alpha', status: 'public' }]),
+      member('Bob', [{ name: 'Beta', status: 'public' }]),
+      // Carol's Alpha membership is hidden — excluded in /weekly-stamp team-selected view
+      member('Carol', [{ name: 'Alpha', status: 'hidden' }]),
+    ])
+
+    const el = await Home({ searchParams: Promise.resolve({ team: 'Alpha' }) })
+
+    const grid = findByType(el, WeeklyHeatmapGrid)
+    expect(grid).not.toBeNull()
+    const results = (grid!.props as { results: MemberFeedResult[] }).results
+    const names = results.map((r) => r.member.name).sort()
+    // Alice (Alpha/public) included; Bob (Beta) excluded; Carol (Alpha/hidden) EXCLUDED.
+    // NOTE: main page TEAM-04(b) includes Carol — this page intentionally differs.
+    expect(names).toEqual(['Alice'])
+  })
 })
