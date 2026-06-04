@@ -46,7 +46,9 @@ export default function CommitGrid({ slots, items }: CommitGridProps) {
     }
   }
 
-  const colsClass = COLS_CLASS[slots.length] ?? 'grid-cols-1'
+  // Always render slots in Mon→Sun order (day_of_week 1–7), regardless of DB order
+  const sortedSlots = [...slots].sort((a, b) => a.day_of_week - b.day_of_week)
+  const colsClass = COLS_CLASS[sortedSlots.length] ?? 'grid-cols-1'
 
   // Compute week dates for 3 weeks: -2 (oldest), -1 (middle), 0 (current)
   const week0Dates = getWeekDates(-2) // oldest
@@ -54,7 +56,7 @@ export default function CommitGrid({ slots, items }: CommitGridProps) {
   const week2Dates = getWeekDates(0)  // current (most recent)
 
   function renderCells(weekDates: string[]) {
-    return slots.map((slot, idx) => {
+    return sortedSlots.map((slot, idx) => {
       const article = matchArticleToSlot(slot, weekDates, articleDateMap)
       if (article && article.thumbnail && article.link) {
         return (
