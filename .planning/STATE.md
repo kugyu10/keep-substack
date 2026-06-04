@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Commit & Goal View + Substack Profile Link
-status: executing
-stopped_at: Phase 30 UI-SPEC approved
-last_updated: "2026-06-04T17:16:39.646Z"
+status: milestone_complete
+stopped_at: Milestone complete (Phase 30 was final phase)
+last_updated: 2026-06-04T17:22:52.003Z
 last_activity: 2026-06-04 -- Phase 30 planning complete
 progress:
   total_phases: 4
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-02 — v1.7 Commit & Goal View + Substack Profile Link started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 30 — アチーブメント（👑 / 🔥）
+**Current focus:** Milestone complete
 
 ## Current Position
 
 Phase: 30
 Plan: Not started
-Status: Ready to execute
-Last activity: 2026-06-04 -- Phase 30 planning complete
+Status: Milestone complete
+Last activity: 2026-06-04
 
 ## Performance Metrics
 
