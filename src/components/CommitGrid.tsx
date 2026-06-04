@@ -2,6 +2,7 @@
 import { getWeekDates, matchArticleToSlot } from '@/lib/commitUtils'
 import { isoToJSTDateKey } from '@/lib/calendarUtils'
 import type { CommitSlot, FeedItem } from '@/lib/types'
+import CommitGridCell from './CommitGridCell'
 
 type CommitGridProps = {
   slots: CommitSlot[]
@@ -61,23 +62,19 @@ export default function CommitGrid({ slots, items, imageUrl }: CommitGridProps) 
     return sortedSlots.map((slot, idx) => {
       const article = matchArticleToSlot(slot, weekDates, articleDateMap)
       if (article && article.thumbnail && article.link) {
+        // Pattern A: thumbnail + link
         return (
-          <a
-            key={idx}
-            href={article.link}
-            target="_blank"
-            rel="noreferrer"
-            className="h-full rounded overflow-hidden block border border-gray-200"
-          >
-            <img src={article.thumbnail} alt="" className="object-cover w-full h-full" />
-          </a>
+          <CommitGridCell key={idx} href={article.link} title={article.title}>
+            <img src={article.thumbnail} alt="" className="object-cover w-full h-full rounded overflow-hidden border border-gray-200" />
+          </CommitGridCell>
         )
       }
       if (article && article.thumbnail) {
+        // Pattern B: thumbnail, no link
         return (
-          <div key={idx} className="h-full rounded overflow-hidden block border border-gray-200">
-            <img src={article.thumbnail} alt="" className="object-cover w-full h-full" />
-          </div>
+          <CommitGridCell key={idx} title={article.title}>
+            <img src={article.thumbnail} alt="" className="object-cover w-full h-full rounded overflow-hidden border border-gray-200" />
+          </CommitGridCell>
         )
       }
       const dateKey = weekDates[slot.day_of_week - 1]
@@ -85,6 +82,7 @@ export default function CommitGrid({ slots, items, imageUrl }: CommitGridProps) 
         ? `${parseInt(dateKey.slice(5, 7))}/${parseInt(dateKey.slice(8, 10))}`
         : ''
       if (article) {
+        // Pattern C: no thumbnail, use imageUrl fallback or ✓ mark
         const cell = imageUrl ? (
           <div className="h-full rounded overflow-hidden block border border-gray-200">
             <img src={imageUrl} alt="" className="object-cover w-full h-full" />
@@ -94,9 +92,11 @@ export default function CommitGrid({ slots, items, imageUrl }: CommitGridProps) 
             <span className="text-[10px] leading-none text-primary font-medium">✓</span>
           </div>
         )
-        return article.link
-          ? <a key={idx} href={article.link} target="_blank" rel="noreferrer" className="h-full block">{cell}</a>
-          : <div key={idx} className="h-full">{cell}</div>
+        return (
+          <CommitGridCell key={idx} href={article.link ?? undefined} title={article.title}>
+            {cell}
+          </CommitGridCell>
+        )
       }
       return (
         <div
