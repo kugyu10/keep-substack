@@ -67,7 +67,7 @@ export default function CommitGrid({ slots, items, imageUrl }: CommitGridProps) 
             href={article.link}
             target="_blank"
             rel="noreferrer"
-            className="h-full rounded overflow-hidden block"
+            className="h-full rounded overflow-hidden block border border-gray-200"
           >
             <img src={article.thumbnail} alt="" className="object-cover w-full h-full" />
           </a>
@@ -75,7 +75,7 @@ export default function CommitGrid({ slots, items, imageUrl }: CommitGridProps) 
       }
       if (article && article.thumbnail) {
         return (
-          <div key={idx} className="h-full rounded overflow-hidden block">
+          <div key={idx} className="h-full rounded overflow-hidden block border border-gray-200">
             <img src={article.thumbnail} alt="" className="object-cover w-full h-full" />
           </div>
         )
@@ -86,11 +86,11 @@ export default function CommitGrid({ slots, items, imageUrl }: CommitGridProps) 
         : ''
       if (article) {
         const cell = imageUrl ? (
-          <div className="h-full rounded overflow-hidden block">
+          <div className="h-full rounded overflow-hidden block border border-gray-200">
             <img src={imageUrl} alt="" className="object-cover w-full h-full" />
           </div>
         ) : (
-          <div className="h-full flex items-center justify-center rounded bg-primary/20">
+          <div className="h-full flex items-center justify-center rounded border border-gray-200 bg-primary/20">
             <span className="text-[10px] leading-none text-primary font-medium">✓</span>
           </div>
         )
