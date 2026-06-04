@@ -434,17 +434,17 @@ Unicode emoji を JSX に直接書くのは XSS リスクなし（React は文�
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **`buildArticleDateMap` の重複実装をどうするか**
    - What we know: `CommitGrid.tsx` と `consecutiveWeekStreak` で同じ articleDateMap 構築ロジックが必要
    - What's unclear: `commitUtils.ts` にエクスポート関数として切り出すか、private ヘルパーにとどめるか
-   - Recommendation: `commitUtils.ts` に非エクスポートの内部ヘルパーとして実装。`CommitGrid` は現行のインライン実装を維持（変更最小化）
+   - RESOLVED: `commitUtils.ts` に非エクスポートの内部ヘルパーとして実装。`CommitGrid` は現行のインライン実装を維持（変更最小化）
 
 2. **`CommitGoalRow.test.tsx` のテスト手法**
    - What we know: 既存 `CommitGrid.test.tsx` は jsdom を使わずに React element tree を直接検査している
    - What's unclear: `CommitGoalRow` に `Link` コンポーネント（Next.js）が含まれるため、同じ手法が使えるか
-   - Recommendation: `Link` は文字列型チェックで迂回できる（既存パターン踏襲）。`findByType(el, 'div')` / `collectText()` で streak 値ごとの DOM 出力を検証
+   - RESOLVED: `Link` は文字列型チェックで迂回できる（既存パターン踏襲）。`findByType(el, 'div')` / `collectText()` で streak 値ごとの DOM 出力を検証
 
 ---
 
