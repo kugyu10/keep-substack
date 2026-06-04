@@ -51,17 +51,6 @@ export function matchArticleToSlot(
 }
 
 /**
- * Count articles whose JST date falls within the given date set.
- */
-function countArticlesInDateSet(items: FeedItem[], dateSet: Set<string>): number {
-  return items.filter((item) => {
-    if (!item.isoDate) return false
-    const key = isoToJSTDateKey(item.isoDate)
-    return key !== null && dateSet.has(key)
-  }).length
-}
-
-/**
  * Builds a Map from JST date key ('YYYY-MM-DD') to FeedItem[] from the given items array.
  * Internal helper — not exported.
  */
