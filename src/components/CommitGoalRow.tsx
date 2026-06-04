@@ -8,9 +8,10 @@ type CommitGoalRowProps = {
   items: FeedItem[]
   slots: CommitSlot[]
   imageUrl?: string
+  streak: number
 }
 
-export default function CommitGoalRow({ member, items, slots, imageUrl }: CommitGoalRowProps) {
+export default function CommitGoalRow({ member, items, slots, imageUrl, streak }: CommitGoalRowProps) {
   return (
     <div className="flex items-center border-b border-[#ebebeb] py-1">
       {/* Column 1: Avatar + Name */}
@@ -46,8 +47,18 @@ export default function CommitGoalRow({ member, items, slots, imageUrl }: Commit
         </div>
       )}
 
-      {/* Column 3: Achievement placeholder (D-09) — Phase 30 will fill this */}
-      <div className="w-8 shrink-0" aria-hidden="true" />
+      {/* Column 3: Achievement icon (D-09 / Phase 30 ACHIEV-01/02) */}
+      {streak === 0 ? (
+        <div className="w-8 shrink-0" aria-hidden="true" />
+      ) : streak === 1 ? (
+        <div className="w-8 shrink-0 flex items-center justify-center">
+          <span role="img" aria-label="今週達成" className="text-sm leading-none">👑</span>
+        </div>
+      ) : (
+        <div className="w-10 shrink-0 flex items-center justify-center gap-1">
+          <span role="img" aria-label="連続達成" className="text-sm leading-none">👑🔥</span>
+        </div>
+      )}
     </div>
   )
 }
