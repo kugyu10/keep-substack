@@ -28,7 +28,13 @@ See: .planning/PROJECT.md (updated 2026-06-02 — v1.7 Commit & Goal View + Subs
 Phase: 30
 Plan: Not started
 Status: Milestone complete
-Last activity: 2026-06-04
+Last activity: 2026-06-05 - Completed quick task 260605-42o: grid hoverでタイトルpopover
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260605-42o | grid hoverでタイトルpopover | 2026-06-05 | d4bc6f6 | [260605-42o-grid-hover-popover](.planning/quick/260605-42o-grid-hover-popover/) |
 
 ## Performance Metrics
 
