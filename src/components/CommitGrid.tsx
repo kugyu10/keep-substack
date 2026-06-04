@@ -100,21 +100,21 @@ export default function CommitGrid({ slots, items }: CommitGridProps) {
   }
 
   return (
-    <div className="flex flex-1">
-      {/* Week 0 (oldest): hidden on mobile */}
-      <div className="hidden sm:flex flex-1 gap-1">
+    <div className="flex flex-1 gap-2">
+      {/* Week 0 (2週前): hidden on mobile */}
+      <div className="hidden sm:flex flex-1 bg-gray-50 rounded-md p-1">
         <div className={`grid gap-1 ${colsClass} w-full`}>
           {renderCells(week0Dates)}
         </div>
       </div>
-      {/* Week 1 (middle): hidden on mobile */}
-      <div className="hidden sm:flex flex-1 gap-1 border-l border-gray-200">
+      {/* Week 1 (先週): hidden on mobile */}
+      <div className="hidden sm:flex flex-1 bg-gray-50 rounded-md p-1">
         <div className={`grid gap-1 ${colsClass} w-full`}>
           {renderCells(week1Dates)}
         </div>
       </div>
-      {/* Week 2 (current): always visible */}
-      <div className="flex flex-1 gap-1 border-l border-gray-200 sm:border-l-0">
+      {/* Week 2 (今週): always visible */}
+      <div className="flex flex-1 bg-gray-50 rounded-md p-1">
         <div className={`grid gap-1 ${colsClass} w-full`}>
           {renderCells(week2Dates)}
         </div>

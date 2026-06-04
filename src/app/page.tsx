@@ -49,7 +49,7 @@ export default async function Home({ searchParams }: Props) {
   }))
 
   return (
-    <main className="max-w-[600px] mx-auto px-3 py-4">
+    <main className="max-w-[960px] mx-auto px-4 py-4">
       <h1 className="text-2xl mb-2" style={{ fontFamily: 'Georgia, serif', fontWeight: 900 }}>Keep Substack</h1>
 
       {teams.length > 0 && (

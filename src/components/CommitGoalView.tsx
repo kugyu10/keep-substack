@@ -15,6 +15,25 @@ export default function CommitGoalView({ results, slots }: CommitGoalViewProps) 
 
   return (
     <div>
+      {/* Week header — aligned to CommitGoalRow column structure */}
+      <div className="flex items-center pb-1 mb-0.5">
+        {/* Spacer matching avatar+name column (w-16 sm:w-52 + pr-2) */}
+        <div className="w-16 sm:w-52 shrink-0 pr-2" />
+        {/* Week labels — gap-2 matches CommitGrid gap */}
+        <div className="flex flex-1 gap-2">
+          <div className="hidden sm:flex flex-1 justify-center">
+            <span className="text-[10px] text-gray-400">2週前</span>
+          </div>
+          <div className="hidden sm:flex flex-1 justify-center">
+            <span className="text-[10px] text-gray-400">先週</span>
+          </div>
+          <div className="flex flex-1 justify-center">
+            <span className="text-[10px] text-gray-500 font-medium">今週</span>
+          </div>
+        </div>
+        {/* Spacer matching achievement placeholder */}
+        <div className="w-8 shrink-0" />
+      </div>
       {sorted.map(({ member, items, imageUrl }) => {
         const memberSlots = slots.filter((s) => s.member_id === member.id)
         return (
