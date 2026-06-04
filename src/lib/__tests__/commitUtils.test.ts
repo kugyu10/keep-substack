@@ -219,6 +219,32 @@ describe('sortMembersForCommitView', () => {
     expect(original[0].member.name).toBe('A')
     expect(original[1].member.name).toBe('B')
   })
+
+  it('breaks rate ties by streak weeks descending', () => {
+    // Both members fulfill their slot this week (equal rate = 100%).
+    // HighStreak also fulfilled last week → streak 2.
+    // LowStreak only fulfilled this week → streak 1.
+    // Tiebreak ② should place HighStreak first.
+    const thisWeekDates = getWeekDates(0)
+    const lastWeekDates = getWeekDates(-1)
+    const mondayThisIso = thisWeekDates[0] + 'T00:30:00.000Z'
+    const mondayLastIso = lastWeekDates[0] + 'T00:30:00.000Z'
+
+    const highStreak = member('HighStreak')
+    const lowStreak = member('LowStreak')
+
+    const highResult = result(highStreak, [feedItem(mondayThisIso), feedItem(mondayLastIso)])
+    const lowResult = result(lowStreak, [feedItem(mondayThisIso)])
+
+    const slots: CommitSlot[] = [
+      { member_id: highStreak.id, day_of_week: 1, hour: 10 },
+      { member_id: lowStreak.id, day_of_week: 1, hour: 10 },
+    ]
+
+    const sorted = sortMembersForCommitView([lowResult, highResult], slots)
+    expect(sorted[0].member.name).toBe('HighStreak')
+    expect(sorted[1].member.name).toBe('LowStreak')
+  })
 })
 
 // ─────────────────────────────────────────────
