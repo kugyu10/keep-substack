@@ -94,6 +94,7 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - ✓ Magic Linkログインフローと/admin保護をPlaywrightでE2Eテストできる — v1.6 (Validated in Phase 26)
 - ✓ 個人マンスリービューで名前/アイコンクリック → `https://substack.com/@{substack_handle}` に遷移する — v1.7 (Validated in Phase 27)
 - ✓ `/my` ページで Substack @handle を登録・更新できる — v1.7 (Validated in Phase 27)
+- ✓ 👑（今週全コミット達成）・🔥（2週以上連続達成）のアチーブメントアイコンを CommitGoalView に表示する — v1.7 (Validated in Phase 30)
 
 ### Active
 - [ ] `/my` ページでコミットスケジュール（週N回・曜日・時刻）を設定できる
@@ -101,7 +102,6 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - [ ] コミットGridが3週分横並びで表示される（週1〜4で総横幅同一・達成=サムネイル / 未達成=曜日名）
 - [ ] スマホ幅が足りない場合はGridを1週表示に縮退する
 - [ ] コミット未設定メンバーは `| 未コミット |` グレー表示される
-- [ ] 👑（今週全コミット達成）・🔥（2週以上連続達成）のアチーブメントアイコンを表示する
 - [ ] 現トップ（週次ヒートマップ）が `/weekly-stamp` で引き続きアクセスできる
 
 ### Active (Future)
@@ -192,4 +192,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-02 after v1.7 milestone started — Commit & Goal View + Substack Profile Link*
+*Last updated: 2026-06-05
