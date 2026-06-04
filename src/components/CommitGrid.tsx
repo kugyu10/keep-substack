@@ -95,8 +95,8 @@ export default function CommitGrid({ slots, items, imageUrl }: CommitGridProps) 
           </div>
         )
         return article.link
-          ? <a key={idx} href={article.link} target="_blank" rel="noreferrer">{cell}</a>
-          : <div key={idx}>{cell}</div>
+          ? <a key={idx} href={article.link} target="_blank" rel="noreferrer" className="h-full block">{cell}</a>
+          : <div key={idx} className="h-full">{cell}</div>
       }
       return (
         <div
