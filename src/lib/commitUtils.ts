@@ -90,12 +90,33 @@ export function isCurrentWeekComplete(
 }
 
 /**
- * Returns the number of consecutive weeks (starting from this week) in which
- * all commit slots were fulfilled. Today's week counts if complete.
+ * Returns true if any slot's day has already passed this week (strictly before today
+ * in JST) and has no article. Used to distinguish "slot day not yet arrived" from
+ * "slot day passed and missed".
+ */
+function hasWeekFailed(
+  slots: CommitSlot[],
+  weekDates: string[],
+  articleDateMap: Map<string, FeedItem[]>
+): boolean {
+  const nowJST = new Date(Date.now() + 9 * 60 * 60 * 1000)
+  const todayKey = `${nowJST.getUTCFullYear()}-${String(nowJST.getUTCMonth() + 1).padStart(2, '0')}-${String(nowJST.getUTCDate()).padStart(2, '0')}`
+  return slots.some((slot) => {
+    const dateKey = weekDates[slot.day_of_week - 1]
+    if (!dateKey) return false
+    if (dateKey >= todayKey) return false // today or future — not missed yet
+    const articles = articleDateMap.get(dateKey)
+    return !(articles && articles.length > 0)
+  })
+}
+
+/**
+ * Returns the number of consecutive weeks in which all commit slots were fulfilled.
  *
  * - slots=[] → 0
- * - This week incomplete → 0
- * - This week only → 1
+ * - This week: slot day not yet arrived (still pending) → check prior weeks
+ * - This week: slot day passed with no article → 0
+ * - This week only complete → 1
  * - This week + last week → 2
  * - This week + last week + 2 weeks ago → 3
  *
@@ -105,9 +126,15 @@ export function consecutiveWeekStreak(slots: CommitSlot[], items: FeedItem[]): n
   if (slots.length === 0) return 0
   const articleDateMap = buildArticleDateMap(items)
   let streak = 0
+  // Look back at most 3 weeks (current + 2 prior). Spec caps streak display at 3.
   for (let offset = 0; offset >= -2; offset--) {
-    if (isCurrentWeekComplete(slots, getWeekDates(offset), articleDateMap)) {
+    const weekDates = getWeekDates(offset)
+    if (isCurrentWeekComplete(slots, weekDates, articleDateMap)) {
       streak++
+    } else if (offset === 0 && !hasWeekFailed(slots, weekDates, articleDateMap)) {
+      // Current week: no slot day has passed without an article yet.
+      // Slot day is today or in the future — don't count this week but keep checking prior weeks.
+      continue
     } else {
       break
     }

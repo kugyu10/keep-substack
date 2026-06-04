@@ -334,4 +334,36 @@ describe('consecutiveWeekStreak', () => {
     const items: FeedItem[] = [feedItem(thisMondayIso), feedItem(lastMondayIso)]
     expect(consecutiveWeekStreak(slots, items)).toBe(2)
   })
+
+  it('今週のスロット日がまだ来ていない場合、先週のstreakを引き継ぐ', () => {
+    // Sunday slot (day_of_week=7): if today is Mon-Sat (JST), this Sunday hasn't arrived yet.
+    // The streak from last week should carry over unchanged.
+    const nowJST = new Date(Date.now() + 9 * 60 * 60 * 1000)
+    const todayIsoDow = nowJST.getUTCDay() === 0 ? 7 : nowJST.getUTCDay()
+    if (todayIsoDow === 7) return // Running on Sunday — slot day has arrived, skip
+
+    const slots: CommitSlot[] = [{ member_id: 'uuid-1', day_of_week: 7, hour: 10 }]
+    const lastWeekDates = getWeekDates(-1)
+    const lastSundayIso = lastWeekDates[6] + 'T01:00:00.000Z'
+    const items: FeedItem[] = [feedItem(lastSundayIso)]
+
+    // Last week complete, this week's Sunday not yet arrived → streak = 1
+    expect(consecutiveWeekStreak(slots, items)).toBe(1)
+  })
+
+  it('2週連続達成 + 今週スロット日未到来 → streak=2', () => {
+    // Same Sunday-slot setup: last 2 weeks both complete, this Sunday pending.
+    const nowJST = new Date(Date.now() + 9 * 60 * 60 * 1000)
+    const todayIsoDow = nowJST.getUTCDay() === 0 ? 7 : nowJST.getUTCDay()
+    if (todayIsoDow === 7) return // Running on Sunday — skip
+
+    const slots: CommitSlot[] = [{ member_id: 'uuid-1', day_of_week: 7, hour: 10 }]
+    const lastWeekDates = getWeekDates(-1)
+    const twoWeeksAgoDates = getWeekDates(-2)
+    const lastSundayIso = lastWeekDates[6] + 'T01:00:00.000Z'
+    const twoWeeksAgoSundayIso = twoWeeksAgoDates[6] + 'T01:00:00.000Z'
+    const items: FeedItem[] = [feedItem(lastSundayIso), feedItem(twoWeeksAgoSundayIso)]
+
+    expect(consecutiveWeekStreak(slots, items)).toBe(2)
+  })
 })
