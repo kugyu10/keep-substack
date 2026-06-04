@@ -197,9 +197,16 @@ Plans:
 
 **Requirements:** ACHIEV-01, ACHIEV-02
 
-**Plans:** 1
+**Plans:** 2 plans
 
-1. アチーブメント計算ロジック（`isCurrentWeekComplete`・`consecutiveWeekStreak`）+ CommitGoalView への表示
+Plans:
+**Wave 1**
+
+- [ ] 30-01-PLAN.md — ロジック実装（TDD）: isCurrentWeekComplete / consecutiveWeekStreak / sortMembersForCommitView D-10完全版 を commitUtils.ts に追加・更新 + テスト
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 30-02-PLAN.md — UI接続: CommitGoalRow に streak prop 追加・Column 3 👑/👑🔥/空 条件分岐 + CommitGoalView で streak 計算・ヘッダー幅同期 + CommitGoalRow.test.tsx 新規作成
 
 **Success Criteria:**
 
@@ -247,4 +254,4 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 27. Substack Handle — DB + プロフィールリンク | v1.7 | 2/2 | Complete    | 2026-06-02 |
 | 28. コミットスケジュール — DB + /my ページ | v1.7 | 0/2 | Pending | — |
 | 29. Commit & Goal View — 新トップページ | v1.7 | 2/2 | Complete | 2026-06-04 |
-| 30. アチーブメント（👑 / 🔥） | v1.7 | 0/1 | Pending | — |
+| 30. アチーブメント（👑 / 🔥） | v1.7 | 0/2 | Pending | — |
