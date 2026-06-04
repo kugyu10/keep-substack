@@ -6,6 +6,7 @@ import type { CommitSlot, FeedItem } from '@/lib/types'
 type CommitGridProps = {
   slots: CommitSlot[]
   items: FeedItem[]
+  imageUrl?: string
 }
 
 // Day-of-week label mapping (ISO 8601: 1=Mon … 7=Sun, D-03)
@@ -31,7 +32,7 @@ const COLS_CLASS: Record<number, string> = {
   7: 'grid-cols-7',
 }
 
-export default function CommitGrid({ slots, items }: CommitGridProps) {
+export default function CommitGrid({ slots, items, imageUrl }: CommitGridProps) {
   // Build articleDateMap: Map<string, FeedItem[]> keyed by JST date key
   const articleDateMap = new Map<string, FeedItem[]>()
   for (const item of items) {
@@ -94,12 +95,15 @@ export default function CommitGrid({ slots, items }: CommitGridProps) {
       const dateLabel = dateKey
         ? `${parseInt(dateKey.slice(5, 7))}/${parseInt(dateKey.slice(8, 10))}`
         : ''
-      // Article exists but has no thumbnail (e.g. audio/text-only post) — show posted indicator
+      // Article exists but has no thumbnail (e.g. audio/text-only post) — show publication icon
       if (article) {
-        const cell = (
-          <div className="aspect-square flex flex-col items-center justify-center gap-0.5 rounded bg-primary/20">
+        const cell = imageUrl ? (
+          <div className="aspect-square rounded overflow-hidden block">
+            <img src={imageUrl} alt="" className="object-cover w-full h-full" />
+          </div>
+        ) : (
+          <div className="aspect-square flex items-center justify-center rounded bg-primary/20">
             <span className="text-[10px] leading-none text-primary font-medium">✓</span>
-            <span className="text-[10px] leading-none text-primary/80">{dateLabel}</span>
           </div>
         )
         return article.link

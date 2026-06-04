@@ -42,7 +42,7 @@ export default function CommitGoalRow({ member, items, slots, imageUrl }: Commit
         </div>
       ) : (
         <div className="flex-1">
-          <CommitGrid slots={slots} items={items} />
+          <CommitGrid slots={slots} items={items} imageUrl={imageUrl} />
         </div>
       )}
 
