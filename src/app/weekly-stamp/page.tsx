@@ -56,6 +56,12 @@ export default async function Home({ searchParams }: Props) {
         </div>
       )}
 
+      <div className="flex justify-end mb-2">
+        <a href="/" className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2">
+          ← コミット & ゴール
+        </a>
+      </div>
+
       <WeeklyHeatmapGrid results={results} />
       <PrBanner />
     </main>

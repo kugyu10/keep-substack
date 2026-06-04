@@ -76,6 +76,12 @@ export default async function Home({ searchParams }: Props) {
         </div>
       )}
 
+      <div className="flex justify-end mb-2">
+        <a href="/weekly-stamp" className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2">
+          週次ヒートマップ →
+        </a>
+      </div>
+
       <CommitGoalView results={results21} slots={(slotsData ?? []) as CommitSlot[]} />
       <PrBanner />
     </main>
