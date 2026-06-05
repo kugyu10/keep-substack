@@ -2,6 +2,7 @@ import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import CommitGoalView from '@/components/CommitGoalView'
+import ViewTabs from '@/components/ViewTabs'
 import type { CommitSlot } from '@/lib/types'
 
 export const revalidate = 300
@@ -49,7 +50,9 @@ export default async function Home({ searchParams }: Props) {
 
   return (
     <main className="max-w-[960px] mx-auto px-4 py-4">
-      <h1 className="text-2xl mb-2" style={{ fontFamily: 'Georgia, serif', fontWeight: 900 }}>Keep Substack</h1>
+      <h1 className="text-2xl mb-4" style={{ fontFamily: 'Georgia, serif', fontWeight: 900 }}>Keep Substack</h1>
+
+      <ViewTabs active="goal" />
 
       {teams.length > 0 && (
         <div className="flex gap-2 mb-4 flex-wrap">
@@ -74,12 +77,6 @@ export default async function Home({ searchParams }: Props) {
           ))}
         </div>
       )}
-
-      <div className="flex justify-end mb-2">
-        <a href="/weekly-stamp" className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2">
-          週次ヒートマップ →
-        </a>
-      </div>
 
       <CommitGoalView results={results21} slots={(slotsData ?? []) as CommitSlot[]} />
     </main>
