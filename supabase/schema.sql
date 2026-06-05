@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS members (
   image_url      TEXT,
   added_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
   user_id        UUID        REFERENCES auth.users(id) UNIQUE,
-  substack_handle TEXT
+  substack_handle TEXT UNIQUE
 );
 -- 既存Supabaseインスタンスへの適用:
 -- ALTER TABLE members ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) UNIQUE;
