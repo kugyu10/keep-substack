@@ -22,7 +22,7 @@ created: 2026-06-05
 | Preset | not applicable |
 | Component library | none (Tailwind CSS v4 inline theme) |
 | Icon library | none (絵文字 👑🔥 のみ) |
-| Font | Lora (Google Fonts, weights 400/500/600/700) |
+| Font | Lora (Google Fonts, weights 400/600) |
 
 Source: `src/app/globals.css` — 直接確認
 
@@ -57,9 +57,9 @@ Source: `MyProfileForm.tsx`, `AdminMemberList.tsx`, `LoginForm.tsx` — 既存�
 | Body | 14px (`text-sm`) | 400 (regular) | 1.5 |
 | Label | 14px (`text-sm`) | 600 (semibold) | 1.2 |
 | Caption | 12px (`text-xs`) | 400 (regular) | 1.4 |
-| Heading (送信完了) | 18px (`text-lg`) | 500 (medium) | 1.2 |
+| Heading (送信完了) | 18px (`text-lg`) | 600 (semibold) | 1.2 |
 
-制約: フォントは Lora serif のみ。`font-semibold` (600) と plain (400) の2ウェイト。
+制約: フォントは Lora serif のみ。`font-semibold` (600) と plain (400) の2ウェイト体系。weight 500 (medium) は使用しない。
 
 Source: `MyProfileForm.tsx`, `LoginForm.tsx`, `AdminMemberList.tsx` — 既存 className から抽出
 
@@ -99,6 +99,10 @@ Phase 31 で UI に触れるコンポーネントを列挙する。
 **表示コントラクト:**
 - エラーは `<p role="alert" className="text-sm text-red-600">` で表示 (`MyProfileForm.tsx` パターンに統一)
 - 現在 `LoginForm` は `role="alert"` なし → Phase 31 で追加する
+
+**送信完了状態の focal point:**
+- `state === 'SENT'` 時にフォームを非表示にして表示される `<h2 className="text-lg font-semibold">メールを送信しました</h2>` がこの画面の唯一の視覚的アンカー (focal point) である
+- body テキスト (`text-sm`) はこの heading の下に配置し、視線の流れを heading → body の順に誘導する
 
 ### 2. MyProfileForm.tsx — substack_handle 読み取り専用制御 (D-03)
 
@@ -160,10 +164,11 @@ Pattern source: `MyProfileForm.tsx` 既存の `publicationId` 読み取り専用
 | 保存中 | `保存中...` (既存) |
 | エラー — 登録リンク不正 (D-01) | `登録リンクが不正です` |
 | エラー — handle 重複 (D-05) | `このハンドルはすでに使用されています` |
+| エラー — handle 重複 サブテキスト (D-05) | `別のハンドルを試してください` (`text-xs text-gray-500` キャプションとして直後に表示) |
 | エラー — 汎用保存失敗 | `保存に失敗しました。もう一度お試しください` |
 | 読み取り専用 — handle 設定済み | `Substack ハンドルは変更できません` |
 | 読み取り専用 — handle 設定済み説明 | (キャプション不要 — 「変更できません」で十分) |
-| 送信完了メッセージ heading | `メールを送信しました` (既存) |
+| 送信完了メッセージ heading | `メールを送信しました` (既存、focal point) |
 | 送信完了メッセージ body | `受信トレイを確認してログインリンクをクリックしてください` (既存) |
 | 確認ダイアログ — publication_id 変更 (D-04) | `publication_id を変更します。記事データとの紐付けに影響します。続けますか？` |
 | 確認ダイアログ — メンバー削除 (既存) | `"{publicationId}" を削除しますか？` (既存、変更なし) |
@@ -186,7 +191,7 @@ Phase 31 で変更・追加される全インタラクション状態を列挙�
 | Pending | submit 後 `isPending=true` | ボタン `disabled opacity-50`、ラベル「送信中...」 |
 | Error — invalid link | `pid` or `handle` 欠落 | `<p role="alert" text-red-600>` 登録リンクが不正です |
 | Error — other | Supabase エラー等 | `<p role="alert" text-red-600>` {error message} |
-| Success | `state === 'SENT'` | フォームを非表示、完了メッセージ表示 |
+| Success | `state === 'SENT'` | フォームを非表示、完了メッセージ表示 (focal point: `text-lg font-semibold` heading) |
 
 ### MyProfileForm — substack_handle
 
@@ -194,7 +199,7 @@ Phase 31 で変更・追加される全インタラクション状態を列挙�
 |-------|---------|--------|
 | 設定済み (locked) | `substackHandle != null` | `<p>` タグ + bg-gray-100 + 「変更できません」キャプション |
 | 未設定 (editable) | `substackHandle == null` | `<input>` + プレースホルダー `@yourhandle` |
-| Error — 23505 | handleUpdate → 23505 | `<p role="alert" text-red-600>` このハンドルはすでに使用されています |
+| Error — 23505 | handleUpdate → 23505 | `<p role="alert" text-red-600>` このハンドルはすでに使用されています + `<p text-xs text-gray-500>` 別のハンドルを試してください |
 | Error — generic | handleUpdate → other error | `<p role="alert" text-red-600>` 保存に失敗しました |
 
 ### AdminMemberList — 編集行
