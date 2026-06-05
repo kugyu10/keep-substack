@@ -1,163 +1,110 @@
 ---
 phase: 31-login-fix
-reviewed: 2026-06-05T00:00:00Z
+reviewed: 2026-06-06T00:00:00Z
 depth: standard
-files_reviewed: 16
+files_reviewed: 22
 files_reviewed_list:
-  - src/app/admin/AdminMemberList.tsx
-  - src/app/admin/__tests__/updateMemberAction.test.ts
-  - src/app/admin/actions.ts
-  - src/app/auth/__tests__/callback.test.ts
-  - src/app/auth/callback/route.ts
-  - src/app/login-51cf21389c56/LoginForm.tsx
-  - src/app/login-51cf21389c56/__tests__/sendMagicLinkAction.test.ts
-  - src/app/login-51cf21389c56/actions.ts
-  - src/app/my/MyProfileForm.tsx
-  - src/app/my/__tests__/updateMyProfileAction.test.ts
-  - src/app/my/actions.ts
-  - src/app/my/page.tsx
-  - src/lib/members.ts
-  - src/lib/types.ts
   - supabase/migrations/20260605000000_add_substack_handle_unique.sql
   - supabase/schema.sql
+  - src/app/auth/callback/route.ts
+  - src/app/auth/__tests__/callback.test.ts
+  - src/app/my/actions.ts
+  - src/app/my/__tests__/updateMyProfileAction.test.ts
+  - src/app/admin/__tests__/updateMemberAction.test.ts
+  - src/lib/members.ts
+  - src/lib/types.ts
+  - src/app/admin/actions.ts
+  - src/app/admin/AdminMemberList.tsx
+  - src/app/my/MyProfileForm.tsx
+  - src/app/my/page.tsx
+  - src/app/my/__tests__/page.test.tsx
+  - src/app/member/[publicationId]/page.tsx
+  - src/app/login/actions.ts
+  - src/app/login/LoginForm.tsx
+  - src/app/login/page.tsx
+  - src/app/login/__tests__/sendMagicLinkAction.test.ts
+  - src/app/signin-51cf21389c56/actions.ts
+  - src/app/signin-51cf21389c56/LoginForm.tsx
+  - src/app/signin-51cf21389c56/page.tsx
+  - src/app/signin-51cf21389c56/__tests__/sendMagicLinkAction.test.ts
 findings:
   critical: 2
-  warning: 4
-  info: 1
-  total: 7
+  warning: 3
+  info: 3
+  total: 8
 status: issues_found
 ---
 
 # Phase 31: Code Review Report
 
-**Reviewed:** 2026-06-05T00:00:00Z
+**Reviewed:** 2026-06-06T00:00:00Z
 **Depth:** standard
-**Files Reviewed:** 16
+**Files Reviewed:** 22
 **Status:** issues_found
 
 ## Summary
 
-This phase implements a login flow fix: magic-link generation captures `pid` and `substack_handle` in the callback URL, the callback route auto-inserts a new member row if one does not exist, and the profile page allows a user to set their handle for the first time. The overall architecture is sound, but two blockers were found: a data-loss bug that silently clears `substack_handle` on every profile save, and an invalid PostgreSQL migration syntax that will fail at deploy time. Four additional warnings address error-handling gaps and a dead-code path.
+This phase splits the login flow into two routes: `signin-51cf21389c56` (new member registration, requires `pid` + `handle`) and `/login` (existing member re-login, bare callback URL). The `auth/callback` route was extended to INSERT a new member row when `pid` is present but no existing member record is found, including a 23505-fallback that retries with `substack_handle: null`. The `MyProfileForm` renders the handle as read-only once set (via a hidden input to preserve the value on save).
+
+Two critical issues were found. First, `updateMyProfileAction` does not enforce server-side immutability of `substack_handle`: any authenticated user can POST an arbitrary handle value to overwrite their stored handle, bypassing the client-side read-only UI. Second, the 23505 error code check in the callback route does not distinguish a `substack_handle` collision from a `publication_id` collision — the fallback INSERT silently discards its own error, leaving the user with no member record on a `publication_id` conflict.
 
 ---
 
 ## Critical Issues
 
-### CR-01: `MyProfileForm` clears `substack_handle` to `null` on every save when a handle is already set
+### CR-01: `substack_handle` immutability enforced client-side only — any user can overwrite their handle
 
-**File:** `src/app/my/MyProfileForm.tsx:52`
+**File:** `src/app/my/actions.ts:50-51` / `src/app/my/MyProfileForm.tsx:52-58`
 
-**Issue:** When `substackHandle != null`, the form renders the value inside a `<p>` element (read-only display) and does **not** render an `<input name="substack_handle">`. When the form is submitted, `FormData.get('substack_handle')` therefore returns `null`. In `updateMyProfileAction` (`src/app/my/actions.ts:50-51`):
+**Issue:** `MyProfileForm` renders a `<input type="hidden" name="substack_handle" value={substackHandle} />` to preserve a non-null handle through the form submission. This is a client-side mechanism only. `updateMyProfileAction` reads `formData.get('substack_handle')` and writes whatever value arrives unconditionally:
 
 ```ts
+// actions.ts lines 50-51, 64
 const rawHandle = (formData.get('substack_handle') as string | null)?.trim() ?? ''
-// null?.trim() → undefined; undefined ?? '' → ''
-const substack_handle: string | null = rawHandle === '' ? null : ...
-// '' === '' → null
+const substack_handle: string | null = rawHandle === '' ? null : rawHandle.startsWith('@') ? rawHandle : '@' + rawHandle
+// ...
+await admin.from('members').update({ name, substack_handle }).eq('user_id', user.id)
 ```
 
-The update then executes `.update({ name, substack_handle: null })`, overwriting the stored handle with `NULL`. Any user who saves their profile after their Substack handle has been auto-set by the callback route will lose that handle silently.
+Any authenticated user can craft a POST request with a different `substack_handle` value, overwriting their stored handle to any string, including attempting to claim another user's handle (which would fail with a 23505 unique error returned as a user-facing message — but the attempt is unbounded). There is no server-side check that the existing handle is already set before accepting a new one.
 
-**Fix:** Add a hidden input to propagate the existing value when the handle is already set:
-
-```tsx
-{substackHandle != null ? (
-  <div>
-    <label className="block text-sm font-semibold mb-1">Substack ハンドル</label>
-    {/* Hidden input preserves the value so the server action does not clear it */}
-    <input type="hidden" name="substack_handle" value={substackHandle} />
-    <p className="text-sm text-gray-400 border rounded px-3 py-2 bg-gray-100">{substackHandle}</p>
-    <p className="text-xs text-gray-500 mt-1">Substack ハンドルは変更できません</p>
-  </div>
-) : (
-  // ... editable input as before
-)}
-```
-
-Alternatively, the server action can treat an absent `substack_handle` field (raw `null` from `FormData.get`) differently from an explicitly empty string, and skip the update in that case.
-
----
-
-### CR-02: Migration uses invalid PostgreSQL syntax — `ADD CONSTRAINT IF NOT EXISTS` does not exist
-
-**File:** `supabase/migrations/20260605000000_add_substack_handle_unique.sql:4`
-
-**Issue:** The migration contains:
-
-```sql
-ALTER TABLE members ADD CONSTRAINT IF NOT EXISTS members_substack_handle_key UNIQUE (substack_handle);
-```
-
-`ALTER TABLE … ADD CONSTRAINT IF NOT EXISTS` is **not valid PostgreSQL syntax**. PostgreSQL supports `ADD COLUMN IF NOT EXISTS` but has never had an `IF NOT EXISTS` clause for `ADD CONSTRAINT`. Running this migration will fail with:
-
-```
-ERROR: syntax error at or near "IF"
-```
-
-The migration is intended to be idempotent so that it can be applied to databases where the column already exists without the unique constraint (added by the previous migration `20260602000000_add_substack_handle.sql`).
-
-**Fix:** Use a `DO` block to check for constraint existence before adding it:
-
-```sql
-BEGIN;
-
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_constraint
-    WHERE conname = 'members_substack_handle_key'
-      AND conrelid = 'members'::regclass
-  ) THEN
-    ALTER TABLE members
-      ADD CONSTRAINT members_substack_handle_key UNIQUE (substack_handle);
-  END IF;
-END
-$$;
-
-COMMIT;
-```
-
-Note: `schema.sql` already declares `substack_handle TEXT UNIQUE` for fresh databases, so this migration only needs to target existing databases that have the column without the constraint.
-
----
-
-## Warnings
-
-### WR-01: `next` / `nextParam` variables computed but never used — dead code
-
-**File:** `src/app/auth/callback/route.ts:10-12`
-
-**Issue:** Two variables are computed that are never read again:
+**Fix:** In `updateMyProfileAction`, fetch the current `substack_handle` from the database first. If already non-null, preserve it and ignore the submitted value:
 
 ```ts
-const nextParam = searchParams.get('next') ?? '/my'   // line 10
-const next = nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/my'  // line 12
+const { data: current } = await admin
+  .from('members')
+  .select('substack_handle')
+  .eq('user_id', user.id)
+  .single()
+
+const substack_handle: string | null =
+  current?.substack_handle != null
+    ? current.substack_handle          // already set — preserve DB value, ignore form input
+    : rawHandle === '' ? null
+      : rawHandle.startsWith('@') ? rawHandle : '@' + rawHandle
 ```
-
-Line 57 always redirects to `/my` unconditionally. The `?next=` query-parameter feature was apparently removed (per the D-02 comment on line 56), but the dead code was not cleaned up. This creates confusion: a reader may expect `next` to be respected but it silently never is.
-
-**Fix:** Delete lines 10–12. If the `?next=` feature should be re-enabled, use `next` on line 57 instead of the hardcoded `'/my'`.
 
 ---
 
-### WR-02: Fallback INSERT error in callback route is silently discarded
+### CR-02: 23505 error in `auth/callback` does not distinguish `publication_id` collision from `substack_handle` collision; fallback INSERT error is silently discarded
 
-**File:** `src/app/auth/callback/route.ts:47-49`
+**File:** `src/app/auth/callback/route.ts:44-51`
 
-**Issue:** When the first INSERT fails with code `23505` (duplicate `substack_handle`), a fallback INSERT is attempted with `substack_handle: null`. The result of the fallback is not captured:
+**Issue:** Both `publication_id` (UNIQUE NOT NULL) and `substack_handle` (UNIQUE) carry unique constraints. When the initial INSERT fails, the code checks only for error code `'23505'` and assumes the conflict is on `substack_handle`:
 
 ```ts
 if (insertError?.code === '23505') {
-  // fallback — result not captured; errors silently lost
+  // assumed to be substack_handle collision, but could be publication_id
   await admin
     .from('members')
     .insert({ ...insertPayload, substack_handle: null })
+  // ← result never captured; error silently discarded
 }
 ```
 
-If the fallback INSERT also fails (e.g., a race condition on `publication_id` uniqueness, or a transient DB error), the error is discarded, the user is still redirected to `/my`, and they will have no member row — causing a broken profile page.
+If the conflict is on `publication_id` (another user has already claimed the same `pid`), the fallback INSERT also fails with 23505 and the error is silently dropped. The user is then redirected to `/my` with no member record, which renders `LinkMemberForm` instead of their profile — a confusing broken state with no error message.
 
-**Fix:** Capture and log the fallback error:
+**Fix:** Capture and log the fallback INSERT error at minimum. Ideally inspect the error detail to distinguish which constraint was violated:
 
 ```ts
 if (insertError?.code === '23505') {
@@ -166,103 +113,142 @@ if (insertError?.code === '23505') {
     .insert({ ...insertPayload, substack_handle: null })
   if (fallbackError) {
     console.error('[auth/callback] fallback member insert:', fallbackError)
+    // Consider redirecting to an error page or / instead of /my
   }
 }
 ```
 
+To distinguish constraints, check `insertError.message` — Supabase includes the constraint name in the error detail (e.g., `members_substack_handle_key` vs `members_publication_id_key`).
+
 ---
 
-### WR-03: `substack_handle` not normalized in callback route — inconsistent `@` prefix
+## Warnings
 
-**File:** `src/app/auth/callback/route.ts:39`
+### WR-01: `substack_handle` not normalized in `auth/callback` — missing `@` prefix
 
-**Issue:** The callback stores the `handle` URL parameter directly:
+**File:** `src/app/auth/callback/route.ts:9,39`
 
-```ts
-substack_handle: handle || null,
-```
+**Issue:** `handle = searchParams.get('handle')` is stored directly as `substack_handle: handle || null` without normalization. Every other write path for `substack_handle` (`my/actions.ts:51`, `admin/actions.ts:75-77`) ensures a leading `@` prefix is present. If the callback URL contains `?handle=hoge` (no `@`), the DB stores `'hoge'`. `CalendarGrid` constructs the Substack profile URL as `'https://substack.com/' + substackHandle`, so a handle stored without `@` produces `https://substack.com/hoge` instead of the correct `https://substack.com/@hoge`.
 
-The `handle` parameter originates from the magic-link URL generated by `sendMagicLinkAction`, which itself takes the value verbatim from the login page's `?handle=` query parameter. There is no `@` prefix normalization in the callback path. By contrast, both `updateMemberAction` (`src/app/admin/actions.ts:74-77`) and `updateMyProfileAction` (`src/app/my/actions.ts:51`) normalize handles by prepending `@` if absent.
-
-If the login page URL is ever generated with `handle=hoge` (no `@`), the callback stores `"hoge"` while all other code paths would store `"@hoge"`. This creates inconsistent data and will break any downstream display logic that expects the `@` prefix.
-
-**Fix:** Normalize the handle in the callback route before storing:
+**Fix:** Apply the same normalization used in the other action files:
 
 ```ts
-const rawHandle = handle?.trim() ?? ''
-const normalizedHandle = rawHandle === '' ? null
+const rawHandle = (searchParams.get('handle') ?? '').trim()
+const normalizedHandle: string | null =
+  rawHandle === '' ? null
   : rawHandle.startsWith('@') ? rawHandle : '@' + rawHandle
-
-const insertPayload = {
-  publication_id: pid,
-  name: pid,
-  user_id: user.id,
-  substack_handle: normalizedHandle,
-}
+// then use normalizedHandle instead of handle || null
 ```
 
 ---
 
-### WR-04: `deleteMemberAction` errors are unhandled in `AdminMemberList` — unhandled promise rejection
+### WR-02: Dead `next` / `nextParam` variables — misleading dead code in `auth/callback`
 
-**File:** `src/app/admin/AdminMemberList.tsx:13-16`
+**File:** `src/app/auth/callback/route.ts:10-12`
 
-**Issue:** `handleDelete` calls `deleteMemberAction` without a `try/catch`:
+**Issue:** Two variables are computed but never consumed:
 
 ```ts
-async function handleDelete(publicationId: string) {
-  if (!window.confirm(`"${publicationId}" を削除しますか？`)) return
-  await deleteMemberAction(publicationId)
-  // no error handling
+const nextParam = searchParams.get('next') ?? '/my'
+// open-redirect protection applied...
+const next = nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/my'
+// 'next' is never used below; line 57 redirects to hardcoded '/my'
+```
+
+The presence of the open-redirect guard logic implies that `next` is or will be used for dynamic post-login routing, but it is not. A future developer may add a redirect that inadvertently skips the protection, or may add `?next=/somewhere` to a URL and be confused when it is silently ignored.
+
+**Fix:** Delete lines 10-12. If the `?next=` feature is ever needed, introduce it deliberately and use the `next` variable in the redirect.
+
+---
+
+### WR-03: `deleteMemberAction` propagates unhandled exception to browser on auth failure
+
+**File:** `src/app/admin/actions.ts:52-57` / `src/app/admin/AdminMemberList.tsx:13-16`
+
+**Issue:** `deleteMemberAction` does not wrap `requireAdmin()` in a try/catch, unlike `addMemberAction` and `updateMemberAction`:
+
+```ts
+export async function deleteMemberAction(publicationId: string): Promise<void> {
+  await requireAdmin()  // throws Error('Unauthorized') if session expires
+  await deleteMember(publicationId)
+  await deleteArticles(publicationId)
+  revalidatePath('/admin')
 }
 ```
 
-`deleteMemberAction` can throw in two ways: `requireAdmin()` throws `Error('Unauthorized')` if the session expires between page load and click, and `deleteMember` / `deleteArticles` throw on database errors. An unhandled rejection in a React event handler will surface as an uncaught browser error with no user-visible feedback.
+`AdminMemberList.handleDelete` also lacks error handling. An expired session or DB error causes an unhandled promise rejection in the browser with no user-visible feedback.
 
-**Fix:**
+**Fix:** Wrap requireAdmin in the action, matching the pattern used by other admin actions:
 
 ```ts
-async function handleDelete(publicationId: string) {
-  if (!window.confirm(`"${publicationId}" を削除しますか？`)) return
+export async function deleteMemberAction(publicationId: string): Promise<string | null> {
+  try { await requireAdmin() } catch { return '権限がありません' }
   try {
-    await deleteMemberAction(publicationId)
+    await deleteMember(publicationId)
+    await deleteArticles(publicationId)
   } catch (e) {
-    setEditError(e instanceof Error ? e.message : '削除に失敗しました')
+    return e instanceof Error ? e.message : '削除に失敗しました'
   }
+  revalidatePath('/admin')
+  return null
 }
 ```
 
-Note: `editError` is only shown inside the currently-editing row. For the delete case (which operates on a non-editing row) a separate error state may be needed, or the error can be shown via an alert.
+And in `handleDelete`:
+
+```ts
+async function handleDelete(publicationId: string) {
+  if (!window.confirm(`"${publicationId}" を削除しますか？`)) return
+  const error = await deleteMemberAction(publicationId)
+  if (error) setEditError(error)
+}
+```
 
 ---
 
 ## Info
 
-### IN-01: `origin` header fallback produces a non-functional magic-link callback URL
+### IN-01: Dead `handle` variable in `my/page.tsx` after D-03 refactor
 
-**File:** `src/app/login-51cf21389c56/actions.ts:20-23`
+**File:** `src/app/my/page.tsx:14`
 
-**Issue:** The callback URL is built from the HTTP `Origin` header:
+**Issue:** `const { handle } = await searchParams` destructures the `handle` URL parameter, but `handle` is never referenced anywhere in the function body. After the D-03 change, `substackHandle` is read exclusively from the database (`(member as any)?.substack_handle ?? null`). The unused destructuring and the `handle?: string` in the searchParams type are leftover dead code that mislead readers into thinking the URL parameter has an effect.
+
+**Fix:** Remove the unused `handle` destructuring. If `searchParams` is also otherwise unused, simplify the page signature to remove the parameter entirely.
+
+---
+
+### IN-02: `getMembers()` maps DB `null` to `undefined` for `substackHandle` — loses the null signal
+
+**File:** `src/lib/members.ts:30`
+
+**Issue:** `substackHandle: m.substack_handle ?? undefined` converts a DB `null` (explicitly cleared handle) to `undefined` (field not set). The `Member` type declares `substackHandle?: string | null`, so both are valid. However, any caller that tests `substackHandle === null` to detect an explicitly cleared handle (as opposed to an unset/unavailable one) will never see `null` from `getMembers()`. Currently this does not cause a runtime bug, but it pollutes the type contract and could cause silent failures if the distinction is relied upon in future code.
+
+**Fix:** Preserve the `null`:
 
 ```ts
-const origin = headersList.get('origin') ?? ''
-const callbackUrl = `${origin}/auth/callback?pid=...&handle=...`
-```
-
-When `origin` is absent (which can happen in non-browser HTTP clients, server-to-server calls, or certain proxy configurations), `callbackUrl` becomes a relative path like `/auth/callback?pid=…`. Supabase's `signInWithOtp` requires `emailRedirectTo` to be an absolute URL; a relative path will either be rejected or cause the magic link to redirect incorrectly.
-
-This is not a security issue (Next.js server actions enforce same-origin via CSRF checks), but it is a reliability gap.
-
-**Fix:** Fall back to a configured environment variable:
-
-```ts
-const origin = headersList.get('origin')
-  ?? process.env.NEXT_PUBLIC_SITE_URL
-  ?? ''
+// Before
+substackHandle: m.substack_handle ?? undefined,
+// After
+substackHandle: m.substack_handle,   // null from DB stays null
 ```
 
 ---
 
-_Reviewed: 2026-06-05T00:00:00Z_
+### IN-03: SQL migration uses unqualified `'members'::regclass`
+
+**File:** `supabase/migrations/20260605000000_add_substack_handle_unique.sql:7`
+
+**Issue:** `AND conrelid = 'members'::regclass` resolves the table using the current `search_path`. If the migration runs in a context where `search_path` does not include `public` (e.g., a migration runner that sets `search_path = ''`), the cast will throw "relation does not exist" and the idempotency guard will fail, causing the `ALTER TABLE` below it to execute even when the constraint already exists and fail with a duplicate-constraint error.
+
+**Fix:** Use a schema-qualified reference:
+
+```sql
+AND conrelid = 'public.members'::regclass
+```
+
+---
+
+_Reviewed: 2026-06-06_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
