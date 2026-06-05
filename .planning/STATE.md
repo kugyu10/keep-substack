@@ -4,14 +4,14 @@ milestone: v1.7
 milestone_name: Commit & Goal View + Substack Profile Link
 status: executing
 stopped_at: Phase 31 UI-SPEC approved
-last_updated: "2026-06-05T13:07:58.441Z"
-last_activity: 2026-06-05
+last_updated: "2026-06-05T23:17:42.283Z"
+last_activity: 2026-06-05 -- Phase 31 planning complete
 progress:
   total_phases: 5
-  completed_phases: 5
-  total_plans: 11
+  completed_phases: 4
+  total_plans: 12
   completed_plans: 11
-  percent: 100
+  percent: 80
 ---
 
 # Project State
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-06-02 — v1.7 Commit & Goal View + Subs
 Phase: 31 (login-fix) — EXECUTING
 Plan: 3 of 3
 Status: Ready to execute
-Last activity: 2026-06-05
+Last activity: 2026-06-05 -- Phase 31 planning complete
 
 ### Quick Tasks Completed
 
