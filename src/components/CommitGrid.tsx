@@ -98,6 +98,7 @@ export default function CommitGrid({ slots, items, imageUrl }: CommitGridProps) 
           </CommitGridCell>
         )
       }
+      const timeLabel = `${String(slot.hour).padStart(2, '0')}:00`
       return (
         <div
           key={idx}
@@ -105,6 +106,7 @@ export default function CommitGrid({ slots, items, imageUrl }: CommitGridProps) 
         >
           <span className="text-[10px] leading-none text-gray-400">{DAY_NAMES[slot.day_of_week]}</span>
           <span className="text-[10px] leading-none text-gray-400">{dateLabel}</span>
+          <span className="text-[10px] leading-none text-gray-300">{timeLabel}</span>
         </div>
       )
     })
