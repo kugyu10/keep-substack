@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Commit & Goal View + Substack Profile Link
 status: executing
-stopped_at: Phase 31 added — login flow fix pending
-last_updated: 2026-06-04T17:22:52.003Z
-last_activity: 2026-06-04 -- Phase 30 planning complete
+stopped_at: Phase 31 UI-SPEC approved
+last_updated: "2026-06-05T12:30:15.426Z"
+last_activity: 2026-06-05 -- Phase 31 planning complete
 progress:
-  total_phases: 4
+  total_phases: 5
   completed_phases: 4
-  total_plans: 8
+  total_plans: 11
   completed_plans: 8
-  percent: 100
+  percent: 73
 ---
 
 # Project State
@@ -27,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-06-02 — v1.7 Commit & Goal View + Subs
 
 Phase: 30
 Plan: Not started
-Status: Milestone complete
-Last activity: 2026-06-05 - Completed quick task 260605-42o: grid hoverでタイトルpopover
+Status: Ready to execute
+Last activity: 2026-06-05 -- Phase 31 planning complete
 
 ### Quick Tasks Completed
 
@@ -82,8 +82,8 @@ Last activity: 2026-06-05 - Completed quick task 260605-42o: grid hoverでタイ
 
 ## Session Continuity
 
-Last session: 2026-06-04T17:16:39.641Z
-Stopped at: Phase 30 UI-SPEC approved
+Last session: 2026-06-05T12:11:31.729Z
+Stopped at: Phase 31 UI-SPEC approved
 Next step: Execute Phase 30 — Achievement calculation (👑/🔥)
 
 ## Deferred Items
