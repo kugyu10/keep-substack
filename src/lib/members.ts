@@ -81,7 +81,7 @@ export async function deleteMember(publicationId: string): Promise<void> {
 
 export async function updateMember(
   publicationId: string,
-  updates: Partial<Omit<Member, 'publicationId'>>
+  updates: Partial<Omit<Member, 'id'>>
 ): Promise<void> {
   const supabase = createSupabaseAdminClient()
 
@@ -96,12 +96,24 @@ export async function updateMember(
   const memberUpdate: Record<string, unknown> = {}
   if (updates.name !== undefined) memberUpdate.name = updates.name
   if (updates.addedAt !== undefined) memberUpdate.added_at = updates.addedAt
+  if (updates.substackHandle !== undefined) memberUpdate.substack_handle = updates.substackHandle
+  if (updates.publicationId !== undefined) memberUpdate.publication_id = updates.publicationId
+
   if (Object.keys(memberUpdate).length > 0) {
     const { error: updateError } = await supabase
       .from('members')
       .update(memberUpdate)
       .eq('publication_id', publicationId)
     if (updateError) throw updateError
+  }
+
+  // publication_id 変更時に articles テーブルを連動 UPDATE
+  if (updates.publicationId !== undefined && updates.publicationId !== publicationId) {
+    const { error: articlesUpdateError } = await supabase
+      .from('articles')
+      .update({ publication_id: updates.publicationId })
+      .eq('publication_id', publicationId)
+    if (articlesUpdateError) throw articlesUpdateError
   }
 
   if (updates.teams !== undefined) {
