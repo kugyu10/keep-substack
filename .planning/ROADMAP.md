@@ -222,7 +222,7 @@ Plans:
 
 **Requirements:** AUTH-FIX-01
 
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
 **Wave 1**
@@ -231,7 +231,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 31-02-PLAN.md — Auth バックエンド: sendMagicLinkAction D-01 + auth/callback D-02 新規 member INSERT + my/actions.ts D-05 23505 処理
+- [x] 31-02-PLAN.md — Auth バックエンド: sendMagicLinkAction D-01 + auth/callback D-02 新規 member INSERT + my/actions.ts D-05 23505 処理
 - [ ] 31-03-PLAN.md — フロント + admin: MyProfileForm D-03 読み取り専用 + AdminMemberList D-04 編集拡張 + lib/members.ts D-04/D-05
 
 **Success Criteria:**
@@ -284,4 +284,4 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 28. コミットスケジュール — DB + /my ページ | v1.7 | 0/2 | Pending | — |
 | 29. Commit & Goal View — 新トップページ | v1.7 | 2/2 | Complete | 2026-06-04 |
 | 30. アチーブメント（👑 / 🔥） | v1.7 | 2/2 | Complete    | 2026-06-04 |
-| 31. ログインフロー修正 | v1.7 | 1/3 | In Progress|  |
+| 31. ログインフロー修正 | v1.7 | 2/3 | In Progress|  |
