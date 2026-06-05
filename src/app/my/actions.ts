@@ -66,6 +66,11 @@ export async function updateMyProfileAction(
     .select('id')
     .single()
 
+  // D-05: substack_handle unique 違反 (23505) を先にチェック
+  if (updateError?.code === '23505') {
+    return 'このハンドルはすでに使用されています'
+  }
+
   if (updateError || !member) {
     console.error('[updateMyProfile] member update:', updateError)
     return '保存に失敗しました。もう一度お試しください'

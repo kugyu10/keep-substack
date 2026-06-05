@@ -30,11 +30,31 @@ export async function GET(request: NextRequest) {
               .from('members')
               .update({ user_id: user.id })
               .eq('id', member.id)
+          } else if (!member) {
+            // D-02: member が存在しない場合 → 新規 member を INSERT
+            const insertPayload = {
+              publication_id: pid,
+              name: pid,
+              user_id: user.id,
+              substack_handle: handle || null,
+            }
+            const { error: insertError } = await admin
+              .from('members')
+              .insert(insertPayload)
+
+            if (insertError?.code === '23505') {
+              // substack_handle unique 違反 → null でフォールバック INSERT (D-05)
+              await admin
+                .from('members')
+                .insert({ ...insertPayload, substack_handle: null })
+            } else if (insertError) {
+              console.error('[auth/callback] member insert:', insertError)
+            }
           }
         }
       }
-      const myRedirectPath = handle ? '/my?handle=' + encodeURIComponent(handle) : next
-      return NextResponse.redirect(new URL(myRedirectPath, origin))
+      // D-02: callback 時点で substack_handle は INSERT 済み。/my へ直接リダイレクト
+      return NextResponse.redirect(new URL('/my', origin))
     }
     console.error('[auth/callback] exchangeCodeForSession error:', error)
   }
