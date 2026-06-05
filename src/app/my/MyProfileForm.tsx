@@ -52,6 +52,7 @@ export default function MyProfileForm({ member, substackHandle }: { member: Memb
       {substackHandle != null ? (
         <div>
           <label className="block text-sm font-semibold mb-1">Substack ハンドル</label>
+          <input type="hidden" name="substack_handle" value={substackHandle} />
           <p className="text-sm text-gray-400 border rounded px-3 py-2 bg-gray-100">{substackHandle}</p>
           <p className="text-xs text-gray-500 mt-1">Substack ハンドルは変更できません</p>
         </div>
