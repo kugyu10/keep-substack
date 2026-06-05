@@ -13,19 +13,14 @@ export async function sendMagicLinkAction(
   const pid = (formData.get('pid') as string | null)?.trim() || null
   const handle = (formData.get('handle') as string | null)?.trim() || null
 
+  // D-01: pid と handle は両方必須。片方でも欠けていたら早期エラー
+  if (!pid || !handle) return '登録リンクが不正です'
+
   const headersList = await headers()
   const origin = headersList.get('origin') ?? ''
 
-  let callbackUrl: string
-  if (pid && handle) {
-    callbackUrl = `${origin}/auth/callback?pid=${encodeURIComponent(pid)}&handle=${encodeURIComponent(handle)}`
-  } else if (pid) {
-    callbackUrl = `${origin}/auth/callback?pid=${encodeURIComponent(pid)}`
-  } else if (handle) {
-    callbackUrl = `${origin}/auth/callback?handle=${encodeURIComponent(handle)}`
-  } else {
-    callbackUrl = `${origin}/auth/callback`
-  }
+  // pid && handle が保証されたため単一形式で生成
+  const callbackUrl = `${origin}/auth/callback?pid=${encodeURIComponent(pid)}&handle=${encodeURIComponent(handle)}`
 
   const supabase = await createSupabaseServerClient()
   const { error } = await supabase.auth.signInWithOtp({

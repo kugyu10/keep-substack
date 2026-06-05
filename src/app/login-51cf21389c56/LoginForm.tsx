@@ -9,7 +9,7 @@ export default function LoginForm({ pid, handle }: { pid?: string; handle?: stri
   if (state === 'SENT') {
     return (
       <div className="text-center py-8">
-        <p className="text-lg font-medium mb-2">メールを送信しました</p>
+        <p className="text-lg font-semibold mb-2">メールを送信しました</p>
         <p className="text-sm text-gray-600">
           受信トレイを確認してログインリンクをクリックしてください
         </p>
@@ -22,7 +22,7 @@ export default function LoginForm({ pid, handle }: { pid?: string; handle?: stri
       {pid && <input type="hidden" name="pid" value={pid} />}
       {handle && <input type="hidden" name="handle" value={handle} />}
       {state && state !== 'SENT' && (
-        <p className="text-sm text-red-600">{state}</p>
+        <p role="alert" className="text-sm text-red-600">{state}</p>
       )}
       <div>
         <label htmlFor="email" className="block text-sm font-medium mb-1">
