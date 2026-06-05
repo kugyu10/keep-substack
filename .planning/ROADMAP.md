@@ -222,13 +222,26 @@ Plans:
 
 **Requirements:** AUTH-FIX-01
 
-**Plans:** 0 plans — pending discussion
+**Plans:** 3 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 31-01-PLAN.md — DB migration: substack_handle UNIQUE 制約追加 + schema.sql 更新 + supabase db push [BLOCKING]
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 31-02-PLAN.md — Auth バックエンド: sendMagicLinkAction D-01 + auth/callback D-02 新規 member INSERT + my/actions.ts D-05 23505 処理
+- [ ] 31-03-PLAN.md — フロント + admin: MyProfileForm D-03 読み取り専用 + AdminMemberList D-04 編集拡張 + lib/members.ts D-04/D-05
 
 **Success Criteria:**
 
 1. Magic Link メール送信後、リンクをクリックするとセッションが正しく確立される
 2. ログイン後のリダイレクト先が正しい（/my ページ）
 3. セッション切れ・再ログイン時も同様に動作する
+4. pid/handle が欠けた不正リンクからは「登録リンクが不正です」エラーが表示される
+5. substack_handle 設定済みのメンバーは /my ページで読み取り専用表示になる
+6. admin が substack_handle と publication_id を編集できる
 
 ---
 
@@ -271,4 +284,4 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 28. コミットスケジュール — DB + /my ページ | v1.7 | 0/2 | Pending | — |
 | 29. Commit & Goal View — 新トップページ | v1.7 | 2/2 | Complete | 2026-06-04 |
 | 30. アチーブメント（👑 / 🔥） | v1.7 | 2/2 | Complete    | 2026-06-04 |
-| 31. ログインフロー修正 | v1.7 | 0/? | Pending | — |
+| 31. ログインフロー修正 | v1.7 | 0/3 | Pending | — |
