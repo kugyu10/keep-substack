@@ -136,7 +136,7 @@ describe('GET /auth/callback — D-02: member not found → INSERT (Phase 31)', 
     expect(location).toMatch(/\/my$/)
     // INSERT が呼ばれたこと
     expect(insertMock).toHaveBeenCalledOnce()
-    const insertPayload = insertMock.mock.calls[0][0]
+    const insertPayload = (insertMock.mock.calls as unknown as [unknown[]][])[0][0]
     expect(insertPayload).toMatchObject({
       publication_id: 'new-pid',
       name: 'new-pid',
