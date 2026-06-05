@@ -1,9 +1,9 @@
 ---
-status: diagnosed
+status: resolved
 phase: 31-login-fix
 source: [31-VERIFICATION.md]
 started: 2026-06-05T22:20:00Z
-updated: 2026-06-06T00:00:00Z
+updated: 2026-06-06T09:00:00Z
 ---
 
 ## Current Test
@@ -36,6 +36,7 @@ blocked: 0
 ## Gaps
 
 ### G-01: 既存メンバーが pid/handle なしで再ログインできない
-status: failed
+status: resolved
 description: D-01 で sendMagicLinkAction に pid/handle 必須バリデーションを追加したため、クエリパラメータなしの URL からはログイン不可になった
 fix: ログインページを /login（既存メンバー用）と /login-51cf21389c56（新規招待用）に分離する
+resolved_by: plan 31-04 — /login と /signin-51cf21389c56 に分離完了（2026-06-06）
