@@ -222,12 +222,12 @@ Plans:
 
 **Requirements:** AUTH-FIX-01
 
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 31-01-PLAN.md — DB migration: substack_handle UNIQUE 制約追加 + schema.sql 更新 + supabase db push [BLOCKING]
+- [x] 31-01-PLAN.md — DB migration: substack_handle UNIQUE 制約追加 + schema.sql 更新 + supabase db push [BLOCKING]
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -284,4 +284,4 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 28. コミットスケジュール — DB + /my ページ | v1.7 | 0/2 | Pending | — |
 | 29. Commit & Goal View — 新トップページ | v1.7 | 2/2 | Complete | 2026-06-04 |
 | 30. アチーブメント（👑 / 🔥） | v1.7 | 2/2 | Complete    | 2026-06-04 |
-| 31. ログインフロー修正 | v1.7 | 0/3 | Pending | — |
+| 31. ログインフロー修正 | v1.7 | 1/3 | In Progress|  |
