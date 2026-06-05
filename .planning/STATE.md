@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Commit & Goal View + Substack Profile Link
-status: milestone_complete
-stopped_at: Milestone complete (Phase 30 was final phase)
+status: executing
+stopped_at: Phase 31 added — login flow fix pending
 last_updated: 2026-06-04T17:22:52.003Z
 last_activity: 2026-06-04 -- Phase 30 planning complete
 progress:
@@ -21,7 +21,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-02 — v1.7 Commit & Goal View + Substack Profile Link started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Milestone complete
+**Current focus:** Phase 31 — ログインフロー修正
 
 ## Current Position
 

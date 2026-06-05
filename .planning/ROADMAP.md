@@ -100,7 +100,7 @@ Full archive: `.planning/milestones/v1.6-ROADMAP.md`
 
 </details>
 
-## v1.7 Commit & Goal View + Substack Profile Link (Phases 27-30)
+## v1.7 Commit & Goal View + Substack Profile Link (Phases 27-31)
 
 **Milestone Goal:** コミットスケジュールの宣言と3週間の達成グリッドで「継続の意志と実績」を仲間に見せるトップビューを新設し、Substackプロフィールへの直リンクも追加する
 
@@ -216,6 +216,22 @@ Plans:
 
 ---
 
+### Phase 31: ログインフロー修正
+
+**Goal:** Magic Link ログインフローの不具合を調査・修正し、メンバーが確実にログインできる状態にする
+
+**Requirements:** AUTH-FIX-01
+
+**Plans:** 0 plans — pending discussion
+
+**Success Criteria:**
+
+1. Magic Link メール送信後、リンクをクリックするとセッションが正しく確立される
+2. ログイン後のリダイレクト先が正しい（/my ページ）
+3. セッション切れ・再ログイン時も同様に動作する
+
+---
+
 ## Phase Details (archived)
 
 Full phase details for shipped milestones live in their archives under `.planning/milestones/`.
@@ -255,3 +271,4 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 28. コミットスケジュール — DB + /my ページ | v1.7 | 0/2 | Pending | — |
 | 29. Commit & Goal View — 新トップページ | v1.7 | 2/2 | Complete | 2026-06-04 |
 | 30. アチーブメント（👑 / 🔥） | v1.7 | 2/2 | Complete    | 2026-06-04 |
+| 31. ログインフロー修正 | v1.7 | 0/? | Pending | — |
