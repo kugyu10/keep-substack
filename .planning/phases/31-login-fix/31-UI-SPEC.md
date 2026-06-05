@@ -43,7 +43,7 @@ Declared values (must be multiples of 4):
 | 3xl | 64px | Page-level spacing |
 
 Exceptions:
-- タッチターゲット最小高: `min-h-[44px]` (既存チェックボックス行に準拠)
+- タッチターゲット最小高: `min-h-[48px]` (48px = 4×12) — WCAG 2.5.5 推奨 44px を満たす最小の 4倍数値
 - 成功メッセージ余白: `py-8` (32px) — LoginForm の送信完了表示
 
 Source: `MyProfileForm.tsx`, `AdminMemberList.tsx`, `LoginForm.tsx` — 既存パターンから確認
@@ -108,6 +108,11 @@ Phase 31 で UI に触れるコンポーネントを列挙する。
 
 **変更内容:** `substackHandle` が設定済みなら `<input>` を `<p>` に置換し、変更不可メッセージを表示する。
 
+**Focal point:**
+- 設定済みケースでは `<p className="text-sm text-gray-400 ...">` の **ハンドル値テキスト** が主要な情報要素 (focal point) である
+- 「変更できません」キャプション (`text-xs text-gray-500`) はハンドル値の直下に配置し、状態を補足する役割に限定する
+- 入力フォームが存在しないため、このセクションにインタラクティブな focal point は存在しない (読み取り専用表示のみ)
+
 **表示コントラクト (設定済みケース):**
 ```
 <label className="block text-sm font-semibold mb-1">Substack ハンドル</label>
@@ -132,6 +137,11 @@ Pattern source: `MyProfileForm.tsx` 既存の `publicationId` 読み取り専用
 ### 3. AdminMemberList.tsx — substack_handle / publication_id フィールド追加 (D-04)
 
 **変更内容:** 編集行 (`editingId === m.publicationId`) に `substack_handle` と `publication_id` の入力フィールドを追加する。
+
+**Focal point:**
+- 編集行では `substack_handle` 入力フィールドが主要インタラクション要素 (focal point) である
+- `publication_id` 入力フィールドは警告テキスト付きで副次的に配置し、誤操作を防ぐ
+- 編集行に入ったとき、ユーザーの視線は `substack_handle` 入力 → `publication_id` 入力 + 警告テキスト → 「保存」ボタンの順に誘導する
 
 **表示コントラクト:**
 - テーブルに `substack_handle` 列と `publication_id` 列を追加
@@ -207,7 +217,7 @@ Phase 31 で変更・追加される全インタラクション状態を列挙�
 | State | Trigger | Visual |
 |-------|---------|--------|
 | 閲覧モード | default | substack_handle, publication_id を text で表示 |
-| 編集モード | 「編集」ボタンクリック | substack_handle: `<input>` 表示, publication_id: `<input>` 表示 + 警告テキスト |
+| 編集モード | 「編集」ボタンクリック | substack_handle: `<input>` 表示 (focal point)、publication_id: `<input>` 表示 + 警告テキスト |
 | publication_id 変更確認 | `handleUpdate` で publication_id が変更された場合 | `window.confirm()` ダイアログ |
 | Error — 23505 | updateMemberAction → 23505 | `editError` パターン (text-red-500 text-xs mt-1) |
 | Error — generic | updateMemberAction → other | 同上 |
