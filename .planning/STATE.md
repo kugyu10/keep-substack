@@ -35,6 +35,7 @@ Last activity: 2026-06-05 - Completed quick task 260605-42o: grid hoverでタイ
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260605-42o | grid hoverでタイトルpopover | 2026-06-05 | d4bc6f6 | [260605-42o-grid-hover-popover](.planning/quick/260605-42o-grid-hover-popover/) |
+| 260605-qqq | 未投稿日は曜日・日付だけでなく時刻HH:mmも表示 | 2026-06-05 | d2f55a2 | [260605-qqq-hh-mm](.planning/quick/260605-qqq-hh-mm/) |
 
 ## Performance Metrics
 
