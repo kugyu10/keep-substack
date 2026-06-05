@@ -236,7 +236,7 @@ Plans:
 
 **Gap Closure** *(G-01 fix — 既存メンバー再ログイン不可)*
 
-- [ ] 31-04-PLAN.md — ログインページ分離: login-51cf21389c56 → signin-51cf21389c56 (git mv) + /login 新規作成（既存メンバー専用）
+- [x] 31-04-PLAN.md — ログインページ分離: login-51cf21389c56 → signin-51cf21389c56 (git mv) + /login 新規作成（既存メンバー専用）
 
 **Success Criteria:**
 
@@ -288,4 +288,4 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 28. コミットスケジュール — DB + /my ページ | v1.7 | 0/2 | Pending | — |
 | 29. Commit & Goal View — 新トップページ | v1.7 | 2/2 | Complete | 2026-06-04 |
 | 30. アチーブメント（👑 / 🔥） | v1.7 | 2/2 | Complete    | 2026-06-04 |
-| 31. ログインフロー修正 | v1.7 | 3/4 | Executing (gap closure) | — |
+| 31. ログインフロー修正 | v1.7 | 4/4 | Complete | 2026-06-06 |

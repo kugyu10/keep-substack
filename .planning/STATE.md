@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Commit & Goal View + Substack Profile Link
 status: executing
-stopped_at: Phase 31 UI-SPEC approved
-last_updated: "2026-06-05T23:17:42.283Z"
-last_activity: 2026-06-05 -- Phase 31 planning complete
+stopped_at: Phase 31 Plan 04 complete
+last_updated: "2026-06-06T08:26:00.000Z"
+last_activity: 2026-06-06 -- Phase 31 Plan 04 complete (G-01 gap closure)
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 12
-  completed_plans: 11
-  percent: 80
+  completed_plans: 12
+  percent: 85
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-06-02 — v1.7 Commit & Goal View + Subs
 
 ## Current Position
 
-Phase: 31 (login-fix) — EXECUTING
-Plan: 3 of 3
-Status: Ready to execute
-Last activity: 2026-06-05 -- Phase 31 planning complete
+Phase: 31 (login-fix) — COMPLETE
+Plan: 4 of 4
+Status: All plans complete
+Last activity: 2026-06-06 -- Phase 31 Plan 04 complete (G-01 gap closure)
 
 ### Quick Tasks Completed
 
@@ -64,6 +64,7 @@ Last activity: 2026-06-05 -- Phase 31 planning complete
 | Phase 29 P01 | ~25min | 3 tasks | 9 files |
 | Phase 29 P02 | ~4min | 3 tasks | 5 files |
 | Phase 31 P03 | 6 | 3 tasks | 9 files |
+| Phase 31 P04 | ~8min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -83,9 +84,9 @@ Last activity: 2026-06-05 -- Phase 31 planning complete
 
 ## Session Continuity
 
-Last session: 2026-06-05T13:07:58.434Z
-Stopped at: Phase 31 UI-SPEC approved
-Next step: Execute Phase 30 — Achievement calculation (👑/🔥)
+Last session: 2026-06-06T08:26:00.000Z
+Stopped at: Phase 31 Plan 04 complete
+Next step: Phase 31 UAT — /login で既存メンバー再ログイン動作確認
 
 ## Deferred Items
 
