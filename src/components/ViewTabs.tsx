@@ -5,7 +5,7 @@ type Props = {
 
 const TABS = [
   { key: 'goal', label: 'コミット＆ゴール', href: '/' },
-  { key: 'daily', label: 'デイリー', href: '/weekly-stamp' },
+  { key: 'daily', label: 'デイリー', href: '/daily' },
 ] as const
 
 export default function ViewTabs({ active }: Props) {

@@ -37,7 +37,7 @@ export default async function Home({ searchParams }: Props) {
       {teams.length > 0 && (
         <div className="flex gap-2 mb-4 flex-wrap">
           <a
-            href="/weekly-stamp"
+            href="/daily"
             className={`px-3 py-1 rounded text-sm border ${
               !team ? 'bg-primary text-white border-primary' : 'bg-white text-[#363737] border-[#ebebeb] hover:bg-[#fafafa] hover:border-[#d8d8d8]'
             }`}
@@ -47,7 +47,7 @@ export default async function Home({ searchParams }: Props) {
           {teams.map((t) => (
             <a
               key={t}
-              href={`/weekly-stamp?team=${encodeURIComponent(t)}`}
+              href={`/daily?team=${encodeURIComponent(t)}`}
               className={`px-3 py-1 rounded text-sm border ${
                 team === t ? 'bg-primary text-white border-primary' : 'bg-white text-[#363737] border-[#ebebeb] hover:bg-[#fafafa] hover:border-[#d8d8d8]'
               }`}

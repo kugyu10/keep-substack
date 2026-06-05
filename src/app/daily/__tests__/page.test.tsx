@@ -99,7 +99,7 @@ function member(name: string, teams: { name: string; status: string }[]): Member
   }
 }
 
-describe('/weekly-stamp page (VIEW-01)', () => {
+describe('/daily page (VIEW-01)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockGetMembers.mockResolvedValue([])
@@ -117,7 +117,7 @@ describe('/weekly-stamp page (VIEW-01)', () => {
     expect(grid).not.toBeNull()
   })
 
-  it('All link href points to /weekly-stamp (not /)', async () => {
+  it('All link href points to /daily (not /)', async () => {
     mockGetMembers.mockResolvedValue([
       member('Alice', [{ name: 'Team', status: 'public' }]),
     ])
@@ -132,11 +132,11 @@ describe('/weekly-stamp page (VIEW-01)', () => {
     })
     expect(allAnchor).toBeDefined()
     const href = (allAnchor!.props as { href?: string }).href
-    expect(href).toBe('/weekly-stamp')
+    expect(href).toBe('/daily')
     expect(href).not.toBe('/')
   })
 
-  it('team tab links include /weekly-stamp base path', async () => {
+  it('team tab links include /daily base path', async () => {
     mockGetMembers.mockResolvedValue([
       member('Alice', [{ name: 'Alpha', status: 'public' }]),
     ])
@@ -151,7 +151,7 @@ describe('/weekly-stamp page (VIEW-01)', () => {
     expect(teamAnchors.length).toBeGreaterThan(0)
     for (const anchor of teamAnchors) {
       const href = (anchor.props as { href?: string }).href ?? ''
-      expect(href).toContain('/weekly-stamp')
+      expect(href).toContain('/daily')
     }
   })
 
@@ -169,16 +169,16 @@ describe('/weekly-stamp page (VIEW-01)', () => {
     expect(labels).toContain('Beta')
   })
 
-  // ── TEAM-04 (divergence): /weekly-stamp excludes hidden members in team-selected view ──
+  // ── TEAM-04 (divergence): /daily excludes hidden members in team-selected view ──
   // This is an INTENTIONAL behavioral divergence from the main page (src/app/page.tsx):
   //   - main page (TEAM-04 b): team-selected view includes hidden-status members
-  //   - /weekly-stamp:          team-selected view excludes hidden-status members
-  // This test documents and locks in the /weekly-stamp behavior to prevent silent drift.
+  //   - /daily:          team-selected view excludes hidden-status members
+  // This test documents and locks in the /daily behavior to prevent silent drift.
   it('team-selected view: excludes hidden-status members even when they belong to the selected team', async () => {
     mockGetMembers.mockResolvedValue([
       member('Alice', [{ name: 'Alpha', status: 'public' }]),
       member('Bob', [{ name: 'Beta', status: 'public' }]),
-      // Carol's Alpha membership is hidden — excluded in /weekly-stamp team-selected view
+      // Carol's Alpha membership is hidden — excluded in /daily team-selected view
       member('Carol', [{ name: 'Alpha', status: 'hidden' }]),
     ])
 
