@@ -13,7 +13,7 @@ export type Member = {
   publicationId: string
   teams: { name: string; status: string }[]
   addedAt: string  // ISO 8601
-  substackHandle?: string
+  substackHandle?: string | null
 }
 
 // Phase 4 KV移行後のスキーマ（D-03）。フィードURLは publicationId から動的生成する（D-08）

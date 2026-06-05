@@ -47,7 +47,7 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
     (t: any) => ({ name: t.name })
   )
 
-  const substackHandleDefault = (member as any)?.substack_handle ?? handle ?? undefined
+  const substackHandle = (member as any)?.substack_handle ?? null
 
   const { data: commitSlotsData } = member
     ? await admin
@@ -76,7 +76,7 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
               currentTeams,
               publicTeams,
             }}
-            substackHandleDefault={substackHandleDefault}
+            substackHandle={substackHandle}
           />
           <div className="mt-8">
             <h2 className="text-sm font-semibold mb-2">投稿スケジュール</h2>

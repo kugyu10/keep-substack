@@ -31,7 +31,7 @@ export async function getMembers(): Promise<Member[]> {
   }))
 }
 
-export async function addMember(member: Omit<Member, 'addedAt'>): Promise<void> {
+export async function addMember(member: Omit<Member, 'addedAt' | 'id'>): Promise<void> {
   const supabase = createSupabaseAdminClient()
 
   const { data: existing } = await supabase

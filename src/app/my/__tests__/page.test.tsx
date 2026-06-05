@@ -217,13 +217,15 @@ describe('MyPage RSC — read path (SELF-01 / SELF-03 / T-23-05 / T-23-06)', () 
   })
 })
 
-describe('MyPage RSC — substackHandleDefault pre-fill (Phase 27 D-05, D-06)', () => {
+describe('MyPage RSC — substackHandle prop (Phase 31 D-03)', () => {
+  // D-03: substackHandleDefault → substackHandle, handle URL param fallback removed
+  // callback (D-02) saves substack_handle to DB, so handle= param is no longer needed
   beforeEach(() => {
     vi.clearAllMocks()
     mockGetUser.mockResolvedValue({ data: { user: { id: USER_ID } } })
   })
 
-  it('DB value wins: member has substack_handle, searchParams has different handle → MyProfileForm receives DB value', async () => {
+  it('DB value: member has substack_handle → MyProfileForm receives DB value as substackHandle', async () => {
     setupAdminMock({
       member: {
         name: 'Tester',
@@ -234,18 +236,19 @@ describe('MyPage RSC — substackHandleDefault pre-fill (Phase 27 D-05, D-06)', 
       publicTeams: [],
     })
 
-    // Call MyPage with searchParams containing a different handle
+    // D-03: handle URL param is ignored — only DB value used
     const el = await (MyPage as (props: { searchParams: Promise<{ handle?: string }> }) => Promise<unknown>)({
       searchParams: Promise.resolve({ handle: 'other' }),
     })
     const form = findByType(el, MyProfileForm)
     expect(form).not.toBeNull()
 
-    const props = form!.props as { substackHandleDefault?: string }
-    expect(props.substackHandleDefault).toBe('@hoge')
+    const props = form!.props as { substackHandle?: string | null }
+    expect(props.substackHandle).toBe('@hoge')
   })
 
-  it('searchParams fallback: member has substack_handle=null, searchParams has handle → MyProfileForm receives searchParams value', async () => {
+  it('null DB value: member has substack_handle=null → MyProfileForm receives null (not searchParams fallback)', async () => {
+    // D-03: handle URL param fallback is removed; null stays null
     setupAdminMock({
       member: {
         name: 'Tester',
@@ -262,11 +265,12 @@ describe('MyPage RSC — substackHandleDefault pre-fill (Phase 27 D-05, D-06)', 
     const form = findByType(el, MyProfileForm)
     expect(form).not.toBeNull()
 
-    const props = form!.props as { substackHandleDefault?: string }
-    expect(props.substackHandleDefault).toBe('hoge')
+    const props = form!.props as { substackHandle?: string | null }
+    // D-03 change: searchParams handle is no longer used as fallback
+    expect(props.substackHandle).toBeNull()
   })
 
-  it('both absent: member has substack_handle=null, no searchParams handle → MyProfileForm receives undefined', async () => {
+  it('both absent: member has substack_handle=null, no searchParams → MyProfileForm receives null', async () => {
     setupAdminMock({
       member: {
         name: 'Tester',
@@ -283,7 +287,7 @@ describe('MyPage RSC — substackHandleDefault pre-fill (Phase 27 D-05, D-06)', 
     const form = findByType(el, MyProfileForm)
     expect(form).not.toBeNull()
 
-    const props = form!.props as { substackHandleDefault?: string }
-    expect(props.substackHandleDefault).toBeUndefined()
+    const props = form!.props as { substackHandle?: string | null }
+    expect(props.substackHandle).toBeNull()
   })
 })

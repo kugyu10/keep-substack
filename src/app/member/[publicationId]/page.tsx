@@ -51,7 +51,7 @@ export default async function MemberPage({
         memberName={memberResult.member.name}
         articleMap={articleMapEntries}
         imageUrl={memberResult.imageUrl}
-        substackHandle={memberResult.member.substackHandle}
+        substackHandle={memberResult.member.substackHandle ?? undefined}
       />
     </main>
   )
