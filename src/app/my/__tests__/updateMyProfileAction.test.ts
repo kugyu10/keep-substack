@@ -304,4 +304,40 @@ describe('updateMyProfileAction - public-team reconcile + security', () => {
     expect(insertSpy).not.toHaveBeenCalled()
     expect(deleteSpy).not.toHaveBeenCalled()
   })
+
+  it('Test D: members.update が 23505 エラーを返す → このハンドルはすでに使用されています', async () => {
+    // update spy が 23505 エラーを返すようにカスタムモックを構築
+    const updateSpy = vi.fn(() => ({
+      eq: () => ({
+        select: () => ({
+          single: async () => ({
+            data: null,
+            error: { code: '23505', message: 'duplicate key value violates unique constraint "members_substack_handle_key"' },
+          }),
+        }),
+      }),
+    }))
+
+    mockAdminFrom.mockImplementation((table: string) => {
+      if (table === 'members') return { update: updateSpy }
+      if (table === 'teams') {
+        return {
+          select: () => ({
+            eq: async () => ({ data: [], error: null }),
+          }),
+        }
+      }
+      if (table === 'member_teams') {
+        return {
+          delete: () => ({ eq: () => ({ in: async () => ({ error: null }) }) }),
+          insert: async () => ({ error: null }),
+        }
+      }
+      throw new Error(`unexpected table: ${table}`)
+    })
+
+    const result = await updateMyProfileAction(null, makeFormData('Tester', [], '@conflicthoge'))
+
+    expect(result).toBe('このハンドルはすでに使用されています')
+  })
 })
