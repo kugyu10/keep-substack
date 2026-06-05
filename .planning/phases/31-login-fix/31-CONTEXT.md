@@ -18,18 +18,24 @@ Magic Link サインインフローの不具合修正と、メンバーのプロ
 <decisions>
 ## Implementation Decisions
 
-### D-01: 新規メンバー自動作成（auth/callback）
-- `pid` が渡されたが `publication_id` が一致するメンバーが存在しない場合 → `publication_id=pid` で新規 member を INSERT する
-- `handle` も渡されていれば `substack_handle=handle` で一緒に設定する（ユニーク制約違反の場合は `substack_handle=null` でフォールバック）
-- `name` は空文字 or publication_id で仮置き — ユーザーが `/my` から後で入力
-- `user_id` は現在のログインユーザーの ID を設定する
+### D-01: ログイン URL の必須パラメータ（根本的な仕様）
+- サインイン Magic Link は **`pid` と `handle` の両方が必須**。片方だけのリンクは不完全とみなす
+- ログイン URL 形式: `/login-51cf21389c56?pid=xxx&handle=@yyy`
+- `LoginForm` は両方を hidden input で保持 → `sendMagicLinkAction` → callback URL に両方を付与
+- `sendMagicLinkAction` で `pid` または `handle` が空の場合はエラーを返す（「登録リンクが不正です」）
 
-### D-02: substack_handle の /my ページでの扱い
-- `substack_handle` が `null`（未設定）→ 入力フィールドを表示して設定可能
+### D-02: auth/callback での member 作成・紐付け
+- `pid` に一致するメンバーが **存在する** → `user_id` を紐付け（既存の動作）
+- `pid` に一致するメンバーが **存在しない** → `publication_id=pid, substack_handle=handle` で新規 member を INSERT し `user_id` を設定
+  - `substack_handle` の unique 違反（既存 member が同じ handle を持つ）の場合 → `substack_handle=null` でフォールバック INSERT
+- `name` は `publication_id` 値で仮置き — ユーザーが `/my` から後で変更可能
+
+### D-03: substack_handle の /my ページでの扱い
+- `substack_handle` は callback で登録時に設定されるため、通常は `/my` 初回アクセス時点で設定済み
 - `substack_handle` が設定済み → publicationId と同様に `<p>` タグで読み取り専用表示（「変更できません」メッセージ付き）
-- ハンドルはログイン URL のクエリパラメータ（`?handle=xxx`）から渡されるため、通常は登録時に callback で設定される
+- `substack_handle` が `null`（例外的なフォールバックケース）→ 入力フィールドを表示し一度だけ設定可能
 
-### D-03: admin による publication_id / substack_handle 編集
+### D-04: admin による publication_id / substack_handle 編集
 - admin の `updateMemberAction` に `substack_handle` と `publication_id` を追加
 - `publication_id` 変更は FK が連鎖しているため CASCADE UPDATE が必要。以下のテーブルが影響を受ける：
   - `member_teams` (member_id FK → members.id … id は UUID なので直接関係なし)
@@ -38,7 +44,7 @@ Magic Link サインインフローの不具合修正と、メンバーのプロ
   - DB スキーマを確認して適切な UPDATE 方法を選択（ON UPDATE CASCADE が設定されているか確認）
 - `AdminMemberList.tsx` の編集行に `substack_handle` と `publication_id` の入力フィールドを追加
 
-### D-04: substack_handle のユニーク制約エラー処理
+### D-05: substack_handle のユニーク制約エラー処理
 - INSERT / UPDATE 時に `error.code === '23505'` (unique violation) が返った場合 → ユーザーに「このハンドルはすでに使用されています」エラーを表示
 - コールバックでの新規メンバー作成時は `substack_handle=null` でフォールバック（サイレント）
 
