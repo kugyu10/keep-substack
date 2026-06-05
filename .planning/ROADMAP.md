@@ -222,7 +222,7 @@ Plans:
 
 **Requirements:** AUTH-FIX-01
 
-**Plans:** 3/3 plans complete
+**Plans:** 4 plans (3 complete + 1 gap closure)
 
 Plans:
 **Wave 1**
@@ -234,12 +234,16 @@ Plans:
 - [x] 31-02-PLAN.md — Auth バックエンド: sendMagicLinkAction D-01 + auth/callback D-02 新規 member INSERT + my/actions.ts D-05 23505 処理
 - [x] 31-03-PLAN.md — フロント + admin: MyProfileForm D-03 読み取り専用 + AdminMemberList D-04 編集拡張 + lib/members.ts D-04/D-05
 
+**Gap Closure** *(G-01 fix — 既存メンバー再ログイン不可)*
+
+- [ ] 31-04-PLAN.md — ログインページ分離: login-51cf21389c56 → signin-51cf21389c56 (git mv) + /login 新規作成（既存メンバー専用）
+
 **Success Criteria:**
 
 1. Magic Link メール送信後、リンクをクリックするとセッションが正しく確立される
 2. ログイン後のリダイレクト先が正しい（/my ページ）
-3. セッション切れ・再ログイン時も同様に動作する
-4. pid/handle が欠けた不正リンクからは「登録リンクが不正です」エラーが表示される
+3. セッション切れ・再ログイン時も同様に動作する（/login からメールのみで再ログイン可能）
+4. pid/handle が欠けた不正リンクからは「登録リンクが不正です」エラーが表示される（/signin-51cf21389c56 のみ）
 5. substack_handle 設定済みのメンバーは /my ページで読み取り専用表示になる
 6. admin が substack_handle と publication_id を編集できる
 
@@ -284,4 +288,4 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 28. コミットスケジュール — DB + /my ページ | v1.7 | 0/2 | Pending | — |
 | 29. Commit & Goal View — 新トップページ | v1.7 | 2/2 | Complete | 2026-06-04 |
 | 30. アチーブメント（👑 / 🔥） | v1.7 | 2/2 | Complete    | 2026-06-04 |
-| 31. ログインフロー修正 | v1.7 | 3/3 | Complete   | 2026-06-05 |
+| 31. ログインフロー修正 | v1.7 | 3/4 | Executing (gap closure) | — |
