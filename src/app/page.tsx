@@ -35,8 +35,7 @@ export default async function Home({ searchParams }: Props) {
     .from('member_commit_slots')
     .select('member_id, day_of_week, hour')
   if (slotsError) {
-    // Fail loudly so the error surfaces in Next.js error monitoring / logs.
-    throw slotsError
+    console.error('[Home] member_commit_slots fetch error:', slotsError)
   }
 
   const results = await fetchAllFeedsCached(filteredMembers)
