@@ -1,8 +1,10 @@
 ---
 phase: 31-login-fix
 verified: 2026-06-06T08:40:00Z
-status: human_needed
+status: passed
 score: 14/14 must-haves verified
+human_verification_completed: true
+human_verification_note: "UAT完了（2026-06-06）— テスト3(招待リンクログイン)・テスト4(/loginメールのみ再ログイン G-01修正)を実環境で確認済み。テスト8(重複フォールバック)はスキップ(テストデータ準備困難、TDD自動テストでカバー済み)"
 overrides_applied: 0
 re_verification:
   previous_status: gaps_found
