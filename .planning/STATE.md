@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Commit & Goal View + Substack Profile Link
-status: shipped
-stopped_at: Phase 31 shipped — PR #3
-last_updated: "2026-06-06T10:10:00.000Z"
-last_activity: 2026-06-06 -- Phase 31 shipped — PR #3 (develop → main)
+status: Awaiting next milestone
+stopped_at: Phase 31 Plan 04 complete
+last_updated: "2026-06-06T01:54:11.028Z"
+last_activity: 2026-06-06 — Milestone v1.7 completed and archived
 progress:
   total_phases: 5
   completed_phases: 5
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-06-02 — v1.7 Commit & Goal View + Subs
 
 ## Current Position
 
-Phase: 31 (login-fix) — COMPLETE
-Plan: 4 of 4
-Status: All plans complete
-Last activity: 2026-06-06 -- Phase 31 Plan 04 complete (G-01 gap closure)
+Phase: Milestone v1.7 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-06-06 — Milestone v1.7 completed and archived
 
 ### Quick Tasks Completed
 
@@ -109,6 +109,24 @@ long-standing backlog ideas, not functional gaps.
 | todo | 2026-05-11-multi-team-membership | pending |
 | todo | 2026-05-11-supabase-migration | pending |
 
+## Deferred Items (v1.7 close — 2026-06-06)
+
+Items acknowledged and deferred at v1.7 milestone close. 次マイルストーンの安定化フェーズで解消予定。
+
+| Category | Item | Status |
+|----------|------|--------|
+| debug_session | schedule-save-fails-production | root_cause_found (本番DBマイグレーション適用で解消) |
+| uat_gap | Phase 27 — 27-HUMAN-UAT.md (6 pending scenarios) | partial |
+| verification_gap | Phase 27 — 27-VERIFICATION.md | human_needed |
+| verification_gap | Phase 28 — 28-VERIFICATION.md | human_needed |
+| verification_gap | Phase 29 — 29-VERIFICATION.md | human_needed |
+| quick_task | 260605-42o-grid-hover-popover | missing |
+| quick_task | 260605-qqq-hh-mm | missing |
+| todo | 2026-06-06-restore-next-redirect-in-auth-callback | pending |
+| todo | 2026-06-06-upsert-commit-slots-replace-delete-insert | pending |
+
+Known deferred items at close: 9 (v1.7) + 11 (v1.6 carry-over) = 20 total
+
 ## Operator Next Steps
 
-- Plan Phase 29: `/gsd:discuss-phase 29` or `/gsd:plan-phase 29`
+- Start the next milestone with /gsd:new-milestone

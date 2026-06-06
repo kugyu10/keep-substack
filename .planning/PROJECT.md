@@ -1,16 +1,19 @@
 # Keep Substack
 
-## Current Milestone: v1.7 Commit & Goal View + Substack Profile Link
+## Current State: v1.7 SHIPPED
 
-**Goal:** コミットスケジュールの宣言と3週間の達成グリッドで「継続の意志と実績」を仲間に見せるトップビューを新設し、Substackプロフィールへの直リンクも追加する
+**Shipped:** v1.7 Commit & Goal View + Substack Profile Link (2026-06-06)
 
-**Target features:**
-- 個人マンスリービューの名前/アイコンから `https://substack.com/@{substack_handle}` へ遷移
-- 新トップビュー（Commit & Goal View）— 行レイアウト: `|アイコン+名前 | コミットGrid | 👑🔥|`
-- コミットGrid: 3週分横並び（左古→右新）、週1〜4で総横幅同一、達成 = サムネイル / 未達成 = 曜日名
-- /my ページからコミットスケジュール設定（週N回・曜日・時刻）
-- アチーブメント: 👑 今週全コミット達成 ／ 🔥 2週以上連続達成中
-- 現トップ（週次ヒートマップ）を `/weekly-stamp` に移動
+- Substackハンドル（@handle）をDBに登録し、個人マンスリービューからSubstackプロフィールに直リンク
+- /myページでコミットスケジュール（週1〜4回・曜日・時刻）を宣言・保存
+- 新トップページにCommit & Goal View（3週分コミットGrid + 👑🔥アチーブメント）
+- ログインフロー修正：/login（既存メンバー再ログイン）と/signin-51cf21389c56（招待専用）に分離
+
+**Next Milestone Goals:** デバッグ・安定化・品質向上を主軸に置いたマイルストーン
+- 本番環境で判明した積み残しバグの解消
+- Phase 27-29 の検証ギャップ（human UAT・verification）の解消
+- commitSlots delete+insert → upsert へのアトミック化
+- rss-not-fetched-on-user-add バグの調査・修正
 
 <details>
 <summary>Previous milestone: v1.6 Team Roles + Member Self-Service (shipped 2026-05-30)</summary>
@@ -38,7 +41,7 @@
 
 ## What This Is
 
-Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度をヒートマップUIで可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSS + Supabase PostgreSQLで構築し、Vercelにデプロイ済み。v1.5でSupabase完全移行・Magic Linkログイン・メンバー自己管理を実装し、管理者依存を排除した自律的なサービスになった。v1.6でチームステータス（public/private/hidden）のDB管理・/myページからの公開チーム自由参加・Playwright E2Eテスト基盤を追加し、コミュニティの自律性と品質を強化した。v1.7でSubstack @handleのDB登録・/myページでの編集・CalendarGridからのプロフィールリンクを実装し、メンバー同士がSubstackプロフィールに直接アクセスできるようになった。
+Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度とコミット達成状況を可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSS + Supabase PostgreSQLで構築し、Vercelにデプロイ済み。v1.5でSupabase完全移行・Magic Linkログイン・メンバー自己管理を実装。v1.6でチームステータスDB管理・メンバー自律参加・Playwright E2Eテスト基盤を追加。v1.7でコミットスケジュール宣言・3週分Commit Goal View・アチーブメント（👑/🔥）・Substackプロフィール直リンクを実装し、「継続の意志と実績」を仲間に見せるコアビューが完成した。
 
 ## Core Value
 
@@ -96,13 +99,22 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - ✓ `/my` ページで Substack @handle を登録・更新できる — v1.7 (Validated in Phase 27)
 - ✓ 👑（今週全コミット達成）・🔥（2週以上連続達成）のアチーブメントアイコンを CommitGoalView に表示する — v1.7 (Validated in Phase 30)
 
-### Active
-- [ ] `/my` ページでコミットスケジュール（週N回・曜日・時刻）を設定できる
-- [ ] 新トップページにコミット＆ゴールビューを表示する（行: アイコン+名前 / コミットGrid / アチーブメント）
-- [ ] コミットGridが3週分横並びで表示される（週1〜4で総横幅同一・達成=サムネイル / 未達成=曜日名）
-- [ ] スマホ幅が足りない場合はGridを1週表示に縮退する
-- [ ] コミット未設定メンバーは `| 未コミット |` グレー表示される
-- [ ] 現トップ（週次ヒートマップ）が `/weekly-stamp` で引き続きアクセスできる
+### Validated (v1.7)
+
+- ✓ `/my` ページでコミットスケジュール（週N回・曜日・時刻）を設定できる — v1.7 (Phase 28)
+- ✓ 新トップページにコミット＆ゴールビューを表示する（行: アイコン+名前 / コミットGrid / アチーブメント）— v1.7 (Phase 29)
+- ✓ コミットGridが3週分横並びで表示される（週1〜4で総横幅同一・達成=サムネイル / 未達成=曜日名）— v1.7 (Phase 29)
+- ✓ スマホ幅が足りない場合はGridを1週表示に縮退する — v1.7 (Phase 29)
+- ✓ コミット未設定メンバーは `| 未コミット |` グレー表示される — v1.7 (Phase 29)
+- ✓ 現トップ（週次ヒートマップ）が `/weekly-stamp` で引き続きアクセスできる — v1.7 (Phase 29)
+- ✓ Magic Link ログインフロー修正（/login 既存メンバー / /signin-51cf21389c56 招待専用に分離）— v1.7 (Phase 31)
+
+### Active (Next Milestone — 安定化・品質向上)
+
+- [ ] commitSlots 保存を非アトミックな delete+insert から upsert に置き換える
+- [ ] Phase 27-29 の human UAT・verification ギャップを解消する
+- [ ] rss-not-fetched-on-user-add バグの根本原因を特定・修正する
+- [ ] auth/callback の next パラメータを有効化する
 
 ### Active (Future)
 
@@ -129,6 +141,9 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - Tech Stack: Next.js 16.2.6, React 19.2.4, rss-parser 3.13.0, @supabase/supabase-js 2.x, @supabase/ssr 0.10.x, TypeScript 5, Tailwind CSS 4, Lora (Google Fonts), Playwright 1.60 + Vitest
 - v1.5追加: Supabase PostgreSQL（4テーブル + RLS）、Magic Linkログイン、/myページ、adminロール制御
 - v1.6追加: teams.status カラム（public/private/hidden）、member_publications テーブル、Playwright E2Eハーネス + 本番隔離TEST Supabaseプロジェクト
+- v1.7追加: member_commit_slots テーブル（RLS付き）、CommitGoalView / CommitGrid / CommitGoalRow コンポーネント群、commitUtils.ts（JST週計算・streak・sort）、/login と /signin-51cf21389c56 分離、substack_handle UNIQUE制約
+- コードベース: 約6,757行 src TypeScript/TSX（v1.7で+3,355行）
+- 本番/開発 Supabase 分離: prod=xolhjcngrwwwqtklmoyk / dev+E2E=otydhiumsdsyxepnjqjp
 - 記事反映遅延: 最大5分（ISRハイブリッド継続）
 
 ## Constraints
@@ -192,4 +207,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-05
+*Last updated: 2026-06-06 after v1.7 milestone*

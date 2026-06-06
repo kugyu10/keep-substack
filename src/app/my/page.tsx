@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
@@ -84,6 +85,11 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
           </div>
         </>
       )}
+      <div className="mt-10 text-center">
+        <Link href="/" className="text-sm text-gray-500 hover:text-gray-800 underline">
+          トップページへ
+        </Link>
+      </div>
     </main>
   )
 }
