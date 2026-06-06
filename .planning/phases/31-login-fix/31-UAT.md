@@ -1,9 +1,9 @@
 ---
-status: complete
+status: diagnosed
 phase: 31-login-fix
 source: [31-01-SUMMARY.md, 31-02-SUMMARY.md, 31-03-SUMMARY.md, 31-04-SUMMARY.md]
 started: 2026-06-06T09:00:00Z
-updated: 2026-06-06T09:30:00Z
+updated: 2026-06-06T09:45:00Z
 ---
 
 ## Current Test
@@ -61,19 +61,27 @@ blocked: 0
 ## Gaps
 
 - truth: "/signin-51cf21389c56 のページタイトルとボタンラベルが「サインイン」と表示される"
-  status: failed
+  status: resolved
   reason: "User reported: ログイン→サインイン に タイトルとボタンラベル変更"
   severity: cosmetic
   test: 2
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "git mv でリネームした際に page.tsx の h1 テキストと LoginForm.tsx のボタンラベルを更新し忘れた"
+  artifacts:
+    - path: "src/app/signin-51cf21389c56/page.tsx"
+      issue: "h1 が「ログイン」のまま"
+    - path: "src/app/signin-51cf21389c56/LoginForm.tsx"
+      issue: "ボタンラベルが「ログインリンクを送信」のまま"
+  fixed_by: "commit 91b188d"
 
 - truth: "管理画面の publication_id 列が一つに統合され、保存ボタンが画面内に収まっている"
-  status: failed
+  status: resolved
   reason: "User reported: publicationId列とpublicationId (edit)列がある　一つにして　テーブルの横幅が狭くて保存ボタンが隠れるのでレイアウト調整して(max-width大きめにして）"
   severity: major
   test: 7
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "plan 31-03 で publicationId 表示列と new_publication_id 編集列を別列として追加したが、非編集行でも両列が存在し重複表示。admin/page.tsx の max-w-3xl が狭く保存ボタンが見切れていた"
+  artifacts:
+    - path: "src/app/admin/AdminMemberList.tsx"
+      issue: "publicationId 列と publicationId (edit) 列が重複、非編集行でも両列表示"
+    - path: "src/app/admin/page.tsx"
+      issue: "max-w-3xl で列数に対して横幅不足"
+  fixed_by: "commit 91b188d"
