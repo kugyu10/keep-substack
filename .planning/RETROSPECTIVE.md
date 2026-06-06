@@ -216,6 +216,50 @@
 
 ---
 
+## Milestone: v1.7 — Commit & Goal View + Substack Profile Link
+
+**Shipped:** 2026-06-06
+**Phases:** 5 (27-31) | **Plans:** 12 | **Sessions:** 4日
+
+### What Was Built
+- members.substack_handle カラム追加 + /my @handle 入力・保存・CalendarGridプロフィールリンク（Phase 27）
+- member_commit_slots テーブル（RLS付き）+ CommitScheduleModal + updateCommitSlotsAction（Phase 28）
+- CommitGoalView / CommitGrid / CommitGoalRow + commitUtils.ts（JST週計算・streak・sort）+ /weekly-stamp（Phase 29）
+- 👑🔥アチーブメント計算（isCurrentWeekComplete / consecutiveWeekStreak / sortMembersForCommitView TDD）（Phase 30）
+- ログインフロー修正：/login（既存メンバー）/ /signin-51cf21389c56（招待）分離 + substack_handle UNIQUE制約（Phase 31）
+
+### What Worked
+- commitUtils.ts を TDD で実装（Phase 30）— ロジックをUIから完全分離し再利用性と証明可能性を両立
+- sortMembersForCommitView で per-member データを比較前に一括事前計算（pre-compute）— 比較関数内でのO(n)再計算を回避
+- PR #3 コードレビューでの誤指摘を追調査で是正（admin role check は意図的変更と確認、null-pid ガードは既存コードで対処済み）
+- home page の slotsError を throw → console.error + フォールバックに修正し、DBエラーで全体500を防止
+- 本番/dev DB の制約差分を information_schema SQL + PostgREST API 経由で比較できた（2件の未適用マイグレーション発見）
+
+### What Was Inefficient
+- REQUIREMENTS.md のトレーサビリティ表が Phase 28/29 完了後も Pending のまま放置 — マイルストーン close 時に手動修正が必要だった
+- Phase 27 human UAT が 6 シナリオ未完のままマイルストーン close まで繰り越し — UAT 完了を phase completion の必須ゲートにすべきだった
+- 本番 DB への `supabase db push` という誤誘導（config.toml なし、SQL Editor が正道）— PR description の警告が不完全
+- quick tasks の status: missing が 6 件 — 完了したタスクの状態更新漏れが累積
+
+### Patterns Established
+- **commitUtils.ts 純粋関数分離**: JST日付計算・週達成判定・ストリーク計算・ソートをUIから独立させTDDで保証
+- **pre-compute before sort**: comparator 内で重複計算せず、Map で事前にメトリクスを計算してからソート
+- **graceful degradation over throw**: ページ全体に影響する補助データ（スロット）のfetchエラーは throw せず fallback
+- **本番/dev スキーマ比較手順**: PostgREST OpenAPI spec（カラム一致確認）+ Dashboard SQL Editor（制約確認）の2段階
+
+### Key Lessons
+1. PRレビューでの Critical 指摘は追調査必須 — 「user.role vs app_metadata.role」はコードコメントと一貫したテストで意図的変更と確認できた
+2. REQUIREMENTS.md のトレーサビリティは phase 完了時に即座に更新する（milestone close で大量修正が発生する）
+3. 本番 DB マイグレーション適用は SQL Editor 経由（supabase db push は config.toml 必須）— PR description に明記だけでは不十分
+4. human UAT ギャップは「次マイルストールで」として繰り越すよりも、シナリオを削減してでも完了させた方がよい
+
+### Cost Observations
+- Model mix: Sonnet 4.6 (1M context) 中心
+- Sessions: 4日で5フェーズ12プラン（164コミット）
+- Notable: Phase 31 は計画外のギャップクローズ（Plan 04）で G-01（既存メンバー再ログイン不可）を発見・修正
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution

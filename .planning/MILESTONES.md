@@ -1,5 +1,22 @@
 # Milestones: Keep Substack
 
+## v1.7 Commit & Goal View + Substack Profile Link (Shipped: 2026-06-06)
+
+**Phases completed:** 5 phases, 12 plans, 21 tasks
+
+**Key accomplishments:**
+
+- Added `substack_handle TEXT NULL` to members table via idempotent migration file and updated schema.sql bootstrap definition
+- Implemented full app-layer support for PROF-01/02/03: Member type extended with substackHandle, /my page @handle input with @-normalization save, auth callback ?handle= forwarding, login flow handle pass-through, and CalendarGrid conditional profile link
+- One-liner:
+- One-liner:
+- `members.substack_handle` に UNIQUE 制約を追加する migration を作成し live DB に適用
+- Magic Link 認証バックエンド 3 箇所を修正 — D-01 pid/handle バリデーション、D-02 callback 新規 member INSERT、D-05 23505 ハンドリング
+- フロントエンド 2 箇所 + admin バックエンド 3 箇所を修正 — D-03 substack_handle 読み取り専用化、D-04 admin 編集フィールド追加、D-05 23505 エラーハンドリング
+- One-liner:
+
+---
+
 ## v1.6 Team Roles + Member Self-Service — ✅ SHIPPED 2026-05-30
 
 **Phases:** 22-26 | **Plans:** 14 | **Tasks:** 25 | **Timeline:** 2026-05-26 → 2026-05-30 (~5 days)
