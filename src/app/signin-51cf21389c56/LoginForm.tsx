@@ -43,7 +43,7 @@ export default function LoginForm({ pid, handle }: { pid?: string; handle?: stri
         disabled={isPending}
         className="w-full bg-orange-500 text-white rounded px-4 py-2 text-sm font-medium disabled:opacity-50"
       >
-        {isPending ? '送信中...' : 'ログインリンクを送信'}
+        {isPending ? '送信中...' : 'サインインリンクを送信'}
       </button>
     </form>
   )

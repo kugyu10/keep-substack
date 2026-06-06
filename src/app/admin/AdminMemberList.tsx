@@ -52,7 +52,6 @@ export default function AdminMemberList({ members, teams }: Props) {
             <th className="border border-[#ebebeb] px-3 py-2">名前</th>
             <th className="border border-[#ebebeb] px-3 py-2">publicationId</th>
             <th className="border border-[#ebebeb] px-3 py-2">handle</th>
-            <th className="border border-[#ebebeb] px-3 py-2">publicationId (edit)</th>
             <th className="border border-[#ebebeb] px-3 py-2">チーム</th>
             <th className="border border-[#ebebeb] px-3 py-2">addedAt</th>
             <th className="border border-[#ebebeb] px-3 py-2"></th>
@@ -69,15 +68,6 @@ export default function AdminMemberList({ members, teams }: Props) {
                     className="bg-white border border-[#d8d8d8] rounded px-1 w-full text-sm text-[#363737]"
                   />
                 </td>
-                <td className="border border-[#ebebeb] px-3 py-2 text-gray-400">{m.publicationId}</td>
-                <td className="border border-[#ebebeb] px-3 py-2">
-                  <input
-                    defaultValue={m.substackHandle ?? ''}
-                    name="substack_handle"
-                    placeholder="@handle"
-                    className="bg-white border border-[#d8d8d8] rounded px-1 w-full text-sm text-[#363737]"
-                  />
-                </td>
                 <td className="border border-[#ebebeb] px-3 py-2">
                   <input
                     defaultValue={m.publicationId}
@@ -85,6 +75,14 @@ export default function AdminMemberList({ members, teams }: Props) {
                     className="bg-white border border-[#d8d8d8] rounded px-1 w-full text-sm font-mono text-[#363737]"
                   />
                   <p className="text-xs text-gray-500 mt-1">変更すると記事データとの紐付けに影響します</p>
+                </td>
+                <td className="border border-[#ebebeb] px-3 py-2">
+                  <input
+                    defaultValue={m.substackHandle ?? ''}
+                    name="substack_handle"
+                    placeholder="@handle"
+                    className="bg-white border border-[#d8d8d8] rounded px-1 w-full text-sm text-[#363737]"
+                  />
                 </td>
                 <td className="border border-[#ebebeb] px-3 py-2">
                   <div className="flex flex-col gap-1">
@@ -129,7 +127,6 @@ export default function AdminMemberList({ members, teams }: Props) {
                 <td className="border border-[#ebebeb] px-3 py-2">{m.name}</td>
                 <td className="border border-[#ebebeb] px-3 py-2">{m.publicationId}</td>
                 <td className="border border-[#ebebeb] px-3 py-2">{m.substackHandle ?? ''}</td>
-                <td className="border border-[#ebebeb] px-3 py-2">{m.publicationId}</td>
                 <td className="border border-[#ebebeb] px-3 py-2">{m.teams.map(t => t.name).join(', ')}</td>
                 <td className="border border-[#ebebeb] px-3 py-2 text-xs text-gray-400">
                   {new Date(m.addedAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}

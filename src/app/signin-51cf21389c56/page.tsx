@@ -15,7 +15,7 @@ export default async function LoginPage({
 
   return (
     <main className="max-w-sm mx-auto px-4 py-16">
-      <h1 className="text-2xl font-semibold mb-8 text-center">ログイン</h1>
+      <h1 className="text-2xl font-semibold mb-8 text-center">サインイン</h1>
       <LoginForm pid={pid} handle={handle} />
     </main>
   )
