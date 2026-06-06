@@ -27,7 +27,7 @@ export default function RootLayout({
           <span className="text-xs text-gray-400">
             このSubstack継続可視化ツールに参加したい方は{' '}
             <a
-              href="https://uojun.substack.com/p/5d4"
+              href="https://uojun.substack.com/p/8cd"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-[#FF6719] underline"
