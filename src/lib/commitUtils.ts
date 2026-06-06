@@ -182,19 +182,30 @@ export function sortMembersForCommitView(
 ): MemberFeedResult[] {
   const thisWeekDates = getWeekDates(0)
 
+  // Pre-compute per-member values once to avoid rebuilding Maps inside the comparator.
+  const meta = new Map(
+    results.map(({ member, items }) => {
+      const memberSlots = slots.filter((s) => s.member_id === member.id)
+      const dateMap = buildArticleDateMap(items)
+      return [
+        member.id,
+        {
+          rate: achievementRate(memberSlots, thisWeekDates, dateMap),
+          streak: consecutiveWeekStreak(memberSlots, items),
+        },
+      ]
+    })
+  )
+
   return [...results].sort((a, b) => {
-    const aSlots = slots.filter((s) => s.member_id === a.member.id)
-    const bSlots = slots.filter((s) => s.member_id === b.member.id)
+    const am = meta.get(a.member.id)!
+    const bm = meta.get(b.member.id)!
 
     // ① achievement rate descending
-    const aRate = achievementRate(aSlots, thisWeekDates, buildArticleDateMap(a.items))
-    const bRate = achievementRate(bSlots, thisWeekDates, buildArticleDateMap(b.items))
-    if (bRate !== aRate) return bRate - aRate
+    if (bm.rate !== am.rate) return bm.rate - am.rate
 
     // ② streak weeks descending
-    const aStreak = consecutiveWeekStreak(aSlots, a.items)
-    const bStreak = consecutiveWeekStreak(bSlots, b.items)
-    if (bStreak !== aStreak) return bStreak - aStreak
+    if (bm.streak !== am.streak) return bm.streak - am.streak
 
     // ③ addedAt ascending
     return a.member.addedAt.localeCompare(b.member.addedAt)
