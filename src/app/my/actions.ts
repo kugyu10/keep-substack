@@ -162,13 +162,16 @@ export async function updateCommitSlotsAction(
     return '保存に失敗しました。もう一度お試しください'
   }
 
+  // TODO: delete+insert は非アトミック。delete 成功後に insert が失敗するとスロットが消滅する。
+  //       Supabase JS が DB トランザクションを直接サポートしないため、
+  //       将来的に upsert (onConflict: member_id,day_of_week) + 余剰行 delete に置き換えること。
   const { error: deleteError } = await admin
     .from('member_commit_slots')
     .delete()
     .eq('member_id', member.id)
 
   if (deleteError) {
-    console.error('[updateCommitSlots] delete:', deleteError)
+    console.error('[updateCommitSlots] delete failed — slots unchanged:', deleteError)
     return '保存に失敗しました。もう一度お試しください'
   }
 
@@ -178,7 +181,8 @@ export async function updateCommitSlotsAction(
       .insert(slots.map(s => ({ member_id: member.id, day_of_week: s.day_of_week, hour: s.hour })))
 
     if (insertError) {
-      console.error('[updateCommitSlots] insert:', insertError)
+      // delete は成功済み。スロットが空になった状態で insert が失敗している。
+      console.error('[updateCommitSlots] insert failed after delete — slots are now empty:', insertError)
       return '保存に失敗しました。もう一度お試しください'
     }
   }
