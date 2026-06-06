@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS members (
   publication_id TEXT        UNIQUE NOT NULL,
   image_url      TEXT,
   added_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
-  user_id        UUID        REFERENCES auth.users(id) UNIQUE
+  user_id        UUID        REFERENCES auth.users(id) UNIQUE,
+  substack_handle TEXT UNIQUE
 );
 -- 既存Supabaseインスタンスへの適用:
 -- ALTER TABLE members ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) UNIQUE;
@@ -53,6 +54,14 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_member_publications_one_primary
   ON member_publications (member_id)
   WHERE is_primary;
 
+CREATE TABLE IF NOT EXISTS member_commit_slots (
+  id           BIGINT  GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  member_id    UUID    NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+  day_of_week  INT     NOT NULL CHECK (day_of_week BETWEEN 1 AND 7),
+  hour         INT     NOT NULL CHECK (hour BETWEEN 0 AND 23),
+  UNIQUE (member_id, day_of_week)
+);
+
 -- ============================================================
 -- 2. Row Level Security
 -- ============================================================
@@ -62,6 +71,7 @@ ALTER TABLE teams        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE member_teams ENABLE ROW LEVEL SECURITY;
 ALTER TABLE articles     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE member_publications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE member_commit_slots ENABLE ROW LEVEL SECURITY;
 
 -- anon / authenticated: SELECT 全件許可（公開データ）
 CREATE POLICY "public select members"
@@ -78,6 +88,19 @@ CREATE POLICY "public select articles"
 
 CREATE POLICY "public select member_publications"
   ON member_publications FOR SELECT USING (true);
+
+CREATE POLICY "public select member_commit_slots"
+  ON member_commit_slots FOR SELECT USING (true);
+
+CREATE POLICY "member write own commit slots"
+  ON member_commit_slots
+  FOR ALL
+  USING (
+    member_id = (SELECT id FROM members WHERE user_id = auth.uid())
+  )
+  WITH CHECK (
+    member_id = (SELECT id FROM members WHERE user_id = auth.uid())
+  );
 
 -- service_role: INSERT / UPDATE / DELETE 許可（Cron・管理スクリプト用）
 -- service_role はデフォルトでRLSをバイパスするため追加ポリシー不要

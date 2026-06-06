@@ -83,12 +83,148 @@ function setupAdminMock(opts: {
   return { insertSpy, deleteSpy, inSpy, updateSpy }
 }
 
-function makeFormData(name: string, teams: string[]): FormData {
+function makeFormData(name: string, teams: string[], substackHandle?: string): FormData {
   const fd = new FormData()
   fd.append('name', name)
   for (const t of teams) fd.append('teams', t)
+  if (substackHandle !== undefined) fd.append('substack_handle', substackHandle)
   return fd
 }
+
+describe('updateMyProfileAction - substack_handle normalization (Phase 27 D-08)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'u1' } } })
+  })
+
+  it('empty substack_handle → update called with substack_handle: null', async () => {
+    let capturedUpdate: Record<string, unknown> = {}
+    const updateSpy = vi.fn((payload: Record<string, unknown>) => {
+      capturedUpdate = payload
+      return {
+        eq: () => ({
+          select: () => ({
+            single: async () => ({ data: { id: MEMBER_ID }, error: null }),
+          }),
+        }),
+      }
+    })
+    mockAdminFrom.mockImplementation((table: string) => {
+      if (table === 'members') return { update: updateSpy }
+      if (table === 'teams') return {
+        select: () => ({ eq: async () => ({ data: [], error: null }) }),
+      }
+      if (table === 'member_teams') return {
+        delete: () => ({ eq: () => ({ in: async () => ({ error: null }) }) }),
+        insert: async () => ({ error: null }),
+      }
+      throw new Error(`unexpected table: ${table}`)
+    })
+
+    const result = await updateMyProfileAction(null, makeFormData('Tester', [], ''))
+    expect(result).toBeNull()
+    expect(capturedUpdate).toMatchObject({ substack_handle: null })
+  })
+
+  it('substack_handle without @ → update called with substack_handle: @hoge', async () => {
+    let capturedUpdate: Record<string, unknown> = {}
+    const updateSpy = vi.fn((payload: Record<string, unknown>) => {
+      capturedUpdate = payload
+      return {
+        eq: () => ({
+          select: () => ({
+            single: async () => ({ data: { id: MEMBER_ID }, error: null }),
+          }),
+        }),
+      }
+    })
+    mockAdminFrom.mockImplementation((table: string) => {
+      if (table === 'members') return { update: updateSpy }
+      if (table === 'teams') return {
+        select: () => ({ eq: async () => ({ data: [], error: null }) }),
+      }
+      if (table === 'member_teams') return {
+        delete: () => ({ eq: () => ({ in: async () => ({ error: null }) }) }),
+        insert: async () => ({ error: null }),
+      }
+      throw new Error(`unexpected table: ${table}`)
+    })
+
+    const result = await updateMyProfileAction(null, makeFormData('Tester', [], 'hoge'))
+    expect(result).toBeNull()
+    expect(capturedUpdate).toMatchObject({ substack_handle: '@hoge' })
+  })
+
+  it('substack_handle with @ → update called with substack_handle: @hoge (no double @)', async () => {
+    let capturedUpdate: Record<string, unknown> = {}
+    const updateSpy = vi.fn((payload: Record<string, unknown>) => {
+      capturedUpdate = payload
+      return {
+        eq: () => ({
+          select: () => ({
+            single: async () => ({ data: { id: MEMBER_ID }, error: null }),
+          }),
+        }),
+      }
+    })
+    mockAdminFrom.mockImplementation((table: string) => {
+      if (table === 'members') return { update: updateSpy }
+      if (table === 'teams') return {
+        select: () => ({ eq: async () => ({ data: [], error: null }) }),
+      }
+      if (table === 'member_teams') return {
+        delete: () => ({ eq: () => ({ in: async () => ({ error: null }) }) }),
+        insert: async () => ({ error: null }),
+      }
+      throw new Error(`unexpected table: ${table}`)
+    })
+
+    const result = await updateMyProfileAction(null, makeFormData('Tester', [], '@hoge'))
+    expect(result).toBeNull()
+    expect(capturedUpdate).toMatchObject({ substack_handle: '@hoge' })
+  })
+
+  it('invalid substack_handle (contains space) → returns error without calling DB', async () => {
+    const result = await updateMyProfileAction(null, makeFormData('Tester', [], '@ invalid'))
+    expect(result).toBe('ハンドルに使用できない文字が含まれています（英数字・_・- のみ使用可）')
+    expect(mockAdminFrom).not.toHaveBeenCalled()
+  })
+
+  it('invalid substack_handle (starts with hyphen) → returns error', async () => {
+    const result = await updateMyProfileAction(null, makeFormData('Tester', [], '-handle'))
+    expect(result).toBe('ハンドルに使用できない文字が含まれています（英数字・_・- のみ使用可）')
+    expect(mockAdminFrom).not.toHaveBeenCalled()
+  })
+
+  it('substack_handle with surrounding spaces → update called with substack_handle: @hoge (trimmed)', async () => {
+    let capturedUpdate: Record<string, unknown> = {}
+    const updateSpy = vi.fn((payload: Record<string, unknown>) => {
+      capturedUpdate = payload
+      return {
+        eq: () => ({
+          select: () => ({
+            single: async () => ({ data: { id: MEMBER_ID }, error: null }),
+          }),
+        }),
+      }
+    })
+    mockAdminFrom.mockImplementation((table: string) => {
+      if (table === 'members') return { update: updateSpy }
+      if (table === 'teams') return {
+        select: () => ({ eq: async () => ({ data: [], error: null }) }),
+      }
+      if (table === 'member_teams') return {
+        delete: () => ({ eq: () => ({ in: async () => ({ error: null }) }) }),
+        insert: async () => ({ error: null }),
+      }
+      throw new Error(`unexpected table: ${table}`)
+    })
+
+    const result = await updateMyProfileAction(null, makeFormData('Tester', [], '  @hoge  '))
+    expect(result).toBeNull()
+    expect(capturedUpdate).toMatchObject({ substack_handle: '@hoge' })
+  })
+})
 
 describe('updateMyProfileAction - public-team reconcile + security', () => {
   beforeEach(() => {
@@ -179,5 +315,41 @@ describe('updateMyProfileAction - public-team reconcile + security', () => {
     expect(updateSpy).not.toHaveBeenCalled()
     expect(insertSpy).not.toHaveBeenCalled()
     expect(deleteSpy).not.toHaveBeenCalled()
+  })
+
+  it('Test D: members.update が 23505 エラーを返す → このハンドルはすでに使用されています', async () => {
+    // update spy が 23505 エラーを返すようにカスタムモックを構築
+    const updateSpy = vi.fn(() => ({
+      eq: () => ({
+        select: () => ({
+          single: async () => ({
+            data: null,
+            error: { code: '23505', message: 'duplicate key value violates unique constraint "members_substack_handle_key"' },
+          }),
+        }),
+      }),
+    }))
+
+    mockAdminFrom.mockImplementation((table: string) => {
+      if (table === 'members') return { update: updateSpy }
+      if (table === 'teams') {
+        return {
+          select: () => ({
+            eq: async () => ({ data: [], error: null }),
+          }),
+        }
+      }
+      if (table === 'member_teams') {
+        return {
+          delete: () => ({ eq: () => ({ in: async () => ({ error: null }) }) }),
+          insert: async () => ({ error: null }),
+        }
+      }
+      throw new Error(`unexpected table: ${table}`)
+    })
+
+    const result = await updateMyProfileAction(null, makeFormData('Tester', [], '@conflicthoge'))
+
+    expect(result).toBe('このハンドルはすでに使用されています')
   })
 })

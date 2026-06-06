@@ -27,6 +27,7 @@ const getMockParseString = () =>
   ((Parser as unknown as Record<string, unknown>)._parseString as ReturnType<typeof vi.fn>)
 
 const makeMember = (publicationId: string): Member => ({
+  id: '00000000-0000-0000-0000-000000000001',
   name: publicationId,
   publicationId,
   teams: [],

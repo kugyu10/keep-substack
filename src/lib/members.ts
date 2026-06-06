@@ -6,9 +6,11 @@ export async function getMembers(): Promise<Member[]> {
   const { data, error } = await supabase
     .from('members')
     .select(`
+      id,
       name,
       publication_id,
       added_at,
+      substack_handle,
       member_teams (
         teams (name, status)
       )
@@ -16,6 +18,7 @@ export async function getMembers(): Promise<Member[]> {
   if (error) throw error
   if (!data) return []
   return data.map((m: any) => ({
+    id: m.id,
     name: m.name,
     publicationId: m.publication_id,
     teams: (m.member_teams as any[])
@@ -24,10 +27,11 @@ export async function getMembers(): Promise<Member[]> {
         t !== null && typeof t === 'object' && 'name' in (t as object)
       ),
     addedAt: m.added_at,
+    substackHandle: m.substack_handle ?? undefined,
   }))
 }
 
-export async function addMember(member: Omit<Member, 'addedAt'>): Promise<void> {
+export async function addMember(member: Omit<Member, 'addedAt' | 'id'>): Promise<void> {
   const supabase = createSupabaseAdminClient()
 
   const { data: existing } = await supabase
@@ -50,10 +54,10 @@ export async function addMember(member: Omit<Member, 'addedAt'>): Promise<void> 
     .single()
   if (insertError) throw insertError
 
-  for (const teamName of member.teams.map(t => t.name)) {
+  for (const teamObj of member.teams) {
     const { data: team, error: teamError } = await supabase
       .from('teams')
-      .upsert({ name: teamName }, { onConflict: 'name' })
+      .upsert({ name: teamObj.name, status: teamObj.status }, { onConflict: 'name' })
       .select('id')
       .single()
     if (teamError) throw teamError
@@ -77,7 +81,7 @@ export async function deleteMember(publicationId: string): Promise<void> {
 
 export async function updateMember(
   publicationId: string,
-  updates: Partial<Omit<Member, 'publicationId'>>
+  updates: Partial<Omit<Member, 'id'>>
 ): Promise<void> {
   const supabase = createSupabaseAdminClient()
 
@@ -92,12 +96,24 @@ export async function updateMember(
   const memberUpdate: Record<string, unknown> = {}
   if (updates.name !== undefined) memberUpdate.name = updates.name
   if (updates.addedAt !== undefined) memberUpdate.added_at = updates.addedAt
+  if (updates.substackHandle !== undefined) memberUpdate.substack_handle = updates.substackHandle
+  if (updates.publicationId !== undefined) memberUpdate.publication_id = updates.publicationId
+
   if (Object.keys(memberUpdate).length > 0) {
     const { error: updateError } = await supabase
       .from('members')
       .update(memberUpdate)
       .eq('publication_id', publicationId)
     if (updateError) throw updateError
+  }
+
+  // publication_id 変更時に articles テーブルを連動 UPDATE
+  if (updates.publicationId !== undefined && updates.publicationId !== publicationId) {
+    const { error: articlesUpdateError } = await supabase
+      .from('articles')
+      .update({ publication_id: updates.publicationId })
+      .eq('publication_id', publicationId)
+    if (articlesUpdateError) throw articlesUpdateError
   }
 
   if (updates.teams !== undefined) {
@@ -107,10 +123,10 @@ export async function updateMember(
       .eq('member_id', member.id)
     if (deleteError) throw deleteError
 
-    for (const teamName of updates.teams.map(t => t.name)) {
+    for (const teamObj of updates.teams) {
       const { data: team, error: teamError } = await supabase
         .from('teams')
-        .upsert({ name: teamName }, { onConflict: 'name' })
+        .upsert({ name: teamObj.name, status: teamObj.status }, { onConflict: 'name' })
         .select('id')
         .single()
       if (teamError) throw teamError

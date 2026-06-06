@@ -6,8 +6,11 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const pid = searchParams.get('pid')
+  const handle = searchParams.get('handle')
   const nextParam = searchParams.get('next') ?? '/my'
   // Open Redirect防止: 内部パスのみ許可
+  // TODO: next は現在ハードコードの '/my' リダイレクトに上書きされており未使用。
+  //       signin/login 両アクションが next= を渡すようになったら復活させること。
   const next = nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/my'
 
   if (code) {
@@ -29,10 +32,31 @@ export async function GET(request: NextRequest) {
               .from('members')
               .update({ user_id: user.id })
               .eq('id', member.id)
+          } else if (!member) {
+            // D-02: member が存在しない場合 → 新規 member を INSERT
+            const insertPayload = {
+              publication_id: pid,
+              name: pid,
+              user_id: user.id,
+              substack_handle: handle || null,
+            }
+            const { error: insertError } = await admin
+              .from('members')
+              .insert(insertPayload)
+
+            if (insertError?.code === '23505') {
+              // substack_handle unique 違反 → null でフォールバック INSERT (D-05)
+              await admin
+                .from('members')
+                .insert({ ...insertPayload, substack_handle: null })
+            } else if (insertError) {
+              console.error('[auth/callback] member insert:', insertError)
+            }
           }
         }
       }
-      return NextResponse.redirect(new URL(next, origin))
+      // D-02: callback 時点で substack_handle は INSERT 済み。/my へ直接リダイレクト
+      return NextResponse.redirect(new URL('/my', origin))
     }
     console.error('[auth/callback] exchangeCodeForSession error:', error)
   }

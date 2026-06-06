@@ -1,17 +1,27 @@
 # Keep Substack
 
-## Current State: v1.6 SHIPPED
+## Current Milestone: v1.7 Commit & Goal View + Substack Profile Link
 
-**Shipped:** v1.6 Team Roles + Member Self-Service (2026-05-30)
+**Goal:** コミットスケジュールの宣言と3週間の達成グリッドで「継続の意志と実績」を仲間に見せるトップビューを新設し、Substackプロフィールへの直リンクも追加する
+
+**Target features:**
+- 個人マンスリービューの名前/アイコンから `https://substack.com/@{substack_handle}` へ遷移
+- 新トップビュー（Commit & Goal View）— 行レイアウト: `|アイコン+名前 | コミットGrid | 👑🔥|`
+- コミットGrid: 3週分横並び（左古→右新）、週1〜4で総横幅同一、達成 = サムネイル / 未達成 = 曜日名
+- /my ページからコミットスケジュール設定（週N回・曜日・時刻）
+- アチーブメント: 👑 今週全コミット達成 ／ 🔥 2週以上連続達成中
+- 現トップ（週次ヒートマップ）を `/weekly-stamp` に移動
+
+<details>
+<summary>Previous milestone: v1.6 Team Roles + Member Self-Service (shipped 2026-05-30)</summary>
+
 - チームステータス（public/private/hidden）をDBで管理し、HIDDEN_TEAM定数を廃止（Member型を `teams: {name, status}[]` に刷新）
 - /myページからpublicチームをチェックボックスで自由参加・退出する自律参加フロー（private/hiddenはreadonly）
 - /admin/teams/{teamName} 動的RSCでhiddenチームの週次ヒートマップを管理者がURL直アクセスで確認（既存proxy.tsゲートで保護）
 - member_publicationsテーブルで複数publication_id対応のスキーマ基盤を整備（部分ユニークIndex+RLS+同期トリガー、UIは1件前提のまま）
 - Playwright E2Eハーネス（login/my-teams/admin-guard 3 spec）を本番隔離TEST Supabaseプロジェクトに対しgreen化
 
-## Next Milestone
-
-未定 — `/gsd:new-milestone` で次の方向性を定義する。候補は v1.7 の継続可視化強化（ストリーク・月間サマリー・年間ヒートマップ）。
+</details>
 
 <details>
 <summary>Previous milestones</summary>
@@ -28,7 +38,7 @@
 
 ## What This Is
 
-Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度をヒートマップUIで可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSS + Supabase PostgreSQLで構築し、Vercelにデプロイ済み。v1.5でSupabase完全移行・Magic Linkログイン・メンバー自己管理を実装し、管理者依存を排除した自律的なサービスになった。v1.6でチームステータス（public/private/hidden）のDB管理・/myページからの公開チーム自由参加・Playwright E2Eテスト基盤を追加し、コミュニティの自律性と品質を強化した。
+Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度をヒートマップUIで可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSS + Supabase PostgreSQLで構築し、Vercelにデプロイ済み。v1.5でSupabase完全移行・Magic Linkログイン・メンバー自己管理を実装し、管理者依存を排除した自律的なサービスになった。v1.6でチームステータス（public/private/hidden）のDB管理・/myページからの公開チーム自由参加・Playwright E2Eテスト基盤を追加し、コミュニティの自律性と品質を強化した。v1.7でSubstack @handleのDB登録・/myページでの編集・CalendarGridからのプロフィールリンクを実装し、メンバー同士がSubstackプロフィールに直接アクセスできるようになった。
 
 ## Core Value
 
@@ -82,14 +92,20 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - ✓ /admin/teams/{teamName} でhiddenチームの週次ビューを表示する — v1.6 (Validated in Phase 24)
 - ✓ メンバーが複数のpublication_idを持てるスキーマにする（member_publicationsテーブル、UIは1件前提のまま）— v1.6 (Validated in Phase 25)
 - ✓ Magic Linkログインフローと/admin保護をPlaywrightでE2Eテストできる — v1.6 (Validated in Phase 26)
+- ✓ 個人マンスリービューで名前/アイコンクリック → `https://substack.com/@{substack_handle}` に遷移する — v1.7 (Validated in Phase 27)
+- ✓ `/my` ページで Substack @handle を登録・更新できる — v1.7 (Validated in Phase 27)
+- ✓ 👑（今週全コミット達成）・🔥（2週以上連続達成）のアチーブメントアイコンを CommitGoalView に表示する — v1.7 (Validated in Phase 30)
 
 ### Active
-
-(None — v1.6 shipped. Next milestone requirements defined via `/gsd:new-milestone`.)
+- [ ] `/my` ページでコミットスケジュール（週N回・曜日・時刻）を設定できる
+- [ ] 新トップページにコミット＆ゴールビューを表示する（行: アイコン+名前 / コミットGrid / アチーブメント）
+- [ ] コミットGridが3週分横並びで表示される（週1〜4で総横幅同一・達成=サムネイル / 未達成=曜日名）
+- [ ] スマホ幅が足りない場合はGridを1週表示に縮退する
+- [ ] コミット未設定メンバーは `| 未コミット |` グレー表示される
+- [ ] 現トップ（週次ヒートマップ）が `/weekly-stamp` で引き続きアクセスできる
 
 ### Active (Future)
 
-- [ ] 連続投稿日数（ストリーク）を表示する
 - [ ] 月間投稿数サマリーを表示する
 - [ ] 年間ヒートマップ（GitHub草型）で長期活動を可視化する
 
@@ -176,4 +192,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-30 after v1.6 milestone — Team Roles + Member Self-Service shipped (チームステータスDB管理・/my自由参加・Playwright E2E基盤)*
+*Last updated: 2026-06-05

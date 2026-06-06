@@ -3,19 +3,24 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import LinkMemberForm from './LinkMemberForm'
 import MyProfileForm from './MyProfileForm'
+import CommitScheduleModal from './CommitScheduleModal'
 import LogoutButton from '@/components/LogoutButton'
 
-export default async function MyPage() {
+export default async function MyPage({ searchParams }: { searchParams: Promise<{ handle?: string }> } = { searchParams: Promise.resolve({}) }) {
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/')
+
+  const { handle } = await searchParams
 
   const admin = createSupabaseAdminClient()
   const { data: member } = await admin
     .from('members')
     .select(`
+      id,
       name,
       publication_id,
+      substack_handle,
       member_teams (
         teams (name, status)
       )
@@ -42,6 +47,18 @@ export default async function MyPage() {
     (t: any) => ({ name: t.name })
   )
 
+  const substackHandle = (member as any)?.substack_handle ?? null
+
+  const { data: commitSlotsData } = member
+    ? await admin
+        .from('member_commit_slots')
+        .select('id, day_of_week, hour')
+        .eq('member_id', (member as any).id)
+        .order('day_of_week')
+    : { data: null }
+
+  const commitSlots = (commitSlotsData ?? []) as { id: number; day_of_week: number; hour: number }[]
+
   return (
     <main className="max-w-sm mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
@@ -51,14 +68,21 @@ export default async function MyPage() {
       {!member ? (
         <LinkMemberForm />
       ) : (
-        <MyProfileForm
-          member={{
-            name: member.name,
-            publicationId: member.publication_id,
-            currentTeams,
-            publicTeams,
-          }}
-        />
+        <>
+          <MyProfileForm
+            member={{
+              name: member.name,
+              publicationId: member.publication_id,
+              currentTeams,
+              publicTeams,
+            }}
+            substackHandle={substackHandle}
+          />
+          <div className="mt-8">
+            <h2 className="text-sm font-semibold mb-2">投稿スケジュール</h2>
+            <CommitScheduleModal initialSlots={commitSlots} />
+          </div>
+        </>
       )}
     </main>
   )

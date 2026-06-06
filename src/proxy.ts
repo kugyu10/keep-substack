@@ -30,9 +30,9 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // /admin: admin ロール必須
+  // /admin: admin ロール必須 (auth.users.role カラムで判定)
   if (pathname.startsWith('/admin')) {
-    if (!user || user.app_metadata?.role !== 'admin') {
+    if (!user || user.role !== 'admin') {
       return NextResponse.redirect(new URL('/', request.url))
     }
   }

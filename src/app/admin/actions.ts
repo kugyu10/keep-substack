@@ -9,7 +9,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 async function requireAdmin(): Promise<void> {
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.app_metadata?.role !== 'admin') {
+  if (!user || user.role !== 'admin') {
     throw new Error('Unauthorized')
   }
 }
@@ -71,15 +71,33 @@ export async function updateMemberAction(
     return 'addedAt は有効なISO日付文字列を入力してください'
   }
 
+  const substackHandleRaw = (formData.get('substack_handle') as string | null)?.trim() ?? ''
+  const handleBody = substackHandleRaw.startsWith('@') ? substackHandleRaw.slice(1) : substackHandleRaw
+  let substack_handle: string | null
+  if (handleBody === '') {
+    substack_handle = null
+  } else if (!/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,49}$/.test(handleBody)) {
+    return 'ハンドルに使用できない文字が含まれています（英数字・_・- のみ使用可）'
+  } else {
+    substack_handle = '@' + handleBody
+  }
+
+  const new_publication_id = (formData.get('new_publication_id') as string | null)?.trim() || null
+
   try {
     await updateMember(publicationId, {
       name,
       teams: teamNames.map((teamName) => ({ name: teamName, status: 'public' })),
       addedAt,
+      substackHandle: substack_handle,
+      ...(new_publication_id ? { publicationId: new_publication_id } : {}),
     })
     revalidatePath('/admin')
     return null
   } catch (e) {
+    if (e instanceof Error && ((e as any).code === '23505' || e.message.includes('23505'))) {
+      return 'このハンドルはすでに使用されています'
+    }
     return e instanceof Error ? e.message : '更新に失敗しました'
   }
 }

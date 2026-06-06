@@ -1,7 +1,9 @@
 import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
-import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'
-import PrBanner from '@/components/PrBanner'
+import { createSupabaseAdminClient } from '@/lib/supabase/admin'
+import CommitGoalView from '@/components/CommitGoalView'
+import ViewTabs from '@/components/ViewTabs'
+import type { CommitSlot } from '@/lib/types'
 
 export const revalidate = 300
 
@@ -22,15 +24,34 @@ export default async function Home({ searchParams }: Props) {
   ]
   const filteredMembers = team
     ? allMembers.filter((m) =>
-        m.teams.some((t) => t.name === team && t.status !== 'hidden')
+        // Team-selected view: include members of the selected team regardless of status
+        m.teams.some((t) => t.name === team)
       )
     : allMembers.filter((m) => m.teams.every((t) => t.status !== 'hidden'))
 
+  // Fetch all commit slots for all members (D-05)
+  const admin = createSupabaseAdminClient()
+  const { data: slotsData, error: slotsError } = await admin
+    .from('member_commit_slots')
+    .select('member_id, day_of_week, hour')
+  if (slotsError) {
+    console.error('[Home] member_commit_slots fetch error:', slotsError)
+  }
+
   const results = await fetchAllFeedsCached(filteredMembers)
 
+  // Filter to 21-day window (3 weeks) for CommitGoalView (D-04)
+  const cutoff = new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString()
+  const results21 = results.map((r) => ({
+    ...r,
+    items: r.items.filter((item) => item.isoDate && item.isoDate >= cutoff),
+  }))
+
   return (
-    <main className="max-w-[600px] mx-auto px-3 py-4">
-      <h1 className="text-2xl mb-2" style={{ fontFamily: 'Georgia, serif', fontWeight: 900 }}>Keep Substack</h1>
+    <main className="max-w-[960px] mx-auto px-4 py-4">
+      <h1 className="text-2xl mb-4" style={{ fontFamily: 'Georgia, serif', fontWeight: 900 }}>Keep Substack</h1>
+
+      <ViewTabs active="goal" />
 
       {teams.length > 0 && (
         <div className="flex gap-2 mb-4 flex-wrap">
@@ -56,8 +77,7 @@ export default async function Home({ searchParams }: Props) {
         </div>
       )}
 
-      <WeeklyHeatmapGrid results={results} />
-      <PrBanner />
+      <CommitGoalView results={results21} slots={(slotsData ?? []) as CommitSlot[]} />
     </main>
   )
 }

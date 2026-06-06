@@ -8,10 +8,12 @@ export type FeedItem = {
 }
 
 export type Member = {
+  id: string  // UUID from members.id — required; use a placeholder UUID in test fixtures
   name: string
   publicationId: string
   teams: { name: string; status: string }[]
   addedAt: string  // ISO 8601
+  substackHandle?: string | null
 }
 
 // Phase 4 KV移行後のスキーマ（D-03）。フィードURLは publicationId から動的生成する（D-08）
@@ -21,4 +23,12 @@ export type MemberFeedResult = {
   member: Member
   items: FeedItem[]
   imageUrl?: string  // channel.image.url（取得失敗時 undefined）
+}
+
+// Phase 29: member_commit_slots テーブルの行を型安全に表現する
+// day_of_week は ISO 8601 規則: 1=月曜 〜 7=日曜 (Phase 28 D-15)
+export type CommitSlot = {
+  member_id: string  // UUID — members.id FK
+  day_of_week: number  // 1–7 (1=月〜7=日)
+  hour: number  // 0–23
 }

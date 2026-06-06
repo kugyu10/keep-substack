@@ -76,8 +76,10 @@ type MemberTeamsJoin = { teams: { name: string; status: string } | null }[]
 
 function setupAdminMock(opts: {
   member?: {
+    id?: string
     name: string
     publication_id: string
+    substack_handle?: string | null
     member_teams: MemberTeamsJoin
   } | null
   publicTeams?: { id: string; name: string }[]
@@ -100,13 +102,19 @@ function setupAdminMock(opts: {
   }))
   const teamsSelectSpy = vi.fn(() => ({ eq: teamsEqSpy }))
 
+  // member_commit_slots: .select(...).eq('member_id', id).order('day_of_week')
+  const commitSlotsOrderSpy = vi.fn(async () => ({ data: [], error: null }))
+  const commitSlotsEqSpy = vi.fn(() => ({ order: commitSlotsOrderSpy }))
+  const commitSlotsSelectSpy = vi.fn(() => ({ eq: commitSlotsEqSpy }))
+
   mockAdminFrom.mockImplementation((table: string) => {
     if (table === 'members') return { select: membersSelectSpy }
     if (table === 'teams') return { select: teamsSelectSpy }
+    if (table === 'member_commit_slots') return { select: commitSlotsSelectSpy }
     throw new Error(`unexpected table: ${table}`)
   })
 
-  return { membersSelectSpy, membersEqSpy, teamsSelectSpy, teamsEqSpy }
+  return { membersSelectSpy, membersEqSpy, teamsSelectSpy, teamsEqSpy, commitSlotsSelectSpy, commitSlotsEqSpy }
 }
 
 describe('MyPage RSC — read path (SELF-01 / SELF-03 / T-23-05 / T-23-06)', () => {
@@ -206,5 +214,80 @@ describe('MyPage RSC — read path (SELF-01 / SELF-03 / T-23-05 / T-23-06)', () 
 
     expect(findByType(el, LinkMemberForm)).not.toBeNull()
     expect(findByType(el, MyProfileForm)).toBeNull()
+  })
+})
+
+describe('MyPage RSC — substackHandle prop (Phase 31 D-03)', () => {
+  // D-03: substackHandleDefault → substackHandle, handle URL param fallback removed
+  // callback (D-02) saves substack_handle to DB, so handle= param is no longer needed
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockGetUser.mockResolvedValue({ data: { user: { id: USER_ID } } })
+  })
+
+  it('DB value: member has substack_handle → MyProfileForm receives DB value as substackHandle', async () => {
+    setupAdminMock({
+      member: {
+        name: 'Tester',
+        publication_id: 'pub-1',
+        substack_handle: '@hoge',
+        member_teams: [],
+      },
+      publicTeams: [],
+    })
+
+    // D-03: handle URL param is ignored — only DB value used
+    const el = await (MyPage as (props: { searchParams: Promise<{ handle?: string }> }) => Promise<unknown>)({
+      searchParams: Promise.resolve({ handle: 'other' }),
+    })
+    const form = findByType(el, MyProfileForm)
+    expect(form).not.toBeNull()
+
+    const props = form!.props as { substackHandle?: string | null }
+    expect(props.substackHandle).toBe('@hoge')
+  })
+
+  it('null DB value: member has substack_handle=null → MyProfileForm receives null (not searchParams fallback)', async () => {
+    // D-03: handle URL param fallback is removed; null stays null
+    setupAdminMock({
+      member: {
+        name: 'Tester',
+        publication_id: 'pub-1',
+        substack_handle: null,
+        member_teams: [],
+      },
+      publicTeams: [],
+    })
+
+    const el = await (MyPage as (props: { searchParams: Promise<{ handle?: string }> }) => Promise<unknown>)({
+      searchParams: Promise.resolve({ handle: 'hoge' }),
+    })
+    const form = findByType(el, MyProfileForm)
+    expect(form).not.toBeNull()
+
+    const props = form!.props as { substackHandle?: string | null }
+    // D-03 change: searchParams handle is no longer used as fallback
+    expect(props.substackHandle).toBeNull()
+  })
+
+  it('both absent: member has substack_handle=null, no searchParams → MyProfileForm receives null', async () => {
+    setupAdminMock({
+      member: {
+        name: 'Tester',
+        publication_id: 'pub-1',
+        substack_handle: null,
+        member_teams: [],
+      },
+      publicTeams: [],
+    })
+
+    const el = await (MyPage as (props: { searchParams: Promise<{ handle?: string }> }) => Promise<unknown>)({
+      searchParams: Promise.resolve({}),
+    })
+    const form = findByType(el, MyProfileForm)
+    expect(form).not.toBeNull()
+
+    const props = form!.props as { substackHandle?: string | null }
+    expect(props.substackHandle).toBeNull()
   })
 })

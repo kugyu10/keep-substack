@@ -47,6 +47,16 @@ export async function updateMyProfileAction(
   const name = (formData.get('name') as string)?.trim()
   // Field contract for Plan 02's form: checkbox inputs use name="teams".
   const checkedTeamNames = formData.getAll('teams').map(String)
+  const rawHandle = (formData.get('substack_handle') as string | null)?.trim() ?? ''
+  const handleBody = rawHandle.startsWith('@') ? rawHandle.slice(1) : rawHandle
+  let substack_handle: string | null
+  if (handleBody === '') {
+    substack_handle = null
+  } else if (!/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,49}$/.test(handleBody)) {
+    return 'ハンドルに使用できない文字が含まれています（英数字・_・- のみ使用可）'
+  } else {
+    substack_handle = '@' + handleBody
+  }
 
   if (!name) return '名前を入力してください'
 
@@ -59,10 +69,15 @@ export async function updateMyProfileAction(
   // Update the authenticated member's name, scoped to their own user_id (no member_id from client).
   const { data: member, error: updateError } = await admin
     .from('members')
-    .update({ name })
+    .update({ name, substack_handle })
     .eq('user_id', user.id)
     .select('id')
     .single()
+
+  // D-05: substack_handle unique 違反 (23505) を先にチェック
+  if (updateError?.code === '23505') {
+    return 'このハンドルはすでに使用されています'
+  }
 
   if (updateError || !member) {
     console.error('[updateMyProfile] member update:', updateError)
@@ -106,6 +121,76 @@ export async function updateMyProfileAction(
 
     if (insertError) {
       console.error('[updateMyProfile] insert member_teams:', insertError)
+      return '保存に失敗しました。もう一度お試しください'
+    }
+  }
+
+  revalidatePath('/my')
+  return null
+}
+
+export async function updateCommitSlotsAction(
+  prevState: string | null,
+  formData: FormData
+): Promise<string | null> {
+  const rawSlots = formData.get('slots') as string | null
+  if (!rawSlots) return 'スロットデータが見つかりません'
+
+  let slots: { day_of_week: number; hour: number }[]
+  try {
+    slots = JSON.parse(rawSlots)
+  } catch {
+    return 'スロットデータが不正です'
+  }
+
+  if (!Array.isArray(slots) || slots.length > 4) return '不正なスロット数です'
+  for (const s of slots) {
+    if (
+      typeof s !== 'object' || s === null ||
+      !Number.isInteger(s.day_of_week) || !Number.isInteger(s.hour)
+    ) return 'スロットデータが不正です'
+    if (s.day_of_week < 1 || s.day_of_week > 7) return '曜日の値が不正です'
+    if (s.hour < 0 || s.hour > 23) return '時刻の値が不正です'
+  }
+
+  const supabase = await createSupabaseServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return 'ログインセッションが切れました。再ログインしてください'
+
+  const admin = createSupabaseAdminClient()
+
+  const { data: member, error: memberError } = await admin
+    .from('members')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (memberError || !member) {
+    console.error('[updateCommitSlots] member lookup:', memberError)
+    return '保存に失敗しました。もう一度お試しください'
+  }
+
+  // TODO: delete+insert は非アトミック。delete 成功後に insert が失敗するとスロットが消滅する。
+  //       Supabase JS が DB トランザクションを直接サポートしないため、
+  //       将来的に upsert (onConflict: member_id,day_of_week) + 余剰行 delete に置き換えること。
+  const { error: deleteError } = await admin
+    .from('member_commit_slots')
+    .delete()
+    .eq('member_id', member.id)
+
+  if (deleteError) {
+    console.error('[updateCommitSlots] delete failed — slots unchanged:', deleteError)
+    return '保存に失敗しました。もう一度お試しください'
+  }
+
+  if (slots.length > 0) {
+    const { error: insertError } = await admin
+      .from('member_commit_slots')
+      .insert(slots.map(s => ({ member_id: member.id, day_of_week: s.day_of_week, hour: s.hour })))
+
+    if (insertError) {
+      // delete は成功済み。スロットが空になった状態で insert が失敗している。
+      console.error('[updateCommitSlots] insert failed after delete — slots are now empty:', insertError)
       return '保存に失敗しました。もう一度お試しください'
     }
   }
