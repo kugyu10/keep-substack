@@ -112,7 +112,14 @@ describe('updateMemberAction — substack_handle / publication_id 拡張 (Phase 
     expect(result).toBe('このハンドルはすでに使用されています')
   })
 
-  it('Test 5: requireAdmin が Unauthorized → "権限がありません" が返る', async () => {
+  it('Test 5: 不正な substack_handle（スペース含む）→ バリデーションエラーが返り updateMember は呼ばれない', async () => {
+    const formData = makeFormData(DEFAULT_NAME, DEFAULT_ADDED_AT, '@ invalid')
+    const result = await updateMemberAction('pub-1', formData)
+    expect(result).toBe('ハンドルに使用できない文字が含まれています（英数字・_・- のみ使用可）')
+    expect(mockUpdateMember).not.toHaveBeenCalled()
+  })
+
+  it('Test 6: requireAdmin が Unauthorized → "権限がありません" が返る', async () => {
     mockGetUser.mockResolvedValue({ data: { user: null } })
 
     const formData = makeFormData(DEFAULT_NAME, DEFAULT_ADDED_AT)

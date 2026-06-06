@@ -72,9 +72,15 @@ export async function updateMemberAction(
   }
 
   const substackHandleRaw = (formData.get('substack_handle') as string | null)?.trim() ?? ''
-  const substack_handle: string | null = substackHandleRaw === ''
-    ? null
-    : substackHandleRaw.startsWith('@') ? substackHandleRaw : '@' + substackHandleRaw
+  const handleBody = substackHandleRaw.startsWith('@') ? substackHandleRaw.slice(1) : substackHandleRaw
+  let substack_handle: string | null
+  if (handleBody === '') {
+    substack_handle = null
+  } else if (!/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,49}$/.test(handleBody)) {
+    return 'ハンドルに使用できない文字が含まれています（英数字・_・- のみ使用可）'
+  } else {
+    substack_handle = '@' + handleBody
+  }
 
   const new_publication_id = (formData.get('new_publication_id') as string | null)?.trim() || null
 

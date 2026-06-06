@@ -184,6 +184,18 @@ describe('updateMyProfileAction - substack_handle normalization (Phase 27 D-08)'
     expect(capturedUpdate).toMatchObject({ substack_handle: '@hoge' })
   })
 
+  it('invalid substack_handle (contains space) → returns error without calling DB', async () => {
+    const result = await updateMyProfileAction(null, makeFormData('Tester', [], '@ invalid'))
+    expect(result).toBe('ハンドルに使用できない文字が含まれています（英数字・_・- のみ使用可）')
+    expect(mockAdminFrom).not.toHaveBeenCalled()
+  })
+
+  it('invalid substack_handle (starts with hyphen) → returns error', async () => {
+    const result = await updateMyProfileAction(null, makeFormData('Tester', [], '-handle'))
+    expect(result).toBe('ハンドルに使用できない文字が含まれています（英数字・_・- のみ使用可）')
+    expect(mockAdminFrom).not.toHaveBeenCalled()
+  })
+
   it('substack_handle with surrounding spaces → update called with substack_handle: @hoge (trimmed)', async () => {
     let capturedUpdate: Record<string, unknown> = {}
     const updateSpy = vi.fn((payload: Record<string, unknown>) => {
