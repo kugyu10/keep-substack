@@ -9,6 +9,8 @@ export async function GET(request: NextRequest) {
   const handle = searchParams.get('handle')
   const nextParam = searchParams.get('next') ?? '/my'
   // Open Redirect防止: 内部パスのみ許可
+  // TODO: next は現在ハードコードの '/my' リダイレクトに上書きされており未使用。
+  //       signin/login 両アクションが next= を渡すようになったら復活させること。
   const next = nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/my'
 
   if (code) {
