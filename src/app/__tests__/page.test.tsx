@@ -38,6 +38,7 @@ vi.mock('@/lib/supabase/admin', () => ({
 
 import Home from '../page'
 import CommitGoalView from '@/components/CommitGoalView'
+import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 
 // --- Element-tree helpers (no jsdom: inspect the React element object tree) ---
 
@@ -97,6 +98,31 @@ function member(name: string, teams: { name: string; status: string }[]): Member
     addedAt: '2026-01-01T00:00:00.000Z',
   }
 }
+
+describe('Home RSC — slotsError graceful degradation', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockGetMembers.mockResolvedValue([])
+    mockFetchAllFeedsCached.mockImplementation(async (members: Member[]) =>
+      members.map((m) => ({ member: m, items: [] }))
+    )
+  })
+
+  it('renders without throwing when member_commit_slots fetch fails; CommitGoalView gets empty slots', async () => {
+    vi.mocked(createSupabaseAdminClient).mockReturnValueOnce({
+      from: vi.fn(() => ({
+        select: vi.fn(() => ({ data: null, error: { message: 'DB error', code: '500' } })),
+      })),
+    } as ReturnType<typeof createSupabaseAdminClient>)
+
+    const el = await Home({ searchParams: Promise.resolve({}) })
+    expect(el).not.toBeNull()
+    const grid = findByType(el, CommitGoalView)
+    expect(grid).not.toBeNull()
+    const slots = (grid!.props as { results: MemberFeedResult[]; slots: CommitSlot[] }).slots
+    expect(slots).toEqual([])
+  })
+})
 
 describe('Home RSC — team tabs (TEAM-03) and All/team filtering (TEAM-04)', () => {
   beforeEach(() => {
