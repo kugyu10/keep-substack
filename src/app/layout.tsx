@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import Header from '@/components/Header'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://keep-substack.vercel.app'),
@@ -20,6 +21,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body>
+        <Header />
         {children}
         <footer className="py-4 text-center">
           <span className="text-xs text-gray-400">

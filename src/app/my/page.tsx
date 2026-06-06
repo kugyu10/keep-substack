@@ -84,6 +84,11 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
           </div>
         </>
       )}
+      <div className="mt-10 text-center">
+        <a href="/" className="text-sm text-gray-500 hover:text-gray-800 underline">
+          トップページへ
+        </a>
+      </div>
     </main>
   )
 }
