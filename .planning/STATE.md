@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Debug, Stabilization & UI Polish
-status: executing
-stopped_at: Phase 32 Plan 01 complete
-last_updated: "2026-06-08T00:30:00.000Z"
+status: ready_to_plan
+stopped_at: Phase 32 complete (1/1) — ready to discuss Phase 33
+last_updated: 2026-06-07T21:59:01.279Z
 last_activity: 2026-06-08 -- Phase 32 Plan 01 completed (本番 DB マイグレーション確認 + E2E 検証)
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 1
-  completed_plans: 1
+  completed_plans: 13
   percent: 20
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-07 — v1.8 Debug, Stabilization & UI Polish started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 32 — db
+**Current focus:** Phase 33 — バグ修正 + commitslots upsert化
 
 ## Current Position
 
-Phase: 32 (db) — COMPLETE
-Plan: 1 of 1 (COMPLETE)
-Status: Phase 32 complete — proceeding to Phase 33
-Last activity: 2026-06-08 -- Phase 32 Plan 01 completed (本番 DB マイグレーション確認 + E2E 検証)
+Phase: 33
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-06-07
 
 Progress bar: ██░░░░░░░░ 20% (1/5 phases complete)
 

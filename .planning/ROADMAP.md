@@ -228,7 +228,7 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 29. Commit & Goal View — 新トップページ | v1.7 | 2/2 | Complete | 2026-06-04 |
 | 30. アチーブメント（👑 / 🔥） | v1.7 | 2/2 | Complete    | 2026-06-04 |
 | 31. ログインフロー修正 | v1.7 | 4/4 | Complete | 2026-06-06 |
-| 32. 本番DBマイグレーション | v1.8 | 1/1 | Complete | 2026-06-08 |
+| 32. 本番DBマイグレーション | v1.8 | 1/1 | Complete    | 2026-06-07 |
 | 33. バグ修正 + commitSlots upsert化 | v1.8 | 0/? | Not started | - |
 | 34. UI Polish バッチ | v1.8 | 0/? | Not started | - |
 | 35. チーム可視性拡張 + Google Analytics | v1.8 | 0/? | Not started | - |
