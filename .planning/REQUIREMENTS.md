@@ -1,0 +1,88 @@
+# Requirements: Keep Substack
+
+**Defined:** 2026-06-07
+**Milestone:** v1.8 Debug, Stabilization & UI Polish
+**Core Value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
+
+## v1.8 Requirements
+
+### Bug Fixes (BUG)
+
+- [ ] **BUG-01**: 新規メンバー追加時に Substack RSS フィードが即時取得される（rss-not-fetched-on-user-add 根本修正）
+- [ ] **BUG-02**: Magic Link 認証後、ユーザーが元々リクエストしたページにリダイレクトされる（auth/callback next パラメータ有効化）
+
+### Database (DB)
+
+- [ ] **DB-01**: commitSlots の保存・更新がアトミックになる（delete+insert を upsert に置き換え、部分失敗による不整合を排除）
+- [ ] **DB-02**: 本番 DB に member_commit_slots テーブルが適用される（schedule-save-fails-production の根本解消）
+
+### Quality Assurance (QA)
+
+- [ ] **QA-01**: Phase 27 の human UAT 6 シナリオを本番環境で検証する
+- [ ] **QA-02**: Phase 27 VERIFICATION.md のギャップを解消する
+- [ ] **QA-03**: Phase 28 VERIFICATION.md のギャップを解消する
+- [ ] **QA-04**: Phase 29 VERIFICATION.md のギャップを解消する
+
+### UI Polish (UI)
+
+- [ ] **UI-01**: ログイン・サインインページ（/login, /signin-51cf21389c56）にフッターを表示しない
+- [ ] **UI-02**: ログイン・サインインページに Keep Substack ロゴを表示する（サイトヘッダーなし、ロゴのみ）
+- [ ] **UI-03**: フッターのログイン状態によって表示文言が変わる（ログイン中は適切な文言に）
+- [ ] **UI-04**: Commit & Goal View のメンバーソート順を変更する
+- [ ] **UI-05**: /my ページ表示中はヘッダーの「マイページ」ボタンを非表示にする
+
+### Team Visibility (TEAM)
+
+- [ ] **TEAM-01**: private チームがトップビューのチームタブに表示され、ログイン不要で閲覧できる（/my ページでの参加・退出制限はそのまま維持）
+
+### Analytics (ANLT)
+
+- [ ] **ANLT-01**: GA4 が全ページのページビューを自動トラッキングする（`@next/third-parties` の `GoogleAnalytics` コンポーネント使用）
+- [ ] **ANLT-02**: 開発環境（`NODE_ENV !== 'production'`）では GA4 トラッキングが無効になる
+
+## Future Requirements
+
+### Visualisation
+
+- 月間投稿数サマリーを表示する
+- 年間ヒートマップ（GitHub草型）で長期活動を可視化する
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| hidden チームのトップビュー表示 | 管理者専用。/admin/teams/{name} URL直打ちのみ（v1.6方針継続）|
+| private チームへの /my からの参加・退出 | readonly 制限を維持。閲覧のみ許可 |
+| GA4 カスタムイベント（クリック・スクロール等） | v1.8はページビューのみ。カスタムイベントは将来 |
+| Cookie同意バナー / GDPR対応 | 日本主体のコミュニティ、広告機能なし。Consent Mode v2は将来対応 |
+| コミット未達成の通知・リマインダー | ゆるいコミュニティの空気を壊す |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| BUG-01 | — | Pending |
+| BUG-02 | — | Pending |
+| DB-01 | — | Pending |
+| DB-02 | — | Pending |
+| QA-01 | — | Pending |
+| QA-02 | — | Pending |
+| QA-03 | — | Pending |
+| QA-04 | — | Pending |
+| UI-01 | — | Pending |
+| UI-02 | — | Pending |
+| UI-03 | — | Pending |
+| UI-04 | — | Pending |
+| UI-05 | — | Pending |
+| TEAM-01 | — | Pending |
+| ANLT-01 | — | Pending |
+| ANLT-02 | — | Pending |
+
+**Coverage:**
+- v1.8 requirements: 16 total
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 16 ⚠️
+
+---
+*Requirements defined: 2026-06-07*
+*Last updated: 2026-06-07 after initial definition*

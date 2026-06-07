@@ -16,6 +16,7 @@
 - コミット＆ゴールビューのソート順を変更する
 - /my ページ表示中はヘッダーの「マイページ」ボタンを非表示にする
 - Google Analytics を導入する
+- private チームをトップビューのチームタブに表示し、ログイン不要で閲覧できるようにする
 
 <details>
 <summary>Previous milestone: v1.7 Commit & Goal View + Substack Profile Link (shipped 2026-06-06)</summary>
@@ -134,6 +135,7 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - [ ] コミット＆ゴールビューのソート順を変更する
 - [ ] /my ページ表示中はヘッダーの「マイページ」ボタンを非表示にする
 - [ ] Google Analytics を導入する
+- [ ] private チームをトップビューのチームタブに表示し、ログイン不要で閲覧できるようにする
 
 ### Active (Future)
 
