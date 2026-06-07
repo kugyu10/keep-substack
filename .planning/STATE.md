@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Debug, Stabilization & UI Polish
-status: ready_to_plan
-stopped_at: Phase 32 complete (1/1) — ready to discuss Phase 33
-last_updated: 2026-06-07T21:59:01.279Z
-last_activity: 2026-06-08 -- Phase 32 Plan 01 completed (本番 DB マイグレーション確認 + E2E 検証)
+status: planning
+stopped_at: Phase 33 context gathered
+last_updated: "2026-06-07T22:39:06.129Z"
+last_activity: 2026-06-07
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 1
-  completed_plans: 13
+  completed_plans: 1
   percent: 20
 ---
 
@@ -97,8 +97,8 @@ Progress bar: ██░░░░░░░░ 20% (1/5 phases complete)
 
 ## Session Continuity
 
-Last session: 2026-06-08T00:30:00.000Z
-Stopped at: Phase 32 Plan 01 complete
+Last session: 2026-06-07T22:39:06.123Z
+Stopped at: Phase 33 context gathered
 Next step: `/gsd:plan-phase 33` — バグ修正 + commitSlots upsert 化
 
 ## Deferred Items
