@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Debug, Stabilization & UI Polish
 status: executing
-stopped_at: Roadmap creation complete
-last_updated: "2026-06-07T14:52:32.429Z"
-last_activity: 2026-06-07 -- Phase 32 planning complete
+stopped_at: Phase 32 Plan 01 complete
+last_updated: "2026-06-08T00:30:00.000Z"
+last_activity: 2026-06-08 -- Phase 32 Plan 01 completed (本番 DB マイグレーション確認 + E2E 検証)
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 1
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 20
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-07 — v1.8 Debug, Stabilization & UI Polish started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** v1.8 — Phase 32 next (本番DBマイグレーション)
+**Current focus:** Phase 32 — db
 
 ## Current Position
 
-Phase: 32 — 本番DBマイグレーション (next to start)
-Plan: —
-Status: Ready to execute
-Last activity: 2026-06-07 -- Phase 32 planning complete
+Phase: 32 (db) — COMPLETE
+Plan: 1 of 1 (COMPLETE)
+Status: Phase 32 complete — proceeding to Phase 33
+Last activity: 2026-06-08 -- Phase 32 Plan 01 completed (本番 DB マイグレーション確認 + E2E 検証)
 
-Progress bar: ░░░░░░░░░░ 0% (0/5 phases complete)
+Progress bar: ██░░░░░░░░ 20% (1/5 phases complete)
 
 ### Quick Tasks Completed
 
@@ -87,6 +87,7 @@ Progress bar: ░░░░░░░░░░ 0% (0/5 phases complete)
 ### Key Architecture Decisions (v1.8 — 計画段階)
 
 - Phase 32: 本番 DB マイグレーションは SQL Editor 経由（schema.sql が正規ソース）— dev=otydhiumsdsyxepnjqjp / prod=xolhjcngrwwwqtklmoyk
+- Phase 32 (完了): 両マイグレーション (20260602000001/02) は事前に本番 DB へ適用済みだった。コード変更なしで /my スケジュール保存が本番動作確認済み。ログアウトリダイレクトバグ (BUG-02) は Phase 33 対応。
 - Phase 33: commitSlots の delete+insert → upsert 置き換え（冪等性確保）。upsert key は (member_id, day_of_week)
 - Phase 33: BUG-01 (rss-not-fetched-on-user-add) の根本原因はメンバー追加 Server Action 内の RSS fetch 呼び出し欠落またはエラーハンドリング不備
 - Phase 33: BUG-02 (auth/callback next パラメータ) — /auth/callback でのリダイレクト先が固定になっている箇所を修正
@@ -96,9 +97,9 @@ Progress bar: ░░░░░░░░░░ 0% (0/5 phases complete)
 
 ## Session Continuity
 
-Last session: 2026-06-07T00:00:00.000Z
-Stopped at: Roadmap creation complete
-Next step: `/gsd:plan-phase 32` — 本番DBマイグレーション計画
+Last session: 2026-06-08T00:30:00.000Z
+Stopped at: Phase 32 Plan 01 complete
+Next step: `/gsd:plan-phase 33` — バグ修正 + commitSlots upsert 化
 
 ## Deferred Items
 

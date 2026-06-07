@@ -14,7 +14,7 @@
 ### Database (DB)
 
 - [ ] **DB-01**: commitSlots の保存・更新がアトミックになる（delete+insert を upsert に置き換え、部分失敗による不整合を排除）
-- [ ] **DB-02**: 本番 DB に member_commit_slots テーブルが適用される（schedule-save-fails-production の根本解消）
+- [x] **DB-02**: 本番 DB に member_commit_slots テーブルが適用される（schedule-save-fails-production の根本解消）
 
 ### Quality Assurance (QA)
 
@@ -64,7 +64,7 @@
 | BUG-01 | Phase 33 | Pending |
 | BUG-02 | Phase 33 | Pending |
 | DB-01 | Phase 33 | Pending |
-| DB-02 | Phase 32 | Pending |
+| DB-02 | Phase 32 | Complete |
 | QA-01 | Phase 36 | Pending |
 | QA-02 | Phase 36 | Pending |
 | QA-03 | Phase 36 | Pending |

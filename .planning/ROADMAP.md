@@ -122,7 +122,7 @@ Full archive: `.planning/milestones/v1.7-ROADMAP.md`
 
 **Milestone Goal:** 本番バグを解消・安定化しつつ、ログインフロー・ナビゲーション・分析基盤などのUI改善を積み重ねる
 
-- [ ] **Phase 32: 本番DBマイグレーション** — member_commit_slots を本番 DB に適用し schedule-save を本番で動作させる
+- [x] **Phase 32: 本番DBマイグレーション** — member_commit_slots を本番 DB に適用し schedule-save を本番で動作させる
 - [ ] **Phase 33: バグ修正 + commitSlots upsert化** — RSS即時取得バグ・auth/callback リダイレクト・commitSlots アトミック保存を修正する
 - [ ] **Phase 34: UI Polish バッチ** — ログインページ・フッター・マイページボタン・ソート順の小改善を一括適用する
 - [ ] **Phase 35: チーム可視性拡張 + Google Analytics** — private チームをトップビューに表示し GA4 を全ページに導入する
@@ -140,7 +140,7 @@ Full archive: `.planning/milestones/v1.7-ROADMAP.md`
   3. 保存したスケジュールが /my ページをリロードしても正しく表示される
 **Plans**: 1 plan
 Plans:
-- [ ] 32-01-PLAN.md — 本番 DB マイグレーション適用 + E2E 検証（member_commit_slots CREATE TABLE + UNIQUE 制約）
+- [x] 32-01-PLAN.md — 本番 DB マイグレーション適用 + E2E 検証（member_commit_slots CREATE TABLE + UNIQUE 制約）
 
 ### Phase 33: バグ修正 + commitSlots upsert化
 **Goal**: 新規メンバー追加時の RSS 取得バグ・Magic Link 後のリダイレクト欠落・commitSlots の非アトミック保存がそれぞれ修正されている
@@ -228,7 +228,7 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 29. Commit & Goal View — 新トップページ | v1.7 | 2/2 | Complete | 2026-06-04 |
 | 30. アチーブメント（👑 / 🔥） | v1.7 | 2/2 | Complete    | 2026-06-04 |
 | 31. ログインフロー修正 | v1.7 | 4/4 | Complete | 2026-06-06 |
-| 32. 本番DBマイグレーション | v1.8 | 0/? | Not started | - |
+| 32. 本番DBマイグレーション | v1.8 | 1/1 | Complete | 2026-06-08 |
 | 33. バグ修正 + commitSlots upsert化 | v1.8 | 0/? | Not started | - |
 | 34. UI Polish バッチ | v1.8 | 0/? | Not started | - |
 | 35. チーム可視性拡張 + Google Analytics | v1.8 | 0/? | Not started | - |
