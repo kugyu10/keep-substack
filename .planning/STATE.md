@@ -1,34 +1,34 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.7
-milestone_name: Commit & Goal View + Substack Profile Link
-status: Awaiting next milestone
-stopped_at: Phase 31 Plan 04 complete
-last_updated: "2026-06-06T01:54:11.028Z"
-last_activity: 2026-06-06 — Milestone v1.7 completed and archived
+milestone: v1.8
+milestone_name: Debug, Stabilization & UI Polish
+status: planning
+stopped_at: —
+last_updated: "2026-06-07T00:00:00.000Z"
+last_activity: 2026-06-07 — Milestone v1.8 started
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 12
-  completed_plans: 12
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-02 — v1.7 Commit & Goal View + Substack Profile Link started)
+See: .planning/PROJECT.md (updated 2026-06-07 — v1.8 Debug, Stabilization & UI Polish started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 31 — login-fix
+**Current focus:** v1.8 — requirements definition
 
 ## Current Position
 
-Phase: Milestone v1.7 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-06-06 — Milestone v1.7 completed and archived
+Status: Defining requirements
+Last activity: 2026-06-07 — Milestone v1.8 started
 
 ### Quick Tasks Completed
 

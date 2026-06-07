@@ -1,19 +1,31 @@
 # Keep Substack
 
-## Current State: v1.7 SHIPPED
+## Current Milestone: v1.8 Debug, Stabilization & UI Polish
 
-**Shipped:** v1.7 Commit & Goal View + Substack Profile Link (2026-06-06)
+**Goal:** 本番バグを解消・安定化しつつ、ログインフロー・ナビゲーション・分析基盤などのUI改善を積み重ねる
+
+**Target features:**
+- commitSlots 保存を upsert に置き換えてアトミック化する
+- rss-not-fetched-on-user-add バグの根本原因を特定・修正する
+- auth/callback の next パラメータを有効化する
+- Phase 27-29 の human UAT・verification ギャップを解消する
+- 本番 DB に member_commit_slots マイグレーションを適用する（schedule-save-fails-production 根本解消）
+- ログイン・サインインページのフッターを非表示にする
+- ログイン・サインインページに Keep Substack ロゴを表示する（ヘッダーなし）
+- フッターのログイン中の文言を変える
+- コミット＆ゴールビューのソート順を変更する
+- /my ページ表示中はヘッダーの「マイページ」ボタンを非表示にする
+- Google Analytics を導入する
+
+<details>
+<summary>Previous milestone: v1.7 Commit & Goal View + Substack Profile Link (shipped 2026-06-06)</summary>
 
 - Substackハンドル（@handle）をDBに登録し、個人マンスリービューからSubstackプロフィールに直リンク
 - /myページでコミットスケジュール（週1〜4回・曜日・時刻）を宣言・保存
 - 新トップページにCommit & Goal View（3週分コミットGrid + 👑🔥アチーブメント）
 - ログインフロー修正：/login（既存メンバー再ログイン）と/signin-51cf21389c56（招待専用）に分離
 
-**Next Milestone Goals:** デバッグ・安定化・品質向上を主軸に置いたマイルストーン
-- 本番環境で判明した積み残しバグの解消
-- Phase 27-29 の検証ギャップ（human UAT・verification）の解消
-- commitSlots delete+insert → upsert へのアトミック化
-- rss-not-fetched-on-user-add バグの調査・修正
+</details>
 
 <details>
 <summary>Previous milestone: v1.6 Team Roles + Member Self-Service (shipped 2026-05-30)</summary>
@@ -109,12 +121,19 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - ✓ 現トップ（週次ヒートマップ）が `/weekly-stamp` で引き続きアクセスできる — v1.7 (Phase 29)
 - ✓ Magic Link ログインフロー修正（/login 既存メンバー / /signin-51cf21389c56 招待専用に分離）— v1.7 (Phase 31)
 
-### Active (Next Milestone — 安定化・品質向上)
+### Active (v1.8 — 安定化・品質向上・UI Polish)
 
 - [ ] commitSlots 保存を非アトミックな delete+insert から upsert に置き換える
 - [ ] Phase 27-29 の human UAT・verification ギャップを解消する
 - [ ] rss-not-fetched-on-user-add バグの根本原因を特定・修正する
 - [ ] auth/callback の next パラメータを有効化する
+- [ ] 本番 DB に member_commit_slots マイグレーションを適用する（schedule-save-fails-production 根本解消）
+- [ ] ログイン・サインインページのフッターを非表示にする
+- [ ] ログイン・サインインページに Keep Substack ロゴを表示する（ヘッダーなし）
+- [ ] フッターのログイン中の文言を変える
+- [ ] コミット＆ゴールビューのソート順を変更する
+- [ ] /my ページ表示中はヘッダーの「マイページ」ボタンを非表示にする
+- [ ] Google Analytics を導入する
 
 ### Active (Future)
 
@@ -207,4 +226,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-06 after v1.7 milestone*
+*Last updated: 2026-06-07 after v1.8 milestone start*
