@@ -138,7 +138,9 @@ Full archive: `.planning/milestones/v1.7-ROADMAP.md`
   1. 本番 DB (xolhjcngrwwwqtklmoyk) に member_commit_slots テーブルが存在する
   2. /my ページでコミットスケジュールを保存すると、本番環境でエラーなく保存される
   3. 保存したスケジュールが /my ページをリロードしても正しく表示される
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 32-01-PLAN.md — 本番 DB マイグレーション適用 + E2E 検証（member_commit_slots CREATE TABLE + UNIQUE 制約）
 
 ### Phase 33: バグ修正 + commitSlots upsert化
 **Goal**: 新規メンバー追加時の RSS 取得バグ・Magic Link 後のリダイレクト欠落・commitSlots の非アトミック保存がそれぞれ修正されている
