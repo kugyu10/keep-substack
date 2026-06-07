@@ -10,6 +10,7 @@
 - ✅ **v1.5 Member Auth + Supabase Migration** — Phases 17-21 (shipped 2026-05-17)
 - ✅ **v1.6 Team Roles + Member Self-Service** — Phases 22-26 (shipped 2026-05-30)
 - ✅ **v1.7 Commit & Goal View + Substack Profile Link** — Phases 27-31 (shipped 2026-06-06)
+- 🔄 **v1.8 Debug, Stabilization & UI Polish** — Phases 32-36 (in progress)
 
 ## Phases
 
@@ -115,6 +116,76 @@ Full archive: `.planning/milestones/v1.7-ROADMAP.md`
 
 </details>
 
+---
+
+## v1.8 Debug, Stabilization & UI Polish
+
+**Milestone Goal:** 本番バグを解消・安定化しつつ、ログインフロー・ナビゲーション・分析基盤などのUI改善を積み重ねる
+
+- [ ] **Phase 32: 本番DBマイグレーション** — member_commit_slots を本番 DB に適用し schedule-save を本番で動作させる
+- [ ] **Phase 33: バグ修正 + commitSlots upsert化** — RSS即時取得バグ・auth/callback リダイレクト・commitSlots アトミック保存を修正する
+- [ ] **Phase 34: UI Polish バッチ** — ログインページ・フッター・マイページボタン・ソート順の小改善を一括適用する
+- [ ] **Phase 35: チーム可視性拡張 + Google Analytics** — private チームをトップビューに表示し GA4 を全ページに導入する
+- [ ] **Phase 36: QA・UAT・検証ギャップ解消** — Phase 27-29 の human UAT シナリオと VERIFICATION.md ギャップをすべて完了させる
+
+## Phase Details
+
+### Phase 32: 本番DBマイグレーション
+**Goal**: 本番 Supabase DB に member_commit_slots テーブルが存在し、コミットスケジュール保存が本番環境で正常に動作する
+**Depends on**: Nothing (first phase — unblocks all other phases)
+**Requirements**: DB-02
+**Success Criteria** (what must be TRUE):
+  1. 本番 DB (xolhjcngrwwwqtklmoyk) に member_commit_slots テーブルが存在する
+  2. /my ページでコミットスケジュールを保存すると、本番環境でエラーなく保存される
+  3. 保存したスケジュールが /my ページをリロードしても正しく表示される
+**Plans**: TBD
+
+### Phase 33: バグ修正 + commitSlots upsert化
+**Goal**: 新規メンバー追加時の RSS 取得バグ・Magic Link 後のリダイレクト欠落・commitSlots の非アトミック保存がそれぞれ修正されている
+**Depends on**: Phase 32
+**Requirements**: BUG-01, BUG-02, DB-01
+**Success Criteria** (what must be TRUE):
+  1. 管理画面でメンバーを新規追加すると、そのメンバーの RSS フィードが即時取得されて記事データが保存される
+  2. Magic Link でログインした後、ログイン前にいたページ（next パラメータ）に正しくリダイレクトされる
+  3. /my ページでコミットスケジュールを保存したとき、ネットワーク遅延や再試行があっても重複・欠損なくデータが保存される（upsert による冪等性）
+**Plans**: TBD
+
+### Phase 34: UI Polish バッチ
+**Goal**: ログイン・サインインページのUIが整理され、フッター文言が改善され、/my ページのナビゲーションが適切に制御され、Commit & Goal View のソートが改善されている
+**Depends on**: Phase 32
+**Requirements**: UI-01, UI-02, UI-03, UI-04, UI-05
+**Success Criteria** (what must be TRUE):
+  1. /login と /signin-51cf21389c56 ページを開くと、サイトヘッダーとフッターが非表示で Keep Substack ロゴのみ表示される
+  2. フッターを表示したとき、ログイン中のユーザーには適切な（ログイン済みを前提とした）文言が表示される
+  3. Commit & Goal View のメンバー並び順が新しいソートルールに従って表示される
+  4. /my ページを表示中はサイトヘッダーの「マイページ」ボタンが表示されない
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 35: チーム可視性拡張 + Google Analytics
+**Goal**: private チームがトップビューのチームタブに表示されてログイン不要で閲覧でき、GA4 が本番環境の全ページでページビューをトラッキングしている
+**Depends on**: Phase 32
+**Requirements**: TEAM-01, ANLT-01, ANLT-02
+**Success Criteria** (what must be TRUE):
+  1. トップページのチームタブに private チームが表示され、未ログインユーザーがそのタブを選択してメンバーの Commit & Goal View を閲覧できる
+  2. /my ページからの private チームへの参加・退出操作は引き続き不可（readonly のまま）
+  3. 本番環境（Vercel production build）で全ページのページビューが GA4 プロパティに記録される
+  4. ローカル開発環境（next dev）では GA4 スクリプトが読み込まれない
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 36: QA・UAT・検証ギャップ解消
+**Goal**: Phase 27-29 で積み残されていた human UAT シナリオと VERIFICATION.md の未検証項目がすべて完了し、v1.8 出荷判定が可能な状態になっている
+**Depends on**: Phase 32, Phase 33, Phase 34, Phase 35
+**Requirements**: QA-01, QA-02, QA-03, QA-04
+**Success Criteria** (what must be TRUE):
+  1. Phase 27 の human UAT 6 シナリオがすべて本番環境で実行・パスしている
+  2. Phase 27 VERIFICATION.md の未解決ギャップが解消され、結果が記録されている
+  3. Phase 28 VERIFICATION.md の未解決ギャップが解消され、結果が記録されている
+  4. Phase 29 VERIFICATION.md の未解決ギャップが解消され、結果が記録されている
+  5. v1.8 全フェーズの success criteria がすべて満たされており、milestone close 判定ができる
+**Plans**: TBD
+
 ## Phase Details (archived)
 
 Full phase details for shipped milestones live in their archives under `.planning/milestones/`.
@@ -155,3 +226,8 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 29. Commit & Goal View — 新トップページ | v1.7 | 2/2 | Complete | 2026-06-04 |
 | 30. アチーブメント（👑 / 🔥） | v1.7 | 2/2 | Complete    | 2026-06-04 |
 | 31. ログインフロー修正 | v1.7 | 4/4 | Complete | 2026-06-06 |
+| 32. 本番DBマイグレーション | v1.8 | 0/? | Not started | - |
+| 33. バグ修正 + commitSlots upsert化 | v1.8 | 0/? | Not started | - |
+| 34. UI Polish バッチ | v1.8 | 0/? | Not started | - |
+| 35. チーム可視性拡張 + Google Analytics | v1.8 | 0/? | Not started | - |
+| 36. QA・UAT・検証ギャップ解消 | v1.8 | 0/? | Not started | - |

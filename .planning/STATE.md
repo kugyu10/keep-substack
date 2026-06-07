@@ -5,9 +5,9 @@ milestone_name: Debug, Stabilization & UI Polish
 status: planning
 stopped_at: —
 last_updated: "2026-06-07T00:00:00.000Z"
-last_activity: 2026-06-07 — Milestone v1.8 started
+last_activity: 2026-06-07 — Roadmap created (Phases 32-36)
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,14 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-07 — v1.8 Debug, Stabilization & UI Polish started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** v1.8 — requirements definition
+**Current focus:** v1.8 — Phase 32 next (本番DBマイグレーション)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 32 — 本番DBマイグレーション (next to start)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-07 — Milestone v1.8 started
+Status: Roadmap defined — ready to plan Phase 32
+Last activity: 2026-06-07 — Roadmap created (Phases 32-36)
+
+Progress bar: ░░░░░░░░░░ 0% (0/5 phases complete)
 
 ### Quick Tasks Completed
 
@@ -82,11 +84,21 @@ Last activity: 2026-06-07 — Milestone v1.8 started
 - Phase 29 P02: CommitGrid Server Component: flex-1 week blocks (not 36-col grid), static COLS_CLASS map, DAY_NAMES, CSS-only hidden sm:flex mobile collapse. CommitGoalRow: three-column HeatmapRow analog, 未コミット fallback, w-8 placeholder. CommitGoalView: stub replaced with sortMembersForCommitView + per-member slot filter. page.tsx: 21-day cutoff filter producing results21. 88 tests passing. VIEW-01 through VIEW-07 all satisfied.
 - Phase 26 P03: Three E2E specs green against the TEST project — login.spec (E2E-01 injected session reaches /my, heading マイページ), my-teams.spec (E2E-02 public-team join → member_teams INSERT via expect.poll + scoped afterEach delete by member_id, no truncate per D-09), admin-guard.spec (E2E-03 anon /admin+/my redirect + non-admin /admin redirect via nested test.use storageState inside the anonymous project). Full Playwright suite 5 passed; vitest 24 passed (src/** only, no runner collision). Zero src/ changes. Real end-to-end (no Supabase mocking) — distinct from src/__tests__/proxy.test.ts. Stopped a stale next-server on :3000 to avoid reuseExistingServer attaching to a prod-env build (Pitfall 6). Phase 26 success criteria fully met.
 
+### Key Architecture Decisions (v1.8 — 計画段階)
+
+- Phase 32: 本番 DB マイグレーションは SQL Editor 経由（schema.sql が正規ソース）— dev=otydhiumsdsyxepnjqjp / prod=xolhjcngrwwwqtklmoyk
+- Phase 33: commitSlots の delete+insert → upsert 置き換え（冪等性確保）。upsert key は (member_id, day_of_week)
+- Phase 33: BUG-01 (rss-not-fetched-on-user-add) の根本原因はメンバー追加 Server Action 内の RSS fetch 呼び出し欠落またはエラーハンドリング不備
+- Phase 33: BUG-02 (auth/callback next パラメータ) — /auth/callback でのリダイレクト先が固定になっている箇所を修正
+- Phase 34: UI-01/02 — /login と /signin-51cf21389c56 のレイアウトにヘッダー・フッターを含まない専用レイアウトを適用
+- Phase 35: TEAM-01 — getMembers() の status フィルタを 'hidden' のみ除外に変更（'private' を含める）
+- Phase 35: ANLT-01/02 — @next/third-parties の GoogleAnalytics コンポーネントを layout.tsx に追加。NODE_ENV !== 'production' ガードで dev 無効化
+
 ## Session Continuity
 
-Last session: 2026-06-06T08:26:00.000Z
-Stopped at: Phase 31 Plan 04 complete
-Next step: Phase 31 UAT — /login で既存メンバー再ログイン動作確認
+Last session: 2026-06-07T00:00:00.000Z
+Stopped at: Roadmap creation complete
+Next step: `/gsd:plan-phase 32` — 本番DBマイグレーション計画
 
 ## Deferred Items
 
@@ -111,22 +123,22 @@ long-standing backlog ideas, not functional gaps.
 
 ## Deferred Items (v1.7 close — 2026-06-06)
 
-Items acknowledged and deferred at v1.7 milestone close. 次マイルストーンの安定化フェーズで解消予定。
+Items acknowledged and deferred at v1.7 milestone close. v1.8 安定化フェーズで解消予定（Phase 33, 36 で対応）。
 
-| Category | Item | Status |
-|----------|------|--------|
-| debug_session | schedule-save-fails-production | root_cause_found (本番DBマイグレーション適用で解消) |
-| uat_gap | Phase 27 — 27-HUMAN-UAT.md (6 pending scenarios) | partial |
-| verification_gap | Phase 27 — 27-VERIFICATION.md | human_needed |
-| verification_gap | Phase 28 — 28-VERIFICATION.md | human_needed |
-| verification_gap | Phase 29 — 29-VERIFICATION.md | human_needed |
-| quick_task | 260605-42o-grid-hover-popover | missing |
-| quick_task | 260605-qqq-hh-mm | missing |
-| todo | 2026-06-06-restore-next-redirect-in-auth-callback | pending |
-| todo | 2026-06-06-upsert-commit-slots-replace-delete-insert | pending |
+| Category | Item | Status | v1.8 Phase |
+|----------|------|--------|------------|
+| debug_session | schedule-save-fails-production | root_cause_found (本番DBマイグレーション適用で解消) | Phase 32 |
+| uat_gap | Phase 27 — 27-HUMAN-UAT.md (6 pending scenarios) | partial | Phase 36 |
+| verification_gap | Phase 27 — 27-VERIFICATION.md | human_needed | Phase 36 |
+| verification_gap | Phase 28 — 28-VERIFICATION.md | human_needed | Phase 36 |
+| verification_gap | Phase 29 — 29-VERIFICATION.md | human_needed | Phase 36 |
+| quick_task | 260605-42o-grid-hover-popover | missing | — |
+| quick_task | 260605-qqq-hh-mm | missing | — |
+| todo | 2026-06-06-restore-next-redirect-in-auth-callback | pending | Phase 33 |
+| todo | 2026-06-06-upsert-commit-slots-replace-delete-insert | pending | Phase 33 |
 
 Known deferred items at close: 9 (v1.7) + 11 (v1.6 carry-over) = 20 total
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd:new-milestone
+- Run `/gsd:plan-phase 32` to plan Phase 32: 本番DBマイグレーション

@@ -61,28 +61,28 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BUG-01 | — | Pending |
-| BUG-02 | — | Pending |
-| DB-01 | — | Pending |
-| DB-02 | — | Pending |
-| QA-01 | — | Pending |
-| QA-02 | — | Pending |
-| QA-03 | — | Pending |
-| QA-04 | — | Pending |
-| UI-01 | — | Pending |
-| UI-02 | — | Pending |
-| UI-03 | — | Pending |
-| UI-04 | — | Pending |
-| UI-05 | — | Pending |
-| TEAM-01 | — | Pending |
-| ANLT-01 | — | Pending |
-| ANLT-02 | — | Pending |
+| BUG-01 | Phase 33 | Pending |
+| BUG-02 | Phase 33 | Pending |
+| DB-01 | Phase 33 | Pending |
+| DB-02 | Phase 32 | Pending |
+| QA-01 | Phase 36 | Pending |
+| QA-02 | Phase 36 | Pending |
+| QA-03 | Phase 36 | Pending |
+| QA-04 | Phase 36 | Pending |
+| UI-01 | Phase 34 | Pending |
+| UI-02 | Phase 34 | Pending |
+| UI-03 | Phase 34 | Pending |
+| UI-04 | Phase 34 | Pending |
+| UI-05 | Phase 34 | Pending |
+| TEAM-01 | Phase 35 | Pending |
+| ANLT-01 | Phase 35 | Pending |
+| ANLT-02 | Phase 35 | Pending |
 
 **Coverage:**
 - v1.8 requirements: 16 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 16 ⚠️
+- Mapped to phases: 16
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-07*
-*Last updated: 2026-06-07 after initial definition*
+*Last updated: 2026-06-07 — traceability filled after roadmap creation*
