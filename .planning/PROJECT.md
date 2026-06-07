@@ -128,7 +128,7 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - [ ] Phase 27-29 の human UAT・verification ギャップを解消する
 - [ ] rss-not-fetched-on-user-add バグの根本原因を特定・修正する
 - [ ] auth/callback の next パラメータを有効化する
-- [ ] 本番 DB に member_commit_slots マイグレーションを適用する（schedule-save-fails-production 根本解消）
+- ✓ 本番 DB に member_commit_slots マイグレーションを適用する（schedule-save-fails-production 根本解消）— v1.8 (Validated in Phase 32)
 - [ ] ログイン・サインインページのフッターを非表示にする
 - [ ] ログイン・サインインページに Keep Substack ロゴを表示する（ヘッダーなし）
 - [ ] フッターのログイン中の文言を変える
@@ -228,4 +228,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-07 after v1.8 milestone start*
+*Last updated: 2026-06-08 — Phase 32 complete (本番 DB マイグレーション適用確認)*
