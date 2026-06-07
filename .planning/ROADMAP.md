@@ -150,7 +150,13 @@ Plans:
   1. 管理画面でメンバーを新規追加すると、そのメンバーの RSS フィードが即時取得されて記事データが保存される
   2. Magic Link でログインした後、ログイン前にいたページ（next パラメータ）に正しくリダイレクトされる
   3. /my ページでコミットスケジュールを保存したとき、ネットワーク遅延や再試行があっても重複・欠損なくデータが保存される（upsert による冪等性）
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 33-01-PLAN.md — middleware.ts 新規作成 + auth/callback next 変数有効化（BUG-02 server-side）
+- [ ] 33-02-PLAN.md — login page/form/action の next パラメータ対応（BUG-02 login-side）
+- [ ] 33-03-PLAN.md — RPC 関数 schema.sql 追加 + updateCommitSlotsAction RPC 化（DB-01）
+- [ ] 33-04-PLAN.md — migration ファイル作成 + 本番 DB RPC 関数適用（DB-01 prod push）
+- [ ] 33-05-PLAN.md — updateCommitSlotsAction.test.ts RPC mock 更新 + E2E admin-guard 修正
 
 ### Phase 34: UI Polish バッチ
 **Goal**: ログイン・サインインページのUIが整理され、フッター文言が改善され、/my ページのナビゲーションが適切に制御され、Commit & Goal View のソートが改善されている
@@ -229,7 +235,7 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 30. アチーブメント（👑 / 🔥） | v1.7 | 2/2 | Complete    | 2026-06-04 |
 | 31. ログインフロー修正 | v1.7 | 4/4 | Complete | 2026-06-06 |
 | 32. 本番DBマイグレーション | v1.8 | 1/1 | Complete    | 2026-06-07 |
-| 33. バグ修正 + commitSlots upsert化 | v1.8 | 0/? | Not started | - |
+| 33. バグ修正 + commitSlots upsert化 | v1.8 | 0/5 | Not started | - |
 | 34. UI Polish バッチ | v1.8 | 0/? | Not started | - |
 | 35. チーム可視性拡張 + Google Analytics | v1.8 | 0/? | Not started | - |
 | 36. QA・UAT・検証ギャップ解消 | v1.8 | 0/? | Not started | - |
