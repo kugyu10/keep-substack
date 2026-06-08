@@ -187,7 +187,7 @@ Plans:
 **Wave 1** *(parallel)*
 
 - [x] 34-01-PLAN.md — Member型にhasUserを追加 + getMembers()のuser_id取得対応（型カスケード修正含む）
-- [ ] 34-02-PLAN.md — (auth) Route Group作成・loginとsigninを移動 + ロゴ・招待制注記追加
+- [x] 34-02-PLAN.md — (auth) Route Group作成・loginとsigninを移動 + ロゴ・招待制注記追加
 
 **Wave 2** *(parallel, Wave 1完了後)*
 
@@ -272,6 +272,6 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 31. ログインフロー修正 | v1.7 | 4/4 | Complete | 2026-06-06 |
 | 32. 本番DBマイグレーション | v1.8 | 1/1 | Complete    | 2026-06-07 |
 | 33. バグ修正 + commitSlots upsert化 | v1.8 | 5/5 | Complete    | 2026-06-08 |
-| 34. UI Polish バッチ | v1.8 | 1/5 | In Progress|  |
+| 34. UI Polish バッチ | v1.8 | 2/5 | In Progress|  |
 | 35. チーム可視性拡張 + Google Analytics | v1.8 | 0/? | Not started | - |
 | 36. QA・UAT・検証ギャップ解消 | v1.8 | 0/? | Not started | - |
