@@ -125,7 +125,7 @@ Full archive: `.planning/milestones/v1.7-ROADMAP.md`
 - [x] **Phase 32: 本番DBマイグレーション** — member_commit_slots を本番 DB に適用し schedule-save を本番で動作させる
 - [x] **Phase 33: バグ修正 + commitSlots upsert化** — RSS即時取得バグ・auth/callback リダイレクト・commitSlots アトミック保存を修正する (completed 2026-06-08)
 - [x] **Phase 34: UI Polish バッチ** — ログインページ・フッター・マイページボタン・ソート順の小改善を一括適用する (completed 2026-06-08)
-- [ ] **Phase 35: チーム可視性拡張 + Google Analytics** — private チームをトップビューに表示し GA4 を全ページに導入する
+- [x] **Phase 35: チーム可視性拡張 + Google Analytics** — private チームをトップビューに表示し GA4 を全ページに導入する (completed 2026-06-08)
 - [ ] **Phase 36: QA・UAT・検証ギャップ解消** — Phase 27-29 の human UAT シナリオと VERIFICATION.md ギャップをすべて完了させる
 
 ## Phase Details
@@ -221,7 +221,7 @@ Plans:
 
 **Wave 2** *(Wave 1完了後)*
 
-- [ ] 35-03-PLAN.md — 全スイート最終確認 + Vercel 環境変数設定チェックポイント（ANLT-01/02）
+- [x] 35-03-PLAN.md — 全スイート最終確認 + Vercel 環境変数設定チェックポイント（ANLT-01/02）
 
 **UI hint**: yes
 
@@ -283,5 +283,5 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 32. 本番DBマイグレーション | v1.8 | 1/1 | Complete    | 2026-06-07 |
 | 33. バグ修正 + commitSlots upsert化 | v1.8 | 5/5 | Complete    | 2026-06-08 |
 | 34. UI Polish バッチ | v1.8 | 5/5 | Complete    | 2026-06-08 |
-| 35. チーム可視性拡張 + Google Analytics | v1.8 | 2/3 | In Progress|  |
+| 35. チーム可視性拡張 + Google Analytics | v1.8 | 3/3 | Complete   | 2026-06-08 |
 | 36. QA・UAT・検証ギャップ解消 | v1.8 | 0/? | Not started | - |
