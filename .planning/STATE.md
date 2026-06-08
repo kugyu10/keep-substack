@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Debug, Stabilization & UI Polish
-status: verifying
-stopped_at: Completed 36-04-PLAN.md
-last_updated: "2026-06-08T11:33:56.673Z"
+status: milestone_complete
+stopped_at: Milestone complete (Phase 36 was final phase)
+last_updated: 2026-06-08T11:57:39.350Z
 last_activity: 2026-06-08
 progress:
   total_phases: 5
   completed_phases: 5
   total_plans: 18
-  completed_plans: 18
+  completed_plans: 30
   percent: 100
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-07 — v1.8 Debug, Stabilization & UI Polish started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 36 — qa-uat
+**Current focus:** Milestone complete
 
 ## Current Position
 
-Phase: 36 (qa-uat) — COMPLETE（ready for verification）
-Plan: 4 of 4（全プラン完了）
-Status: Phase complete — ready for verification
+Phase: 36
+Plan: Not started
+Status: Milestone complete
 Last activity: 2026-06-08
 
 Progress bar: ██████████ 100% (5/5 phases complete)

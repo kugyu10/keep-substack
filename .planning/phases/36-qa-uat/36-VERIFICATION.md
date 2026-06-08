@@ -1,10 +1,18 @@
 ---
 phase: 36-qa-uat
 verified: 2026-06-08T00:00:00Z
-status: human_needed
-score: 5/5 truths verified（ただし SC#5 は条件付き — 下記 human_verification / 警告参照）
+status: passed
+score: 5/5 truths verified（SC#1-4 無条件 VERIFIED、SC#5 は go/no-go で accept）
 overrides_applied: 0
-human_verification:
+go_no_go_decision:
+  date: 2026-06-08
+  decided_by: developer (operator)
+  outcome: accepted
+  notes:
+    - "コードレビュー CR-03（本番 Supabase 誤書き込みリスク）は f7d13d9 で修正済み（reuseExistingServer 明示オプトイン + global-setup の TEST ref ランタイム検証）"
+    - "CR-01/CR-02（ISR flaky）+ Warning/Info は backlog 退避（.planning/todos/pending/2026-06-08-e2e-isr-cache-flaky-cr01-cr02.md）"
+    - "SC#5 の残項目（Phase 33/35 の human_needed: 本番 RSS / prod RPC / Vercel リダイレクト / GA4 計測）は Phase 36 スコープ外。milestone close（/gsd:complete-milestone）で確認・accept する前提で受理"
+resolved_human_verification:
   - test: "Phase 36 コードレビュー（36-REVIEW.md）の CRITICAL 3 件（CR-01/CR-02 ISR flaky / CR-03 本番 Supabase 誤書き込みリスク）を許容するか、修正フェーズを起こすかを判断する"
     expected: "ship-decision の前に、自動回帰 spec（28 #2 / 29 #1 / 27 #4-#5 の automate pass 根拠）が ISR キャッシュ起因で false green/false red になりうる構造的欠陥、および reuseExistingServer による本番 community データ破壊リスクを開発者が認識し、accept（go/no-go に記録）または fix の判断を下す"
     why_human: "REVIEW.md は issues_found（critical:3）のまま修正コミットが存在しない。これらは本番手動 UAT（36-03、Phase 27）で独立に裏付けられた SC#1 には影響しないが、Phase 28/29 VERIFICATION が引用する『automate pass』証拠の durable 性に直結する設計判断であり、人間の go/no-go 判断が必要"
@@ -17,7 +25,7 @@ human_verification:
 
 **Phase Goal:** Phase 27-29 で積み残されていた human UAT シナリオと VERIFICATION.md の未検証項目がすべて完了し、v1.8 出荷判定が可能な状態になっている
 **Verified:** 2026-06-08T00:00:00Z
-**Status:** human_needed
+**Status:** passed（SC#1-4 VERIFIED / SC#5 は 2026-06-08 の go/no-go で accept、CR-03 修正済み）
 **Re-verification:** No — initial verification
 
 ## Goal Achievement
