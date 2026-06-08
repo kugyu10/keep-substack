@@ -18,7 +18,9 @@ test('未認証で /my → /login にリダイレクト (E2E-03)', async ({ page
   await expect(page).toHaveURL(/http:\/\/localhost:3000\/login(\?next=.*)?/)
 })
 
-// Non-admin logged-in case: proxy.ts checks app_metadata.role === 'admin'.
+// Non-admin logged-in case: middleware checks user.role === 'admin'
+// (auth.users.role JWT claim — set via Supabase admin API or SQL:
+//   UPDATE auth.users SET role = 'admin' WHERE id = '<uuid>')
 // The seeded storageState user has no admin role, so /admin must still bounce
 // to /. We attach the logged-in storageState only for this block — the rest of
 // the file runs anonymous.
