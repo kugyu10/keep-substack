@@ -33,12 +33,12 @@
 
 ### Team Visibility (TEAM)
 
-- [ ] **TEAM-01**: private チームがトップビューのチームタブに表示され、ログイン不要で閲覧できる（/my ページでの参加・退出制限はそのまま維持）
+- [x] **TEAM-01**: private チームがトップビューのチームタブに表示され、ログイン不要で閲覧できる（/my ページでの参加・退出制限はそのまま維持）
 
 ### Analytics (ANLT)
 
-- [ ] **ANLT-01**: GA4 が全ページのページビューを自動トラッキングする（`@next/third-parties` の `GoogleAnalytics` コンポーネント使用）
-- [ ] **ANLT-02**: 開発環境（`NODE_ENV !== 'production'`）では GA4 トラッキングが無効になる
+- [x] **ANLT-01**: GA4 が全ページのページビューを自動トラッキングする（`@next/third-parties` の `GoogleAnalytics` コンポーネント使用）
+- [x] **ANLT-02**: 開発環境（`NODE_ENV !== 'production'`）では GA4 トラッキングが無効になる
 
 ## Future Requirements
 
@@ -74,9 +74,9 @@
 | UI-03 | Phase 34 | Complete |
 | UI-04 | Phase 34 | Complete |
 | UI-05 | Phase 34 | Complete |
-| TEAM-01 | Phase 35 | Pending |
-| ANLT-01 | Phase 35 | Pending |
-| ANLT-02 | Phase 35 | Pending |
+| TEAM-01 | Phase 35 | Complete |
+| ANLT-01 | Phase 35 | Complete |
+| ANLT-02 | Phase 35 | Complete |
 
 **Coverage:**
 - v1.8 requirements: 16 total
