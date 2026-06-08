@@ -29,18 +29,29 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const { pathname } = request.nextUrl
+
+  // /admin: admin ロール必須 (auth.users.role カラムで判定)。proxy.ts と同じロジック
+  if (pathname.startsWith('/admin')) {
+    if (!user || user.role !== 'admin') {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+  }
+
   // /my: ログイン必須。未認証の場合は /login?next=<currentPath> へリダイレクト
-  if (!user) {
-    const url = request.nextUrl.clone()
-    const next = encodeURIComponent(request.nextUrl.pathname)
-    url.pathname = '/login'
-    url.search = `?next=${next}`
-    return NextResponse.redirect(url)
+  if (pathname.startsWith('/my')) {
+    if (!user) {
+      const url = request.nextUrl.clone()
+      const next = encodeURIComponent(pathname)
+      url.pathname = '/login'
+      url.search = `?next=${next}`
+      return NextResponse.redirect(url)
+    }
   }
 
   return supabaseResponse
 }
 
 export const config = {
-  matcher: ['/my', '/my/:path*'],
+  matcher: ['/admin', '/admin/:path*', '/my', '/my/:path*'],
 }

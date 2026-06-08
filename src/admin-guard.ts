@@ -1,6 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 
+// admin-guard.ts: /admin 認可ロジック（ユニットテスト専用モジュール）
+// src/middleware.ts が Next.js の実ミドルウェアとして動作する。
+// この関数は src/__tests__/proxy.test.ts から直接インポートされてテストされる。
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request })
 
@@ -47,6 +50,5 @@ export async function proxy(request: NextRequest) {
   return response
 }
 
-export const config = {
-  matcher: ['/admin', '/admin/:path*', '/my', '/my/:path*'],
-}
+// NOTE: proxy.ts は /admin 認可ロジックのユニットテスト専用モジュール。
+// Next.js middleware は src/middleware.ts が担う（config export なし）。

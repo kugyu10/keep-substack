@@ -17,7 +17,7 @@ vi.mock('@supabase/ssr', () => ({
   })),
 }))
 
-import { proxy } from '../proxy'
+import { proxy } from '../admin-guard'
 
 const ADMIN_TEAMS_URL =
   'https://example.com/admin/teams/' + encodeURIComponent('営業部')
