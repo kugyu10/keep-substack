@@ -1,5 +1,5 @@
 import { isoToJSTDateKey } from './calendarUtils'
-import type { CommitSlot, FeedItem, MemberFeedResult } from './types'
+import type { CommitSlot, FeedItem, Member, MemberFeedResult } from './types'
 
 /**
  * Returns an array of 7 date strings ['YYYY-MM-DD', ...] for the Monday-start week
@@ -155,7 +155,7 @@ export function consecutiveWeekStreak(slots: CommitSlot[], items: FeedItem[]): n
  * Compute achievement rate for a member in a given week.
  * rate = achieved slots / total slots (0 if slots empty)
  */
-function achievementRate(
+export function achievementRate(
   slots: CommitSlot[],
   weekDates: string[],
   articleDateMap: Map<string, FeedItem[]>
@@ -171,16 +171,38 @@ function achievementRate(
 }
 
 /**
- * Sorts members for CommitGoalView — D-10 完全版.
- * ① Today's-week achievement rate (achieved slots / total slots) descending
- * ② Streak weeks (consecutiveWeekStreak) descending
- * ③ addedAt ascending (earlier registered members first)
+ * Returns the group number for a member:
+ * - 0 (Group A): hasUser=true and has at least one commit slot
+ * - 1 (Group B): hasUser=true but no commit slots
+ * - 2 (Group C): hasUser=false (no linked auth user)
+ */
+function getGroup(member: Member, memberSlots: CommitSlot[]): 0 | 1 | 2 {
+  if (!member.hasUser) return 2
+  if (memberSlots.length === 0) return 1
+  return 0
+}
+
+/**
+ * Sorts members for CommitGoalView — D-13/D-14 3-group 5-key sort.
+ * Groups (D-14):
+ *   A: hasUser=true + slots > 0
+ *   B: hasUser=true + slots === 0
+ *   C: hasUser=false
+ * Within each group, sort keys (D-13):
+ *   ① group ascending (A→B→C)
+ *   ② thisWeek achievement rate descending
+ *   ③ streak weeks descending
+ *   ④ lastWeek achievement rate descending
+ *   ⑤ twoWeeksAgo achievement rate descending
+ *   ⑥ addedAt ascending
  */
 export function sortMembersForCommitView(
   results: MemberFeedResult[],
   slots: CommitSlot[]
 ): MemberFeedResult[] {
   const thisWeekDates = getWeekDates(0)
+  const lastWeekDates = getWeekDates(-1)
+  const twoWeeksAgoDates = getWeekDates(-2)
 
   // Pre-compute per-member values once to avoid rebuilding Maps inside the comparator.
   const meta = new Map(
@@ -190,8 +212,11 @@ export function sortMembersForCommitView(
       return [
         member.id,
         {
-          rate: achievementRate(memberSlots, thisWeekDates, dateMap),
+          group: getGroup(member, memberSlots),
+          rate0: achievementRate(memberSlots, thisWeekDates, dateMap),
           streak: consecutiveWeekStreak(memberSlots, items),
+          rate1: achievementRate(memberSlots, lastWeekDates, dateMap),
+          rate2: achievementRate(memberSlots, twoWeeksAgoDates, dateMap),
         },
       ]
     })
@@ -201,13 +226,22 @@ export function sortMembersForCommitView(
     const am = meta.get(a.member.id)!
     const bm = meta.get(b.member.id)!
 
-    // ① achievement rate descending
-    if (bm.rate !== am.rate) return bm.rate - am.rate
+    // ① group ascending (A=0, B=1, C=2)
+    if (am.group !== bm.group) return am.group - bm.group
 
-    // ② streak weeks descending
+    // ② this week achievement rate descending
+    if (bm.rate0 !== am.rate0) return bm.rate0 - am.rate0
+
+    // ③ streak weeks descending
     if (bm.streak !== am.streak) return bm.streak - am.streak
 
-    // ③ addedAt ascending
+    // ④ last week achievement rate descending
+    if (bm.rate1 !== am.rate1) return bm.rate1 - am.rate1
+
+    // ⑤ two weeks ago achievement rate descending
+    if (bm.rate2 !== am.rate2) return bm.rate2 - am.rate2
+
+    // ⑥ addedAt ascending
     return a.member.addedAt.localeCompare(b.member.addedAt)
   })
 }
