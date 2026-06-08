@@ -241,7 +241,7 @@ Plans:
 **Plans**: 4 plans
 Plans:
 **Wave 1**
-- [ ] 36-01-PLAN.md — config 375px viewport + 27-handle.spec.ts + 28-commit-flow.spec.ts（QA-02/QA-03 自動レイヤー）
+- [x] 36-01-PLAN.md — config 375px viewport + 27-handle.spec.ts + 28-commit-flow.spec.ts（QA-02/QA-03 自動レイヤー）
 
 **Wave 2** *(36-01 完了後)*
 - [ ] 36-02-PLAN.md — 29-mobile.spec.ts + 29-layout-nav.spec.ts（QA-04 自動レイヤー、/daily リネーム追従）
@@ -294,4 +294,4 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 33. バグ修正 + commitSlots upsert化 | v1.8 | 5/5 | Complete    | 2026-06-08 |
 | 34. UI Polish バッチ | v1.8 | 5/5 | Complete    | 2026-06-08 |
 | 35. チーム可視性拡張 + Google Analytics | v1.8 | 3/3 | Complete    | 2026-06-08 |
-| 36. QA・UAT・検証ギャップ解消 | v1.8 | 0/4 | In progress | - |
+| 36. QA・UAT・検証ギャップ解消 | v1.8 | 1/4 | In Progress|  |

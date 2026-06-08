@@ -4,14 +4,14 @@ milestone: v1.8
 milestone_name: Debug, Stabilization & UI Polish
 status: executing
 stopped_at: Phase 36 context gathered
-last_updated: "2026-06-08T08:44:53.315Z"
-last_activity: 2026-06-08 -- Phase 36 planning complete
+last_updated: "2026-06-08T09:50:48.061Z"
+last_activity: 2026-06-08
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 18
-  completed_plans: 14
-  percent: 78
+  completed_plans: 15
+  percent: 80
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-07 — v1.8 Debug, Stabilization & UI Polish started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 36 — qa・uat・検証ギャップ解消
+**Current focus:** Phase 36 — qa-uat
 
 ## Current Position
 
-Phase: 36
-Plan: Not started
+Phase: 36 (qa-uat) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-06-08 -- Phase 36 planning complete
+Last activity: 2026-06-08
 
 Progress bar: ██░░░░░░░░ 20% (1/5 phases complete)
 
@@ -73,6 +73,7 @@ Progress bar: ██░░░░░░░░ 20% (1/5 phases complete)
 | Phase 33-commitslots-upsert P05 | 7min | 2 tasks | 4 files |
 | Phase 34 P03 | 129s | 2 tasks | 2 files |
 | Phase 34-ui-polish P05 | 5min | 2 tasks | 2 files |
+| Phase 36 P01 | 15 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -101,12 +102,13 @@ Progress bar: ██░░░░░░░░ 20% (1/5 phases complete)
 - Phase 34: UI-01/02 — /login と /signin-51cf21389c56 のレイアウトにヘッダー・フッターを含まない専用レイアウトを適用
 - Phase 35: TEAM-01 — getMembers() の status フィルタを 'hidden' のみ除外に変更（'private' を含める）
 - Phase 35: ANLT-01/02 — @next/third-parties の GoogleAnalytics コンポーネントを layout.tsx に追加。NODE_ENV !== 'production' ガードで dev 無効化
+- Phase 36 P01 (完了): QA-02/QA-03 の自動回帰レイヤー（D-01 自動側）を session-injection ハーネスに薄く追加。e2e/27-handle.spec.ts（@handle 描画/保存往復/プロフィールリンク有無、4 テスト）+ e2e/28-commit-flow.spec.ts（RPC 前提スモーク + /my スケジュール宣言フルフロー）。playwright.config.ts に 27/28/29 spec の project 割り当て + mobile-375（375px viewport）を確定（config はこのプランが唯一の owner）。DEVIATION なし（src/ 無変更）。CHECKPOINT: TEST project（otydhiumsdsyxepnjqjp）に replace_member_commit_slots RPC が未適用 → human-action で停止し SQL Editor 経由で適用、本継続で green 確認（本番 xolhjcngrwwwqtklmoyk 未接触）。Playwright 1.60 は --fail-on-empty 未サポートのため ranRpcSmoke フラグ + afterAll(expect) で no-tests-run の false green を防止。commit slots 保存は RPC（Drift D-B）のため count==2 でブラックボックス往復検証。SC#1 の本番充足は 36-03 手動 UAT が担保（D-04）。
 
 ## Session Continuity
 
-Last session: 2026-06-08T07:58:10.452Z
-Stopped at: Phase 36 context gathered
-Next step: Execute Phase 33 Plan 05 — updateCommitSlotsAction.test.ts RPC mock update + E2E admin-guard fix
+Last session: 2026-06-08T09:50:38.103Z
+Stopped at: Completed 36-01-PLAN.md
+Next step: Execute Phase 36 Plan 02 — 29-mobile.spec.ts / 29-layout-nav.spec.ts 実装（config は 36-01 で割り当て済み、spec 本体のみ）
 
 ## Deferred Items
 
