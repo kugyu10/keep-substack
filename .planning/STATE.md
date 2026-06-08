@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Debug, Stabilization & UI Polish
-status: executing
-stopped_at: Completed 36-03-PLAN.md
-last_updated: "2026-06-08T11:27:10.764Z"
+status: verifying
+stopped_at: Completed 36-04-PLAN.md
+last_updated: "2026-06-08T11:33:56.673Z"
 last_activity: 2026-06-08
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 18
-  completed_plans: 17
-  percent: 80
+  completed_plans: 18
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-06-07 — v1.8 Debug, Stabilization & UI
 
 ## Current Position
 
-Phase: 36 (qa-uat) — EXECUTING
-Plan: 4 of 4
-Status: Ready to execute (36-03 完了)
+Phase: 36 (qa-uat) — COMPLETE（ready for verification）
+Plan: 4 of 4（全プラン完了）
+Status: Phase complete — ready for verification
 Last activity: 2026-06-08
 
-Progress bar: ██░░░░░░░░ 20% (1/5 phases complete)
+Progress bar: ██████████ 100% (5/5 phases complete)
 
 ### Quick Tasks Completed
 
@@ -76,6 +76,7 @@ Progress bar: ██░░░░░░░░ 20% (1/5 phases complete)
 | Phase 36 P01 | 15 | 3 tasks | 3 files |
 | Phase 36 P02 | ~6min | 2 tasks | 2 files files |
 | Phase 36 P03 | ~10min | 4 tasks | 2 files |
+| Phase 36 P04 | ~3min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -107,12 +108,13 @@ Progress bar: ██░░░░░░░░ 20% (1/5 phases complete)
 - Phase 36 P02 (完了): QA-04（Phase 29 VERIFICATION ギャップ）の自動化可能部分を回帰 spec 化。e2e/29-mobile.spec.ts（mobile-375 project で CommitGrid root `div.flex.flex-1.gap-2` の week-0/1 を toBeHidden・week-2 を toBeVisible、`hidden sm:flex` の 375px display:none をブラックボックス検出）+ e2e/29-layout-nav.spec.ts（anonymous で #2 `a[href^=/member/]` 構造存在のみ + #3 ViewTabs `/daily` ナビ・/daily 到達）。29 #2 はピクセル整列を assert せず構造のみ自動化し整列は本番手動目視へ委譲（Pitfall 4）。29 #3 は ⚠ Drift D-C に従い旧 `/weekly-stamp` ではなく現行 `/daily` を対象（src バグではなく後続フェーズの意図的リネーム追従、検証文言の追従であり修正対象ではない）。29-mobile は CommitGrid を持つ行を `/` に確実に出すため beforeAll で seed member（TEST.publicationId）に commit slot 1 件を独立 seed（28 spec と非競合）し afterAll で member_id スコープ delete 復元（truncate 禁止、D-09 / T-36-04）。29-layout-nav は読み取り専用で afterEach 不要（T-36-05）。src/ 無変更（git diff src/ 空）。3 tests green（mobile 1 + layout-nav 2）、実行後 seed slots 0 行で復元確認。config は 36-01 が owner のため無変更。DEVIATION なし。
 - Phase 36 P01 (完了): QA-02/QA-03 の自動回帰レイヤー（D-01 自動側）を session-injection ハーネスに薄く追加。e2e/27-handle.spec.ts（@handle 描画/保存往復/プロフィールリンク有無、4 テスト）+ e2e/28-commit-flow.spec.ts（RPC 前提スモーク + /my スケジュール宣言フルフロー）。playwright.config.ts に 27/28/29 spec の project 割り当て + mobile-375（375px viewport）を確定（config はこのプランが唯一の owner）。DEVIATION なし（src/ 無変更）。CHECKPOINT: TEST project（otydhiumsdsyxepnjqjp）に replace_member_commit_slots RPC が未適用 → human-action で停止し SQL Editor 経由で適用、本継続で green 確認（本番 xolhjcngrwwwqtklmoyk 未接触）。Playwright 1.60 は --fail-on-empty 未サポートのため ranRpcSmoke フラグ + afterAll(expect) で no-tests-run の false green を防止。commit slots 保存は RPC（Drift D-B）のため count==2 でブラックボックス往復検証。SC#1 の本番充足は 36-03 手動 UAT が担保（D-04）。
 - Phase 36 P03 (完了): 本番 https://keep-substack.com / Supabase prod xolhjcngrwwwqtklmoyk でテストアカウント kugyu10@gmail.com を用い Phase 27 UAT 6 シナリオ #1-#6 を一巡し**全 PASS**（SC#1 充足 — #2-#5 も本番手動結果を個別取得）。27-HUMAN-UAT.md を status partial→passed / result 全 [pass] / Summary passed:6 pending:0 に、27-VERIFICATION.md を human_needed→verified に in-place 更新（D-09）。#2-#5 は**本番手動=主 + 36-01 自動 spec=補助**の二層記録（D-05、自動 spec を本番結果の代替にしない）。⚠ #6 Magic Link の入口を `/login-51cf21389c56` → **`signin-51cf21389c56`** に訂正（`?handle=` を消費するのは signin ルート: `src/app/(auth)/signin-51cf21389c56/page.tsx`→LoginForm→`src/app/my/page.tsx`。`/login` は handle を読まない。チェックリストの取り違えであり src バグではない）。#6/全体の前提として D-06 Redirect URL 修正（本番 Auth が新ドメイン keep-substack.com を許可）を明記。#3 は Drift D-A（handle 設定後 read-only）に検証が追従。検証で変更したテストアカウント行の substack_handle は最終的に NULL に復元（D-04、自分の行限定・他メンバー非汚染）。fail 0 件のため D-10 バグ化は該当なし。Phase 27 正典 .md が verified/passed に確定し v1.8 go/no-go 判定（D-11）材料が揃った。src/ 無変更。
+- Phase 36 P04 (完了): 28/29-VERIFICATION.md を in-place で `human_needed → verified` に解消（D-09、Phase 36 側に統合サマリーを作らない）。**28-VERIFICATION**: #1（member_commit_slots 本番存在）= Phase 32（DB-02 Complete、本番 xolhjcngrwwwqtklmoyk 適用確認済み）への **resolved-by-reference** で再検証なし close（D-07/D-08）、#2（/my フルフロー）= `e2e/28-commit-flow.spec.ts`（36-01、2 green）の automate pass、Observable Truth #14 を RPC `replace_member_commit_slots`（Drift D-B）前提に **VERIFIED**（旧 delete+insert 前提の UNCERTAIN から往復検証へ、13/14→14/14）。**29-VERIFICATION**: #1（モバイル375px 1週縮退）= `e2e/29-mobile.spec.ts`（36-02）automate pass、#3（ヒートマップ+タブナビ）= `e2e/29-layout-nav.spec.ts` automate pass で ⚠ 旧 `/weekly-stamp` → 現行 `/daily` リネーム（Drift D-C、src バグではなく後続フェーズの意図的リネーム）に**文言追従**、#2（3列レイアウト）= 構造 automate（a[href^=/member/]）+ ピクセル整列は **36-03 本番目視**の二層（Pitfall 4、provenance=36-03-SUMMARY.md）。依存 spec 計 5 green + 36-03 本番ウォークスルー全 PASS で fail 0 → D-10 バグ化は該当なし、両 VERIFICATION を verified に確定。29-HUMAN-UAT.md は無編集（D-07、既 resolved 3/3）、src/ 無変更。**v1.8 全検証ギャップ（Phase 27/28/29）が pass / resolved-by-reference / バグ化のいずれかで処理済みとなり、go/no-go 判定（D-11）の材料が揃った。**
 
 ## Session Continuity
 
-Last session: 2026-06-08T11:27:04.702Z
-Stopped at: Completed 36-03-PLAN.md
-Next step: Execute Phase 36 Plan 04 — 28/29 VERIFICATION.md in-place 更新（QA-03/QA-04、resolved-by-reference 含む）
+Last session: 2026-06-08T11:33:56.669Z
+Stopped at: Completed 36-04-PLAN.md
+Next step: Phase 36 全プラン完了。v1.8 全検証ギャップ（Phase 27/28/29）が verified/passed に確定。`/gsd:verify-phase 36` で Phase 検証 → v1.8 go/no-go 判定（D-11）へ
 
 ## Deferred Items
 
