@@ -18,7 +18,7 @@
 
 ### Quality Assurance (QA)
 
-- [ ] **QA-01**: Phase 27 の human UAT 6 シナリオを本番環境で検証する
+- [x] **QA-01**: Phase 27 の human UAT 6 シナリオを本番環境で検証する
 - [x] **QA-02**: Phase 27 VERIFICATION.md のギャップを解消する
 - [x] **QA-03**: Phase 28 VERIFICATION.md のギャップを解消する
 - [x] **QA-04**: Phase 29 VERIFICATION.md のギャップを解消する
@@ -65,7 +65,7 @@
 | BUG-02 | Phase 33 | Complete |
 | DB-01 | Phase 33 | Complete |
 | DB-02 | Phase 32 | Complete |
-| QA-01 | Phase 36 | Pending |
+| QA-01 | Phase 36 | Complete |
 | QA-02 | Phase 36 | Complete |
 | QA-03 | Phase 36 | Complete |
 | QA-04 | Phase 36 | Complete |

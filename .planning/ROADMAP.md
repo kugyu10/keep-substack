@@ -245,7 +245,7 @@ Plans:
 
 **Wave 2** *(36-01 完了後)*
 - [x] 36-02-PLAN.md — 29-mobile.spec.ts + 29-layout-nav.spec.ts（QA-04 自動レイヤー、/daily リネーム追従）
-- [ ] 36-03-PLAN.md — 本番手動 UAT ランブック実行 + 27 検証.md in-place 更新（QA-01/QA-02、autonomous: false）
+- [x] 36-03-PLAN.md — 本番手動 UAT ランブック実行 + 27 検証.md in-place 更新（QA-01/QA-02、autonomous: false）
 
 **Wave 3** *(36-01/36-02 完了後)*
 - [ ] 36-04-PLAN.md — 28/29 VERIFICATION.md in-place 更新（QA-03/QA-04、resolved-by-reference 含む）
@@ -294,4 +294,4 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 33. バグ修正 + commitSlots upsert化 | v1.8 | 5/5 | Complete    | 2026-06-08 |
 | 34. UI Polish バッチ | v1.8 | 5/5 | Complete    | 2026-06-08 |
 | 35. チーム可視性拡張 + Google Analytics | v1.8 | 3/3 | Complete    | 2026-06-08 |
-| 36. QA・UAT・検証ギャップ解消 | v1.8 | 2/4 | In Progress|  |
+| 36. QA・UAT・検証ギャップ解消 | v1.8 | 3/4 | In Progress|  |

@@ -1,9 +1,10 @@
 ---
 phase: 27-substack-handle-db
-verified: 2026-06-02T13:40:00Z
-status: human_needed
+verified: 2026-06-08T00:00:00Z
+status: verified
 score: 10/10 must-haves verified
 overrides_applied: 0
+human_verification_status: passed (本番 6/6 PASS — Phase 36-03 手動 UAT, 2026-06-08)
 human_verification:
   - test: "Visit /my when logged in — confirm @handle input renders below name field with placeholder '@yourhandle'"
     expected: "Input field with id=substack_handle, label 'Substack ハンドル', placeholder '@yourhandle', hint text '例: @yourname — 入力すると個人ページからプロフィールへのリンクが作成されます' appears below the name field"
@@ -28,9 +29,9 @@ human_verification:
 # Phase 27: Substack Handle — DB + Profile Link Verification Report
 
 **Phase Goal:** `members` テーブルに `substack_handle` カラムを追加し、/my ページから登録・個人マンスリービューからプロフィールリンクを実装する
-**Verified:** 2026-06-02T13:40:00Z
-**Status:** human_needed
-**Re-verification:** No — initial verification
+**Verified:** 2026-06-08T00:00:00Z（human verification 完了で再確定）
+**Status:** verified
+**Re-verification:** Yes — 2026-06-08 に Phase 36-03 手動 UAT で 6 件の human verification をすべて本番で PASS させ human_needed → verified に確定
 
 ## Goal Achievement
 
@@ -117,49 +118,57 @@ All three requirements are mapped to Phase 27 in REQUIREMENTS.md and ROADMAP.md.
 
 No `TBD`, `FIXME`, `XXX`, `TODO`, `HACK`, or stub patterns found in any Phase 27 modified files.
 
-### Human Verification Required
+### Human Verification Required → RESOLVED (本番 6/6 PASS, 2026-06-08)
 
-#### 1. Live DB Migration Apply
+**実行コンテキスト:** Phase 36-03 手動 UAT。本番 https://keep-substack.com / Supabase prod `xolhjcngrwwwqtklmoyk`、テスト用アカウント `kugyu10@gmail.com` で開発者自身が一巡。検証後にテストアカウント行の `substack_handle` を NULL に復元（D-04、自分の行限定・他メンバー非汚染）。
+**D-06 前提（全体共通・特に #6）:** 本番 Supabase Auth の URL Configuration（Redirect URL）で新ドメイン `keep-substack.com` を許可するよう開発者が事前に修正済み（D-06 landmine 解消）。これが Magic Link 系シナリオ成功の前提。
+
+#### 1. Live DB Migration Apply — ✅ PASS（本番 SQL）
 
 **Test:** Apply `supabase/migrations/20260602000000_add_substack_handle.sql` to both production (`xolhjcngrwwwqtklmoyk`) and TEST (`otydhiumsdsyxepnjqjp`) Supabase instances via SQL Editor.
 **Expected:** `SELECT column_name FROM information_schema.columns WHERE table_name='members' AND column_name='substack_handle'` returns 1 row; `SELECT substack_handle FROM members LIMIT 5` returns all NULL.
-**Why human:** Migration is in the codebase but live DB state cannot be verified programmatically from this environment.
+**Result:** PASS — 本番 prod の SQL Editor で `information_schema.columns` 参照により `substack_handle` カラム 1 行存在を確認、既存 5 行が NULL であることも確認（本番手動、2026-06-08）。
 
-#### 2. /my Page @handle Input Renders (PROF-01)
+#### 2. /my Page @handle Input Renders (PROF-01) — ✅ PASS（本番手動が主 + 自動 spec 補助）
 
 **Test:** Visit `/my` when logged in as a member.
 **Expected:** Input field labeled "Substack ハンドル" with placeholder "@yourhandle" and hint text "例: @yourname — 入力すると個人ページからプロフィールへのリンクが作成されます" appears between the name field and the team checkboxes.
-**Why human:** Server-side auth required; cannot run the Next.js app in this environment.
+**Result:** PASS — 本番 https://keep-substack.com/my に kugyu10@gmail.com でログインし、handle を NULL にした状態で「Substack ハンドル」入力欄が描画されることを本番ブラウザで目視（**主たる結果 = 本番手動**、SC#1 充足）。**補助証拠（D-05）:** 36-01 の TEST project 自動 spec `e2e/27-handle.spec.ts`（4 テスト green）が durable レイヤーとして同挙動を裏付け。自動 spec の green は本番手動結果の代替ではない。
 
-#### 3. @handle Save + Reload (PROF-01 D-08)
+#### 3. @handle Save + Reload (PROF-01 D-08) — ✅ PASS（本番手動が主 + 自動 spec 補助、Drift D-A 追従）
 
 **Test:** Enter "hoge" (no @) in the handle field, click 保存する, then reload `/my`.
 **Expected:** The handle input pre-fills with "@hoge" on reload (DB value, @-normalized).
-**Why human:** Requires live Supabase write and subsequent fetch.
+**Result:** PASS — 本番で "hoge" 保存 → reload で `@hoge` が表示。⚠ **Drift D-A 追従**: handle は設定後 read-only（`MyProfileForm.tsx:52`）のため、input への pre-fill 再編集ではなく read-only `<p>` 表示で検証が追従した（仕様変更に検証文言が追従、src バグではない）。**主たる結果 = 本番手動**、補助証拠 = 36-01 自動 spec（D-05）。
 
-#### 4. CalendarGrid Profile Link (PROF-02)
+#### 4. CalendarGrid Profile Link (PROF-02) — ✅ PASS（本番手動が主 + 自動 spec 補助）
 
 **Test:** Visit `/member/[publicationId]` for a member whose `substack_handle` is set in the DB; click their name/avatar.
 **Expected:** `https://substack.com/@handle` opens in a new browser tab.
-**Why human:** Requires live DB row with substack_handle populated and real browser navigation.
+**Result:** PASS — 本番 /member/[テストアカウントの publicationId] で名前/アイコンが `https://substack.com/@hoge` を新タブで開くリンクとして表示されることを確認。**主たる結果 = 本番手動**、補助証拠 = 36-01 自動 spec（D-05）。
 
-#### 5. CalendarGrid Static Fallback (PROF-02)
+#### 5. CalendarGrid Static Fallback (PROF-02) — ✅ PASS（本番手動が主 + 自動 spec 補助）
 
 **Test:** Visit `/member/[publicationId]` for a member whose `substack_handle` is NULL in the DB.
 **Expected:** Name/avatar renders without an anchor element — no pointer cursor, not clickable as a link.
-**Why human:** Requires a live member row with null substack_handle.
+**Result:** PASS — handle を NULL に戻す（read-only のため UI 不可、本番 SQL Editor で `UPDATE members SET substack_handle=NULL WHERE id='<自分のid>'`、自分の行限定 D-04）と /member でリンクが消滅し plain 表示になることを確認。**主たる結果 = 本番手動**、補助証拠 = 36-01 自動 spec（D-05）。
 
-#### 6. Magic Link ?handle= Pre-fill (PROF-03)
+#### 6. Magic Link ?handle= Pre-fill (PROF-03) — ✅ PASS（本番手動、⚠ 入口訂正 + D-06 前提）
 
-**Test:** Navigate to `/login-51cf21389c56/?handle=hoge`, submit your email, click the Magic Link in your inbox.
+**Test（訂正後）:** Navigate to `https://keep-substack.com/signin-51cf21389c56/?handle=hoge`, submit your email, click the Magic Link in your inbox.
 **Expected:** You are redirected to `/my?handle=hoge`; the @handle input pre-fills with "hoge" if your DB `substack_handle` is currently null.
-**Why human:** Full Magic Link round-trip requires live email delivery and Supabase auth; cannot be automated in this environment.
+**Result:** PASS — Magic Link クリック後 `/my?handle=hoge` に着地し、DB handle が NULL のとき input に "hoge" pre-fill を確認（本番手動、2026-06-08）。
+**⚠ テスト定義訂正（バグではなくチェックリストの取り違え）:** 当初の入口記載は `/login-51cf21389c56/?handle=hoge` だったが、これは誤り。実装上 `?handle=` を消費するのは **signin ルート**（`src/app/(auth)/signin-51cf21389c56/page.tsx` が `searchParams.handle` を `LoginForm` に渡し、`src/app/my/page.tsx` が `/my?handle=` を読んで pre-fill する）であり、`/login` 側は handle を読まない。正しい入口 `https://keep-substack.com/signin-51cf21389c56/?handle=hoge` で実行し PASS。これはチェックリストの入口記載誤りの訂正であり、src バグではない。
+**前提（D-06）:** 本番 Supabase Auth の Redirect URL で新ドメイン `keep-substack.com` を許可済み（事前確認・必要分追加）。これが #6 成功の前提。
 
 ### Gaps Summary
 
-No code-level gaps found. All 10 must-have truths are verified in the codebase with substantive implementations and fully wired data flows. The 6 human verification items are live-environment checks (DB migration confirmation and E2E user flows) that are structurally sound in code but require a running application to confirm.
+✅ コードレベルのギャップ無し（10/10 must-have truths verified）+ human verification 6/6 を本番で PASS（2026-06-08）。全項目クローズ。残ギャップなし。
+- #2-#5 は **本番手動を主たる結果**、TEST project の 36-01 自動 spec を **durable な補助レイヤー** として二層で記録（D-05、自動 spec を本番結果の代替にしていない）。
+- #6 は入口を `/login` → signin ルートに訂正のうえ PASS（src バグではない）。D-06 Redirect URL 修正を前提として明記。
+- 失敗シナリオ 0 件のため Phase 36-03 Task 4 のバグ化（D-10）は該当なし。go/no-go 判定（D-11）に必要な情報が揃った。
 
 ---
 
-_Verified: 2026-06-02T13:40:00Z_
-_Verifier: Claude (gsd-verifier)_
+_Verified: 2026-06-02T13:40:00Z (code-level), 2026-06-08T00:00:00Z (human verification 完了で verified に確定)_
+_Verifier: Claude (gsd-verifier) / Human UAT: 開発者（Phase 36-03 手動 UAT, 本番）_

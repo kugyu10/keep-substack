@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Debug, Stabilization & UI Polish
 status: executing
-stopped_at: Completed 36-02-PLAN.md
-last_updated: "2026-06-08T09:56:32.233Z"
+stopped_at: Completed 36-03-PLAN.md
+last_updated: "2026-06-08T11:27:10.764Z"
 last_activity: 2026-06-08
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 18
-  completed_plans: 16
+  completed_plans: 17
   percent: 80
 ---
 
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-07 — v1.8 Debug, Stabilization & UI
 ## Current Position
 
 Phase: 36 (qa-uat) — EXECUTING
-Plan: 3 of 4
-Status: Ready to execute
+Plan: 4 of 4
+Status: Ready to execute (36-03 完了)
 Last activity: 2026-06-08
 
 Progress bar: ██░░░░░░░░ 20% (1/5 phases complete)
@@ -75,6 +75,7 @@ Progress bar: ██░░░░░░░░ 20% (1/5 phases complete)
 | Phase 34-ui-polish P05 | 5min | 2 tasks | 2 files |
 | Phase 36 P01 | 15 | 3 tasks | 3 files |
 | Phase 36 P02 | ~6min | 2 tasks | 2 files files |
+| Phase 36 P03 | ~10min | 4 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -105,12 +106,13 @@ Progress bar: ██░░░░░░░░ 20% (1/5 phases complete)
 - Phase 35: ANLT-01/02 — @next/third-parties の GoogleAnalytics コンポーネントを layout.tsx に追加。NODE_ENV !== 'production' ガードで dev 無効化
 - Phase 36 P02 (完了): QA-04（Phase 29 VERIFICATION ギャップ）の自動化可能部分を回帰 spec 化。e2e/29-mobile.spec.ts（mobile-375 project で CommitGrid root `div.flex.flex-1.gap-2` の week-0/1 を toBeHidden・week-2 を toBeVisible、`hidden sm:flex` の 375px display:none をブラックボックス検出）+ e2e/29-layout-nav.spec.ts（anonymous で #2 `a[href^=/member/]` 構造存在のみ + #3 ViewTabs `/daily` ナビ・/daily 到達）。29 #2 はピクセル整列を assert せず構造のみ自動化し整列は本番手動目視へ委譲（Pitfall 4）。29 #3 は ⚠ Drift D-C に従い旧 `/weekly-stamp` ではなく現行 `/daily` を対象（src バグではなく後続フェーズの意図的リネーム追従、検証文言の追従であり修正対象ではない）。29-mobile は CommitGrid を持つ行を `/` に確実に出すため beforeAll で seed member（TEST.publicationId）に commit slot 1 件を独立 seed（28 spec と非競合）し afterAll で member_id スコープ delete 復元（truncate 禁止、D-09 / T-36-04）。29-layout-nav は読み取り専用で afterEach 不要（T-36-05）。src/ 無変更（git diff src/ 空）。3 tests green（mobile 1 + layout-nav 2）、実行後 seed slots 0 行で復元確認。config は 36-01 が owner のため無変更。DEVIATION なし。
 - Phase 36 P01 (完了): QA-02/QA-03 の自動回帰レイヤー（D-01 自動側）を session-injection ハーネスに薄く追加。e2e/27-handle.spec.ts（@handle 描画/保存往復/プロフィールリンク有無、4 テスト）+ e2e/28-commit-flow.spec.ts（RPC 前提スモーク + /my スケジュール宣言フルフロー）。playwright.config.ts に 27/28/29 spec の project 割り当て + mobile-375（375px viewport）を確定（config はこのプランが唯一の owner）。DEVIATION なし（src/ 無変更）。CHECKPOINT: TEST project（otydhiumsdsyxepnjqjp）に replace_member_commit_slots RPC が未適用 → human-action で停止し SQL Editor 経由で適用、本継続で green 確認（本番 xolhjcngrwwwqtklmoyk 未接触）。Playwright 1.60 は --fail-on-empty 未サポートのため ranRpcSmoke フラグ + afterAll(expect) で no-tests-run の false green を防止。commit slots 保存は RPC（Drift D-B）のため count==2 でブラックボックス往復検証。SC#1 の本番充足は 36-03 手動 UAT が担保（D-04）。
+- Phase 36 P03 (完了): 本番 https://keep-substack.com / Supabase prod xolhjcngrwwwqtklmoyk でテストアカウント kugyu10@gmail.com を用い Phase 27 UAT 6 シナリオ #1-#6 を一巡し**全 PASS**（SC#1 充足 — #2-#5 も本番手動結果を個別取得）。27-HUMAN-UAT.md を status partial→passed / result 全 [pass] / Summary passed:6 pending:0 に、27-VERIFICATION.md を human_needed→verified に in-place 更新（D-09）。#2-#5 は**本番手動=主 + 36-01 自動 spec=補助**の二層記録（D-05、自動 spec を本番結果の代替にしない）。⚠ #6 Magic Link の入口を `/login-51cf21389c56` → **`signin-51cf21389c56`** に訂正（`?handle=` を消費するのは signin ルート: `src/app/(auth)/signin-51cf21389c56/page.tsx`→LoginForm→`src/app/my/page.tsx`。`/login` は handle を読まない。チェックリストの取り違えであり src バグではない）。#6/全体の前提として D-06 Redirect URL 修正（本番 Auth が新ドメイン keep-substack.com を許可）を明記。#3 は Drift D-A（handle 設定後 read-only）に検証が追従。検証で変更したテストアカウント行の substack_handle は最終的に NULL に復元（D-04、自分の行限定・他メンバー非汚染）。fail 0 件のため D-10 バグ化は該当なし。Phase 27 正典 .md が verified/passed に確定し v1.8 go/no-go 判定（D-11）材料が揃った。src/ 無変更。
 
 ## Session Continuity
 
-Last session: 2026-06-08T09:56:32.228Z
-Stopped at: Completed 36-02-PLAN.md
-Next step: Execute Phase 36 Plan 02 — 29-mobile.spec.ts / 29-layout-nav.spec.ts 実装（config は 36-01 で割り当て済み、spec 本体のみ）
+Last session: 2026-06-08T11:27:04.702Z
+Stopped at: Completed 36-03-PLAN.md
+Next step: Execute Phase 36 Plan 04 — 28/29 VERIFICATION.md in-place 更新（QA-03/QA-04、resolved-by-reference 含む）
 
 ## Deferred Items
 
@@ -150,6 +152,15 @@ Items acknowledged and deferred at v1.7 milestone close. v1.8 安定化フェー
 | todo | 2026-06-06-upsert-commit-slots-replace-delete-insert | pending | Phase 33 |
 
 Known deferred items at close: 9 (v1.7) + 11 (v1.6 carry-over) = 20 total
+
+## Backlog (PR #5 code review — 2026-06-08)
+
+PR #5（v1.8 Phase 32–36）マージ時のコードレビュー指摘。コード変更は行わずバックログ登録のみ。
+
+| Category | Item | Status | Priority |
+|----------|------|--------|----------|
+| todo | 2026-06-08-verify-admin-role-check-middleware (指摘1: `user.role !== 'admin'` 判定検証) | pending | 🔴 high |
+| todo | 2026-06-08-dedupe-auth-guard-middleware-admin-guard (指摘2: 認証ガード二重化の解消) | pending | 🔴 high |
 
 ## Operator Next Steps
 
