@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Debug, Stabilization & UI Polish
-status: verifying
-stopped_at: Phase 34 UI-SPEC approved
-last_updated: "2026-06-08T05:16:17.924Z"
+status: ready_to_plan
+stopped_at: Phase 34 complete (5/5) — ready to discuss Phase 35
+last_updated: 2026-06-08T05:27:44.655Z
 last_activity: 2026-06-08
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 11
-  completed_plans: 11
+  completed_plans: 23
   percent: 60
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-07 — v1.8 Debug, Stabilization & UI Polish started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 34 — ui-polish
+**Current focus:** Phase 35 — チーム可視性拡張 + google analytics
 
 ## Current Position
 
-Phase: 34 (ui-polish) — EXECUTING
-Plan: 5 of 5
-Status: Phase complete — ready for verification
+Phase: 35
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-06-08
 
 Progress bar: ██░░░░░░░░ 20% (1/5 phases complete)
