@@ -228,4 +228,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-08 — Phase 32 complete (本番 DB マイグレーション適用確認)*
+*Last updated: 2026-06-08 — Phase 34 complete (UI polish: auth route group, hasUser field, 3-group sort, Footer/HeaderNav wired)*
