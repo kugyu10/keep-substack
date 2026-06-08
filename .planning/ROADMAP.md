@@ -182,7 +182,22 @@ Plans:
   3. Commit & Goal View のメンバー並び順が新しいソートルールに従って表示される
   4. /my ページを表示中はサイトヘッダーの「マイページ」ボタンが表示されない
 
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+**Wave 1** *(parallel)*
+
+- [ ] 34-01-PLAN.md — Member型にhasUserを追加 + getMembers()のuser_id取得対応（型カスケード修正含む）
+- [ ] 34-02-PLAN.md — (auth) Route Group作成・loginとsigninを移動 + ロゴ・招待制注記追加
+
+**Wave 2** *(parallel, Wave 1完了後)*
+
+- [ ] 34-03-PLAN.md — commitUtils achievementRateエクスポート + sortMembersForCommitViewを3グループ・5キーソートに更新
+- [ ] 34-04-PLAN.md — Footer.tsx（3ステートServer Component）+ HeaderNav.tsx（usePathname Client Component）新規作成
+
+**Wave 3** *(Wave 2完了後)*
+
+- [ ] 34-05-PLAN.md — layout.tsxにFooterを配線、Header.tsxにHeaderNavを配線・フルスイート検証
+
 **UI hint**: yes
 
 ### Phase 35: チーム可視性拡張 + Google Analytics
