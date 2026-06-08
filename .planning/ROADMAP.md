@@ -163,7 +163,7 @@ Plans:
 
 - [x] 33-01-PLAN.md — middleware.ts 新規作成 + auth/callback next 変数有効化（BUG-02 server-side）
 - [x] 33-02-PLAN.md — login page/form/action の next パラメータ対応（BUG-02 login-side）
-- [ ] 33-03-PLAN.md — RPC 関数 schema.sql 追加 + updateCommitSlotsAction RPC 化（DB-01）
+- [x] 33-03-PLAN.md — RPC 関数 schema.sql 追加 + updateCommitSlotsAction RPC 化（DB-01）
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -256,7 +256,7 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 30. アチーブメント（👑 / 🔥） | v1.7 | 2/2 | Complete    | 2026-06-04 |
 | 31. ログインフロー修正 | v1.7 | 4/4 | Complete | 2026-06-06 |
 | 32. 本番DBマイグレーション | v1.8 | 1/1 | Complete    | 2026-06-07 |
-| 33. バグ修正 + commitSlots upsert化 | v1.8 | 2/5 | In Progress|  |
+| 33. バグ修正 + commitSlots upsert化 | v1.8 | 3/5 | In Progress|  |
 | 34. UI Polish バッチ | v1.8 | 0/? | Not started | - |
 | 35. チーム可視性拡張 + Google Analytics | v1.8 | 0/? | Not started | - |
 | 36. QA・UAT・検証ギャップ解消 | v1.8 | 0/? | Not started | - |
