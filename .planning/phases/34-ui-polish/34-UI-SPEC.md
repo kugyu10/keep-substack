@@ -56,12 +56,14 @@ Source: existing code patterns; confirmed against 8-point scale
 |------|------|--------|-------------|------|
 | Body | 14px (text-sm) | 400 regular | 1.5 | Lora / Georgia serif |
 | Label / Note | 12px (text-xs) | 400 regular | 1.5 | Lora / Georgia serif |
-| Heading (page) | 24px (text-2xl) | 600 semibold | 1.2 | Lora / Georgia serif |
+| Heading (page) | 24px (text-2xl) | 900 black (font-black) | 1.2 | Lora / Georgia serif |
 | Logo / Display | 24px (text-2xl) | 900 black (font-black) | 1.0 | Georgia, serif (inline style) |
+
+Weight contract: **400 regular + 900 black (font-black)** — exactly 2 weights.
 
 Notes:
 - Logo on auth pages (D-05): `text-2xl font-black` with `style={{ fontFamily: 'Georgia, serif' }}`. Mirrors header logo but one step larger than header's `text-lg`.
-- Heading `text-2xl font-semibold` matches the existing login/signin `<h1>` (`text-2xl font-semibold`). After adding the logo, remove the `<h1>` or demote it — the logo IS the identity mark. Keep `<h1>` as page title for accessibility, style it with `text-2xl font-semibold text-center mb-8`.
+- Heading `text-2xl font-black` — the page `<h1>` uses `font-black` to match the logo weight. Style it with `text-2xl font-black text-center mb-8`.
 - Invitation note (D-08): `text-xs text-gray-400 text-center` — 12px, 400, 1.5.
 - Footer text (D-11): `text-xs text-gray-400` — 12px, 400.
 
