@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
+import { safeRedirectPath } from '@/lib/safe-redirect'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const pid = searchParams.get('pid')
   const handle = searchParams.get('handle')
-  const nextParam = searchParams.get('next') ?? '/my'
-  // Open Redirect防止: 内部パスのみ許可
-  const next = nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/my'
+  const next = safeRedirectPath(searchParams.get('next'), '/my')
 
   if (code) {
     const supabase = await createSupabaseServerClient()

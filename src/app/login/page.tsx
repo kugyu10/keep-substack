@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import LoginForm from './LoginForm'
+import { safeRedirectPath } from '@/lib/safe-redirect'
 
 export default async function LoginPage({
   searchParams,
@@ -12,9 +13,7 @@ export default async function LoginPage({
   if (user) redirect('/my')
 
   const { next } = await searchParams
-  const safeNext = next && next.startsWith('/') && !next.startsWith('//')
-    ? next
-    : undefined
+  const safeNext = safeRedirectPath(next) ?? undefined
 
   return (
     <main className="max-w-sm mx-auto px-4 py-16">
