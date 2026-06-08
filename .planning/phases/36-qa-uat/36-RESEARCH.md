@@ -431,11 +431,13 @@ test('スケジュール宣言フルフロー (SCHED-01/02/03)', async ({ page }
    - What we know: schema.sql / migrations/ にコードは存在。global-setup は migration を流さない（seed のみ）。
    - What's unclear: TEST project の DB に `replace_member_commit_slots` RPC と member_commit_slots UNIQUE が反映済みか。
    - Recommendation: 28 spec を書く前に Supabase SQL Editor（TEST）で RPC 存在を 1 度確認、または global-setup に存在チェック（fail-fast）を追加。28 #2 の前提条件タスクとして planner が組む。
+   - **(RESOLVED: 36-01 Task 1 — `RPC 前提` テスト（`-g "RPC 前提" --fail-on-empty`）で TEST project の replace_member_commit_slots RPC 存在を fail-fast 確認するタスクとして組込済み。未適用なら SQL Editor で schema.sql 定義を適用。)**
 
 2. **本番 #5（handle を null に戻す）が UI 上可能か**
    - What we know: 設定後は read-only。/my から空にして保存できない可能性。
    - What's unclear: actions.ts は handleBody=='' で null 化を許すが、フォームが hidden input で既存値を送るため UI からは戻せない設計の可能性。
    - Recommendation: 本番では SQL Editor で `UPDATE members SET substack_handle=NULL` を fallback（ランブック §2 に記載済み）。
+   - **(RESOLVED: 36-03 Task 2 — 本番 #5 を UI で戻せない場合は SQL Editor の `UPDATE members SET substack_handle=NULL WHERE id='<自分のid>'` fallback を採用済み。プランに組込済み。)**
 
 ## Environment Availability
 
