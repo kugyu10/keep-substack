@@ -43,7 +43,10 @@ export async function proxy(request: NextRequest) {
   // /my: ログイン必須
   if (pathname.startsWith('/my')) {
     if (!user) {
-      return NextResponse.redirect(new URL('/', request.url))
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      url.search = `?next=${encodeURIComponent(pathname)}`
+      return NextResponse.redirect(url)
     }
   }
 
