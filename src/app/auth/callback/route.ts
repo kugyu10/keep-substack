@@ -9,8 +9,6 @@ export async function GET(request: NextRequest) {
   const handle = searchParams.get('handle')
   const nextParam = searchParams.get('next') ?? '/my'
   // Open Redirect防止: 内部パスのみ許可
-  // TODO: next は現在ハードコードの '/my' リダイレクトに上書きされており未使用。
-  //       signin/login 両アクションが next= を渡すようになったら復活させること。
   const next = nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/my'
 
   if (code) {
@@ -55,8 +53,8 @@ export async function GET(request: NextRequest) {
           }
         }
       }
-      // D-02: callback 時点で substack_handle は INSERT 済み。/my へ直接リダイレクト
-      return NextResponse.redirect(new URL('/my', origin))
+      // D-02: callback 時点で substack_handle は INSERT 済み。next パラメータ先へリダイレクト
+      return NextResponse.redirect(new URL(next, origin))
     }
     console.error('[auth/callback] exchangeCodeForSession error:', error)
   }
