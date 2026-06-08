@@ -74,3 +74,51 @@ test('RPC 前提: replace_member_commit_slots が TEST project に存在する',
   })
   expect(rpcError).toBeNull()
 })
+
+// QA-03 / 28 #2 — /my スケジュール宣言フルフロー。
+//   モーダル開閉 → 頻度変更でスロット行が増える → 重複曜日で警告＋「宣言する」無効化 →
+//   別曜日に直して宣言 → モーダルが閉じる → DB(member_commit_slots) に 2 行（RPC 往復を
+//   ブラックボックス検証）→ reload 後サマリー「週2回 —」表示。
+// DOM 契約: CommitScheduleModal.tsx（トリガー「投稿スケジュールを宣言する」/ role=dialog /
+//   #frequency / #day-{i} / 警告「同じ曜日を複数選択しています」/ 送信「宣言する」、
+//   disabled={isPending || showDuplicateWarning}）。waitForTimeout 不使用・expect.poll で
+//   server-action レイテンシ吸収（S-5）。
+test('スケジュール宣言フルフロー (SCHED-01/02/03)', async ({ page }) => {
+  await page.goto('/my')
+
+  // モーダルを開く
+  await page.getByRole('button', { name: '投稿スケジュールを宣言する' }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+
+  // 頻度 2 → スロット行が 2 つ（#day-1 が出現）
+  await page.locator('#frequency').selectOption('2')
+  await expect(page.locator('#day-1')).toBeVisible()
+
+  // 同じ曜日を 2 つ選ぶ → 重複警告 visible + 「宣言する」disabled
+  await page.locator('#day-0').selectOption('1')
+  await page.locator('#day-1').selectOption('1')
+  await expect(page.getByText('同じ曜日を複数選択しています')).toBeVisible()
+  await expect(page.getByRole('button', { name: '宣言する' })).toBeDisabled()
+
+  // 別曜日に直す → 「宣言する」click → モーダルが閉じる
+  await page.locator('#day-1').selectOption('3')
+  await page.getByRole('button', { name: '宣言する' }).click()
+  await expect(page.getByRole('dialog')).toBeHidden()
+
+  // DB 往復（RPC 経由のブラックボックス検証）: member_commit_slots に member_id スコープで 2 行
+  const admin = createTestAdmin()
+  const memberId = await resolveTestMemberId()
+  await expect
+    .poll(async () => {
+      const { count } = await admin
+        .from('member_commit_slots')
+        .select('*', { count: 'exact', head: true })
+        .eq('member_id', memberId)
+      return count
+    })
+    .toBe(2)
+
+  // reload 後サマリー「週2回 —」が表示される
+  await page.reload()
+  await expect(page.getByText(/週2回 —/)).toBeVisible()
+})
