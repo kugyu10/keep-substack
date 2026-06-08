@@ -13,9 +13,9 @@ test('未認証で /admin → / にリダイレクト (E2E-03)', async ({ page }
   await expect(page).toHaveURL('http://localhost:3000/')
 })
 
-test('未認証で /my → / にリダイレクト (E2E-03)', async ({ page }) => {
+test('未認証で /my → /login にリダイレクト (E2E-03)', async ({ page }) => {
   await page.goto('/my')
-  await expect(page).toHaveURL('http://localhost:3000/')
+  await expect(page).toHaveURL(/http:\/\/localhost:3000\/login(\?next=.*)?/)
 })
 
 // Non-admin logged-in case: proxy.ts checks app_metadata.role === 'admin'.
