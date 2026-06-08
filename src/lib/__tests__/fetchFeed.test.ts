@@ -32,6 +32,7 @@ const makeMember = (publicationId: string): Member => ({
   publicationId,
   teams: [],
   addedAt: '2025-01-01',
+  hasUser: true,
 })
 
 const makeItem = (link: string | undefined, isoDate: string): FeedItem => ({

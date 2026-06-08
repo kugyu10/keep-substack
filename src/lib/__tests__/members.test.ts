@@ -37,6 +37,7 @@ describe('Member type — substackHandle field (Phase 27)', () => {
       teams: [],
       addedAt: '2026-01-01T00:00:00Z',
       substackHandle: '@hoge',  // This line causes a TS error until the field is added
+      hasUser: true,
     }
     expect(member.substackHandle).toBe('@hoge')
   })
@@ -48,6 +49,7 @@ describe('Member type — substackHandle field (Phase 27)', () => {
       publicationId: 'test-id',
       teams: [],
       addedAt: '2026-01-01T00:00:00Z',
+      hasUser: true,
     }
     expect(member.substackHandle).toBeUndefined()
   })
