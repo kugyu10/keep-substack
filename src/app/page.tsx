@@ -18,7 +18,7 @@ export default async function Home({ searchParams }: Props) {
   const teams = [
     ...new Set(
       allMembers
-        .flatMap((m) => m.teams.filter((t) => t.status === 'public').map((t) => t.name))
+        .flatMap((m) => m.teams.filter((t) => t.status !== 'hidden').map((t) => t.name))
         .filter(Boolean)
     ),
   ]
