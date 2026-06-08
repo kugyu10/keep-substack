@@ -123,7 +123,7 @@ Full archive: `.planning/milestones/v1.7-ROADMAP.md`
 **Milestone Goal:** 本番バグを解消・安定化しつつ、ログインフロー・ナビゲーション・分析基盤などのUI改善を積み重ねる
 
 - [x] **Phase 32: 本番DBマイグレーション** — member_commit_slots を本番 DB に適用し schedule-save を本番で動作させる
-- [ ] **Phase 33: バグ修正 + commitSlots upsert化** — RSS即時取得バグ・auth/callback リダイレクト・commitSlots アトミック保存を修正する
+- [x] **Phase 33: バグ修正 + commitSlots upsert化** — RSS即時取得バグ・auth/callback リダイレクト・commitSlots アトミック保存を修正する (completed 2026-06-08)
 - [ ] **Phase 34: UI Polish バッチ** — ログインページ・フッター・マイページボタン・ソート順の小改善を一括適用する
 - [ ] **Phase 35: チーム可視性拡張 + Google Analytics** — private チームをトップビューに表示し GA4 を全ページに導入する
 - [ ] **Phase 36: QA・UAT・検証ギャップ解消** — Phase 27-29 の human UAT シナリオと VERIFICATION.md ギャップをすべて完了させる
@@ -168,7 +168,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [x] 33-04-PLAN.md — migration ファイル作成 + 本番 DB RPC 関数適用（DB-01 prod push）
-- [ ] 33-05-PLAN.md — updateCommitSlotsAction.test.ts RPC mock 更新 + E2E admin-guard 修正
+- [x] 33-05-PLAN.md — updateCommitSlotsAction.test.ts RPC mock 更新 + E2E admin-guard 修正
 
 ### Phase 34: UI Polish バッチ
 
@@ -256,7 +256,7 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 30. アチーブメント（👑 / 🔥） | v1.7 | 2/2 | Complete    | 2026-06-04 |
 | 31. ログインフロー修正 | v1.7 | 4/4 | Complete | 2026-06-06 |
 | 32. 本番DBマイグレーション | v1.8 | 1/1 | Complete    | 2026-06-07 |
-| 33. バグ修正 + commitSlots upsert化 | v1.8 | 4/5 | In Progress|  |
+| 33. バグ修正 + commitSlots upsert化 | v1.8 | 5/5 | Complete   | 2026-06-08 |
 | 34. UI Polish バッチ | v1.8 | 0/? | Not started | - |
 | 35. チーム可視性拡張 + Google Analytics | v1.8 | 0/? | Not started | - |
 | 36. QA・UAT・検証ギャップ解消 | v1.8 | 0/? | Not started | - |
