@@ -153,6 +153,9 @@ export async function updateCommitSlotsAction(
     if (s.hour < 0 || s.hour > 23) return '時刻の値が不正です'
   }
 
+  const daySet = new Set(slots.map((s) => s.day_of_week))
+  if (daySet.size !== slots.length) return '同じ曜日を複数指定することはできません'
+
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return 'ログインセッションが切れました。再ログインしてください'
