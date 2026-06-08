@@ -582,17 +582,13 @@ export default async function Footer() {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **`getMembers()` を変更するか、`page.tsx` で独自クエリを組むか**
-   - What we know: D-16 は「page.tsx の members クエリに user_id を追加」と述べている
-   - What's unclear: `getMembers()` を変更することで `members.ts` のテスト（`src/lib/__tests__/members.test.ts`）への影響が出る可能性がある
-   - Recommendation: `getMembers()` に `user_id` SELECT を追加し `hasUser: !!m.user_id` を返すよう変更するのが最も型安全。テストのフィクスチャに `hasUser: false` を追加する必要がある。ただし D-16 の意図が「getMembers() は変えずに page.tsx のみ変える」なら独自クエリアプローチが必要。プランナーは実装担当者に確認を委ねること。
+   - RESOLVED: `getMembers()` を変更する（`src/lib/members.ts` に `user_id` SELECT + `hasUser: !!m.user_id` を追加）。型安全を優先し、型エラーカスケードを利用して全構築箇所を確実に更新する。Plan 01 参照。
 
 2. **`heading font-black` vs 既存の `font-semibold`**
-   - What we know: UI-SPEC は `text-2xl font-black text-center mb-8` を指定している。現在のコードは `font-semibold` を使っている。
-   - What's unclear: D-04 と UI-SPEC の指定に従い `font-black` に変更するのが正しいか。
-   - Recommendation: UI-SPEC は approved なので `font-black` に変更する。これは UI-02 の一部として実装する。
+   - RESOLVED: `font-black` に変更する。UI-SPEC（34-UI-SPEC.md）が approved 済みであり、D-04/D-05 の指定通り `text-2xl font-black` を使用する。Plan 02 Task 2 参照。
 
 ---
 
