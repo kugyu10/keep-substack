@@ -212,7 +212,17 @@ Plans:
   3. 本番環境（Vercel production build）で全ページのページビューが GA4 プロパティに記録される
   4. ローカル開発環境（next dev）では GA4 スクリプトが読み込まれない
 
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+**Wave 1** *(parallel)*
+
+- [ ] 35-01-PLAN.md — TEAM-03 テスト更新 + page.tsx private チームタブ有効化（TEAM-01）
+- [ ] 35-02-PLAN.md — layout.tsx に GoogleAnalytics 追加（ANLT-01/02）
+
+**Wave 2** *(Wave 1完了後)*
+
+- [ ] 35-03-PLAN.md — 全スイート最終確認 + Vercel 環境変数設定チェックポイント（ANLT-01/02）
+
 **UI hint**: yes
 
 ### Phase 36: QA・UAT・検証ギャップ解消
@@ -273,5 +283,5 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 32. 本番DBマイグレーション | v1.8 | 1/1 | Complete    | 2026-06-07 |
 | 33. バグ修正 + commitSlots upsert化 | v1.8 | 5/5 | Complete    | 2026-06-08 |
 | 34. UI Polish バッチ | v1.8 | 5/5 | Complete    | 2026-06-08 |
-| 35. チーム可視性拡張 + Google Analytics | v1.8 | 0/? | Not started | - |
+| 35. チーム可視性拡張 + Google Analytics | v1.8 | 0/3 | Not started | - |
 | 36. QA・UAT・検証ギャップ解消 | v1.8 | 0/? | Not started | - |
