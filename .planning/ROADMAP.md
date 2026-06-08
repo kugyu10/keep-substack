@@ -167,7 +167,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 33-04-PLAN.md — migration ファイル作成 + 本番 DB RPC 関数適用（DB-01 prod push）
+- [x] 33-04-PLAN.md — migration ファイル作成 + 本番 DB RPC 関数適用（DB-01 prod push）
 - [ ] 33-05-PLAN.md — updateCommitSlotsAction.test.ts RPC mock 更新 + E2E admin-guard 修正
 
 ### Phase 34: UI Polish バッチ
@@ -256,7 +256,7 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 30. アチーブメント（👑 / 🔥） | v1.7 | 2/2 | Complete    | 2026-06-04 |
 | 31. ログインフロー修正 | v1.7 | 4/4 | Complete | 2026-06-06 |
 | 32. 本番DBマイグレーション | v1.8 | 1/1 | Complete    | 2026-06-07 |
-| 33. バグ修正 + commitSlots upsert化 | v1.8 | 3/5 | In Progress|  |
+| 33. バグ修正 + commitSlots upsert化 | v1.8 | 4/5 | In Progress|  |
 | 34. UI Polish バッチ | v1.8 | 0/? | Not started | - |
 | 35. チーム可視性拡張 + Google Analytics | v1.8 | 0/? | Not started | - |
 | 36. QA・UAT・検証ギャップ解消 | v1.8 | 0/? | Not started | - |
