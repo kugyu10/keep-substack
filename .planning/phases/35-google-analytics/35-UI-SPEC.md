@@ -47,16 +47,17 @@ Exceptions: none. Team tab buttons use `px-3 py-1` (12px/4px) matching existing 
 
 ## Typography
 
-All sizes from existing codebase. No new type roles introduced in this phase.
+Declared weights for this phase: **400 (regular)** and **600 (semibold)** only.
+
+Note: `Header.tsx` (logo, `font-black` / weight 900) is a pre-existing, unmodified element not in scope for this phase. It is not declared here.
 
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body | 16px | 400 (regular) | 1.5 |
 | Label / tab | 14px (`text-sm`) | 400 regular / 600 semibold (active state) | 1.25 |
-| Heading (header logo) | 18px (`text-lg`) | 900 (`font-black`) | 1.2 |
 | Caption / footer | 12px (`text-xs`) | 400 (regular) | 1.4 |
 
-Source: `src/components/Header.tsx` (text-lg font-black), `src/components/ViewTabs.tsx` (text-sm), `src/components/Footer.tsx` (text-xs), `src/app/globals.css` (body font-family Lora).
+Source: `src/components/ViewTabs.tsx` (text-sm), `src/components/Footer.tsx` (text-xs), `src/app/globals.css` (body font-family Lora).
 
 ---
 
