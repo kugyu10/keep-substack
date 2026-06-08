@@ -134,8 +134,8 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - [ ] フッターのログイン中の文言を変える
 - [ ] コミット＆ゴールビューのソート順を変更する
 - [ ] /my ページ表示中はヘッダーの「マイページ」ボタンを非表示にする
-- [ ] Google Analytics を導入する
-- [ ] private チームをトップビューのチームタブに表示し、ログイン不要で閲覧できるようにする
+- ✓ Google Analytics を導入する — v1.8 (Validated in Phase 35)
+- ✓ private チームをトップビューのチームタブに表示し、ログイン不要で閲覧できるようにする — v1.8 (Validated in Phase 35)
 
 ### Active (Future)
 
@@ -228,4 +228,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-08 — Phase 34 complete (UI polish: auth route group, hasUser field, 3-group sort, Footer/HeaderNav wired)*
+*Last updated: 2026-06-08
