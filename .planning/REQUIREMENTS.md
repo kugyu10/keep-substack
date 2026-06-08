@@ -9,7 +9,7 @@
 ### Bug Fixes (BUG)
 
 - [ ] **BUG-01**: 新規メンバー追加時に Substack RSS フィードが即時取得される（rss-not-fetched-on-user-add 根本修正）
-- [ ] **BUG-02**: Magic Link 認証後、ユーザーが元々リクエストしたページにリダイレクトされる（auth/callback next パラメータ有効化）
+- [x] **BUG-02**: Magic Link 認証後、ユーザーが元々リクエストしたページにリダイレクトされる（auth/callback next パラメータ有効化）
 
 ### Database (DB)
 
@@ -62,7 +62,7 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | BUG-01 | Phase 33 | Pending |
-| BUG-02 | Phase 33 | Pending |
+| BUG-02 | Phase 33 | Complete |
 | DB-01 | Phase 33 | Pending |
 | DB-02 | Phase 32 | Complete |
 | QA-01 | Phase 36 | Pending |

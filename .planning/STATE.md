@@ -4,14 +4,14 @@ milestone: v1.8
 milestone_name: Debug, Stabilization & UI Polish
 status: executing
 stopped_at: Phase 33 context gathered
-last_updated: "2026-06-08T01:12:23.476Z"
-last_activity: 2026-06-08 -- Phase 33 planning complete
+last_updated: "2026-06-08T01:20:34.546Z"
+last_activity: 2026-06-08
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 6
-  completed_plans: 1
-  percent: 17
+  completed_plans: 2
+  percent: 20
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-07 — v1.8 Debug, Stabilization & UI Polish started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 33 — バグ修正 + commitslots upsert化
+**Current focus:** Phase 33 — commitslots-upsert
 
 ## Current Position
 
-Phase: 33
-Plan: Not started
+Phase: 33 (commitslots-upsert) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-06-08 -- Phase 33 planning complete
+Last activity: 2026-06-08
 
 Progress bar: ██░░░░░░░░ 20% (1/5 phases complete)
 
@@ -91,15 +91,16 @@ Progress bar: ██░░░░░░░░ 20% (1/5 phases complete)
 - Phase 33: commitSlots の delete+insert → upsert 置き換え（冪等性確保）。upsert key は (member_id, day_of_week)
 - Phase 33: BUG-01 (rss-not-fetched-on-user-add) の根本原因はメンバー追加 Server Action 内の RSS fetch 呼び出し欠落またはエラーハンドリング不備
 - Phase 33: BUG-02 (auth/callback next パラメータ) — /auth/callback でのリダイレクト先が固定になっている箇所を修正
+- Phase 33 P01 (完了): src/middleware.ts 新規作成 — /my と /my/:path* を matcher に設定、未認証時 /login?next=<encodeURIComponent(pathname)> へリダイレクト。proxy.ts は変更なし（ユニットテスト専用モジュール維持）。auth/callback/route.ts の line 59 を next 変数使用に修正（ハードコード '/my' 除去）。3 unit tests green。
 - Phase 34: UI-01/02 — /login と /signin-51cf21389c56 のレイアウトにヘッダー・フッターを含まない専用レイアウトを適用
 - Phase 35: TEAM-01 — getMembers() の status フィルタを 'hidden' のみ除外に変更（'private' を含める）
 - Phase 35: ANLT-01/02 — @next/third-parties の GoogleAnalytics コンポーネントを layout.tsx に追加。NODE_ENV !== 'production' ガードで dev 無効化
 
 ## Session Continuity
 
-Last session: 2026-06-07T22:39:06.123Z
-Stopped at: Phase 33 context gathered
-Next step: `/gsd:plan-phase 33` — バグ修正 + commitSlots upsert 化
+Last session: 2026-06-08T01:20:00Z
+Stopped at: Completed Phase 33 Plan 01 — BUG-02 middleware/auth callback fix
+Next step: Execute Phase 33 Plan 02 — /login page searchParams.next 対応 + sendMagicLinkAction next= 付与
 
 ## Deferred Items
 
@@ -135,7 +136,7 @@ Items acknowledged and deferred at v1.7 milestone close. v1.8 安定化フェー
 | verification_gap | Phase 29 — 29-VERIFICATION.md | human_needed | Phase 36 |
 | quick_task | 260605-42o-grid-hover-popover | missing | — |
 | quick_task | 260605-qqq-hh-mm | missing | — |
-| todo | 2026-06-06-restore-next-redirect-in-auth-callback | pending | Phase 33 |
+| todo | 2026-06-06-restore-next-redirect-in-auth-callback | resolved (Phase 33 P01) | Phase 33 |
 | todo | 2026-06-06-upsert-commit-slots-replace-delete-insert | pending | Phase 33 |
 
 Known deferred items at close: 9 (v1.7) + 11 (v1.6 carry-over) = 20 total
