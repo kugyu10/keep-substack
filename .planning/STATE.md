@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Debug, Stabilization & UI Polish
-status: verifying
-stopped_at: Completed Phase 33 Plan 04 — migration file + prod RPC deployment
-last_updated: "2026-06-08T01:48:19.307Z"
+status: ready_to_plan
+stopped_at: Phase 33 complete (5/5) — ready to discuss Phase 34
+last_updated: 2026-06-08T02:33:43.228Z
 last_activity: 2026-06-08
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 6
-  completed_plans: 6
+  completed_plans: 18
   percent: 40
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-07 — v1.8 Debug, Stabilization & UI Polish started)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Phase 33 — commitslots-upsert
+**Current focus:** Phase 34 — ui polish バッチ
 
 ## Current Position
 
-Phase: 33 (commitslots-upsert) — EXECUTING
-Plan: 5 of 5
-Status: Phase complete — ready for verification
+Phase: 34
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-06-08
 
 Progress bar: ██░░░░░░░░ 20% (1/5 phases complete)
