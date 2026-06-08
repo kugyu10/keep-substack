@@ -1,9 +1,11 @@
 // Playwright E2E config for the Keep Substack app.
 //
-// WARNING (Pitfall 6): `reuseExistingServer: !process.env.CI` will ATTACH to any
-// process already listening on :3000. If you have `npm run dev` running, STOP IT
-// before `npm run test:e2e` — otherwise tests attach to a dev server built with
-// production env and may read/write the WRONG (production) Supabase project.
+// WARNING (Pitfall 6 / CR-03): attaching to a process already listening on :3000
+// risks read/writing the WRONG (production) Supabase project if a prod-env dev
+// server is running. Server reuse is now OPT-IN ONLY (PW_REUSE_SERVER=1); by
+// default Playwright starts its own TEST-env build. global-setup.ts additionally
+// asserts the resolved Supabase URL is the TEST project ref (fail-fast denylist
+// of the prod ref) before any write.
 //
 // WARNING (Pitfall 1): NEXT_PUBLIC_* are inlined at BUILD time. The webServer
 // command MUST run `npm run build` under the test env (loaded from .env.test
@@ -57,7 +59,8 @@ export default defineConfig({
     // as deployed and NEXT_PUBLIC_* are inlined under the test env.
     command: 'npm run build && npm run start',
     url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
+    // Opt-in only: prevents accidental attach to a prod-env server (CR-03).
+    reuseExistingServer: process.env.PW_REUSE_SERVER === '1' && !process.env.CI,
     timeout: 180_000, // first `next build` can be slow
     env: {
       // Forward the test secrets into the app process (build + runtime).
