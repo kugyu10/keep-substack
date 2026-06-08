@@ -14,8 +14,17 @@ findings:
   warning: 5
   info: 2
   total: 10
-status: issues_found
+status: partially_resolved
+resolution:
+  resolved:
+    - "CR-03: fixed in f7d13d9 — reuseExistingServer 明示オプトイン化 + global-setup.ts に TEST project ref ランタイム検証（prod ref denylist）"
+  deferred_to_backlog:
+    - "CR-01/CR-02: ISR キャッシュ起因 flaky（27 #4/#5・29-mobile）。go/no-go で backlog 退避（2026-06-08）"
+    - "WR-01..05 / IN-01..02: 同上 backlog"
 ---
+
+> **更新 (2026-06-08, go/no-go 判定):** CR-03（本番データ破壊リスク）は f7d13d9 で修正済み。
+> 残る CRITICAL（CR-01/CR-02 = ISR flaky）と Warning/Info は backlog へ退避。SC#1 は本番手動 UAT で独立裏付け済みのため Phase 36 は完了受理。
 
 # Phase 36: コードレビュー報告書（QA/UAT E2E 回帰 spec）
 
