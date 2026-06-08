@@ -27,9 +27,9 @@
 
 - [x] **UI-01**: ログイン・サインインページ（/login, /signin-51cf21389c56）にフッターを表示しない
 - [x] **UI-02**: ログイン・サインインページに Keep Substack ロゴを表示する（サイトヘッダーなし、ロゴのみ）
-- [ ] **UI-03**: フッターのログイン状態によって表示文言が変わる（ログイン中は適切な文言に）
+- [x] **UI-03**: フッターのログイン状態によって表示文言が変わる（ログイン中は適切な文言に）
 - [x] **UI-04**: Commit & Goal View のメンバーソート順を変更する
-- [ ] **UI-05**: /my ページ表示中はヘッダーの「マイページ」ボタンを非表示にする
+- [x] **UI-05**: /my ページ表示中はヘッダーの「マイページ」ボタンを非表示にする
 
 ### Team Visibility (TEAM)
 
@@ -71,9 +71,9 @@
 | QA-04 | Phase 36 | Pending |
 | UI-01 | Phase 34 | Complete |
 | UI-02 | Phase 34 | Complete |
-| UI-03 | Phase 34 | Pending |
+| UI-03 | Phase 34 | Complete |
 | UI-04 | Phase 34 | Complete |
-| UI-05 | Phase 34 | Pending |
+| UI-05 | Phase 34 | Complete |
 | TEAM-01 | Phase 35 | Pending |
 | ANLT-01 | Phase 35 | Pending |
 | ANLT-02 | Phase 35 | Pending |
