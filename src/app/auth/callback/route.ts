@@ -1,17 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
+import { safeRedirectPath } from '@/lib/safe-redirect'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const pid = searchParams.get('pid')
   const handle = searchParams.get('handle')
-  const nextParam = searchParams.get('next') ?? '/my'
-  // Open Redirect防止: 内部パスのみ許可
-  // TODO: next は現在ハードコードの '/my' リダイレクトに上書きされており未使用。
-  //       signin/login 両アクションが next= を渡すようになったら復活させること。
-  const next = nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/my'
+  const next = safeRedirectPath(searchParams.get('next'), '/my')
 
   if (code) {
     const supabase = await createSupabaseServerClient()
@@ -55,8 +52,8 @@ export async function GET(request: NextRequest) {
           }
         }
       }
-      // D-02: callback 時点で substack_handle は INSERT 済み。/my へ直接リダイレクト
-      return NextResponse.redirect(new URL('/my', origin))
+      // D-02: callback 時点で substack_handle は INSERT 済み。next パラメータ先へリダイレクト
+      return NextResponse.redirect(new URL(next, origin))
     }
     console.error('[auth/callback] exchangeCodeForSession error:', error)
   }

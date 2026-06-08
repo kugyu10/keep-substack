@@ -5,6 +5,7 @@ import {
   sortMembersForCommitView,
   isCurrentWeekComplete,
   consecutiveWeekStreak,
+  achievementRate,
 } from '../commitUtils'
 import type { CommitSlot, FeedItem, Member, MemberFeedResult } from '../types'
 
@@ -17,6 +18,7 @@ function member(name: string, addedAt = '2026-01-01T00:00:00.000Z'): Member {
     publicationId: `pub-${name}`,
     teams: [],
     addedAt,
+    hasUser: true,
   }
 }
 
@@ -365,5 +367,59 @@ describe('consecutiveWeekStreak', () => {
     const items: FeedItem[] = [feedItem(lastSundayIso), feedItem(twoWeeksAgoSundayIso)]
 
     expect(consecutiveWeekStreak(slots, items)).toBe(2)
+  })
+})
+
+// ─────────────────────────────────────────────
+// sortMembersForCommitView — group ordering (D-14)
+// ─────────────────────────────────────────────
+describe('sortMembersForCommitView — group ordering (hasUser grouping D-14)', () => {
+  it('Group A (hasUser=true, slots) sorts before Group C (hasUser=false)', () => {
+    const memberA = member('A')
+    const memberC = { ...member('C'), hasUser: false }
+    const slotA: CommitSlot = { member_id: memberA.id, day_of_week: 1, hour: 10 }
+    const slotC: CommitSlot = { member_id: memberC.id, day_of_week: 1, hour: 10 }
+    const slots = [slotA, slotC]
+    const sorted = sortMembersForCommitView(
+      [result(memberC, []), result(memberA, [])],
+      slots
+    )
+    expect(sorted[0].member.name).toBe('A')
+    expect(sorted[1].member.name).toBe('C')
+  })
+
+  it('Group B (hasUser=true, no slots) sorts before Group C (hasUser=false)', () => {
+    const memberB = member('B')
+    const memberC = { ...member('C'), hasUser: false }
+    const slotC: CommitSlot = { member_id: memberC.id, day_of_week: 1, hour: 10 }
+    const slots = [slotC]
+    const sorted = sortMembersForCommitView(
+      [result(memberC, []), result(memberB, [])],
+      slots
+    )
+    expect(sorted[0].member.name).toBe('B')
+    expect(sorted[1].member.name).toBe('C')
+  })
+
+  it('Group A (hasUser=true, slots) sorts before Group B (hasUser=true, no slots)', () => {
+    const memberA = member('A')
+    const memberB = member('B')
+    const slotA: CommitSlot = { member_id: memberA.id, day_of_week: 1, hour: 10 }
+    const slots = [slotA]
+    const sorted = sortMembersForCommitView(
+      [result(memberB, []), result(memberA, [])],
+      slots
+    )
+    expect(sorted[0].member.name).toBe('A')
+    expect(sorted[1].member.name).toBe('B')
+  })
+})
+
+// ─────────────────────────────────────────────
+// achievementRate export
+// ─────────────────────────────────────────────
+describe('achievementRate export', () => {
+  it('achievementRate is importable and returns 0 for empty slots', () => {
+    expect(achievementRate([], [], new Map())).toBe(0)
   })
 })

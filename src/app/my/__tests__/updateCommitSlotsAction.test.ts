@@ -15,15 +15,16 @@ vi.mock('@/lib/supabase/server', () => ({
   })),
 }))
 
-// Supabase admin client (service role) → table reads/writes
+// Supabase admin client (service role) → table reads/writes + rpc
 const mockAdminFrom = vi.fn()
+const mockAdminRpc = vi.fn()
 vi.mock('@/lib/supabase/admin', () => ({
   createSupabaseAdminClient: vi.fn(() => ({
     from: mockAdminFrom,
+    rpc: mockAdminRpc,
   })),
 }))
 
-// TODO: implement in Plan 02
 import { updateCommitSlotsAction } from '../actions'
 
 // --- Test helpers ---
@@ -34,13 +35,8 @@ const AUTH_ERROR = 'ログインセッションが切れました。再ログイ
 function setupAdminMock(opts: {
   member?: { id: string } | null
   memberError?: unknown
-  deleteError?: unknown
-  insertError?: unknown
+  rpcError?: unknown
 } = {}) {
-  const insertSpy = vi.fn(async () => ({ error: opts.insertError ?? null }))
-  const deleteSpy = vi.fn(() => ({
-    eq: async () => ({ error: opts.deleteError ?? null }),
-  }))
   const selectSpy = vi.fn(() => ({
     eq: () => ({
       single: async () => ({
@@ -52,11 +48,12 @@ function setupAdminMock(opts: {
 
   mockAdminFrom.mockImplementation((table: string) => {
     if (table === 'members') return { select: selectSpy }
-    if (table === 'member_commit_slots') return { delete: deleteSpy, insert: insertSpy }
     throw new Error(`unexpected table: ${table}`)
   })
 
-  return { insertSpy, deleteSpy, selectSpy }
+  mockAdminRpc.mockResolvedValue({ error: opts.rpcError ?? null })
+
+  return { selectSpy, mockAdminRpc }
 }
 
 function makeFormData(slots: { day_of_week: number; hour: number }[]): FormData {
@@ -71,35 +68,38 @@ describe('updateCommitSlotsAction', () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'u1' } } })
   })
 
-  it('テスト1 (SCHED-03): 認証済みユーザーで delete → insert を実行し null を返す', async () => {
-    const { deleteSpy, insertSpy } = setupAdminMock()
+  it('テスト1 (SCHED-03): 認証済みユーザーで rpc を呼び出し null を返す', async () => {
+    setupAdminMock()
 
     const result = await updateCommitSlotsAction(null, makeFormData([{ day_of_week: 1, hour: 8 }]))
 
     expect(result).toBeNull()
-    expect(deleteSpy).toHaveBeenCalled()
-    expect(insertSpy).toHaveBeenCalledWith([{ member_id: MEMBER_ID, day_of_week: 1, hour: 8 }])
+    expect(mockAdminRpc).toHaveBeenCalledWith('replace_member_commit_slots', {
+      p_member_id: MEMBER_ID,
+      p_slots: [{ day_of_week: 1, hour: 8 }],
+    })
   })
 
-  it('テスト2 (SCHED-03): 未認証時は AUTH_ERROR を返し DB 操作ゼロ', async () => {
+  it('テスト2 (SCHED-03): 未認証時は AUTH_ERROR を返し rpc は呼ばれない', async () => {
     mockGetUser.mockResolvedValue({ data: { user: null } })
-    const { deleteSpy, insertSpy } = setupAdminMock()
+    setupAdminMock()
 
     const result = await updateCommitSlotsAction(null, makeFormData([{ day_of_week: 1, hour: 8 }]))
 
     expect(result).toBe(AUTH_ERROR)
-    expect(deleteSpy).not.toHaveBeenCalled()
-    expect(insertSpy).not.toHaveBeenCalled()
+    expect(mockAdminRpc).not.toHaveBeenCalled()
   })
 
-  it('テスト3 (SCHED-01/02): slots が空配列のとき delete のみ実行し insert はスキップする', async () => {
-    const { deleteSpy, insertSpy } = setupAdminMock()
+  it('テスト3: slots が空配列のとき rpc を空配列で呼び出す（削除のみのケース）', async () => {
+    setupAdminMock()
 
     const result = await updateCommitSlotsAction(null, makeFormData([]))
 
     expect(result).toBeNull()
-    expect(deleteSpy).toHaveBeenCalled()
-    expect(insertSpy).not.toHaveBeenCalled()
+    expect(mockAdminRpc).toHaveBeenCalledWith('replace_member_commit_slots', {
+      p_member_id: MEMBER_ID,
+      p_slots: [],
+    })
   })
 
   it('テスト4 (SCHED-01): slots.length > 4 のとき "不正なスロット数です" を返す', async () => {
@@ -135,14 +135,8 @@ describe('updateCommitSlotsAction', () => {
     expect(result).toBe('時刻の値が不正です')
   })
 
-  it('delete エラー時は "保存に失敗しました..." を返す', async () => {
-    setupAdminMock({ deleteError: { message: 'db error' } })
-    const result = await updateCommitSlotsAction(null, makeFormData([{ day_of_week: 1, hour: 8 }]))
-    expect(result).toBe('保存に失敗しました。もう一度お試しください')
-  })
-
-  it('insert エラー時は "保存に失敗しました..." を返す', async () => {
-    setupAdminMock({ insertError: { message: 'db error' } })
+  it('rpc エラー時は "保存に失敗しました..." を返す', async () => {
+    setupAdminMock({ rpcError: { message: 'db error' } })
     const result = await updateCommitSlotsAction(null, makeFormData([{ day_of_week: 1, hour: 8 }]))
     expect(result).toBe('保存に失敗しました。もう一度お試しください')
   })

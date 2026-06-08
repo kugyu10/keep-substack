@@ -24,9 +24,10 @@ import { sendMagicLinkAction } from '../actions'
 
 // --- Test helpers ---
 
-function makeFormData(email: string): FormData {
+function makeFormData(email: string, next?: string): FormData {
   const fd = new FormData()
   fd.append('email', email)
+  if (next) fd.append('next', next)
   return fd
 }
 
@@ -51,6 +52,20 @@ describe('sendMagicLinkAction — /login 既存メンバー再ログイン (Phas
     expect(callArgs.options.emailRedirectTo).toContain('/auth/callback')
     expect(callArgs.options.emailRedirectTo).not.toContain('pid=')
     expect(callArgs.options.emailRedirectTo).not.toContain('handle=')
+  })
+
+  it("Test L-2b: next='/my' のとき callbackUrl に ?next=%2Fmy が付与される", async () => {
+    const fd = makeFormData('user@example.com', '/my')
+    await sendMagicLinkAction(null, fd)
+    const callArgs = mockSignInWithOtp.mock.calls[0][0]
+    expect(callArgs.options.emailRedirectTo).toBe('http://localhost/auth/callback?next=%2Fmy')
+  })
+
+  it('Test L-2c: next なし のとき callbackUrl に ?next= が付与されない', async () => {
+    const fd = makeFormData('user@example.com')
+    await sendMagicLinkAction(null, fd)
+    const callArgs = mockSignInWithOtp.mock.calls[0][0]
+    expect(callArgs.options.emailRedirectTo).toBe('http://localhost/auth/callback')
   })
 
   it('Test L-3: email が空 → メールアドレスを入力してください が返り、signInWithOtp は呼ばれない', async () => {

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import Header from '@/components/Header'
+import Footer from '@/components/Footer'
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://keep-substack.vercel.app'),
@@ -23,19 +25,10 @@ export default function RootLayout({
       <body>
         <Header />
         {children}
-        <footer className="py-4 text-center">
-          <span className="text-xs text-gray-400">
-            このSubstack継続可視化ツールに参加したい方は{' '}
-            <a
-              href="https://uojun.substack.com/p/8cd"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[#FF6719] underline"
-            >
-              コチラ
-            </a>
-          </span>
-        </footer>
+        <Footer />
+        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+        )}
       </body>
     </html>
   )

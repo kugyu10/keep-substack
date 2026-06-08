@@ -30,13 +30,26 @@ export default defineConfig({
   projects: [
     {
       name: 'logged-in',
-      testMatch: ['login.spec.ts', 'my-teams.spec.ts'],
+      testMatch: [
+        'login.spec.ts',
+        'my-teams.spec.ts',
+        '27-handle.spec.ts',
+        '28-commit-flow.spec.ts',
+      ],
       use: { ...devices['Desktop Chrome'], storageState: 'e2e/.auth/user.json' },
     },
     {
       name: 'anonymous',
-      testMatch: ['admin-guard.spec.ts'],
+      testMatch: ['admin-guard.spec.ts', '29-layout-nav.spec.ts'],
       use: { ...devices['Desktop Chrome'] }, // no storageState
+    },
+    {
+      // 375px viewport project for mobile 1-week collapse (Phase 29 #1).
+      // Desktop Chrome engine + narrow viewport so Tailwind `hidden sm:flex`
+      // media queries apply; storageState なし（`/` はログイン不要）。
+      name: 'mobile-375',
+      testMatch: ['29-mobile.spec.ts'],
+      use: { ...devices['Desktop Chrome'], viewport: { width: 375, height: 800 } },
     },
   ],
   webServer: {

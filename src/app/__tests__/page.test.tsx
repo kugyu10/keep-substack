@@ -96,6 +96,7 @@ function member(name: string, teams: { name: string; status: string }[]): Member
     publicationId: `pub-${name}`,
     teams,
     addedAt: '2026-01-01T00:00:00.000Z',
+    hasUser: true,
   }
 }
 
@@ -135,12 +136,12 @@ describe('Home RSC — team tabs (TEAM-03) and All/team filtering (TEAM-04)', ()
   })
 
   // ── TEAM-03 ──────────────────────────────────────────────────────────────
-  it('shows ONLY public team names as tabs — private/hidden teams absent', async () => {
+  it('shows public AND private team names as tabs — hidden teams absent', async () => {
     mockGetMembers.mockResolvedValue([
       member('Alice', [{ name: 'PublicTeam', status: 'public' }]),
       member('Bob', [{ name: 'PrivateTeam', status: 'private' }]),
       member('Carol', [{ name: 'HiddenTeam', status: 'hidden' }]),
-      // member in both a public and a private team — only public name should tab
+      // member in both a public and a private team — both names should tab
       member('Dave', [
         { name: 'PublicTeam', status: 'public' },
         { name: 'SecretTeam', status: 'private' },
@@ -153,9 +154,10 @@ describe('Home RSC — team tabs (TEAM-03) and All/team filtering (TEAM-04)', ()
     // 'All' link is always present
     expect(labels).toContain('All')
     expect(labels).toContain('PublicTeam')
-    // private / hidden team names must NOT appear as tabs
-    expect(labels).not.toContain('PrivateTeam')
-    expect(labels).not.toContain('SecretTeam')
+    // private team names SHOULD appear as tabs
+    expect(labels).toContain('PrivateTeam')
+    expect(labels).toContain('SecretTeam')
+    // hidden team names must NOT appear as tabs
     expect(labels).not.toContain('HiddenTeam')
   })
 

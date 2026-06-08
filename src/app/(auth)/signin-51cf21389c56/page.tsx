@@ -14,8 +14,11 @@ export default async function LoginPage({
   const { pid, handle } = await searchParams
 
   return (
-    <main className="max-w-sm mx-auto px-4 py-16">
-      <h1 className="text-2xl font-semibold mb-8 text-center">サインイン</h1>
+    <main className="max-w-sm mx-auto px-4 py-12">
+      <p className="text-2xl font-black text-center mb-6" style={{ fontFamily: 'Georgia, serif' }}>
+        Keep Substack
+      </p>
+      <h1 className="text-2xl font-black mb-8 text-center">サインイン</h1>
       <LoginForm pid={pid} handle={handle} />
     </main>
   )

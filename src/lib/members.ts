@@ -11,6 +11,7 @@ export async function getMembers(): Promise<Member[]> {
       publication_id,
       added_at,
       substack_handle,
+      user_id,
       member_teams (
         teams (name, status)
       )
@@ -28,10 +29,11 @@ export async function getMembers(): Promise<Member[]> {
       ),
     addedAt: m.added_at,
     substackHandle: m.substack_handle ?? undefined,
+    hasUser: !!m.user_id,
   }))
 }
 
-export async function addMember(member: Omit<Member, 'addedAt' | 'id'>): Promise<void> {
+export async function addMember(member: Omit<Member, 'addedAt' | 'id' | 'hasUser'>): Promise<void> {
   const supabase = createSupabaseAdminClient()
 
   const { data: existing } = await supabase

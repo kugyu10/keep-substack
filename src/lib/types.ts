@@ -14,6 +14,7 @@ export type Member = {
   teams: { name: string; status: string }[]
   addedAt: string  // ISO 8601
   substackHandle?: string | null
+  hasUser: boolean  // true if members.user_id IS NOT NULL (auth user registered)
 }
 
 // Phase 4 KV移行後のスキーマ（D-03）。フィードURLは publicationId から動的生成する（D-08）

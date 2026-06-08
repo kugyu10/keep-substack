@@ -2,6 +2,7 @@
 created: 2026-06-06T00:47:16.937Z
 title: updateCommitSlotsAction を非アトミックな delete+insert から upsert に置き換える
 area: auth
+resolves_phase: 33
 files:
   - src/app/my/actions.ts:165-184
 ---

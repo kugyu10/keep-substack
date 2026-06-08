@@ -80,6 +80,7 @@ function member(name: string, teams: { name: string; status: string }[]): Member
     publicationId: `pub-${name}`,
     teams,
     addedAt: '2026-01-01T00:00:00.000Z',
+    hasUser: true,
   }
 }
 

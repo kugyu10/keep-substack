@@ -2,6 +2,7 @@
 created: 2026-06-06T00:47:16.937Z
 title: auth/callback の next パラメータを有効化する
 area: auth
+resolves_phase: 33
 files:
   - src/app/auth/callback/route.ts:10-12,57
   - src/app/signin-51cf21389c56/actions.ts:22

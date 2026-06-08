@@ -13,8 +13,11 @@ export async function sendMagicLinkAction(
   const headersList = await headers()
   const origin = headersList.get('origin') ?? ''
 
-  // 既存メンバー再ログイン用: callbackUrl は /auth/callback のみ（クエリパラメータなし）
-  const callbackUrl = `${origin}/auth/callback`
+  const next = formData.get('next') as string | null
+  // next は page.tsx 側で既にバリデーション済み。ここでは存在チェックのみ
+  const callbackUrl = next
+    ? `${origin}/auth/callback?next=${encodeURIComponent(next)}`
+    : `${origin}/auth/callback`
 
   const supabase = await createSupabaseServerClient()
   const { error } = await supabase.auth.signInWithOtp({

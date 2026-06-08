@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import HeaderNav from './HeaderNav'
 
 export default async function Header() {
   const supabase = await createSupabaseServerClient()
@@ -15,21 +16,7 @@ export default async function Header() {
         >
           Keep Substack
         </Link>
-        {user ? (
-          <Link
-            href="/my"
-            className="text-sm border border-gray-300 rounded px-3 py-1 hover:bg-gray-50 transition-colors"
-          >
-            マイページ
-          </Link>
-        ) : (
-          <Link
-            href="/login"
-            className="text-sm border border-gray-300 rounded px-3 py-1 hover:bg-gray-50 transition-colors"
-          >
-            ログイン
-          </Link>
-        )}
+        <HeaderNav user={user} />
       </div>
     </header>
   )
