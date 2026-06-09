@@ -28,8 +28,12 @@ vi.mock('@/lib/members', () => ({
 }))
 
 // fetchWithRetry と saveArticles も no-op でモック（addMemberAction 依存）
+const { mockFetchFeedOrThrow } = vi.hoisted(() => ({
+  mockFetchFeedOrThrow: vi.fn(),
+}))
 vi.mock('@/lib/fetchFeed', () => ({
   fetchWithRetry: vi.fn(async () => ({ items: [], imageUrl: undefined })),
+  fetchFeedOrThrow: mockFetchFeedOrThrow,
 }))
 vi.mock('@/lib/articles', () => ({
   saveArticles: vi.fn(async () => {}),
@@ -65,6 +69,8 @@ describe('updateMemberAction — substack_handle / publication_id 拡張 (Phase 
     mockGetUser.mockResolvedValue({ data: { user: ADMIN_USER } })
     // default: updateMember succeeds
     mockUpdateMember.mockResolvedValue(undefined)
+    // default: 実在チェックのフィード取得は成功
+    mockFetchFeedOrThrow.mockResolvedValue({ items: [], imageUrl: undefined })
   })
 
   it('Test 1: substack_handle を含む FormData → updateMember が substackHandle: "@hoge" で呼ばれる', async () => {
@@ -98,6 +104,16 @@ describe('updateMemberAction — substack_handle / publication_id 拡張 (Phase 
     expect(mockUpdateMember).toHaveBeenCalledOnce()
     const [, updates] = mockUpdateMember.mock.calls[0]
     expect(updates).toMatchObject({ publicationId: 'new-pid' })
+  })
+
+  it('Test 3b: new_publication_id 変更で実在チェック失敗 → エラー返却・updateMember 未呼び出し', async () => {
+    mockFetchFeedOrThrow.mockRejectedValue(new Error('HTTP 404'))
+    const formData = makeFormData(DEFAULT_NAME, DEFAULT_ADDED_AT, undefined, 'nonexistent-pid')
+
+    const result = await updateMemberAction('pub-1', formData)
+
+    expect(result).toContain('取得できませんでした')
+    expect(mockUpdateMember).not.toHaveBeenCalled()
   })
 
   it('Test 4: updateMember が 23505 を含む Error を throw → "このハンドルはすでに使用されています" が返る', async () => {

@@ -86,6 +86,16 @@ export async function updateMemberAction(
     return PUBLICATION_ID_ERROR
   }
 
+  // 実在チェック: publication_id を別IDへ変更する場合、新IDのSubstackフィードが
+  // 取得できなければ更新しない（存在しない / typo を弾く）。
+  if (new_publication_id !== null && new_publication_id !== publicationId) {
+    try {
+      await fetchFeedOrThrow(`https://${new_publication_id}.substack.com/feed`)
+    } catch {
+      return `"${new_publication_id}" のSubstackフィードを取得できませんでした。publicationIDが正しいか確認してください`
+    }
+  }
+
   try {
     await updateMember(publicationId, {
       name,
