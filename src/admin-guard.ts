@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
+import { isAdmin } from '@/lib/authz'
 
 // admin-guard.ts: /admin 認可ロジック（ユニットテスト専用モジュール）
 // src/middleware.ts が Next.js の実ミドルウェアとして動作する。
@@ -33,9 +34,9 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // /admin: admin ロール必須 (auth.users.role カラムで判定)
+  // /admin: admin ロール必須。判定は isAdmin() に集約（M-2）。
   if (pathname.startsWith('/admin')) {
-    if (!user || user.role !== 'admin') {
+    if (!isAdmin(user)) {
       return NextResponse.redirect(new URL('/', request.url))
     }
   }

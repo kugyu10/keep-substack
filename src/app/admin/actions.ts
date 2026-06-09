@@ -4,15 +4,8 @@ import { revalidatePath } from 'next/cache'
 import { addMember, deleteMember, updateMember } from '@/lib/members'
 import { fetchWithRetry } from '@/lib/fetchFeed'
 import { saveArticles, deleteArticles } from '@/lib/articles'
-import { createSupabaseServerClient } from '@/lib/supabase/server'
-
-async function requireAdmin(): Promise<void> {
-  const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.role !== 'admin') {
-    throw new Error('Unauthorized')
-  }
-}
+import { requireAdmin } from '@/lib/requireAdmin'
+import { isValidPublicationId, parseSubstackHandle, PUBLICATION_ID_ERROR } from '@/lib/validation'
 
 export async function addMemberAction(
   prevState: string | null,
@@ -26,6 +19,11 @@ export async function addMemberAction(
 
   if (!name || !publicationId) {
     return 'name と publicationId は必須です'
+  }
+
+  // H-1: publication_id は外部 fetch の URL に埋め込まれるため形式を厳格化（SSRF 対策）
+  if (!isValidPublicationId(publicationId)) {
+    return PUBLICATION_ID_ERROR
   }
 
   try {
@@ -71,18 +69,15 @@ export async function updateMemberAction(
     return 'addedAt は有効なISO日付文字列を入力してください'
   }
 
-  const substackHandleRaw = (formData.get('substack_handle') as string | null)?.trim() ?? ''
-  const handleBody = substackHandleRaw.startsWith('@') ? substackHandleRaw.slice(1) : substackHandleRaw
-  let substack_handle: string | null
-  if (handleBody === '') {
-    substack_handle = null
-  } else if (!/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,49}$/.test(handleBody)) {
-    return 'ハンドルに使用できない文字が含まれています（英数字・_・- のみ使用可）'
-  } else {
-    substack_handle = '@' + handleBody
-  }
+  const parsedHandle = parseSubstackHandle(formData.get('substack_handle') as string | null)
+  if (!parsedHandle.ok) return parsedHandle.error
+  const substack_handle = parsedHandle.value
 
   const new_publication_id = (formData.get('new_publication_id') as string | null)?.trim() || null
+  // H-1: publication_id 変更時も形式を厳格化（SSRF 対策）
+  if (new_publication_id !== null && !isValidPublicationId(new_publication_id)) {
+    return PUBLICATION_ID_ERROR
+  }
 
   try {
     await updateMember(publicationId, {

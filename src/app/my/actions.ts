@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
+import { isValidPublicationId, parseSubstackHandle, PUBLICATION_ID_ERROR } from '@/lib/validation'
 
 export async function linkMemberAction(
   prevState: string | null,
@@ -10,6 +11,8 @@ export async function linkMemberAction(
 ): Promise<string | null> {
   const publicationId = (formData.get('publicationId') as string)?.trim()
   if (!publicationId) return 'Publication ID を入力してください'
+  // H-1: 形式を厳格化（SSRF 対策。存在しない不正 pid の探索も弾く）
+  if (!isValidPublicationId(publicationId)) return PUBLICATION_ID_ERROR
 
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -36,6 +39,9 @@ export async function linkMemberAction(
     return '紐付けに失敗しました'
   }
 
+  // H-2: claim を監査ログに記録（誰がどの publication を紐付けたか追跡可能に）
+  console.info(`[audit] member claim: user=${user.id} publication_id=${publicationId} via=linkMemberAction`)
+
   revalidatePath('/my')
   return null
 }
@@ -47,16 +53,9 @@ export async function updateMyProfileAction(
   const name = (formData.get('name') as string)?.trim()
   // Field contract for Plan 02's form: checkbox inputs use name="teams".
   const checkedTeamNames = formData.getAll('teams').map(String)
-  const rawHandle = (formData.get('substack_handle') as string | null)?.trim() ?? ''
-  const handleBody = rawHandle.startsWith('@') ? rawHandle.slice(1) : rawHandle
-  let substack_handle: string | null
-  if (handleBody === '') {
-    substack_handle = null
-  } else if (!/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,49}$/.test(handleBody)) {
-    return 'ハンドルに使用できない文字が含まれています（英数字・_・- のみ使用可）'
-  } else {
-    substack_handle = '@' + handleBody
-  }
+  const parsedHandle = parseSubstackHandle(formData.get('substack_handle') as string | null)
+  if (!parsedHandle.ok) return parsedHandle.error
+  const substack_handle = parsedHandle.value
 
   if (!name) return '名前を入力してください'
 
