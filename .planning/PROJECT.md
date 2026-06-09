@@ -125,7 +125,7 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 ### Active (v1.8 — 安定化・品質向上・UI Polish)
 
 - [ ] commitSlots 保存を非アトミックな delete+insert から upsert に置き換える
-- [ ] Phase 27-29 の human UAT・verification ギャップを解消する
+- ✓ Phase 27-29 の human UAT・verification ギャップを解消する — v1.8 (Validated in Phase 36: 本番 UAT 6/6 PASS + 27/28/29 VERIFICATION verified)
 - [ ] rss-not-fetched-on-user-add バグの根本原因を特定・修正する
 - [ ] auth/callback の next パラメータを有効化する
 - ✓ 本番 DB に member_commit_slots マイグレーションを適用する（schedule-save-fails-production 根本解消）— v1.8 (Validated in Phase 32)

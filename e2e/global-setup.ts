@@ -29,6 +29,29 @@ export default async function globalSetup() {
     )
   }
 
+  // CR-03 guard: fail-fast if the suite is pointed at any non-TEST Supabase
+  // project. The biggest data-loss risk is `reuseExistingServer` accidentally
+  // attaching to a prod-env dev server (browser → prod, admin → TEST split-brain
+  // that overwrites real community handles / commit slots). Reject the known
+  // production ref outright, and require the TEST ref to be present, so even a
+  // mis-pointed .env.test or stale server is caught BEFORE any write.
+  const TEST_PROJECT_REF = 'otydhiumsdsyxepnjqjp'
+  const PROD_PROJECT_REF = 'xolhjcngrwwwqtklmoyk'
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  if (supabaseUrl.includes(PROD_PROJECT_REF)) {
+    throw new Error(
+      `[global-setup] REFUSING TO RUN: NEXT_PUBLIC_SUPABASE_URL points at the PRODUCTION project (${PROD_PROJECT_REF}). ` +
+        `E2E tests write/delete data and must target the TEST project (${TEST_PROJECT_REF}). ` +
+        `Stop any prod-env dev server on :3000 and verify .env.test.`
+    )
+  }
+  if (!supabaseUrl.includes(TEST_PROJECT_REF)) {
+    throw new Error(
+      `[global-setup] REFUSING TO RUN: NEXT_PUBLIC_SUPABASE_URL does not point at the expected TEST project (${TEST_PROJECT_REF}). ` +
+        `Resolved host: ${supabaseUrl}. Verify .env.test targets the TEST Supabase project.`
+    )
+  }
+
   const admin = createTestAdmin()
 
   // 1. Auth user — intentionally NON-admin (E2E-03 negative case requires a

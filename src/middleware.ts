@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { isAdmin } from '@/lib/authz'
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -31,9 +32,9 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // /admin: admin ロール必須 (auth.users.role カラムで判定)。proxy.ts と同じロジック
+  // /admin: admin ロール必須。判定は isAdmin() に集約（M-2）。
   if (pathname.startsWith('/admin')) {
-    if (!user || user.role !== 'admin') {
+    if (!isAdmin(user)) {
       return NextResponse.redirect(new URL('/', request.url))
     }
   }

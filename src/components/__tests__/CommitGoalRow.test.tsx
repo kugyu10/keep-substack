@@ -168,7 +168,61 @@ describe('CommitGoalRow 🔥 のみ: 先週まで連続達成・今週スロッ�
   })
 })
 
+// ─────────────────────────────────────────────
+// スロット未設定: 未登録 / 未コミットメント の表示分離
+// ─────────────────────────────────────────────
+describe('CommitGoalRow スロット未設定の表示分離', () => {
+  it('hasUser=false + slots なし のとき「未登録」を表示する', () => {
+    const el = CommitGoalRow({
+      member: { ...makeMember(), hasUser: false },
+      items: [],
+      slots: [],
+      streak: 0,
+      crownEarned: false,
+    })
+    const joined = collectText(el).join('')
+    expect(joined).toContain('未登録')
+    expect(joined).not.toContain('未コミットメント')
+  })
+
+  it('hasUser=false のとき行を淡色（opacity）で控えめに表示する', () => {
+    const el = CommitGoalRow({
+      member: { ...makeMember(), hasUser: false },
+      items: [],
+      slots: [],
+      streak: 0,
+      crownEarned: false,
+    })
+    const dimmed = findAllByClassName(el, (cls) => cls.includes('opacity-60'))
+    expect(dimmed.length).toBeGreaterThan(0)
+  })
+
+  it('hasUser=true + slots なし のとき「未コミットメント」を表示する', () => {
+    const el = CommitGoalRow({
+      member: makeMember(),
+      items: [],
+      slots: [],
+      streak: 0,
+      crownEarned: false,
+    })
+    const joined = collectText(el).join('')
+    expect(joined).toContain('未コミットメント')
+    expect(joined).not.toContain('未登録')
+  })
+
+  it('hasUser=true + slots なし のとき行は淡色にしない', () => {
+    const el = CommitGoalRow({
+      member: makeMember(),
+      items: [],
+      slots: [],
+      streak: 0,
+      crownEarned: false,
+    })
+    const dimmed = findAllByClassName(el, (cls) => cls.includes('opacity-60'))
+    expect(dimmed.length).toBe(0)
+  })
+})
+
 // suppress unused-variable warnings for helpers not used in this test file
 void findByType
 void findAllByTag
-void findAllByClassName

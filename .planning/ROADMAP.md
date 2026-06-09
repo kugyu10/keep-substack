@@ -126,7 +126,7 @@ Full archive: `.planning/milestones/v1.7-ROADMAP.md`
 - [x] **Phase 33: バグ修正 + commitSlots upsert化** — RSS即時取得バグ・auth/callback リダイレクト・commitSlots アトミック保存を修正する (completed 2026-06-08)
 - [x] **Phase 34: UI Polish バッチ** — ログインページ・フッター・マイページボタン・ソート順の小改善を一括適用する (completed 2026-06-08)
 - [x] **Phase 35: チーム可視性拡張 + Google Analytics** — private チームをトップビューに表示し GA4 を全ページに導入する (completed 2026-06-08)
-- [ ] **Phase 36: QA・UAT・検証ギャップ解消** — Phase 27-29 の human UAT シナリオと VERIFICATION.md ギャップをすべて完了させる
+- [x] **Phase 36: QA・UAT・検証ギャップ解消** — Phase 27-29 の human UAT シナリオと VERIFICATION.md ギャップをすべて完了させる (completed 2026-06-08)
 
 ## Phase Details
 
@@ -245,10 +245,10 @@ Plans:
 
 **Wave 2** *(36-01 完了後)*
 - [x] 36-02-PLAN.md — 29-mobile.spec.ts + 29-layout-nav.spec.ts（QA-04 自動レイヤー、/daily リネーム追従）
-- [ ] 36-03-PLAN.md — 本番手動 UAT ランブック実行 + 27 検証.md in-place 更新（QA-01/QA-02、autonomous: false）
+- [x] 36-03-PLAN.md — 本番手動 UAT ランブック実行 + 27 検証.md in-place 更新（QA-01/QA-02、autonomous: false）
 
 **Wave 3** *(36-01/36-02 完了後)*
-- [ ] 36-04-PLAN.md — 28/29 VERIFICATION.md in-place 更新（QA-03/QA-04、resolved-by-reference 含む）
+- [x] 36-04-PLAN.md — 28/29 VERIFICATION.md in-place 更新（QA-03/QA-04、resolved-by-reference 含む）
 
 ## Phase Details (archived)
 
@@ -294,4 +294,4 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 33. バグ修正 + commitSlots upsert化 | v1.8 | 5/5 | Complete    | 2026-06-08 |
 | 34. UI Polish バッチ | v1.8 | 5/5 | Complete    | 2026-06-08 |
 | 35. チーム可視性拡張 + Google Analytics | v1.8 | 3/3 | Complete    | 2026-06-08 |
-| 36. QA・UAT・検証ギャップ解消 | v1.8 | 2/4 | In Progress|  |
+| 36. QA・UAT・検証ギャップ解消 | v1.8 | 4/4 | Complete    | 2026-06-08 |

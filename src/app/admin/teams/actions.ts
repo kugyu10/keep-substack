@@ -2,17 +2,9 @@
 
 import { revalidatePath } from 'next/cache'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
-import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/requireAdmin'
 
 const VALID_STATUSES = ['public', 'private', 'hidden'] as const
-
-async function requireAdmin(): Promise<void> {
-  const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.role !== 'admin') {
-    throw new Error('Unauthorized')
-  }
-}
 
 export async function addTeamAction(name: string): Promise<string | null> {
   try { await requireAdmin() } catch { return '権限がありません' }

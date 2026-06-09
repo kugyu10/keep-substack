@@ -185,6 +185,34 @@ describe('GET /auth/callback — D-02: member not found → INSERT (Phase 31)', 
     })
   })
 
+  it('Test D (H-1): pid が不正形式（SSRF狙い）→ INSERT/UPDATE は呼ばれず /へリダイレクトせず /my に進む', async () => {
+    const insertMock = vi.fn(async () => ({ error: null }))
+    const updateMock = vi.fn(() => ({ eq: vi.fn(async () => ({ error: null })) }))
+    const selectMock = vi.fn()
+
+    mockAdminFrom.mockImplementation((table: string) => {
+      if (table === 'members') {
+        return {
+          select: selectMock.mockReturnValue({
+            eq: vi.fn(() => ({ maybeSingle: async () => ({ data: null, error: null }) })),
+          }),
+          insert: insertMock,
+          update: updateMock,
+        }
+      }
+      throw new Error(`unexpected table: ${table}`)
+    })
+
+    const req = makeRequest({ code: 'valid-code', pid: 'evil.com/', handle: '@x' })
+    const response = await GET(req)
+
+    expect(response.status).toBe(307)
+    // 不正 pid のため紐付け処理（select/insert/update）は一切行われない
+    expect(selectMock).not.toHaveBeenCalled()
+    expect(insertMock).not.toHaveBeenCalled()
+    expect(updateMock).not.toHaveBeenCalled()
+  })
+
   it('Test C: pid あり、member 存在する、user_id null → UPDATE が呼ばれる（既存動作の維持）', async () => {
     const updateEqMock = vi.fn(async () => ({ error: null }))
     const updateMock = vi.fn(() => ({ eq: updateEqMock }))

@@ -1,27 +1,32 @@
 ---
 phase: 29-commit-goal-view
 verified: 2026-06-04T08:48:00Z
-status: human_needed
+status: verified
+resolved: 2026-06-08T11:29:45Z
+resolved_by: Phase 36 Plan 04（QA-04 ギャップ解消、D-09 in-place / Drift D-C 追従）
 score: 7/7 must-haves verified
 overrides_applied: 0
 human_verification:
   - test: "スマホ幅 (375px) で Grid が1週のみ表示されることを確認する"
     expected: "古い2週 (week-0, week-1) が非表示になり、最新週 (week-2) のみ表示される"
     why_human: "hidden sm:flex は CSS-only。vitest はブラウザレンダリングを実行しないため DOM の表示/非表示を検証できない"
+    resolution: "automate pass → e2e/29-mobile.spec.ts（Phase 36 Plan 02、mobile-375 viewport project、1 green）。375px で CommitGrid root の week-0/week-1（hidden sm:flex）を toBeHidden、week-2（flex flex-1）を toBeVisible で検証し、Tailwind hidden sm:flex の display:none をブラックボックス検出（本文 #### 1 参照）。"
   - test: "/ (新トップ) でメンバーごとの3列レイアウト (avatar+name / CommitGrid / 空欄) が正しく表示されることを確認する"
     expected: "各行に左カラム(アバター+名前)、中央カラム(CommitGrid または「未コミット」)、右カラム(w-8空白) が揃って表示される"
     why_human: "VIEW-03 の視覚的レイアウト整合性はブラウザでのみ確認可能"
-  - test: "/weekly-stamp で旧ヒートマップが正常に動作することを確認する"
-    expected: "既存の WeeklyHeatmapGrid が表示され、チームタブが /weekly-stamp ベースのリンクで動作する"
+    resolution: "構造 automate pass + 本番目視 pass の二層。構造: e2e/29-layout-nav.spec.ts（Phase 36 Plan 02、anonymous project）が a[href^=/member/] の存在を toBeVisible で検証。ピクセル整列: 36-03 の本番手動ウォークスルー（keep-substack.com / prod、Phase 27 UAT 一巡で全 PASS）の本番目視で補完（Pitfall 4 — 構造のみ自動・整列は本番目視へ委譲）。境界注記は本文 #### 2 参照。"
+  - test: "/daily で旧ヒートマップが正常に動作することを確認する（⚠ 旧 /weekly-stamp は Drift D-C により /daily へリネーム済み）"
+    expected: "既存の WeeklyHeatmapGrid が /daily で表示され、ViewTabs（コミット＆ゴール / デイリー）と /daily ベースのチームタブが動作する"
     why_human: "CSS・レンダリングの動作確認はブラウザが必要"
+    resolution: "automate pass → e2e/29-layout-nav.spec.ts（Phase 36 Plan 02）。⚠ Drift D-C: 旧 /weekly-stamp は現行 /daily へリネーム済み（ViewTabs.tsx / src/app/daily/page.tsx、後続フェーズの意図的リネーム・src バグではない）。spec は / で nav a[href=/daily]（ViewTabs デイリータブ）を toBeVisible → /daily で All タブ a[href=/daily] と WeeklyHeatmapGrid 描画を検証し green（本文 #### 3 参照）。検証文言を /weekly-stamp → /daily に追従更新。"
 ---
 
 # Phase 29: Commit & Goal View Verification Report
 
-**Phase Goal:** 現トップ（週次ヒートマップ）を `/weekly-stamp` に移動し、新トップにコミット＆ゴールビューを実装する
+**Phase Goal:** 現トップ（週次ヒートマップ）を `/weekly-stamp` に移動し、新トップにコミット＆ゴールビューを実装する（⚠ 旧 `/weekly-stamp` は Drift D-C により現行 `/daily` へリネーム済み）
 **Verified:** 2026-06-04T08:48:00Z
-**Status:** human_needed
-**Re-verification:** No — initial verification
+**Status:** verified（2026-06-08 Phase 36 Plan 04 でギャップ解消、D-09 in-place / Drift D-C 追従）
+**Re-verification:** No — initial verification + Phase 36 Plan 04 でギャップ解消（automate pass + 36-03 本番目視 + /daily リネーム追従）
 
 ## Goal Achievement
 
@@ -110,31 +115,33 @@ No TBD, FIXME, or XXX markers in Phase 29 files.
 No dynamic Tailwind class generation (`grid-cols-${...}`) found.
 No `use client` directives in CommitGoalView, CommitGoalRow, or CommitGrid.
 
-### Human Verification Required
+### Human Verification Required → 解消済み（Phase 36 Plan 04、D-09 in-place / Drift D-C 追従）
 
-#### 1. Mobile Grid Collapse (VIEW-07 runtime)
+> 2026-06-08 Phase 36 Plan 04 で、本セクションの 3 項目を automate pass（36-02）+ 36-03 本番目視で解消した（D-09）。依存 spec（36-02、3 green）と 36-03 本番ウォークスルー（全 PASS）に fail が無いため verified に確定（D-10 のバグ化は該当なし）。⚠ 旧 `/weekly-stamp` は Drift D-C により現行 `/daily` へリネーム済み（後続フェーズの意図的リネーム・src バグではない）— #3 の検証文言を `/daily` に追従させた。
 
-**Test:** Open `/` in Chrome DevTools at 375px viewport width. Inspect the CommitGrid rows.
-**Expected:** Only the current week (week-2, rightmost) columns are visible in each member's CommitGrid. Enlarge to >= 640px and verify all 3 weeks appear.
-**Why human:** `hidden sm:flex` is CSS-only. vitest RSC inspection does not render CSS or apply media queries. The class attribute is verified to exist in code, but visual absence on mobile must be confirmed in a browser.
+#### 1. Mobile Grid Collapse (VIEW-07 runtime) — RESOLVED（automate pass → e2e/29-mobile.spec.ts）
 
-#### 2. Three-Column Row Layout Visual Integrity (VIEW-03)
+**Status:** ✅ AUTOMATE PASS（Phase 36 Plan 02、mobile-375 project、1 green）
+**Evidence:** `e2e/29-mobile.spec.ts` が 375px viewport（mobile-375 project）で `/` を開き、CommitGrid root `div.flex.flex-1.gap-2` 直下の 3 週ブロックを検証: week-0 / week-1（`hidden sm:flex`）を `toBeHidden`、week-2（`flex flex-1`）を `toBeVisible`。Tailwind `hidden sm:flex` の < 640px における `display:none` をブラウザ実描画でブラックボックス検出した（vitest では不可能だった runtime CSS 検証を Playwright で代替）。CommitGrid を持つ行を確実に出すため beforeAll で seed member に commit slot を 1 件投入し afterAll で member_id スコープ delete 復元。
 
-**Test:** Open `/` in a browser and visually inspect each CommitGoalRow.
-**Expected:** Each row shows three distinct columns: (1) avatar + member name on the left, (2) the CommitGrid (or 未コミット text) in the center taking up available space, (3) a small empty rightmost column.
-**Why human:** CSS flex layout alignment and spacing are not verifiable programmatically with the RSC element-tree inspection pattern used in tests.
+#### 2. Three-Column Row Layout Visual Integrity (VIEW-03) — RESOLVED（構造 automate pass + 36-03 本番目視）
 
-#### 3. /weekly-stamp Route Functional Check (VIEW-01)
+**Status:** ✅ 構造 AUTOMATE PASS + 本番目視 PASS（二層、境界注記あり）
+**Evidence（構造・自動）:** `e2e/29-layout-nav.spec.ts`（Phase 36 Plan 02、anonymous project）が `/` で `a[href^="/member/"]` の `.first()` を `toBeVisible` で検証 — 各行に Col1（avatar+name の member link）が存在する構造を自動確認。
+**Evidence（ピクセル整列・本番目視）:** ピクセル整列（Col1 avatar+name / Col2 CommitGrid or 未コミット / Col3 空欄の視覚的整列）は **36-03 の本番手動ウォークスルー**（keep-substack.com / prod xolhjcngrwwwqtklmoyk、開発者がテストアカウントで Phase 27 UAT 6 シナリオを一巡し全 PASS）の本番目視で pass を確認。**provenance: 36-03-SUMMARY.md**。
+**境界注記（Pitfall 4）:** 自動 spec は構造存在のみを assert し、ピクセル整列は assert しない。視覚的整合は本番目視に委譲（自動と本番目視で半分ずつ充足する二層検証）。
 
-**Test:** Navigate to `/weekly-stamp` in a browser and click team tabs and the All tab.
-**Expected:** The heatmap displays correctly. The All tab navigates to `/weekly-stamp` (not `/`). Team tabs navigate to `/weekly-stamp?team=...`.
-**Why human:** Browser navigation behavior and CSS rendering require a running application.
+#### 3. /daily Route Functional Check (VIEW-01) — RESOLVED（automate pass → e2e/29-layout-nav.spec.ts、/weekly-stamp → /daily 追従）
+
+**Status:** ✅ AUTOMATE PASS（Phase 36 Plan 02）
+**⚠ Drift D-C 追従注記:** 旧 `/weekly-stamp` ルートは現行コードで `/daily` へリネーム済み（`src/components/ViewTabs.tsx` の href + `src/app/daily/page.tsx`）。これは後続フェーズの意図的リネームであり **src のバグではない** — 検証文言を `/weekly-stamp` から `/daily` へ追従させた（修正対象ではなく文言追従、D-09）。タブナビは ViewTabs コンポーネント（href `/`=「コミット＆ゴール」 / `/daily`=「デイリー」）。
+**Evidence:** `e2e/29-layout-nav.spec.ts` が `/` で `nav a[href="/daily"]`（ViewTabs デイリータブ）を `toBeVisible` → `/daily` へ遷移し All タブ `a[href="/daily"]` と旧 WeeklyHeatmapGrid 描画を検証し green。旧 `/weekly-stamp` ではなく現行 `/daily` を対象とする（spec 冒頭にリネーム注記コメントあり）。
 
 ### Gaps Summary
 
 No blocking gaps found. All 7/7 observable truths are verified in the codebase. All artifacts exist, are substantive, wired, and have data flowing through them.
 
-The 3 items in Human Verification are visual/runtime checks (CSS layout, browser behavior) that cannot be assessed with static code analysis. They are required because VIEW-03 and VIEW-07 have visual success criteria per ROADMAP.md.
+**2026-06-08 Phase 36 Plan 04 更新:** Human Verification の 3 項目はすべて解消済み — #1（モバイル縮退）と #3（/daily ナビ）は 36-02 の automate pass、#2（3列レイアウト）は構造 automate pass + 36-03 本番目視 pass の二層で充足。⚠ #3 は Drift D-C により旧 `/weekly-stamp` → 現行 `/daily` に検証文言を追従させた（src バグではなく後続リネーム）。依存 spec（36-02、3 green）と 36-03 本番ウォークスルー（全 PASS）に fail が無いため verified に確定（D-10 バグ化は該当なし、D-11 go/no-go 判定材料が揃った）。29-HUMAN-UAT.md は既 resolved(3/3) のため編集していない（D-07）。src/ は無変更。
 
 ---
 
