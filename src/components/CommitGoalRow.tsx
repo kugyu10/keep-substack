@@ -13,8 +13,11 @@ type CommitGoalRowProps = {
 }
 
 export default function CommitGoalRow({ member, items, slots, imageUrl, streak, crownEarned }: CommitGoalRowProps) {
+  // Group C（hasUser=false）= 未登録: auth ユーザー未連携。淡色で控えめに見せる。
+  // Group B（hasUser=true・slots なし）= 未コミットメント とは表示・濃度を分離する。
+  const isUnregistered = !member.hasUser
   return (
-    <div className="flex items-center border-b border-[#ebebeb] py-1">
+    <div className={`flex items-center border-b border-[#ebebeb] py-1${isUnregistered ? ' opacity-60' : ''}`}>
       {/* Column 1: Avatar + Name */}
       <Link
         href={`/member/${member.publicationId}`}
@@ -41,7 +44,11 @@ export default function CommitGoalRow({ member, items, slots, imageUrl, streak, 
       {/* Column 2: CommitGrid or no-commit fallback (VIEW-06) */}
       {slots.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
-          <span className="text-sm text-gray-400">未コミット</span>
+          {isUnregistered ? (
+            <span className="text-sm text-gray-300">未登録</span>
+          ) : (
+            <span className="text-sm text-gray-400">未コミットメント</span>
+          )}
         </div>
       ) : (
         <div className="flex-1">
