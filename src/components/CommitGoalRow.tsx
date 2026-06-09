@@ -45,7 +45,7 @@ export default function CommitGoalRow({ member, items, slots, imageUrl, streak, 
       {slots.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
           {isUnregistered ? (
-            <span className="text-sm text-gray-300">未登録</span>
+            <span className="text-sm text-gray-400">未登録</span>
           ) : (
             <span className="text-sm text-gray-400">未コミットメント</span>
           )}
