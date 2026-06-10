@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { addMember, deleteMember, updateMember } from '@/lib/members'
-import { fetchWithRetry } from '@/lib/fetchFeed'
+import { fetchFeedOrThrow } from '@/lib/fetchFeed'
 import { saveArticles, deleteArticles } from '@/lib/articles'
 import { requireAdmin } from '@/lib/requireAdmin'
 import { isValidPublicationId, parseSubstackHandle, PUBLICATION_ID_ERROR } from '@/lib/validation'
@@ -26,6 +26,16 @@ export async function addMemberAction(
     return PUBLICATION_ID_ERROR
   }
 
+  // 実在チェック: RSS フィードを取得できなければ登録しない（存在しない / typo の
+  // publication_id を弾く）。fetchFeedOrThrow は失敗時に例外を投げる。
+  // 取得できたフィードはそのまま保存に再利用し、二重フェッチを避ける。
+  let feed
+  try {
+    feed = await fetchFeedOrThrow(`https://${publicationId}.substack.com/feed`)
+  } catch {
+    return `"${publicationId}" のSubstackフィードを取得できませんでした。publicationIDが正しいか確認してください`
+  }
+
   try {
     await addMember({ name, publicationId, teams: teamNames.map((n) => ({ name: n, status: 'public' })) })
   } catch (e) {
@@ -35,13 +45,10 @@ export async function addMemberAction(
   revalidatePath('/admin')
 
   try {
-    const { items, imageUrl } = await fetchWithRetry(
-      `https://${publicationId}.substack.com/feed`
-    )
-    await saveArticles(publicationId, items, imageUrl)
+    await saveArticles(publicationId, feed.items, feed.imageUrl)
   } catch (e) {
-    const msg = e instanceof Error ? e.message : 'RSS取得に失敗しました'
-    return `メンバーを追加しましたが、RSS取得に失敗しました: ${msg}`
+    const msg = e instanceof Error ? e.message : '記事の保存に失敗しました'
+    return `メンバーを追加しましたが、記事の保存に失敗しました: ${msg}`
   }
 
   return null
@@ -77,6 +84,16 @@ export async function updateMemberAction(
   // H-1: publication_id 変更時も形式を厳格化（SSRF 対策）
   if (new_publication_id !== null && !isValidPublicationId(new_publication_id)) {
     return PUBLICATION_ID_ERROR
+  }
+
+  // 実在チェック: publication_id を別IDへ変更する場合、新IDのSubstackフィードが
+  // 取得できなければ更新しない（存在しない / typo を弾く）。
+  if (new_publication_id !== null && new_publication_id !== publicationId) {
+    try {
+      await fetchFeedOrThrow(`https://${new_publication_id}.substack.com/feed`)
+    } catch {
+      return `"${new_publication_id}" のSubstackフィードを取得できませんでした。publicationIDが正しいか確認してください`
+    }
   }
 
   try {

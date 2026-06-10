@@ -56,6 +56,19 @@ export async function fetchWithRetry(url: string): Promise<FeedResult> {
   }
 }
 
+// 実在チェック用: 取得失敗（HTTPエラー / 非XML / ネットワーク / RSSパース失敗）時は
+// 例外を投げる（リトライ1回）。失敗を握り潰して空配列を返す fetchWithRetry とは別物で、
+// メンバー登録時に「存在しない / typo の publication_id」を弾く目的で使う。
+export async function fetchFeedOrThrow(url: string): Promise<FeedResult> {
+  try {
+    return await fetchFeedXml(url)
+  } catch {
+    await new Promise((r) => setTimeout(r, RETRY_DELAY_MS))
+    // 2回目も失敗した場合は例外をそのまま伝播させる
+    return await fetchFeedXml(url)
+  }
+}
+
 export async function fetchAllFeedsCached(members: Member[]): Promise<MemberFeedResult[]> {
   const results = await Promise.allSettled(
     members.map(async (member) => {
