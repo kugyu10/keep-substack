@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-06-07 — v1.8 Debug, Stabilization & UI
 Phase: 36
 Plan: Not started
 Status: Milestone complete
-Last activity: 2026-06-10 - Completed quick task 260610-1f2: 未登録と未コミットメントの表示分離
+Last activity: 2026-06-11 - Completed quick task 260611-ebu: UI-01修正（ログイン/サインインページからHeader/Footer除去）
 
 Progress bar: ██████████ 100% (5/5 phases complete)
 
@@ -39,6 +39,7 @@ Progress bar: ██████████ 100% (5/5 phases complete)
 | 260605-42o | grid hoverでタイトルpopover | 2026-06-05 | d4bc6f6 | [260605-42o-grid-hover-popover](.planning/quick/260605-42o-grid-hover-popover/) |
 | 260605-qqq | 未投稿日は曜日・日付だけでなく時刻HH:mmも表示 | 2026-06-05 | d2f55a2 | [260605-qqq-hh-mm](.planning/quick/260605-qqq-hh-mm/) |
 | 260610-1f2 | 未登録と未コミットメントの表示分離 | 2026-06-10 | e04cb50 | [260610-1f2-separate-unregistered-uncommitted](.planning/quick/260610-1f2-separate-unregistered-uncommitted/) |
+| 260611-ebu | UI-01修正: (main) Route Group化でログイン/サインインからHeader/Footer除去 | 2026-06-11 | 74e2faa | [260611-ebu-ui-01-fix-move-pages-into-main-route-gro](.planning/quick/260611-ebu-ui-01-fix-move-pages-into-main-route-gro/) |
 
 ## Performance Metrics
 
