@@ -1,5 +1,25 @@
 # Milestones: Keep Substack
 
+## v1.8 Debug, Stabilization & UI Polish (Shipped: 2026-06-11)
+
+**Phases completed:** 5 phases, 18 plans, 30 tasks
+
+**Delivered:** 本番DBマイグレーション適用と本番バグ群の修正で安定化を図りつつ、ログイン周りのレイアウト分離・GA4導入・privateチーム公開閲覧などのUI/品質改善を積み重ねた。
+
+**Key accomplishments:**
+
+1. 本番 Supabase DB に member_commit_slots を適用し、/my のコミットスケジュール保存を本番稼働させた（Phase 32, DB-02）
+2. RSS即時取得バグ（BUG-01）・Magic Linkのnextリダイレクト（BUG-02）を修正し、commitSlots保存を replace_member_commit_slots RPC でアトミック化（DB-01）。/my・/admin認証ガードを middleware.ts に集約（Phase 33）
+3. ログイン/サインインページを (main) Route Group 化でヘッダー・フッターから分離（UI-01/02、quick 260611-ebu で本番レンダリングを是正）、フッター3ステート文言・ソート順・/myボタン制御（Phase 34）
+4. privateチームをトップビューのタブに表示しログイン不要で閲覧可能に（TEAM-01）+ GA4(@next/third-parties)を全ページ導入（ANLT-01/02、Phase 35）
+5. Phase 27 UAT 6シナリオを本番(keep-substack.com)で全PASS検証し、Phase 27/28/29 の VERIFICATION ギャップを verified に解消（QA-01〜04、Phase 36）
+
+**Requirements:** 16/16 v1.8 要件すべて Complete（コードレベル検証済み）
+
+**Known deferred items at close: 5** — Phase 33/35 の本番手動確認（RSS即時取得・prod RPC存在・Vercelリダイレクト・GA4リアルタイム計測）。コードは全検証済みで本番デプロイ後の目視のみ残。詳細は STATE.md "Deferred Items (v1.8 close)" 参照。
+
+---
+
 ## v1.7 Commit & Goal View + Substack Profile Link (Shipped: 2026-06-06)
 
 **Phases completed:** 5 phases, 12 plans, 21 tasks

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Debug, Stabilization & UI Polish
-status: milestone_complete
-stopped_at: Milestone complete (Phase 36 was final phase)
-last_updated: 2026-06-08T11:57:39.350Z
-last_activity: 2026-06-08
+status: Awaiting next milestone
+stopped_at: Completed 36-04-PLAN.md
+last_updated: "2026-06-11T13:12:08.957Z"
+last_activity: 2026-06-11 — Milestone v1.8 completed and archived
 progress:
   total_phases: 5
   completed_phases: 5
   total_plans: 18
-  completed_plans: 30
+  completed_plans: 18
   percent: 100
 ---
 
@@ -18,19 +18,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-07 — v1.8 Debug, Stabilization & UI Polish started)
+See: .planning/PROJECT.md (updated 2026-06-11 — v1.8 shipped)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Milestone complete
+**Current focus:** Planning next milestone（/gsd:new-milestone）
 
 ## Current Position
 
-Phase: 36
-Plan: Not started
-Status: Milestone complete
-Last activity: 2026-06-10 - Completed quick task 260610-1f2: 未登録と未コミットメントの表示分離
-
-Progress bar: ██████████ 100% (5/5 phases complete)
+Phase: Milestone v1.8 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-06-11 — Milestone v1.8 completed and archived
 
 ### Quick Tasks Completed
 
@@ -39,6 +37,7 @@ Progress bar: ██████████ 100% (5/5 phases complete)
 | 260605-42o | grid hoverでタイトルpopover | 2026-06-05 | d4bc6f6 | [260605-42o-grid-hover-popover](.planning/quick/260605-42o-grid-hover-popover/) |
 | 260605-qqq | 未投稿日は曜日・日付だけでなく時刻HH:mmも表示 | 2026-06-05 | d2f55a2 | [260605-qqq-hh-mm](.planning/quick/260605-qqq-hh-mm/) |
 | 260610-1f2 | 未登録と未コミットメントの表示分離 | 2026-06-10 | e04cb50 | [260610-1f2-separate-unregistered-uncommitted](.planning/quick/260610-1f2-separate-unregistered-uncommitted/) |
+| 260611-ebu | UI-01修正: (main) Route Group化でログイン/サインインからHeader/Footer除去 | 2026-06-11 | 74e2faa | [260611-ebu-ui-01-fix-move-pages-into-main-route-gro](.planning/quick/260611-ebu-ui-01-fix-move-pages-into-main-route-gro/) |
 
 ## Performance Metrics
 
@@ -113,9 +112,32 @@ Progress bar: ██████████ 100% (5/5 phases complete)
 
 ## Session Continuity
 
-Last session: 2026-06-08T11:33:56.669Z
-Stopped at: Completed 36-04-PLAN.md
-Next step: Phase 36 全プラン完了。v1.8 全検証ギャップ（Phase 27/28/29）が verified/passed に確定。`/gsd:verify-phase 36` で Phase 検証 → v1.8 go/no-go 判定（D-11）へ
+Last session: 2026-06-11
+Stopped at: Milestone v1.8 completed and archived
+Next step: 次マイルストーンを計画（`/gsd:new-milestone`）。先に本番デプロイ→下記 Deferred の本番手動確認を実施するのも可。
+
+## Deferred Items (v1.8 close — 2026-06-11)
+
+v1.8 マイルストーンクローズ時に Acknowledge して繰り越した項目。マイルストーン監査
+（v1.8-MILESTONE-AUDIT.md）では 16/16 要件がコードレベルで Complete、唯一の BLOCKER
+だった UI-01 は quick 260611-ebu で解消済み。残るは外部サービス依存の本番手動確認
+（inherent-manual）と、長期 backlog・bookkeeping ギャップで、機能的欠落ではない。
+
+| Category | Item | Status | 備考 |
+|----------|------|--------|------|
+| verification_gap | Phase 33 — 33-VERIFICATION.md（本番RSS即時取得 / prod RPC存在 / 本番/myリダイレクト）| human_needed | コード配線は監査で検証済み。本番デプロイ後の目視のみ |
+| verification_gap | Phase 35 — 35-VERIFICATION.md（GA4リアルタイム計測）| human_needed | gtag/js本番ロードは監査のcurlで実証済み。GA4記録確認のみ |
+| uat_gap | Phase 33 — 33-HUMAN-UAT.md | partial (2) | 上記 verification と同一の本番確認 |
+| uat_gap | Phase 35 — 35-HUMAN-UAT.md | partial (1) | 同上 |
+| debug_session | schedule-save-fails-production | root_cause_found（Phase 32/33で実質解決・ステータス未更新）| クローズ扱い。次回 /gsd:debug で resolved 化推奨 |
+| todo | 2026-06-06-restore-next-redirect-in-auth-callback | resolved (Phase 33 P01)（todoファイル未削除）| 実装済み |
+| todo | 2026-06-06-upsert-commit-slots-replace-delete-insert | resolved (Phase 33 DB-01)（todoファイル未削除）| 実装済み |
+| todo | 2026-06-08-verify-admin-role-check-middleware | pending 🔴 high | PR #5レビュー指摘。次マイルストーン候補 |
+| todo | 2026-06-08-dedupe-auth-guard-middleware-admin-guard | pending 🔴 high | PR #5レビュー指摘。次マイルストーン候補 |
+| todo | 2026-05-11 article-history / multi-team / supabase-migration | pending | 長期backlog |
+| quick_task | 260515〜260611 の完了済みquick（status missing/unknown）| bookkeeping | 完了済み、audit が status を読めないだけ |
+
+**Known deferred items at close: 5**（真に未消化＝Phase 33/35 の本番手動確認）。残りは解決済み/bookkeeping。
 
 ## Deferred Items
 
@@ -167,4 +189,4 @@ PR #5（v1.8 Phase 32–36）マージ時のコードレビュー指摘。コー
 
 ## Operator Next Steps
 
-- Run `/gsd:plan-phase 32` to plan Phase 32: 本番DBマイグレーション
+- Start the next milestone with /gsd-new-milestone
