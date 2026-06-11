@@ -1,22 +1,22 @@
 # Keep Substack
 
-## Current Milestone: v1.8 Debug, Stabilization & UI Polish
+## Current State
 
-**Goal:** 本番バグを解消・安定化しつつ、ログインフロー・ナビゲーション・分析基盤などのUI改善を積み重ねる
+**Shipped:** v1.8 Debug, Stabilization & UI Polish (2026-06-11)
+**Next:** TBD — run `/gsd:new-milestone` to plan the next cycle
 
-**Target features:**
-- commitSlots 保存を upsert に置き換えてアトミック化する
-- rss-not-fetched-on-user-add バグの根本原因を特定・修正する
-- auth/callback の next パラメータを有効化する
-- Phase 27-29 の human UAT・verification ギャップを解消する
-- 本番 DB に member_commit_slots マイグレーションを適用する（schedule-save-fails-production 根本解消）
-- ログイン・サインインページのフッターを非表示にする
-- ログイン・サインインページに Keep Substack ロゴを表示する（ヘッダーなし）
-- フッターのログイン中の文言を変える
-- コミット＆ゴールビューのソート順を変更する
-- /my ページ表示中はヘッダーの「マイページ」ボタンを非表示にする
-- Google Analytics を導入する
-- private チームをトップビューのチームタブに表示し、ログイン不要で閲覧できるようにする
+残課題（次マイルストーンへ繰り越し）: Phase 33/35 の本番手動確認（RSS即時取得・prod RPC存在・Vercelリダイレクト・GA4リアルタイム計測）。コードはすべて検証済みで、本番デプロイ後の目視確認のみが残る。
+
+<details>
+<summary>Previous milestone: v1.8 Debug, Stabilization & UI Polish (shipped 2026-06-11)</summary>
+
+- 本番DBにmember_commit_slotsを適用しコミットスケジュール保存を本番稼働させた（Phase 32）
+- RSS即時取得バグ（BUG-01）・Magic Linkのnextリダイレクト（BUG-02）・commitSlotsのRPCアトミック保存（DB-01）を修正（Phase 33）
+- ログイン/サインインページを(main) Route Group化でヘッダー・フッターから分離、フッター文言の3ステート化、Commit & Goal Viewソート順、/myのマイページボタン制御（Phase 34）
+- privateチームをトップビューのチームタブに表示（ログイン不要閲覧）+ GA4を全ページに導入（Phase 35）
+- Phase 27-29のhuman UAT 6シナリオ本番検証 + VERIFICATIONギャップ解消（Phase 36）
+
+</details>
 
 <details>
 <summary>Previous milestone: v1.7 Commit & Goal View + Substack Profile Link (shipped 2026-06-06)</summary>
@@ -54,7 +54,7 @@
 
 ## What This Is
 
-Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度とコミット達成状況を可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSS + Supabase PostgreSQLで構築し、Vercelにデプロイ済み。v1.5でSupabase完全移行・Magic Linkログイン・メンバー自己管理を実装。v1.6でチームステータスDB管理・メンバー自律参加・Playwright E2Eテスト基盤を追加。v1.7でコミットスケジュール宣言・3週分Commit Goal View・アチーブメント（👑/🔥）・Substackプロフィール直リンクを実装し、「継続の意志と実績」を仲間に見せるコアビューが完成した。
+Substack継続仲間コミュニティ向けの、メンバーの記事公開頻度とコミット達成状況を可視化するWebアプリ。GitHubの草（コントリビューショングラフ）のように「頑張り」が一目でわかり、継続のモチベーションを支える。Next.js (App Router) + Tailwind CSS + Supabase PostgreSQLで構築し、Vercelにデプロイ済み。v1.5でSupabase完全移行・Magic Linkログイン・メンバー自己管理を実装。v1.6でチームステータスDB管理・メンバー自律参加・Playwright E2Eテスト基盤を追加。v1.7でコミットスケジュール宣言・3週分Commit Goal View・アチーブメント（👑/🔥）・Substackプロフィール直リンクを実装し、「継続の意志と実績」を仲間に見せるコアビューが完成した。v1.8で本番DBマイグレーション適用・本番バグ群（RSS即時取得・Magic Linkリダイレクト・commitSlots RPCアトミック保存）の修正・ログイン周りのレイアウト分離・GA4導入・privateチーム公開閲覧を行い、安定化と品質を固めた。
 
 ## Core Value
 
@@ -122,20 +122,20 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - ✓ 現トップ（週次ヒートマップ）が `/weekly-stamp` で引き続きアクセスできる — v1.7 (Phase 29)
 - ✓ Magic Link ログインフロー修正（/login 既存メンバー / /signin-51cf21389c56 招待専用に分離）— v1.7 (Phase 31)
 
-### Active (v1.8 — 安定化・品質向上・UI Polish)
+### Validated (v1.8)
 
-- [ ] commitSlots 保存を非アトミックな delete+insert から upsert に置き換える
-- ✓ Phase 27-29 の human UAT・verification ギャップを解消する — v1.8 (Validated in Phase 36: 本番 UAT 6/6 PASS + 27/28/29 VERIFICATION verified)
-- [ ] rss-not-fetched-on-user-add バグの根本原因を特定・修正する
-- [ ] auth/callback の next パラメータを有効化する
-- ✓ 本番 DB に member_commit_slots マイグレーションを適用する（schedule-save-fails-production 根本解消）— v1.8 (Validated in Phase 32)
-- [ ] ログイン・サインインページのフッターを非表示にする
-- [ ] ログイン・サインインページに Keep Substack ロゴを表示する（ヘッダーなし）
-- [ ] フッターのログイン中の文言を変える
-- [ ] コミット＆ゴールビューのソート順を変更する
-- [ ] /my ページ表示中はヘッダーの「マイページ」ボタンを非表示にする
-- ✓ Google Analytics を導入する — v1.8 (Validated in Phase 35)
-- ✓ private チームをトップビューのチームタブに表示し、ログイン不要で閲覧できるようにする — v1.8 (Validated in Phase 35)
+- ✓ commitSlots 保存を非アトミックな delete+insert から upsert(RPC) に置き換える — v1.8 (Phase 33, DB-01)
+- ✓ rss-not-fetched-on-user-add バグの根本原因を特定・修正する — v1.8 (Phase 33, BUG-01)
+- ✓ auth/callback の next パラメータを有効化する（Magic Link後に元ページへ復帰）— v1.8 (Phase 33, BUG-02)
+- ✓ 本番 DB に member_commit_slots マイグレーションを適用する（schedule-save-fails-production 根本解消）— v1.8 (Phase 32, DB-02)
+- ✓ Phase 27-29 の human UAT・verification ギャップを解消する — v1.8 (Phase 36: 本番 UAT 6/6 PASS + 27/28/29 VERIFICATION verified)
+- ✓ ログイン・サインインページのフッターを非表示にする（(main) Route Group分離）— v1.8 (Phase 34 + quick 260611-ebu, UI-01)
+- ✓ ログイン・サインインページに Keep Substack ロゴを表示する（ヘッダーなし）— v1.8 (Phase 34, UI-02)
+- ✓ フッターのログイン状態で文言を変える（3ステート）— v1.8 (Phase 34, UI-03)
+- ✓ コミット＆ゴールビューのソート順を変更する — v1.8 (Phase 34, UI-04)
+- ✓ /my ページ表示中はヘッダーの「マイページ」ボタンを非表示にする — v1.8 (Phase 34, UI-05)
+- ✓ Google Analytics(GA4) を全ページに導入する — v1.8 (Phase 35, ANLT-01/02)
+- ✓ private チームをトップビューのチームタブに表示し、ログイン不要で閲覧できるようにする — v1.8 (Phase 35, TEAM-01)
 
 ### Active (Future)
 
@@ -164,8 +164,10 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - v1.6追加: teams.status カラム（public/private/hidden）、member_publications テーブル、Playwright E2Eハーネス + 本番隔離TEST Supabaseプロジェクト
 - v1.7追加: member_commit_slots テーブル（RLS付き）、CommitGoalView / CommitGrid / CommitGoalRow コンポーネント群、commitUtils.ts（JST週計算・streak・sort）、/login と /signin-51cf21389c56 分離、substack_handle UNIQUE制約
 - コードベース: 約6,757行 src TypeScript/TSX（v1.7で+3,355行）
+- v1.8追加: src/middleware.ts（/my・/admin認証ガード）、(auth)/(main) Route Group分離、Footer.tsx（3ステート）/HeaderNav.tsx、replace_member_commit_slots RPC（atomic upsert）、@next/third-parties GoogleAnalytics、Playwright spec拡充（27/28/29 + mobile-375 viewport）
 - 本番/開発 Supabase 分離: prod=xolhjcngrwwwqtklmoyk / dev+E2E=otydhiumsdsyxepnjqjp
 - 記事反映遅延: 最大5分（ISRハイブリッド継続）
+- 本番ドメイン: https://keep-substack.com（旧 vercel.app から移行済み）
 
 ## Constraints
 
@@ -209,6 +211,10 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 | member_publications を additive surrogate-PKテーブルとして追加 | 既存members.publication_idを壊さず将来の複数Substack対応 | ✓ Good — v1.6 Phase 25、UI/app code無変更、同期トリガーで整合 |
 | E2Eは session-injection（@supabase/ssr setSession）+ 本番隔離TEST project | Magic Link実フローを避けつつ実DB契約を検証 | ✓ Good — v1.6 Phase 26、3 spec green、src無変更 |
 | fresh DBのbootstrapは schema.sql（migrations/ではない） | migrations/は増分diffで空DBを起動できない | ✓ Good — v1.6 Phase 26で確認、schema.sqlがdurableミラー |
+| commitSlots保存を delete+insert → replace_member_commit_slots RPC に置換 | 部分失敗による不整合を排除しアトミック化 | ✓ Good — v1.8 Phase 33、DB側トランザクションで冪等 |
+| 認証ガードを middleware.ts に集約（/my・/admin） | proxy.tsはユニットテスト専用維持、実ガードはmiddlewareへ | ✓ Good — v1.8 Phase 33、ただし二重化解消はbacklog |
+| Header/Footerを (main) Route Group の layout に分離 | root layoutは全ルートをラップするため、(auth)ページからHeader/Footerを外すにはRoute Group分割が必須 | ✓ Good — v1.8 quick 260611-ebu、URL不変・GAはrootに残しANLT-01維持 |
+| GA4はenv varガード（NODE_ENVチェック不使用） | NEXT_PUBLIC_GA_MEASUREMENT_ID未設定でdev自動無効、ビルド時インライン | ✓ Good — v1.8 Phase 35、ユーザー決定（D-10） |
 
 ## Evolution
 
@@ -228,4 +234,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-08
+*Last updated: 2026-06-11 after v1.8 milestone*

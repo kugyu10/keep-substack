@@ -260,6 +260,48 @@
 
 ---
 
+## Milestone: v1.8 — Debug, Stabilization & UI Polish
+
+**Shipped:** 2026-06-11
+**Phases:** 5 (32-36) | **Plans:** 18 | **Sessions:** 〜4日
+
+### What Was Built
+- 本番 Supabase DB に member_commit_slots を適用しコミットスケジュール保存を本番稼働（Phase 32、コード変更ゼロの運用フェーズ）
+- middleware.ts による /my・/admin 認証ガード + Magic Link の open-redirect 安全な next 伝搬（BUG-02）、RSS即時取得修正（BUG-01）、replace_member_commit_slots RPC でのアトミック保存（DB-01）（Phase 33）
+- (auth)/(main) Route Group 分離、Footer 3ステート、HeaderNav、ソート順変更（Phase 34）
+- private チームのトップビュー公開表示（TEAM-01）+ @next/third-parties GoogleAnalytics（ANLT-01/02）（Phase 35）
+- Phase 27 本番 UAT 6/6 PASS + 27/28/29 VERIFICATION を verified に解消（Phase 36）
+
+### What Worked
+- マイルストーン監査（/gsd:audit-milestone）が UI-01 の本番レンダリング欠陥を捕捉 — Phase 34 VERIFICATION が「(auth)/layout.tsx に Header/Footer がない」という存在レベル確認で PASSED と誤判定していたのを、統合チェッカーが root layout のネスト構造まで追って本番 curl で実証
+- UI-01 修正を /gsd:quick で局所的に処理 — (main) Route Group 化、168テスト全緑 + build 成功で衝突なしを保証、import 修正不要
+- Phase 32 を「コード変更ゼロの運用フェーズ」として Nyquist manual-only 認定 — 本番DB状態は inherent-manual と判断し、被覆を兄弟フェーズ 28/33 に帰属
+- 検証ギャップの resolved-by-reference（28#1 → Phase 32）で再検証の重複を回避
+
+### What Was Inefficient
+- Phase 34 の VERIFICATION が PASSED (25/25) を出したが UI-01 は本番で壊れていた — レイアウト系は「ファイル存在」ではなく「描画ツリー全体」を検証すべきだった。監査がなければ壊れたまま出荷していた
+- PROJECT.md の Active 要件チェックボックスが phase transition 時に更新されず、close 時に全件手動移動（v1.7 と同じ轍）
+- 本番手動確認（Phase 33/35）が partial のまま close まで繰り越し — 本番外部サービス依存で inherent-manual だが、デプロイ前提のゲート設計が曖昧だった
+- 完了済み todo（restore-next-redirect / upsert-commit-slots）のファイル削除漏れが audit のオープン項目を水増し
+
+### Patterns Established
+- **Route Group でのレイアウト分離**: root layout は html/body + 全ページ共通要素（GA）のみ。ページ固有のシェル（Header/Footer）は (main) など下位グループの layout に置く。(auth) は別グループで共通シェルを継承しない
+- **運用フェーズの Nyquist manual-only 認定**: コード変更ゼロのフェーズは自動テストを捏造せず、本番状態を manual-only として記録し被覆を兄弟フェーズに帰属
+- **監査での描画ツリー検証**: レイアウト要件は単体ファイルの存在ではなく、本番 HTML（curl）でネスト後の最終出力を確認
+
+### Key Lessons
+1. レイアウト/シェルの「非表示」要件は、コンポーネント単体ではなく App Router のネスト解決後の最終描画で検証する（存在レベル確認は false PASS を生む）
+2. milestone audit はマイルストーン close 前の最後の砦 — phase VERIFICATION の PASSED を鵜呑みにせず統合チェッカーで本番実証する価値がある
+3. inherent-manual な本番確認は「next milestone へ繰り越し」を前提に、コードレベル検証で要件 Complete を判定してよい（外部サービス依存をゲートにすると永遠に close できない）
+4. PROJECT.md トレーサビリティとtodoクリーンアップは phase 完了時に即座に（v1.7 の learning が再発 — 仕組み化が必要）
+
+### Cost Observations
+- Model mix: Sonnet 4.6 / Opus 4.8 混在（close フェーズは Opus）
+- Sessions: 〜4日で5フェーズ18プラン
+- Notable: UI-01 は監査で発見され close 直前に quick task で修正 — 監査を挟まなければ見逃していた構造的欠陥
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
