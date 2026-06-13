@@ -12,12 +12,21 @@
 import { useEffect, useRef, useState } from 'react'
 import { buildShareText, SHARE_NOTES_URL, type ShareView } from '@/lib/share'
 
+/** 共有ボタンの既定キャプション（BUG1）。文面変更はこの1か所。 */
+export const SHARE_BUTTON_LABEL = '継続をシェア'
+
 type ShareButtonProps = {
   view: ShareView
   className?: string
+  /** ボタンのキャプション。省略時は SHARE_BUTTON_LABEL（「継続をシェア」）。 */
+  label?: string
 }
 
-export default function ShareButton({ view, className }: ShareButtonProps) {
+export default function ShareButton({
+  view,
+  className,
+  label = SHARE_BUTTON_LABEL,
+}: ShareButtonProps) {
   const [feedback, setFeedback] = useState<'idle' | 'copied' | 'error'>('idle')
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -52,9 +61,10 @@ export default function ShareButton({ view, className }: ShareButtonProps) {
       <button
         type="button"
         onClick={handleShare}
+        aria-label={label}
         className="text-sm border border-gray-300 rounded px-3 py-1 hover:bg-gray-50 transition-colors"
       >
-        共有
+        {label}
       </button>
       {feedback !== 'idle' && (
         <span
