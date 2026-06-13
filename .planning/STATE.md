@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: ワンボタン Substack Note 共有
 status: planning
-last_updated: "2026-06-13T15:43:30.018Z"
-last_activity: 2026-06-13
+last_updated: "2026-06-14T00:00:00.000Z"
+last_activity: 2026-06-14
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,14 +20,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-11 — v1.8 shipped)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Planning next milestone（/gsd:new-milestone）
+**Current focus:** v1.9 ロードマップ確定（Phases 37-39）。次は `/gsd:plan-phase 37`
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-06-13 — Milestone v1.9 started
+Phase: 37 — 共有URLの状態保持（公開URL化）
+Plan: — (not yet planned)
+Status: Roadmap complete — ready to plan Phase 37
+Last activity: 2026-06-14 — v1.9 ROADMAP 作成（Phases 37-39、要件9/9マップ済み）
+
+### v1.9 Roadmap Summary
+
+| Phase | Goal | Requirements |
+|-------|------|--------------|
+| 37 — 共有URLの状態保持 | 対象4ビューが状態を含む復元可能な公開URLを持つ | URL-01 |
+| 38 — ワンボタン共有 | 共有ボタンで定型文+URLコピー & Substack Notes 起動 + toast | SHARE-01..06 |
+| 39 — リンクプレビュー | OGメタタグ + 動的OG画像（ImageResponse） | OGP-01..02 |
+
+**Coverage:** 9/9 v1.9 要件マップ済み（orphan 0）。Granularity=coarse。
 
 ### Quick Tasks Completed
 
@@ -113,7 +123,7 @@ Last activity: 2026-06-13 — Milestone v1.9 started
 
 Last session: 2026-06-13T15:42:40.993Z
 Stopped at: context exhaustion at 76% (2026-06-13)
-Next step: 次マイルストーンを計画（`/gsd:new-milestone`）。先に本番デプロイ→下記 Deferred の本番手動確認を実施するのも可。
+Next step: `/gsd:plan-phase 37`（共有URLの状態保持／公開URL化）。並行して v1.8 Deferred の本番手動確認も可。
 
 ## Deferred Items (v1.8 close — 2026-06-11)
 

@@ -49,21 +49,21 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SHARE-01 | TBD | Pending |
-| SHARE-02 | TBD | Pending |
-| SHARE-03 | TBD | Pending |
-| SHARE-04 | TBD | Pending |
-| SHARE-05 | TBD | Pending |
-| SHARE-06 | TBD | Pending |
-| URL-01 | TBD | Pending |
-| OGP-01 | TBD | Pending |
-| OGP-02 | TBD | Pending |
+| SHARE-01 | Phase 38 | Pending |
+| SHARE-02 | Phase 38 | Pending |
+| SHARE-03 | Phase 38 | Pending |
+| SHARE-04 | Phase 38 | Pending |
+| SHARE-05 | Phase 38 | Pending |
+| SHARE-06 | Phase 38 | Pending |
+| URL-01 | Phase 37 | Pending |
+| OGP-01 | Phase 39 | Pending |
+| OGP-02 | Phase 39 | Pending |
 
 **Coverage:**
 - v1.9 requirements: 9 total
-- Mapped to phases: 0（roadmap前）
-- Unmapped: 9 ⚠️
+- Mapped to phases: 9（Phase 37 URL-01 / Phase 38 SHARE-01..06 / Phase 39 OGP-01..02）
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-14*
-*Last updated: 2026-06-14 after initial definition*
+*Last updated: 2026-06-14 after roadmap creation (Phases 37-39 mapped)*
