@@ -63,6 +63,33 @@ describe('parseYmParam', () => {
     expect(r.month).toBeGreaterThanOrEqual(1)
     expect(r.month).toBeLessThanOrEqual(12)
   })
+
+  it('年下限外 "0000-06" は現在JST年月へフォールバックする（WR-02）', () => {
+    const r = parseYmParam('0000-06')
+    expect(r.year).toBeGreaterThanOrEqual(2000)
+    expect(r.year).toBeLessThanOrEqual(2100)
+    expect(r).not.toEqual({ year: 0, month: 6 })
+  })
+
+  it('年下限外 "1999-06" は現在JST年月へフォールバックする（WR-02）', () => {
+    const r = parseYmParam('1999-06')
+    expect(r.year).toBeGreaterThanOrEqual(2000)
+    expect(r).not.toEqual({ year: 1999, month: 6 })
+  })
+
+  it('年上限外 "9999-12" は現在JST年月へフォールバックする（WR-02）', () => {
+    const r = parseYmParam('9999-12')
+    expect(r.year).toBeLessThanOrEqual(2100)
+    expect(r).not.toEqual({ year: 9999, month: 12 })
+  })
+
+  it('年下限ちょうど "2000-01" は採用する（WR-02 境界）', () => {
+    expect(parseYmParam('2000-01')).toEqual({ year: 2000, month: 1 })
+  })
+
+  it('年上限ちょうど "2100-12" は採用する（WR-02 境界）', () => {
+    expect(parseYmParam('2100-12')).toEqual({ year: 2100, month: 12 })
+  })
 })
 
 describe('formatYmParam', () => {
@@ -123,5 +150,32 @@ describe('buildShareUrl', () => {
     expect(
       buildShareUrl({ type: 'member', publicationId: 'a b' })
     ).toBe('/member/a%20b')
+  })
+
+  it('member の ym は正準化される（"2026/6" → 現在JST年月へフォールバック, WR-03）', () => {
+    const url = buildShareUrl({
+      type: 'member',
+      publicationId: 'uojun',
+      ym: '2026/6',
+    })
+    // 非正準値はエンコードされず、parseYmParam→formatYmParam で正準形になる
+    expect(url).not.toContain('%2F')
+    expect(url).toMatch(/^\/member\/uojun\?ym=\d{4}-\d{2}$/)
+  })
+
+  it('member の ym 正準形 "2026-06" はそのまま保たれる（WR-03）', () => {
+    expect(
+      buildShareUrl({ type: 'member', publicationId: 'uojun', ym: '2026-06' })
+    ).toBe('/member/uojun?ym=2026-06')
+  })
+
+  it('buildShareUrl の出力 ym は parseYmParam で復元できる（ラウンドトリップ対称, WR-03）', () => {
+    const url = buildShareUrl({
+      type: 'member',
+      publicationId: 'uojun',
+      ym: '2026-06',
+    })
+    const ym = url.split('?ym=')[1]
+    expect(parseYmParam(ym)).toEqual({ year: 2026, month: 6 })
   })
 })

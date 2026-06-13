@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { buildDayGrid } from '@/lib/calendarUtils'
-import { formatYmParam } from '@/lib/shareUrl'
+import { formatYmParam, buildShareUrl } from '@/lib/shareUrl'
 import { getIntensityClass } from '@/lib/heatmapUtils'
 import type { HeatmapArticle } from '@/lib/heatmapUtils'
 import HeatmapTooltip from '@/components/HeatmapTooltip'
@@ -23,8 +23,9 @@ export default function CalendarGrid({ memberName, articleMap, publicationId, ye
     month === 1 ? formatYmParam(year - 1, 12) : formatYmParam(year, month - 1)
   const nextYm =
     month === 12 ? formatYmParam(year + 1, 1) : formatYmParam(year, month + 1)
-  const prevHref = `/member/${publicationId}?ym=${prevYm}`
-  const nextHref = `/member/${publicationId}?ym=${nextYm}`
+  // 公開URL生成は buildShareUrl に一元化（publicationId のエンコード規約を統一, WR-01）。
+  const prevHref = buildShareUrl({ type: 'member', publicationId, ym: prevYm })
+  const nextHref = buildShareUrl({ type: 'member', publicationId, ym: nextYm })
 
   const days = buildDayGrid(year, month)
   const map = new Map(articleMap)
@@ -92,7 +93,7 @@ export default function CalendarGrid({ memberName, articleMap, publicationId, ye
         ))}
 
         {days.map((day) => {
-          const dateKey = `${year}-${String(month).padStart(2, '0')}-${String(day.date).padStart(2, '0')}`
+          const dateKey = `${formatYmParam(year, month)}-${String(day.date).padStart(2, '0')}`
           const articles = map.get(dateKey) ?? []
           const count = articles.length
 
