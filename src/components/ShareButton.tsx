@@ -6,12 +6,15 @@
  * Substack には Note 本文を URL 等でプリフィルする API が無いため、ユーザーは
  * 必ず手動で貼り付ける必要がある。
  *
- * フロー（v1.9 修正版 — ページ内の説明モーダルは廃止し、即 Substack を開く）:
+ * フロー（v1.9 最終版 — コピー → 案内表示 → 約3秒後に同一タブで Substack へ遷移）:
  *  1. クリックで共有テキストをクリップボードへコピー（貼り付け用）
- *  2. 続けて即 window.open で Substack Notes コンポーザーを新規タブで開く
- *     （Substack 側のノート作成モーダルが現れ、ユーザーは ⌘V / Ctrl+V で貼り付ける）
- *  3. 自ページ側には非ブロッキングのトーストで案内を出す（約4秒で自動消滅）
- *  4. コピー失敗時も Substack は開き、フォールバック文言のトーストを出す
+ *  2. はっきり見えるインライン案内を表示
+ *     「コピーしました！ノートに貼り付けるだけでシェアできます」
+ *     「まもなくSubstackへ移動します…」
+ *  3. 約3000ms 後に window.location.assign で同一タブで Substack Notes へ遷移
+ *     （setTimeout 内の window.open はポップアップブロックされるため使わない）
+ *  4. コピー失敗時は遷移せず、手動コピー用の読み取り専用テキストと
+ *     「Substackへ移動」ボタンを表示（グレースフルデグラデーション）
  *
  * 再利用可能なコンポーネント。配置は各ビューで <ShareButton view={...} /> の1行を置くだけ（SHARE-01）。
  */
@@ -21,8 +24,22 @@ import { buildShareText, SHARE_NOTES_URL, type ShareView } from '@/lib/share'
 /** 共有ボタンの既定キャプション（BUG1）。文面変更はこの1か所。 */
 export const SHARE_BUTTON_LABEL = '継続をシェア'
 
-/** トーストの自動消滅までのミリ秒。 */
-const TOAST_DURATION_MS = 4000
+/** コピー成功後、Substack へ自動遷移するまでのミリ秒。 */
+export const SHARE_NAVIGATE_DELAY_MS = 3000
+
+/** コピー成功時の案内（主文）。 */
+export const SHARE_SUCCESS_MESSAGE =
+  'コピーしました！ノートに貼り付けるだけでシェアできます'
+/** コピー成功時の案内（副文）。 */
+export const SHARE_SUCCESS_SUBMESSAGE = 'まもなくSubstackへ移動します…'
+/** コピー失敗時の案内。 */
+export const SHARE_FAILURE_MESSAGE =
+  'コピーできませんでした。下のテキストを手動でコピーしてください'
+
+type ShareStatus =
+  | { kind: 'idle' }
+  | { kind: 'success' }
+  | { kind: 'failure'; text: string }
 
 type ShareButtonProps = {
   view: ShareView
@@ -36,40 +53,33 @@ export default function ShareButton({
   className,
   label = SHARE_BUTTON_LABEL,
 }: ShareButtonProps) {
-  // 非ブロッキングのトースト文言。null = 非表示。
-  const [toast, setToast] = useState<string | null>(null)
+  const [status, setStatus] = useState<ShareStatus>({ kind: 'idle' })
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // アンマウント時にタイマーを掃除
+  // アンマウント時にタイマーを掃除（遷移がアンマウント後に発火しないように）
   useEffect(() => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }
   }, [])
 
-  function showToast(message: string) {
-    setToast(message)
-    if (timerRef.current) clearTimeout(timerRef.current)
-    timerRef.current = setTimeout(() => setToast(null), TOAST_DURATION_MS)
-  }
-
-  // ボタンクリック: コピー（貼り付け用）→ 即 Substack Notes を新規タブで開く
+  // ボタンクリック: コピー → 案内 → 約3秒後に同一タブで Substack へ遷移
   async function handleShare() {
     const { text } = buildShareText({ view, origin: window.location.origin })
-    let copied = true
     try {
       await navigator.clipboard.writeText(text)
     } catch {
-      copied = false
+      // コピー失敗: 自動遷移せず、手動コピー用テキストを表示
+      setStatus({ kind: 'failure', text })
+      return
     }
-    // コピー成否に関わらず Substack を開く（クリックジェスチャ内で発火）
-    window.open(SHARE_NOTES_URL, '_blank', 'noopener')
-    showToast(
-      copied
-        ? 'コピーしました！Substackで貼り付けて投稿してください'
-        : 'コピーできませんでした。Substackで本文を入力して投稿してください'
-    )
+    // コピー成功: 案内を出してから同一タブで遷移
+    setStatus({ kind: 'success' })
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      window.location.assign(SHARE_NOTES_URL)
+    }, SHARE_NAVIGATE_DELAY_MS)
   }
 
   return (
@@ -83,13 +93,41 @@ export default function ShareButton({
         {label}
       </button>
 
-      {toast && (
+      {status.kind === 'success' && (
         <span
           role="status"
           aria-live="polite"
-          className="absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 whitespace-nowrap rounded bg-[#363737] px-3 py-2 text-xs text-white shadow-lg"
+          className="absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 whitespace-nowrap rounded border-l-4 border-[#FF6719] bg-white px-4 py-3 text-sm text-gray-900 shadow-lg"
         >
-          {toast}
+          <span className="block font-semibold">{SHARE_SUCCESS_MESSAGE}</span>
+          <span className="mt-1 block text-xs text-gray-500">
+            {SHARE_SUCCESS_SUBMESSAGE}
+          </span>
+        </span>
+      )}
+
+      {status.kind === 'failure' && (
+        <span
+          role="status"
+          aria-live="polite"
+          className="absolute left-1/2 top-full z-50 mt-2 flex w-64 -translate-x-1/2 flex-col gap-2 rounded border-l-4 border-[#FF6719] bg-white px-4 py-3 text-sm text-gray-900 shadow-lg"
+        >
+          <span className="font-semibold">{SHARE_FAILURE_MESSAGE}</span>
+          <textarea
+            readOnly
+            value={status.text}
+            autoFocus
+            onFocus={(e) => e.currentTarget.select()}
+            className="h-20 w-full resize-none rounded border border-gray-300 p-2 text-xs"
+          />
+          <a
+            href={SHARE_NOTES_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block self-start rounded bg-[#FF6719] px-3 py-1 text-xs font-semibold text-white hover:opacity-90"
+          >
+            Substackへ移動
+          </a>
         </span>
       )}
     </span>
