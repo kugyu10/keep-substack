@@ -175,7 +175,8 @@ Full archive: `.planning/milestones/v1.8-ROADMAP.md`
   1. 共有対象ルートに `og:title` / `og:description` / `og:image` / Twitter Card が出力され、リンクデバッガ等でプレビューカードが正しく認識される（OGP-01）
   2. 共有対象ルートに、対象メンバー/ビューの草・実績が見える動的OG画像が Next.js `ImageResponse`（`opengraph-image`）で生成され、`og:image` として配信される（OGP-02）
   3. 個人ビュー `/member/[id]` を共有したとき、そのメンバー固有の内容を反映したOG画像がプレビューに表示される
-**Plans**: TBD
+**Plans**: 1 plan
+- [ ] 39-PLAN.md — OGメタタグ修正 + 純関数ヘルパ + 動的OG画像（メンバー専用 + サイト共通デフォルト）
 **UI hint**: yes
 
 ---
