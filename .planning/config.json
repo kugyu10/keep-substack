@@ -10,6 +10,7 @@
     "verifier": true,
     "nyquist_validation": true,
     "_auto_chain_active": false,
-    "use_worktrees": false
+    "use_worktrees": false,
+    "skip_discuss": true
   }
 }

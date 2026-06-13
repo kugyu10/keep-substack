@@ -1,8 +1,11 @@
 import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import CommitGoalView from '@/components/CommitGoalView'
+import ShareButton from '@/components/ShareButton'
 import ViewTabs from '@/components/ViewTabs'
+import { SHARE_REQUIRE_LOGIN } from '@/lib/share'
 import type { CommitSlot } from '@/lib/types'
 
 export const revalidate = 300
@@ -14,6 +17,12 @@ type Props = {
 export default async function Home({ searchParams }: Props) {
   const { team } = await searchParams
   const allMembers = await getMembers()
+
+  const supabase = await createSupabaseServerClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const showShare = SHARE_REQUIRE_LOGIN ? !!user : true
 
   const teams = [
     ...new Set(
@@ -49,7 +58,10 @@ export default async function Home({ searchParams }: Props) {
 
   return (
     <main className="max-w-[960px] mx-auto px-4 py-4">
-      <ViewTabs active="goal" />
+      <div className="flex items-center justify-between gap-2">
+        <ViewTabs active="goal" />
+        {showShare && <ShareButton view={{ type: 'goal', team }} />}
+      </div>
 
       {teams.length > 0 && (
         <div className="flex gap-2 mb-4 flex-wrap">

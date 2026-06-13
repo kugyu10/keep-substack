@@ -48,7 +48,7 @@ export function formatYmParam(year: number, month: number): string {
   return `${year}-${String(month).padStart(2, '0')}`
 }
 
-type ShareView =
+export type ShareView =
   | { type: 'goal'; team?: string }
   | { type: 'daily'; team?: string }
   | { type: 'member'; publicationId: string; ym?: string }

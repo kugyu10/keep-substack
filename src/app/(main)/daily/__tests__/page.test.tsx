@@ -23,6 +23,20 @@ vi.mock('@/components/WeeklyHeatmapGrid', () => ({
 vi.mock('@/components/PrBanner', () => ({
   default: () => null,
 }))
+// ShareButton is a 'use client' component; stub it.
+vi.mock('@/components/ShareButton', () => ({
+  default: () => null,
+}))
+
+// Mock Supabase server client — page.tsx calls createSupabaseServerClient() to
+// detect the logged-in user for the share button. Return no user (logged out).
+vi.mock('@/lib/supabase/server', () => ({
+  createSupabaseServerClient: vi.fn(async () => ({
+    auth: {
+      getUser: vi.fn(async () => ({ data: { user: null }, error: null })),
+    },
+  })),
+}))
 
 import Home from '../page'
 import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'

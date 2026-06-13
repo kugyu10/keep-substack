@@ -1,7 +1,10 @@
 import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'
+import ShareButton from '@/components/ShareButton'
 import ViewTabs from '@/components/ViewTabs'
+import { SHARE_REQUIRE_LOGIN } from '@/lib/share'
 
 export const revalidate = 300
 
@@ -12,6 +15,12 @@ type Props = {
 export default async function Home({ searchParams }: Props) {
   const { team } = await searchParams
   const allMembers = await getMembers()
+
+  const supabase = await createSupabaseServerClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const showShare = SHARE_REQUIRE_LOGIN ? !!user : true
 
   const teams = [
     ...new Set(
@@ -30,7 +39,10 @@ export default async function Home({ searchParams }: Props) {
 
   return (
     <main className="max-w-[600px] mx-auto px-3 py-4">
-      <ViewTabs active="daily" />
+      <div className="flex items-center justify-between gap-2">
+        <ViewTabs active="daily" />
+        {showShare && <ShareButton view={{ type: 'daily', team }} />}
+      </div>
 
       {teams.length > 0 && (
         <div className="flex gap-2 mb-4 flex-wrap">
