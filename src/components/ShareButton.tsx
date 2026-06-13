@@ -9,7 +9,7 @@
  *
  * 再利用可能なコンポーネント。配置は各ビューで <ShareButton view={...} /> の1行を置くだけ（SHARE-01）。
  */
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { buildShareText, SHARE_NOTES_URL, type ShareView } from '@/lib/share'
 
 type ShareButtonProps = {
@@ -19,19 +19,32 @@ type ShareButtonProps = {
 
 export default function ShareButton({ view, className }: ShareButtonProps) {
   const [feedback, setFeedback] = useState<'idle' | 'copied' | 'error'>('idle')
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // アンマウント時に保留中のタイマーを破棄（unmounted setState 回避, WR-02）
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
+  }, [])
+
+  function showFeedback(state: 'copied' | 'error') {
+    setFeedback(state)
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => setFeedback('idle'), 4000)
+  }
 
   async function handleShare() {
     const { text } = buildShareText({ view, origin: window.location.origin })
+    // ポップアップブロック回避（WR-01）: Notes タブはユーザー操作コンテキスト内で
+    // 同期的に開く。await の後だと Safari 等でブロックされうるため先に開く（SHARE-03）。
+    window.open(SHARE_NOTES_URL, '_blank', 'noopener,noreferrer')
     try {
       await navigator.clipboard.writeText(text)
-      setFeedback('copied')
-      // コピー成功時のみ Notes コンポーザーを開く（SHARE-03）
-      window.open(SHARE_NOTES_URL, '_blank', 'noopener,noreferrer')
+      showFeedback('copied')
     } catch {
-      setFeedback('error')
+      showFeedback('error')
     }
-    // フィードバックは数秒で自動的に消す
-    window.setTimeout(() => setFeedback('idle'), 4000)
   }
 
   return (

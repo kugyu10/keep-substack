@@ -76,6 +76,11 @@ export function buildShareUrl(view: ShareView): string {
       const canonicalYm = formatYmParam(year, month)
       return `${base}?ym=${encodeURIComponent(canonicalYm)}`
     }
+    default: {
+      // 網羅性ガード: 将来 view type を追加したらコンパイルエラーで気づける
+      const _exhaustive: never = view
+      return _exhaustive
+    }
   }
 }
 

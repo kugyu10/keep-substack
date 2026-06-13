@@ -19,7 +19,9 @@ export default async function Home({ searchParams }: Props) {
   const supabase = await createSupabaseServerClient()
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser()
+  if (authError) console.error('[Daily] auth.getUser error:', authError)
   const showShare = SHARE_REQUIRE_LOGIN ? !!user : true
 
   const teams = [

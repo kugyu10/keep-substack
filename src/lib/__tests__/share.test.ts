@@ -50,6 +50,33 @@ describe('buildShareText', () => {
     })
     expect(url).toBe('https://keep-substack.com/member/pub-123?ym=2026-06')
   })
+
+  it('member で ym 省略時は素の URL（?ym なし）になる', () => {
+    const { url } = buildShareText({
+      view: { type: 'member', publicationId: 'pub-123' },
+      origin: 'https://keep-substack.com',
+    })
+    expect(url).toBe('https://keep-substack.com/member/pub-123')
+  })
+
+  it('member の不正な ym は現在JST年月へ正準化される（信頼境界フォールバック）', () => {
+    const { url } = buildShareText({
+      view: { type: 'member', publicationId: 'pub-123', ym: '2026/6' },
+      origin: 'https://keep-substack.com',
+    })
+    // 不正値はフォールバックされ、必ず妥当な ?ym=YYYY-MM 形式になる
+    expect(url).toMatch(
+      /^https:\/\/keep-substack\.com\/member\/pub-123\?ym=\d{4}-\d{2}$/
+    )
+    expect(url).not.toContain('2026/6')
+  })
+
+  it('publicationId はエンコードされる', () => {
+    const { url } = buildShareText({
+      view: { type: 'member', publicationId: 'a b/c' },
+    })
+    expect(url).toBe(`/member/${encodeURIComponent('a b/c')}`)
+  })
 })
 
 describe('共有定数', () => {
