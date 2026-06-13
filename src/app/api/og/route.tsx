@@ -10,7 +10,7 @@
 // runtime=nodejs（Edge ではヘッドレス Chromium を起動できない）。
 
 import { ImageResponse } from 'next/og'
-import { getSiteUrl } from '@/lib/siteUrl'
+import { getSiteUrl, isAllowedOgHost } from '@/lib/siteUrl'
 import {
   buildOgRenderTargetPath,
   type OgView,
@@ -26,24 +26,6 @@ export const revalidate = 300
 
 function isView(v: string | null): v is OgView {
   return v === 'goal' || v === 'daily' || v === 'member'
-}
-
-// このリクエストを処理している自分自身のオリジンを解決する。
-//   - x-forwarded-host / x-forwarded-proto（Vercel/プロキシ背後）を最優先。
-//   - 無ければ Host ヘッダ + リクエストURLのスキーム。
-//   - それも無ければ getSiteUrl()（運用上書き/本番フォールバック）。
-function resolveSelfOrigin(req: Request, reqUrl: URL): string {
-  const xfHost = req.headers.get('x-forwarded-host')
-  const xfProto = req.headers.get('x-forwarded-proto')
-  if (xfHost) {
-    const proto = (xfProto?.split(',')[0] ?? 'https').trim()
-    return `${proto}://${xfHost.split(',')[0].trim()}`
-  }
-  const host = req.headers.get('host')
-  if (host) {
-    return `${reqUrl.protocol}//${host}`
-  }
-  return getSiteUrl()
 }
 
 // 失敗時フォールバック: 撮影なしの簡素なブランド画像（500 回避）。
@@ -97,11 +79,24 @@ export async function GET(req: Request): Promise<Response> {
     return fallbackImage()
   }
 
-  // 撮影対象は「このリクエストを処理している自分自身のオリジン」の描画専用ページ。
-  // これでローカル(localhost)・preview・本番のいずれでも、配信中の自分を撮る
-  // （本番の旧ページを掴まない）。リクエストから取れない場合のみ getSiteUrl() に退避。
-  const reqUrl = new URL(req.url)
-  const origin = resolveSelfOrigin(req, reqUrl).replace(/\/+$/, '')
+  // 撮影対象オリジンは「信頼できる」getSiteUrl()（サーバ env 由来）からのみ導出する。
+  // リクエストヘッダ（x-forwarded-host / host）は攻撃者が偽装可能なため使わない（SSRF 対策）。
+  // VERCEL_URL 由来なので preview デプロイも自分自身を正しく参照できる。
+  const siteUrl = getSiteUrl()
+  const origin = siteUrl.replace(/\/+$/, '')
+
+  // 解決したホストを許可リストで検証してからブラウザに渡す（万一の動的ホスト汚染を弾く）。
+  let targetHost: string
+  try {
+    targetHost = new URL(origin).hostname
+  } catch {
+    return fallbackImage()
+  }
+  if (!isAllowedOgHost(targetHost, siteUrl)) {
+    console.error('[api/og] disallowed screenshot host, returning fallback:', targetHost)
+    return fallbackImage()
+  }
+
   const targetUrl = `${origin}${buildOgRenderTargetPath(view, { publicationId })}`
 
   try {
