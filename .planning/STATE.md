@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.8
-milestone_name: Debug, Stabilization & UI Polish
-status: Awaiting next milestone
-stopped_at: Completed 36-04-PLAN.md
-last_updated: "2026-06-11T13:12:08.957Z"
-last_activity: 2026-06-11 — Milestone v1.8 completed and archived
+milestone: v1.9
+milestone_name: ワンボタン Substack Note 共有
+status: planning
+last_updated: "2026-06-13T15:43:30.018Z"
+last_activity: 2026-06-13
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 18
-  completed_plans: 18
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -25,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-06-11 — v1.8 shipped)
 
 ## Current Position
 
-Phase: Milestone v1.8 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-06-11 — Milestone v1.8 completed and archived
+Status: Defining requirements
+Last activity: 2026-06-13 — Milestone v1.9 started
 
 ### Quick Tasks Completed
 
@@ -112,8 +111,8 @@ Last activity: 2026-06-11 — Milestone v1.8 completed and archived
 
 ## Session Continuity
 
-Last session: 2026-06-11
-Stopped at: Milestone v1.8 completed and archived
+Last session: 2026-06-13T15:42:40.993Z
+Stopped at: context exhaustion at 76% (2026-06-13)
 Next step: 次マイルストーンを計画（`/gsd:new-milestone`）。先に本番デプロイ→下記 Deferred の本番手動確認を実施するのも可。
 
 ## Deferred Items (v1.8 close — 2026-06-11)
