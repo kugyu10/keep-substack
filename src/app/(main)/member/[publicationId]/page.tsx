@@ -4,15 +4,20 @@ import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { buildHeatmapArticleMap } from '@/lib/heatmapUtils'
 import CalendarGrid from '@/components/CalendarGrid'
 import { getMembers } from '@/lib/members'
+import { parseYmParam } from '@/lib/shareUrl'
 
 export const revalidate = 300
 
 export default async function MemberPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ publicationId: string }>
+  searchParams: Promise<{ ym?: string }>
 }) {
   const { publicationId } = await params
+  const { ym } = await searchParams
+  const { year, month } = parseYmParam(ym)
 
   const members = await getMembers()
   const results = await fetchAllFeedsCached(members)
@@ -50,6 +55,9 @@ export default async function MemberPage({
       <CalendarGrid
         memberName={memberResult.member.name}
         articleMap={articleMapEntries}
+        publicationId={publicationId}
+        year={year}
+        month={month}
         imageUrl={memberResult.imageUrl}
         substackHandle={memberResult.member.substackHandle ?? undefined}
       />
