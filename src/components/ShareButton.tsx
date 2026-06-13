@@ -45,15 +45,21 @@ export default function ShareButton({
 
   async function handleShare() {
     const { text } = buildShareText({ view, origin: window.location.origin })
-    // ポップアップブロック回避（WR-01）: Notes タブはユーザー操作コンテキスト内で
-    // 同期的に開く。await の後だと Safari 等でブロックされうるため先に開く（SHARE-03）。
-    window.open(SHARE_NOTES_URL, '_blank', 'noopener,noreferrer')
+    // BUG2 修正: コピー → フィードバック表示 → Notes を開く の順にする。
+    // 旧実装は先に window.open で新規タブを開いており、元タブがフォーカスを失って
+    // clipboard.writeText とトーストが「元タブに戻るまで」遅延していた（"何も開かない"）。
+    // ユーザー操作コンテキスト内で await clipboard を先に解決し、トーストを出してから開く。
     try {
       await navigator.clipboard.writeText(text)
       showFeedback('copied')
     } catch {
+      // クリップボード不可（権限/非対応）でも導線は止めない:
+      // エラーを知らせたうえで Notes は開く（手動コピーで投稿できるよう保険）。
       showFeedback('error')
     }
+    // コピー＆トースト確定後に Notes を開く。await 直後の open はユーザー操作の
+    // 余韻内に収まり、通常ポップアップブロックされない（SHARE-03）。
+    window.open(SHARE_NOTES_URL, '_blank', 'noopener,noreferrer')
   }
 
   return (
@@ -76,8 +82,8 @@ export default function ShareButton({
           }`}
         >
           {feedback === 'copied'
-            ? 'コピー完了！貼り付けて投稿してください'
-            : 'コピーに失敗しました'}
+            ? 'コピーしました！貼り付けて投稿してください'
+            : 'コピーに失敗しました。テキストを手動でコピーして投稿してください'}
         </span>
       )}
     </span>
