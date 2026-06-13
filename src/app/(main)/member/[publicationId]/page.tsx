@@ -68,12 +68,21 @@ export default async function MemberPage({
   if (authError) console.error('[MemberPage] auth.getUser error:', authError)
   const showShare = SHARE_REQUIRE_LOGIN ? !!user : true
 
+  // メンバー存在判定は generateMetadata と同じ単一ソース（getMembers）に統一する
+  // （WR-04）。実在しない publicationId はここで 404 にし、fetchAllFeedsCached は
+  // カレンダー描画データの取得にのみ用いる。
   const members = await getMembers()
+  const member = members.find((m) => m.publicationId === publicationId)
+  if (!member) notFound()
+
   const results = await fetchAllFeedsCached(members)
   const memberResult = results.find(
     (r) => r.member.publicationId === publicationId
   )
 
+  // 存在確認は上の getMembers で済んでいるため、ここに来る memberResult は
+  // 通常必ず存在する。フェッチ結果に現れない異常時のみ保険として 404（page 本体の
+  // 既存挙動を維持）。
   if (!memberResult) notFound()
 
   const map = buildHeatmapArticleMap(memberResult.items)
