@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
@@ -6,9 +7,20 @@ import CommitGoalView from '@/components/CommitGoalView'
 import ShareButton from '@/components/ShareButton'
 import ViewTabs from '@/components/ViewTabs'
 import { SHARE_REQUIRE_LOGIN } from '@/lib/share'
+import { TOP_META } from '@/lib/ogMeta'
 import type { CommitSlot } from '@/lib/types'
 
 export const revalidate = 300
+
+export const metadata: Metadata = {
+  title: TOP_META.title,
+  description: TOP_META.description,
+  openGraph: {
+    title: TOP_META.title,
+    description: TOP_META.description,
+    url: '/',
+  },
+}
 
 type Props = {
   searchParams: Promise<{ team?: string }>

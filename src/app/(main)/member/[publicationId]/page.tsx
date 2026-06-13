@@ -1,15 +1,53 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
+import { getArticles } from '@/lib/articles'
 import { buildHeatmapArticleMap } from '@/lib/heatmapUtils'
 import CalendarGrid from '@/components/CalendarGrid'
 import ShareButton from '@/components/ShareButton'
 import { getMembers } from '@/lib/members'
-import { parseYmParam, formatYmParam } from '@/lib/shareUrl'
+import { parseYmParam, formatYmParam, buildShareUrl } from '@/lib/shareUrl'
+import { buildMemberMetaTitle, buildMemberMetaDescription } from '@/lib/ogMeta'
 import { SHARE_REQUIRE_LOGIN } from '@/lib/share'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export const revalidate = 300
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ publicationId: string }>
+}): Promise<Metadata> {
+  const { publicationId } = await params
+
+  // 安価な Supabase クエリのみ（fetchAllFeedsCached / RSS は使わない）。
+  const members = await getMembers()
+  const member = members.find((m) => m.publicationId === publicationId)
+
+  // メンバー未一致時はサイトデフォルトに準じた安全な metadata を返す
+  // （notFound は page 本体に委ねる）。
+  if (!member) {
+    return {}
+  }
+
+  const { items } = await getArticles(publicationId)
+  const articleCount = items.length
+
+  const title = buildMemberMetaTitle(member.name)
+  const description = buildMemberMetaDescription(member.name, articleCount)
+  const url = buildShareUrl({ type: 'member', publicationId })
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+    },
+  }
+}
 
 export default async function MemberPage({
   params,

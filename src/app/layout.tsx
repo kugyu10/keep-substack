@@ -3,13 +3,18 @@ import './globals.css'
 import { GoogleAnalytics } from '@next/third-parties/google'
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://keep-substack.vercel.app'),
+  metadataBase: new URL('https://keep-substack.com'),
   title: 'Keep Substack',
   description: 'Substackコミュニティメンバーの記事更新を確認するツール',
   openGraph: {
     title: 'Keep Substack',
     description: 'Substackコミュニティメンバーの記事更新を確認するツール',
     images: ['/keep-substack-kv.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Keep Substack',
+    description: 'Substackコミュニティメンバーの記事更新を確認するツール',
   },
 }
 

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
@@ -5,8 +6,19 @@ import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'
 import ShareButton from '@/components/ShareButton'
 import ViewTabs from '@/components/ViewTabs'
 import { SHARE_REQUIRE_LOGIN } from '@/lib/share'
+import { DAILY_META } from '@/lib/ogMeta'
 
 export const revalidate = 300
+
+export const metadata: Metadata = {
+  title: DAILY_META.title,
+  description: DAILY_META.description,
+  openGraph: {
+    title: DAILY_META.title,
+    description: DAILY_META.description,
+    url: '/daily',
+  },
+}
 
 type Props = {
   searchParams: Promise<{ team?: string }>
