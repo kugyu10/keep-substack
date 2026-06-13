@@ -3,8 +3,9 @@ import { buildOgGrassStrip, OG_GRASS_WEEKS } from '../ogImageData'
 import { isoToJSTDateKey } from '../calendarUtils'
 import type { FeedItem } from '../types'
 
-// JST「今日」のISO（UTC基準で +9h されると今日のJSTキーになる時刻）。
-// 正午JSTぶんを足すことで日付境界の揺れを避ける。
+// JST「今日」を基準にした daysAgo 日前の ISO 文字列を返す。
+// 実装は実時刻（Date.now()）基準なので、JST 日付境界付近（00:00–09:00 JST）に
+// 実行すると日付キーが揺れうる点に注意（正午オフセット等の固定はしていない）。
 function jstTodayIso(daysAgo = 0): string {
   const ms = Date.now() - daysAgo * 24 * 60 * 60 * 1000
   return new Date(ms).toISOString()
