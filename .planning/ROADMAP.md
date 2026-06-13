@@ -150,7 +150,8 @@ Full archive: `.planning/milestones/v1.8-ROADMAP.md`
   1. トップ Commit&Goal でチームタブを切り替えるとURLにそのチーム状態が反映される（リロード・別タブで貼り直しても同じチームが選択された状態で開く）
   2. `/daily` と 個人カレンダー `/member/[id]` が、状態を含む公開URLで誰でも（未ログインでも）同じ表示にアクセスできる
   3. 対象4ビューすべてについて「現在表示中の状態を表す正規の公開URL」を1関数/規約で取得でき、Phase 38 の共有ボタンが参照できる
-**Plans**: TBD
+**Plans**: 1 plan
+- [ ] 37-01-PLAN.md — 個人カレンダーを ?ym= 駆動URL化 + buildShareUrl 規約ヘルパ（top/daily は ?team= 既存確認）
 **UI hint**: yes
 
 ### Phase 38: ワンボタン共有（クリップボード + Substack Notes 起動）
