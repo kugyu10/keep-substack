@@ -22,8 +22,8 @@
 
 ### OGP（リンクプレビュー）
 
-- [ ] **OGP-01**: 共有対象ルートに適切なOGメタタグ（`og:title` / `og:description` / `og:image` / Twitter Card）が出力される
-- [ ] **OGP-02**: 共有対象ルートに、その人の草／実績が見える動的OG画像を Next.js `ImageResponse`（`opengraph-image`）で生成する
+- [x] **OGP-01**: 共有対象ルートに適切なOGメタタグ（`og:title` / `og:description` / `og:image` / Twitter Card）が出力される
+- [x] **OGP-02**: 共有対象ルートに、その人の草／実績が見える動的OG画像を Next.js `ImageResponse`（`opengraph-image`）で生成する
 
 ## v2 Requirements
 
@@ -56,8 +56,8 @@
 | SHARE-05 | Phase 38 | Pending |
 | SHARE-06 | Phase 38 | Pending |
 | URL-01 | Phase 37 | Pending |
-| OGP-01 | Phase 39 | Pending |
-| OGP-02 | Phase 39 | Pending |
+| OGP-01 | Phase 39 | Complete |
+| OGP-02 | Phase 39 | Complete |
 
 **Coverage:**
 - v1.9 requirements: 9 total

@@ -3,14 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: ワンボタン Substack Note 共有
 status: planning
-last_updated: "2026-06-14T00:00:00.000Z"
-last_activity: 2026-06-14
+stopped_at: context exhaustion at 76% (2026-06-13)
+last_updated: "2026-06-14T16:37:00.000Z"
+last_activity: 2026-06-14 — Phase 39（OGメタ + 動的OG画像）完了。OGP-01/02 充足、228 tests green、build OK
 progress:
   total_phases: 3
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  completed_phases: 3
+  total_plans: 3
+  completed_plans: 3
+  percent: 100
 ---
 
 # Project State
@@ -24,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-06-11 — v1.8 shipped)
 
 ## Current Position
 
-Phase: 37 — 共有URLの状態保持（公開URL化）
-Plan: — (not yet planned)
-Status: Roadmap complete — ready to plan Phase 37
-Last activity: 2026-06-14 — v1.9 ROADMAP 作成（Phases 37-39、要件9/9マップ済み）
+Phase: 39 — リンクプレビュー（OGメタタグ + 動的OG画像）
+Plan: 01 — Complete
+Status: Phase 39 完了（OGP-01/02 充足）。v1.9 全フェーズ実装完了 → human-UAT（リンクデバッガ）待ち
+Last activity: 2026-06-14 — Phase 39 実装完了（next/og 動的OG画像 + OGメタ、228 tests green、build OK）
 
 ### v1.9 Roadmap Summary
 
@@ -86,6 +87,7 @@ Last activity: 2026-06-14 — v1.9 ROADMAP 作成（Phases 37-39、要件9/9マ�
 | Phase 36 P02 | ~6min | 2 tasks | 2 files files |
 | Phase 36 P03 | ~10min | 4 tasks | 2 files |
 | Phase 36 P04 | ~3min | 2 tasks | 2 files |
+| Phase 39 P01 | 4min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -121,9 +123,9 @@ Last activity: 2026-06-14 — v1.9 ROADMAP 作成（Phases 37-39、要件9/9マ�
 
 ## Session Continuity
 
-Last session: 2026-06-13T15:42:40.993Z
-Stopped at: context exhaustion at 76% (2026-06-13)
-Next step: `/gsd:plan-phase 37`（共有URLの状態保持／公開URL化）。並行して v1.8 Deferred の本番手動確認も可。
+Last session: 2026-06-14T16:37:00.000Z
+Stopped at: Completed 39-01-PLAN.md（Phase 39 OG メタ + 動的OG画像）
+Next step: Phase 39 human-UAT（本番/プレビューURLをリンクデバッガに貼り summary_large_image・/member 画像の草/記事数/ハンドル・JP グリフ描画可否を確認）。v1.9 全実装完了につき milestone close 判断も可。
 
 ## Deferred Items (v1.8 close — 2026-06-11)
 

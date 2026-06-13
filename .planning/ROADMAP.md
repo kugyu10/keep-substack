@@ -176,7 +176,7 @@ Full archive: `.planning/milestones/v1.8-ROADMAP.md`
   2. 共有対象ルートに、対象メンバー/ビューの草・実績が見える動的OG画像が Next.js `ImageResponse`（`opengraph-image`）で生成され、`og:image` として配信される（OGP-02）
   3. 個人ビュー `/member/[id]` を共有したとき、そのメンバー固有の内容を反映したOG画像がプレビューに表示される
 **Plans**: 1 plan
-- [ ] 39-PLAN.md — OGメタタグ修正 + 純関数ヘルパ + 動的OG画像（メンバー専用 + サイト共通デフォルト）
+- [x] 39-PLAN.md — OGメタタグ修正 + 純関数ヘルパ + 動的OG画像（メンバー専用 + サイト共通デフォルト） — completed 2026-06-14
 **UI hint**: yes
 
 ---
@@ -228,4 +228,4 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 36. QA・UAT・検証ギャップ解消 | v1.8 | 4/4 | Complete    | 2026-06-08 |
 | 37. 共有URLの状態保持（公開URL化） | v1.9 | 0/0 | Not started | - |
 | 38. ワンボタン共有（クリップボード + Substack Notes 起動） | v1.9 | 0/0 | Not started | - |
-| 39. リンクプレビュー（OGメタタグ + 動的OG画像） | v1.9 | 0/0 | Not started | - |
+| 39. リンクプレビュー（OGメタタグ + 動的OG画像） | v1.9 | 1/1 | Complete | 2026-06-14 |
