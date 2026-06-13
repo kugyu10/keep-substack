@@ -198,4 +198,32 @@ describe('buildOgWeeklyGrid', () => {
     expect(g.weeks[2][0].achieved).toBe(true)
     expect(g.weeks[2][1].achieved).toBe(false)
   })
+
+  it('達成枠は記事の thumbnail を運ぶ', () => {
+    const items: FeedItem[] = [
+      { isoDate: isoForThisWeek(2), thumbnail: 'https://example.com/cover.jpg' },
+    ]
+    const g = buildOgWeeklyGrid([slot(2)], items)
+    expect(g.weeks[2][0].achieved).toBe(true)
+    expect(g.weeks[2][0].thumbnail).toBe('https://example.com/cover.jpg')
+    // 未達成枠は thumbnail を持たない
+    expect(g.weeks[0][0].achieved).toBe(false)
+    expect(g.weeks[0][0].thumbnail).toBeUndefined()
+  })
+
+  it('thumbnail の無い達成記事は achieved=true / thumbnail=undefined', () => {
+    const items: FeedItem[] = [{ isoDate: isoForThisWeek(3) }] // 水曜・画像なし
+    const g = buildOgWeeklyGrid([slot(3)], items)
+    expect(g.weeks[2][0].achieved).toBe(true)
+    expect(g.weeks[2][0].thumbnail).toBeUndefined()
+  })
+
+  it('同日に複数記事があるとき最初の記事の thumbnail を採用', () => {
+    const items: FeedItem[] = [
+      { isoDate: isoForThisWeek(4), thumbnail: 'https://example.com/first.jpg' },
+      { isoDate: isoForThisWeek(4), thumbnail: 'https://example.com/second.jpg' },
+    ]
+    const g = buildOgWeeklyGrid([slot(4)], items)
+    expect(g.weeks[2][0].thumbnail).toBe('https://example.com/first.jpg')
+  })
 })

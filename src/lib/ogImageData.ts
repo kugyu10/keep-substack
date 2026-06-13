@@ -54,8 +54,9 @@ export function ogHandle(
  * 1メンバーぶんの「週次コミットグリッド」セル。CommitGoalView と同じ
  * 3週（2週前→先週→今週）×コミット枠の達成可否を表す。
  * achieved: その枠の曜日に記事があったか。
+ * thumbnail: 達成枠に記事カバー画像があれば、その URL（live CommitGrid と同様に表示）。
  */
-export type OgWeeklyCell = { achieved: boolean }
+export type OgWeeklyCell = { achieved: boolean; thumbnail?: string }
 export type OgWeeklyGrid = { weeks: OgWeeklyCell[][]; slotCount: number }
 
 /**
@@ -73,12 +74,12 @@ export function buildOgWeeklyGrid(
   const sortedSlots = [...slots].sort((a, b) => a.day_of_week - b.day_of_week)
   if (sortedSlots.length === 0) return { weeks: [], slotCount: 0 }
 
-  // 記事の JST 日付キー集合（存在判定のみ）
-  const articleDays = new Set<string>()
+  // JST 日付キー → その日の最初の記事（カバー画像取得用、live CommitGrid と同じ発想）
+  const articleByDay = new Map<string, FeedItem>()
   for (const item of items) {
     if (!item.isoDate) continue
     const key = isoToJSTDateKey(item.isoDate)
-    if (key) articleDays.add(key)
+    if (key && !articleByDay.has(key)) articleByDay.set(key, item)
   }
 
   const weekOffsets = [-2, -1, 0] // 2週前 → 先週 → 今週
@@ -86,7 +87,8 @@ export function buildOgWeeklyGrid(
     const weekDates = getWeekDates(offset)
     return sortedSlots.map((slot) => {
       const dateKey = weekDates[slot.day_of_week - 1]
-      return { achieved: !!dateKey && articleDays.has(dateKey) }
+      const article = dateKey ? articleByDay.get(dateKey) : undefined
+      return { achieved: !!article, thumbnail: article?.thumbnail }
     })
   })
 

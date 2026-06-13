@@ -2,7 +2,11 @@ import { ImageResponse } from 'next/og'
 import { getMembers } from './members'
 import { getArticlesForMembers } from './articles'
 import { createSupabaseAdminClient } from './supabase/admin'
-import { sortMembersForCommitView } from './commitUtils'
+import {
+  sortMembersForCommitView,
+  consecutiveWeekStreak,
+  isThisWeekComplete,
+} from './commitUtils'
 import {
   buildOgWeeklyGrid,
   ogInitial,
@@ -40,7 +44,54 @@ function brandTitle(variant: Variant, team?: string): string {
   return variant === 'daily' ? 'みんなのSubstack更新' : 'コミット&ゴール'
 }
 
-/** 週次グリッド（3週 × コミット枠）を縦並びのセル群として描く。 */
+// グリッドのセル一辺（px）。枠数が多い行は少し小さくして横はみ出しを防ぐ。
+function cellSize(slotCount: number): number {
+  if (slotCount >= 5) return 38
+  if (slotCount >= 3) return 44
+  return 50
+}
+
+/** 1セル: 達成なら記事カバー画像（無ければオレンジ塗り）、未達成は淡いプレースホルダ。 */
+function GridCell({ cell, size }: { cell: { achieved: boolean; thumbnail?: string }; size: number }) {
+  const radius = Math.round(size * 0.24)
+  if (cell.achieved && cell.thumbnail) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          width: `${size}px`,
+          height: `${size}px`,
+          borderRadius: `${radius}px`,
+          overflow: 'hidden',
+          background: ACHIEVED,
+          border: `2px solid ${PRIMARY}`,
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={cell.thumbnail}
+          alt=""
+          width={size}
+          height={size}
+          style={{ width: `${size}px`, height: `${size}px`, objectFit: 'cover' }}
+        />
+      </div>
+    )
+  }
+  return (
+    <div
+      style={{
+        display: 'flex',
+        width: `${size}px`,
+        height: `${size}px`,
+        borderRadius: `${radius}px`,
+        background: cell.achieved ? ACHIEVED : EMPTY,
+      }}
+    />
+  )
+}
+
+/** 週次グリッド（3週 × コミット枠）を週ごとのまとまりとして描く。 */
 function WeeklyGrid({ grid }: { grid: OgWeeklyGrid }) {
   if (grid.slotCount === 0) {
     return (
@@ -49,7 +100,7 @@ function WeeklyGrid({ grid }: { grid: OgWeeklyGrid }) {
       </div>
     )
   }
-  const cell = grid.slotCount >= 5 ? 22 : 28
+  const size = cellSize(grid.slotCount)
   return (
     <div style={{ display: 'flex', gap: '14px' }}>
       {grid.weeks.map((week, wi) => (
@@ -57,22 +108,14 @@ function WeeklyGrid({ grid }: { grid: OgWeeklyGrid }) {
           key={wi}
           style={{
             display: 'flex',
-            gap: '5px',
-            padding: '6px',
-            borderRadius: '8px',
+            gap: '6px',
+            padding: '8px',
+            borderRadius: '12px',
             background: '#f4f5f7',
           }}
         >
           {week.map((c, ci) => (
-            <div
-              key={ci}
-              style={{
-                width: `${cell}px`,
-                height: `${cell}px`,
-                borderRadius: '5px',
-                background: c.achieved ? ACHIEVED : EMPTY,
-              }}
-            />
+            <GridCell key={ci} cell={c} size={size} />
           ))}
         </div>
       ))}
@@ -84,19 +127,23 @@ function MemberRow({
   name,
   imageUrl,
   grid,
+  streak,
+  complete,
 }: {
   name: string
   imageUrl?: string
   grid: OgWeeklyGrid
+  streak: number
+  complete: boolean
 }) {
-  const display = ogTruncateName(name, 10)
+  const display = ogTruncateName(name, 8)
   return (
     <div
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '20px',
-        padding: '14px 0',
+        gap: '22px',
+        padding: '11px 0',
         borderBottom: '1px solid #ededed',
       }}
     >
@@ -115,6 +162,8 @@ function MemberRow({
           fontWeight: 700,
           overflow: 'hidden',
           flexShrink: 0,
+          border: '3px solid #ffffff',
+          boxShadow: '0 0 0 2px #ffd9c6',
         }}
       >
         {imageUrl ? (
@@ -133,14 +182,24 @@ function MemberRow({
       <div
         style={{
           display: 'flex',
-          width: '300px',
-          fontSize: '32px',
-          fontWeight: 700,
-          color: TEXT,
+          flexDirection: 'column',
+          width: '280px',
           overflow: 'hidden',
         }}
       >
-        {display}
+        <div style={{ display: 'flex', fontSize: '34px', fontWeight: 700, color: TEXT, lineHeight: 1.1 }}>
+          {display}
+        </div>
+        {(complete || streak >= 2) && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', fontSize: '24px' }}>
+            {complete && <span style={{ display: 'flex' }}>👑</span>}
+            {streak >= 2 && (
+              <span style={{ display: 'flex', alignItems: 'center', color: PRIMARY, fontWeight: 700 }}>
+                🔥{streak}週連続
+              </span>
+            )}
+          </div>
+        )}
       </div>
       <WeeklyGrid grid={grid} />
     </div>
@@ -191,22 +250,43 @@ export async function renderMembersGridOg(
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          padding: '56px 64px',
+          padding: '40px 64px',
           background: '#ffffff',
           backgroundImage: 'linear-gradient(135deg, #ffffff 0%, #fff4ee 100%)',
           ...fontOpts,
         }}
       >
         {/* header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '12px' }}>
-          <div style={{ display: 'flex', width: '16px', height: '46px', borderRadius: '5px', background: PRIMARY }} />
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', fontSize: '46px', fontWeight: 700, color: TEXT, lineHeight: 1.1 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '20px',
+            paddingBottom: '18px',
+            borderBottom: `3px solid ${PRIMARY}`,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+            <div style={{ display: 'flex', width: '14px', height: '54px', borderRadius: '5px', background: PRIMARY }} />
+            <div style={{ display: 'flex', fontSize: '52px', fontWeight: 700, color: TEXT, lineHeight: 1.05 }}>
               {brandTitle(variant, team)}
             </div>
-            <div style={{ display: 'flex', fontSize: '22px', fontWeight: 400, color: PRIMARY, marginTop: '2px' }}>
-              Keep Substack
-            </div>
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              background: PRIMARY,
+              color: '#ffffff',
+              fontSize: '24px',
+              fontWeight: 700,
+              padding: '8px 18px',
+              borderRadius: '999px',
+            }}
+          >
+            Keep Substack
           </div>
         </div>
 
@@ -217,17 +297,19 @@ export async function renderMembersGridOg(
               まだメンバーがいません
             </div>
           ) : (
-            sorted.map((r) => (
-              <MemberRow
-                key={r.member.publicationId}
-                name={r.member.name}
-                imageUrl={r.imageUrl}
-                grid={buildOgWeeklyGrid(
-                  slots.filter((s) => s.member_id === r.member.id),
-                  r.items
-                )}
-              />
-            ))
+            sorted.map((r) => {
+              const memberSlots = slots.filter((s) => s.member_id === r.member.id)
+              return (
+                <MemberRow
+                  key={r.member.publicationId}
+                  name={r.member.name}
+                  imageUrl={r.imageUrl}
+                  grid={buildOgWeeklyGrid(memberSlots, r.items)}
+                  streak={consecutiveWeekStreak(memberSlots, r.items)}
+                  complete={isThisWeekComplete(memberSlots, r.items)}
+                />
+              )
+            })
           )}
         </div>
       </div>

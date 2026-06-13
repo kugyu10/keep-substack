@@ -98,6 +98,12 @@ export default async function MemberOpengraphImage({
   const handle = ogHandle(member.substackHandle, publicationId)
   const name = ogTruncateName(member.name, 14)
 
+  // 直近の記事カバー画像（自慢用）。items は pub_date 降順なので先頭から最大4枚。
+  const recentThumbs = items
+    .filter((it) => it.thumbnail)
+    .slice(0, 4)
+    .map((it) => it.thumbnail as string)
+
   // 直近 OG_GRASS_WEEKS×7 日を 7行×週列のグリッドへ切り分けて装飾表示（連続日, WR-01）。
   const columns: { dateKey: string; count: number }[][] = []
   for (let w = 0; w < OG_GRASS_WEEKS; w++) {
@@ -115,16 +121,28 @@ export default async function MemberOpengraphImage({
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          padding: '64px 72px',
+          padding: '48px 64px',
           background: '#ffffff',
           backgroundImage: 'linear-gradient(135deg, #ffffff 0%, #fff4ee 100%)',
           ...(fontFamily ? { fontFamily } : {}),
         }}
       >
         {/* brand strip */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ display: 'flex', width: '14px', height: '40px', borderRadius: '5px', background: PRIMARY }} />
-          <div style={{ display: 'flex', fontSize: '32px', fontWeight: 700, color: PRIMARY }}>Keep Substack</div>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            background: PRIMARY,
+            color: '#ffffff',
+            fontSize: '26px',
+            fontWeight: 700,
+            padding: '8px 20px',
+            borderRadius: '999px',
+            alignSelf: 'flex-start',
+          }}
+        >
+          Keep Substack
         </div>
 
         {/* identity: avatar + name + handle */}
@@ -132,56 +150,81 @@ export default async function MemberOpengraphImage({
           <div
             style={{
               display: 'flex',
-              width: '128px',
-              height: '128px',
-              borderRadius: '64px',
+              width: '120px',
+              height: '120px',
+              borderRadius: '60px',
               background: avatarBg(member.name || publicationId),
               alignItems: 'center',
               justifyContent: 'center',
               color: '#ffffff',
-              fontSize: '60px',
+              fontSize: '56px',
               fontWeight: 700,
               overflow: 'hidden',
               flexShrink: 0,
+              border: '4px solid #ffffff',
+              boxShadow: '0 0 0 3px #ffd9c6',
             }}
           >
             {imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={imageUrl} alt="" width={128} height={128} style={{ width: '128px', height: '128px', objectFit: 'cover' }} />
+              <img src={imageUrl} alt="" width={120} height={120} style={{ width: '120px', height: '120px', objectFit: 'cover' }} />
             ) : (
               ogInitial(member.name)
             )}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {name && (
-              <div style={{ display: 'flex', fontSize: '58px', fontWeight: 700, color: TEXT, lineHeight: 1.1 }}>
+              <div style={{ display: 'flex', fontSize: '56px', fontWeight: 700, color: TEXT, lineHeight: 1.1 }}>
                 {name}
               </div>
             )}
-            <div style={{ display: 'flex', fontSize: '38px', fontWeight: 700, color: PRIMARY, marginTop: name ? '6px' : '0' }}>
+            <div style={{ display: 'flex', fontSize: '34px', fontWeight: 700, color: PRIMARY, marginTop: name ? '4px' : '0' }}>
               {handle}
             </div>
           </div>
         </div>
 
-        {/* grass strip */}
-        <div style={{ display: 'flex', gap: '8px' }}>
-          {columns.map((col, ci) => (
-            <div key={ci} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {col.map((cell, ri) => (
-                <div key={ri} style={{ width: '36px', height: '36px', borderRadius: '8px', background: grassColor(cell.count) }} />
-              ))}
-            </div>
-          ))}
-        </div>
-
-        {/* footer: article count */}
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '16px' }}>
-          <div style={{ display: 'flex', fontSize: '88px', fontWeight: 700, color: PRIMARY, lineHeight: 1 }}>
-            {articleCount}
+        {/* recent article cover thumbnails (自慢) */}
+        {recentThumbs.length > 0 && (
+          <div style={{ display: 'flex', gap: '18px' }}>
+            {recentThumbs.map((src, i) => (
+              <div
+                key={i}
+                style={{
+                  display: 'flex',
+                  width: '124px',
+                  height: '124px',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  border: `3px solid ${PRIMARY}`,
+                  background: EMPTY,
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt="" width={124} height={124} style={{ width: '124px', height: '124px', objectFit: 'cover' }} />
+              </div>
+            ))}
           </div>
-          <div style={{ display: 'flex', fontSize: '36px', fontWeight: 700, color: '#5a5a5a' }}>
-            本の継続記録
+        )}
+
+        {/* footer: grass strip + article count on one row */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', gap: '6px' }}>
+            {columns.map((col, ci) => (
+              <div key={ci} style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                {col.map((cell, ri) => (
+                  <div key={ri} style={{ width: '17px', height: '17px', borderRadius: '4px', background: grassColor(cell.count) }} />
+                ))}
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+            <div style={{ display: 'flex', fontSize: '92px', fontWeight: 700, color: PRIMARY, lineHeight: 1 }}>
+              {articleCount}
+            </div>
+            <div style={{ display: 'flex', fontSize: '34px', fontWeight: 700, color: '#5a5a5a' }}>
+              本の継続記録
+            </div>
           </div>
         </div>
       </div>
