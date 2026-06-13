@@ -8,9 +8,18 @@ import ShareButton from '@/components/ShareButton'
 import ViewTabs from '@/components/ViewTabs'
 import { SHARE_REQUIRE_LOGIN } from '@/lib/share'
 import { TOP_META } from '@/lib/ogMeta'
+import { buildOgImagePath, OG_WIDTH, OG_HEIGHT } from '@/lib/ogScreenshotUrl'
 import type { CommitSlot } from '@/lib/types'
 
 export const revalidate = 300
+
+// og:image はスクリーンショット型（/api/og）。metadataBase（= getSiteUrl）で
+// 絶対URL化される。team 別 OG は v1.9 では既定/All のみ（後で対応）。
+const TOP_OG_IMAGE = {
+  url: buildOgImagePath('goal'),
+  width: OG_WIDTH,
+  height: OG_HEIGHT,
+}
 
 export const metadata: Metadata = {
   title: TOP_META.title,
@@ -19,6 +28,13 @@ export const metadata: Metadata = {
     title: TOP_META.title,
     description: TOP_META.description,
     url: '/',
+    images: [TOP_OG_IMAGE],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TOP_META.title,
+    description: TOP_META.description,
+    images: [TOP_OG_IMAGE.url],
   },
 }
 

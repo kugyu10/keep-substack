@@ -9,6 +9,7 @@ import ShareButton from '@/components/ShareButton'
 import { getMembers } from '@/lib/members'
 import { parseYmParam, formatYmParam, buildShareUrl } from '@/lib/shareUrl'
 import { buildMemberMetaTitle, buildMemberMetaDescription } from '@/lib/ogMeta'
+import { buildOgImagePath, OG_WIDTH, OG_HEIGHT } from '@/lib/ogScreenshotUrl'
 import { SHARE_REQUIRE_LOGIN } from '@/lib/share'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
@@ -38,6 +39,13 @@ export async function generateMetadata({
   const description = buildMemberMetaDescription(member.name, articleCount)
   const url = buildShareUrl({ type: 'member', publicationId })
 
+  // og:image はスクリーンショット型（/api/og）。metadataBase で絶対URL化される。
+  const ogImage = {
+    url: buildOgImagePath('member', { publicationId }),
+    width: OG_WIDTH,
+    height: OG_HEIGHT,
+  }
+
   return {
     title,
     description,
@@ -45,6 +53,13 @@ export async function generateMetadata({
       title,
       description,
       url,
+      images: [ogImage],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage.url],
     },
   }
 }

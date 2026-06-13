@@ -7,8 +7,16 @@ import ShareButton from '@/components/ShareButton'
 import ViewTabs from '@/components/ViewTabs'
 import { SHARE_REQUIRE_LOGIN } from '@/lib/share'
 import { DAILY_META } from '@/lib/ogMeta'
+import { buildOgImagePath, OG_WIDTH, OG_HEIGHT } from '@/lib/ogScreenshotUrl'
 
 export const revalidate = 300
+
+// og:image はスクリーンショット型（/api/og）。metadataBase で絶対URL化される。
+const DAILY_OG_IMAGE = {
+  url: buildOgImagePath('daily'),
+  width: OG_WIDTH,
+  height: OG_HEIGHT,
+}
 
 export const metadata: Metadata = {
   title: DAILY_META.title,
@@ -17,6 +25,13 @@ export const metadata: Metadata = {
     title: DAILY_META.title,
     description: DAILY_META.description,
     url: '/daily',
+    images: [DAILY_OG_IMAGE],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: DAILY_META.title,
+    description: DAILY_META.description,
+    images: [DAILY_OG_IMAGE.url],
   },
 }
 
