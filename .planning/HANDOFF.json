@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-06-16T12:23:32.983Z",
+  "phase": "39",
+  "phase_name": "og-og",
+  "phase_dir": ".planning/phases/39-og-og",
+  "plan": 1,
+  "task": null,
+  "total_tasks": null,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": "debug", "name": "/api/og OOM + OGレイアウト見切れ修正", "status": "done", "commit": "54a3ba7"},
+    {"id": "uat", "name": "Phase 39 UAT 再開 (5 pass / 0 issue / 1 blocked)", "status": "done", "commit": "b603efe"}
+  ],
+  "remaining_tasks": [
+    {"id": "deploy", "name": "PR #9 (v1.9) を開発者が手動マージ→本番デプロイ", "status": "not_started"},
+    {"id": "test5", "name": "デプロイ後 test5 (リンクデバッガ summary_large_image) 再検証→UAT complete", "status": "not_started"},
+    {"id": "milestone", "name": "v1.9 milestone close 判断 (/gsd:complete-milestone)", "status": "not_started"}
+  ],
+  "blockers": [
+    {"description": "test5 (リンクデバッガ) は /og-view + /api/og が本番/プレビュー未デプロイのため検証不可", "type": "external", "workaround": "PR #9 マージ→Vercel デプロイ後に再検証"}
+  ],
+  "human_actions_pending": [
+    {"action": "PR #9 (v1.9 develop) を内容確認の上 main へ手動マージ", "context": "CLAUDE.md 運用ルールでマージは開発者手動。Claude はマージ禁止", "blocking": true}
+  ],
+  "decisions": [
+    {"decision": "OG OOM 真因は Turbopack dev リーク。dev を webpack 化 + predev kill で回避", "rationale": "対照実験で webpack 安定/Turbopack リーク確定。本番(Vercel)無影響", "phase": "39"},
+    {"decision": "スクショ方式は維持(satori戻し等の方式変更は不要)", "rationale": "クラッシュは方式でなく dev インフラ由来。忠実性要求も満たす", "phase": "39"},
+    {"decision": "OGフレーム収容は scale: member 0.58 / daily 0.67 (丸径を member に統一)", "rationale": "実コンポーネント不変で忠実性維持。daily は人数次第の見切れ許容(ユーザー方針)", "phase": "39"}
+  ],
+  "uncommitted_files": [".env.local (gitignore: NEXT_PUBLIC_SITE_URL=http://localhost:3000)", ".planning/STATE.md (本セッション前から M)"],
+  "next_action": "PR #9 を開発者がマージ→本番デプロイ後、/gsd:verify-work 39 で test5 を再検証し UAT を complete に。その後 /gsd:complete-milestone で v1.9 クローズ判断",
+  "context_notes": "v1.9 全実装完了。Phase 39 UAT は 5/6 pass、残1(test5)はデプロイ依存の blocked のみ=新規バグ無し。dev は今後 webpack で起動(npm run dev に predev kill 同梱)。.env.local の NEXT_PUBLIC_SITE_URL は他環境にも必要→.env.example/README 追記を次回検討。daily OG は人数増で下端見切れ(仕様許容)。"
+}

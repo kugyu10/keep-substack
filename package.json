@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "predev": "pkill -f 'next dev' 2>/dev/null; sleep 1; exit 0",
+    "dev": "NODE_OPTIONS=--max-old-space-size=4096 next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",

@@ -131,8 +131,33 @@ async function DailyView() {
   return (
     <Frame>
       <Brand label="みんなのSubstack更新（日次）" />
-      <div style={{ maxWidth: '960px', flex: 1, overflow: 'hidden' }}>
-        <WeeklyHeatmapGrid results={results} />
+      {/* daily（週次ヒートマップ）はメンバー数ぶんの行＋週送り/曜日ヘッダーで、
+          メンバーが増えれば行が増えて Frame(1200x630) には構造的に全行入りきらない。
+          方針変更(2026-06-16): 全行収容は要件にしない（人数次第で下端見切れは許容）。
+          最優先は「daily の丸（ヒートマップのセル/ドット）径を member カレンダーの丸径と
+          揃えること」。実コンポーネント(WeeklyHeatmapGrid)は一切変えず、960px 幅レイアウトを
+          transform: scale で等比縮小（top center 起点）。member(820px×0.58, 丸径≈131px@2x)に
+          対し daily の丸径を一致させるため、実 PNG 計測(member131px / daily(0.6)117px = 1.12)
+          から scale=0.67 を採用（0.6→0.67 で丸径 117→≈131px@2x = member 同等）。
+          下端のメンバー行は見切れてよい。実物の見た目（比率・配置）は維持される。 */}
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            width: '960px',
+            transform: 'scale(0.67)',
+            transformOrigin: 'top center',
+          }}
+        >
+          <WeeklyHeatmapGrid results={results} />
+        </div>
       </div>
     </Frame>
   )
@@ -156,8 +181,12 @@ async function MemberView({ publicationId }: { publicationId?: string }) {
   return (
     <Frame>
       <Brand label="Substack継続記録" />
-      {/* member カレンダーは正方形寄り。フレーム幅いっぱいに引き伸ばして中央寄せし、
-          OG カードとして余白が出すぎないようにする（実コンポーネントはそのまま）。 */}
+      {/* member カレンダー（ヘッダー＋最大6週グリッド）は 820px 幅だと自然高さが
+          ~870px になり、Frame の利用可能高さ(~530px)を超えて下半分の週がクリップ
+          される。実コンポーネント(CalendarGrid)は一切変えず、820px 幅のレイアウトを
+          transform: scale で等比縮小して Frame 内に収める（top center 起点）。
+          scale=0.58 で 820px→~476px 幅・~870px→~505px 高さとなり、6 週すべてが
+          1200x630 フレーム内に収まる。実物の見た目（比率・配置）は維持される。 */}
       <div
         style={{
           flex: 1,
@@ -167,7 +196,13 @@ async function MemberView({ publicationId }: { publicationId?: string }) {
           overflow: 'hidden',
         }}
       >
-        <div style={{ width: '820px' }}>
+        <div
+          style={{
+            width: '820px',
+            transform: 'scale(0.58)',
+            transformOrigin: 'top center',
+          }}
+        >
           <CalendarGrid
             memberName={memberResult.member.name}
             articleMap={Array.from(map.entries())}
