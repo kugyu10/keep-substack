@@ -1,26 +1,34 @@
 {
   "version": "1.0",
-  "timestamp": "2026-06-16T10:17:06.039Z",
+  "timestamp": "2026-06-16T12:23:32.983Z",
   "phase": "39",
   "phase_name": "og-og",
   "phase_dir": ".planning/phases/39-og-og",
+  "plan": 1,
+  "task": null,
+  "total_tasks": null,
   "status": "paused",
-  "work_type": "verify-work (UAT)",
-  "uat_status": "partial",
-  "summary": "Phase 39 UAT: 2 passed, 1 blocker, 3 blocked. Re-verified against current /api/og (Phase 39's opengraph-image.tsx was superseded by v1.9 screenshot method).",
+  "completed_tasks": [
+    {"id": "debug", "name": "/api/og OOM + OGレイアウト見切れ修正", "status": "done", "commit": "54a3ba7"},
+    {"id": "uat", "name": "Phase 39 UAT 再開 (5 pass / 0 issue / 1 blocked)", "status": "done", "commit": "b603efe"}
+  ],
+  "remaining_tasks": [
+    {"id": "deploy", "name": "PR #9 (v1.9) を開発者が手動マージ→本番デプロイ", "status": "not_started"},
+    {"id": "test5", "name": "デプロイ後 test5 (リンクデバッガ summary_large_image) 再検証→UAT complete", "status": "not_started"},
+    {"id": "milestone", "name": "v1.9 milestone close 判断 (/gsd:complete-milestone)", "status": "not_started"}
+  ],
   "blockers": [
-    {
-      "description": "Local /api/og resolves screenshot target to PRODUCTION url (https://keep-substack.com/og-view/...) instead of localhost -> page.goto networkidle 25s timeout -> fallback -> FATAL JS heap OOM (~15GB) crashes dev server",
-      "type": "technical",
-      "severity": "blocker",
-      "test": 3,
-      "workaround": "none yet; likely getSiteUrl/NEXT_PUBLIC_SITE_URL returns prod domain locally + memory leak/Chromium not released on timeout path"
-    }
+    {"description": "test5 (リンクデバッガ) は /og-view + /api/og が本番/プレビュー未デプロイのため検証不可", "type": "external", "workaround": "PR #9 マージ→Vercel デプロイ後に再検証"}
+  ],
+  "human_actions_pending": [
+    {"action": "PR #9 (v1.9 develop) を内容確認の上 main へ手動マージ", "context": "CLAUDE.md 運用ルールでマージは開発者手動。Claude はマージ禁止", "blocking": true}
   ],
   "decisions": [
-    {"decision": "404 on /opengraph-image and /member/[id]/opengraph-image is NOT a bug", "rationale": "Phase 39 opengraph-image.tsx (ImageResponse) was intentionally deleted in commit e697e03 (v1.9 screenshot method). Current OG = /api/og?view=goal|daily|member. Original UAT tests targeted stale URLs.", "phase": "39"},
-    {"decision": "Re-verify Phase 39 OG against /api/og?view=...", "rationale": "user chose '現行/api/ogで再検証'", "phase": "39"}
+    {"decision": "OG OOM 真因は Turbopack dev リーク。dev を webpack 化 + predev kill で回避", "rationale": "対照実験で webpack 安定/Turbopack リーク確定。本番(Vercel)無影響", "phase": "39"},
+    {"decision": "スクショ方式は維持(satori戻し等の方式変更は不要)", "rationale": "クラッシュは方式でなく dev インフラ由来。忠実性要求も満たす", "phase": "39"},
+    {"decision": "OGフレーム収容は scale: member 0.58 / daily 0.67 (丸径を member に統一)", "rationale": "実コンポーネント不変で忠実性維持。daily は人数次第の見切れ許容(ユーザー方針)", "phase": "39"}
   ],
-  "next_action": "Diagnose the /api/og timeout+OOM blocker (likely getSiteUrl returning prod domain locally + Chromium/memory not freed on timeout). Use /gsd:debug in fresh context. Files: src/lib/screenshot.ts:99, src/app/api/og/route.tsx:106, getSiteUrl/buildOgImagePath, NEXT_PUBLIC_SITE_URL env. After fix, /gsd:verify-work 39 re-runs blocked tests 3-6.",
-  "context_notes": "UAT file at .planning/phases/39-og-og/39-UAT.md status=partial. Debug session for 404 not-a-bug at .planning/debug/og-image-404.md. Valid /api/og views: goal|daily|member (member needs publicationId). Per memory: local needs NEXT_PUBLIC_SITE_URL + restart; prod needs Vercel Pro maxDuration."
+  "uncommitted_files": [".env.local (gitignore: NEXT_PUBLIC_SITE_URL=http://localhost:3000)", ".planning/STATE.md (本セッション前から M)"],
+  "next_action": "PR #9 を開発者がマージ→本番デプロイ後、/gsd:verify-work 39 で test5 を再検証し UAT を complete に。その後 /gsd:complete-milestone で v1.9 クローズ判断",
+  "context_notes": "v1.9 全実装完了。Phase 39 UAT は 5/6 pass、残1(test5)はデプロイ依存の blocked のみ=新規バグ無し。dev は今後 webpack で起動(npm run dev に predev kill 同梱)。.env.local の NEXT_PUBLIC_SITE_URL は他環境にも必要→.env.example/README 追記を次回検討。daily OG は人数増で下端見切れ(仕様許容)。"
 }
