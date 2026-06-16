@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: ワンボタン Substack Note 共有
-status: planning
-stopped_at: context exhaustion at 76% (2026-06-13)
-last_updated: "2026-06-14T16:37:00.000Z"
-last_activity: 2026-06-14 — Phase 39（OGメタ + 動的OG画像）完了。OGP-01/02 充足、228 tests green、build OK
+status: Phase 39 完了（OGP-01/02 充足）。v1.9 全フェーズ実装完了 → human-UAT（リンクデバッガ）待ち
+stopped_at: context exhaustion at 78% (2026-06-16)
+last_updated: "2026-06-16T15:43:54.042Z"
+last_activity: 2026-06-14 — Phase 39 実装完了（next/og 動的OG画像 + OGメタ、228 tests green、build OK）
 progress:
   total_phases: 3
-  completed_phases: 3
+  completed_phases: 2
   total_plans: 3
-  completed_plans: 3
-  percent: 100
+  completed_plans: 2
+  percent: 67
 ---
 
 # Project State
@@ -123,8 +123,8 @@ Last activity: 2026-06-14 — Phase 39 実装完了（next/og 動的OG画像 + O
 
 ## Session Continuity
 
-Last session: 2026-06-14T16:37:00.000Z
-Stopped at: Completed 39-01-PLAN.md（Phase 39 OG メタ + 動的OG画像）
+Last session: 2026-06-16T15:43:53.836Z
+Stopped at: context exhaustion at 78% (2026-06-16)
 Next step: Phase 39 human-UAT（本番/プレビューURLをリンクデバッガに貼り summary_large_image・/member 画像の草/記事数/ハンドル・JP グリフ描画可否を確認）。v1.9 全実装完了につき milestone close 判断も可。
 
 ## Deferred Items (v1.8 close — 2026-06-11)
