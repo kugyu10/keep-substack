@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-06-16T10:17:06.039Z",
+  "phase": "39",
+  "phase_name": "og-og",
+  "phase_dir": ".planning/phases/39-og-og",
+  "status": "paused",
+  "work_type": "verify-work (UAT)",
+  "uat_status": "partial",
+  "summary": "Phase 39 UAT: 2 passed, 1 blocker, 3 blocked. Re-verified against current /api/og (Phase 39's opengraph-image.tsx was superseded by v1.9 screenshot method).",
+  "blockers": [
+    {
+      "description": "Local /api/og resolves screenshot target to PRODUCTION url (https://keep-substack.com/og-view/...) instead of localhost -> page.goto networkidle 25s timeout -> fallback -> FATAL JS heap OOM (~15GB) crashes dev server",
+      "type": "technical",
+      "severity": "blocker",
+      "test": 3,
+      "workaround": "none yet; likely getSiteUrl/NEXT_PUBLIC_SITE_URL returns prod domain locally + memory leak/Chromium not released on timeout path"
+    }
+  ],
+  "decisions": [
+    {"decision": "404 on /opengraph-image and /member/[id]/opengraph-image is NOT a bug", "rationale": "Phase 39 opengraph-image.tsx (ImageResponse) was intentionally deleted in commit e697e03 (v1.9 screenshot method). Current OG = /api/og?view=goal|daily|member. Original UAT tests targeted stale URLs.", "phase": "39"},
+    {"decision": "Re-verify Phase 39 OG against /api/og?view=...", "rationale": "user chose '現行/api/ogで再検証'", "phase": "39"}
+  ],
+  "next_action": "Diagnose the /api/og timeout+OOM blocker (likely getSiteUrl returning prod domain locally + Chromium/memory not freed on timeout). Use /gsd:debug in fresh context. Files: src/lib/screenshot.ts:99, src/app/api/og/route.tsx:106, getSiteUrl/buildOgImagePath, NEXT_PUBLIC_SITE_URL env. After fix, /gsd:verify-work 39 re-runs blocked tests 3-6.",
+  "context_notes": "UAT file at .planning/phases/39-og-og/39-UAT.md status=partial. Debug session for 404 not-a-bug at .planning/debug/og-image-404.md. Valid /api/og views: goal|daily|member (member needs publicationId). Per memory: local needs NEXT_PUBLIC_SITE_URL + restart; prod needs Vercel Pro maxDuration."
+}
