@@ -1,5 +1,5 @@
 ---
-status: diagnosed
+status: partial
 phase: 39-og-og
 source: [39-01-SUMMARY.md]
 started: 2026-06-16T09:47:24Z
@@ -9,7 +9,7 @@ updated: 2026-06-16T09:52:00Z
 ## Current Test
 <!-- OVERWRITE each test - shows where we are -->
 
-[testing complete]
+[testing paused — 1 blocker issue (/api/og timeout+OOM), 3 blocked tests outstanding]
 
 ## Tests
 
@@ -21,36 +21,40 @@ result: pass
 expected: og:image / canonical の URL が https://keep-substack.com 始まりの絶対URLになっている（旧 vercel.app ではない）
 result: pass
 
-### 3. メンバー動的OG画像の描画
-expected: /member/[publicationId]/opengraph-image を開くと 1200x630 の PNG で、草ストリップ（12週×7日, 濃淡あり）・記事数・@handle・"Keep Substack"・#FF6719 ブランドカラーが見える
+### 3. メンバー動的OG画像の描画（/api/og 再検証）
+expected: /api/og?view=member&publicationId=<id> を開くと 1200x630 の PNG で、メンバーOG画像（草/記事数/ハンドル等）が表示される
 result: issue
-reported: "404"
-severity: major
+reported: "ローカルの /api/og が https://keep-substack.com/og-view/member?publicationId=uojun（本番URL）へ遷移→page.goto networkidle 25000ms timeout→screenshot failed fallback→直後に FATAL ERROR: Ineffective mark-compacts near heap limit, JavaScript heap out of memory（~15GB）でdevサーバークラッシュ"
+severity: blocker
+note: 当初 /member/[id]/opengraph-image（404・v1.9で削除済み）を検証していたため現行URLで再検証→本物のバグを検出
 
-### 4. サイト共通デフォルトOG画像（top/daily）
-expected: /opengraph-image を開くと "Keep Substack" + 英字タグライン + 草装飾のブランドカードが 1200x630 で表示される
-result: issue
-reported: "404"
-severity: major
+### 4. サイト共通デフォルトOG画像（top/daily, /api/og 再検証）
+expected: /api/og?view=goal および /api/og?view=daily を開くと 1200x630 の PNG ブランドカードが表示される
+result: blocked
+blocked_by: other
+reason: 同一 /api/og エンドポイントが test3 でタイムアウト＋OOMクラッシュするため検証不可。修正後に再検証
+note: 当初 /opengraph-image（404・v1.9で削除済み）を検証していたため、現行スクショ方式URLで再検証
 
 ### 5. リンクデバッガでの summary_large_image 認識
 expected: 本番/プレビューURLを X(Twitter) Card Validator や Facebook Sharing Debugger に貼ると、大判カード(summary_large_image)としてOG画像が認識・プレビュー表示される
-result: skipped
-reason: OG画像ルートが404（テスト3・4）のため検証不可。OG画像修正後に再検証する
+result: blocked
+blocked_by: other
+reason: /api/og（test3）のタイムアウト＋OOMクラッシュ修正後に再検証
 
 ### 6. 日本語ラベル描画可否（best-effort）
 expected: メンバーOG画像の日本語 name は best-effort（描画されなくてもレイアウトが崩れない）。英字/数値/草は確実に表示される
-result: skipped
-reason: OG画像ルートが404（テスト3・4）のため検証不可。OG画像修正後に再検証する
+result: blocked
+blocked_by: other
+reason: /api/og（test3）のタイムアウト＋OOMクラッシュ修正後に再検証
 
 ## Summary
 
 total: 6
 passed: 2
-issues: 2
+issues: 1
 pending: 0
-skipped: 2
-blocked: 0
+skipped: 0
+blocked: 3
 
 ## Gaps
 
@@ -68,6 +72,15 @@ blocked: 0
   missing:
     - "コード修正不要。UATテストを /api/og?view=... に差し替えて再検証"
   debug_session: .planning/debug/og-image-404.md
+- truth: "/api/og?view=member&publicationId=<id> が 1200x630 PNG のメンバーOG画像を返す（ローカル/本番）"
+  status: failed
+  reason: "ローカル /api/og がスクショ対象を本番 https://keep-substack.com/og-view/... に解決→networkidle 25s timeout→fallback→FATAL OOM (heap ~15GB) でdevサーバークラッシュ"
+  severity: blocker
+  test: 3
+  root_cause: ""
+  artifacts: []
+  missing: []
+  debug_session: ""
 - truth: "/opengraph-image を開くとサイト共通デフォルトのブランドカード（Keep Substack + 草装飾）が描画される"
   status: not_a_bug
   reason: "User reported: 404"
