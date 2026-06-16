@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.9
-milestone_name: ワンボタン Substack Note 共有
-status: Phase 39 完了（OGP-01/02 充足）。v1.9 全フェーズ実装完了 → human-UAT（リンクデバッガ）待ち
-stopped_at: context exhaustion at 78% (2026-06-16)
-last_updated: "2026-06-16T15:43:54.042Z"
-last_activity: 2026-06-14 — Phase 39 実装完了（next/og 動的OG画像 + OGメタ、228 tests green、build OK）
+milestone_name: milestone
+status: Awaiting next milestone
+stopped_at: context exhaustion at 75% (2026-06-16)
+last_updated: "2026-06-16T22:33:47.701Z"
+last_activity: 2026-06-16 — Milestone v1.9 completed and archived
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 3
-  completed_plans: 2
-  percent: 67
+  completed_plans: 3
+  percent: 100
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-06-11 — v1.8 shipped)
 
 ## Current Position
 
-Phase: 39 — リンクプレビュー（OGメタタグ + 動的OG画像）
-Plan: 01 — Complete
-Status: Phase 39 完了（OGP-01/02 充足）。v1.9 全フェーズ実装完了 → human-UAT（リンクデバッガ）待ち
-Last activity: 2026-06-14 — Phase 39 実装完了（next/og 動的OG画像 + OGメタ、228 tests green、build OK）
+Phase: Milestone v1.9 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-06-16 — Milestone v1.9 completed and archived
 
 ### v1.9 Roadmap Summary
 
@@ -123,9 +123,26 @@ Last activity: 2026-06-14 — Phase 39 実装完了（next/og 動的OG画像 + O
 
 ## Session Continuity
 
-Last session: 2026-06-16T15:43:53.836Z
-Stopped at: context exhaustion at 78% (2026-06-16)
+Last session: 2026-06-16T22:33:47.697Z
+Stopped at: context exhaustion at 75% (2026-06-16)
 Next step: Phase 39 human-UAT（本番/プレビューURLをリンクデバッガに貼り summary_large_image・/member 画像の草/記事数/ハンドル・JP グリフ描画可否を確認）。v1.9 全実装完了につき milestone close 判断も可。
+
+## Deferred Items (v1.9 close — 2026-06-17)
+
+v1.9 マイルストーンクローズ時に Acknowledge して繰り越した項目（計16件）。v1.9-MILESTONE-AUDIT は
+9/9 要件 Complete・統合 5/5・status=passed。以下はいずれも機能ギャップではなく、bookkeeping
+（quick の status を監査が読めない）・過去マイルストーン繰り越し・検証アーティファクトのギャップ。
+
+| Category | Item | Status | 備考 |
+|----------|------|--------|------|
+| todo | 2026-06-08-verify-admin-role-check-middleware | pending 🔴 high | PR #5レビュー指摘。次マイルストーン候補 |
+| todo | 2026-06-08-dedupe-auth-guard-middleware-admin-guard | pending 🔴 high | PR #5レビュー指摘。次マイルストーン候補 |
+| todo | 2026-05-11 article-history / multi-team / supabase-migration ほか | pending | 長期backlog |
+| verification_gap | Phase 37 — 37-VERIFICATION.md | human_needed | 37-UAT 3/3 passed でカバー済（URL-01 充足） |
+| debug_session | og-image系 / schedule-save-fails-production | diagnosed / root_cause_found | 実質解決済（スクショ方式 / Phase 32-33）、status未更新 |
+| quick_task | 260515〜260611 の完了済みquick ×8（status missing/unknown）| bookkeeping | 完了済み、audit が status を読めないだけ |
+
+**Known deferred items at close: 16**（真の未消化＝PR#5指摘の 🔴 high 2件のみ。残りは解決済み/bookkeeping/UATカバー済）。
 
 ## Deferred Items (v1.8 close — 2026-06-11)
 

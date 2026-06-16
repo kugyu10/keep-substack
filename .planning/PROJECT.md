@@ -2,10 +2,19 @@
 
 ## Current State
 
-**Shipped:** v1.8 Debug, Stabilization & UI Polish (2026-06-11)
-**Next:** v1.9 ワンボタン Substack Note 共有（in progress — Phase 37〜）
+**Shipped:** v1.9 ワンボタン Substack Note 共有 (2026-06-17)
+**Next:** 計画中（`/gsd:new-milestone` で次マイルストーンを定義）
 
-残課題（次マイルストーンへ繰り越し）: Phase 33/35 の本番手動確認（RSS即時取得・prod RPC存在・Vercelリダイレクト・GA4リアルタイム計測）。コードはすべて検証済みで、本番デプロイ後の目視確認のみが残る。
+残課題（次マイルストーンへ繰り越し）: bookkeeping/過去マイルストーン繰り越し 16件（機能ギャップなし）。うち PR#5 指摘の 🔴 high 2件（admin role-check 検証 / 認証ガード二重化解消）は次マイルストーン候補。詳細は STATE.md Deferred Items。
+
+<details>
+<summary>Previous milestone: v1.9 ワンボタン Substack Note 共有 (shipped 2026-06-17)</summary>
+
+- 個人カレンダー `/member/[id]` を `?ym=` 駆動の公開URL化 + `buildShareUrl` 規約ヘルパで対象4ビューの正規公開URLを1関数化（Phase 37）
+- 再利用可能な `<ShareButton>`：定型文+ハッシュタグ+公開URLをコピーし Substack Notes を新規タブ起動、`lib/share.ts` 定数で文面一元管理・ログイン限定はフラグ1か所で切替（Phase 38）
+- 共有URL（top/daily/member）に summary_large_image OGメタ + next/og 動的OG画像（メンバーの草/記事数/ハンドル）、本番OGはスクショ方式で安定化（Phase 39）
+
+</details>
 
 <details>
 <summary>Previous milestone: v1.8 Debug, Stabilization & UI Polish (shipped 2026-06-11)</summary>
@@ -156,14 +165,15 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - ✓ Google Analytics(GA4) を全ページに導入する — v1.8 (Phase 35, ANLT-01/02)
 - ✓ private チームをトップビューのチームタブに表示し、ログイン不要で閲覧できるようにする — v1.8 (Phase 35, TEAM-01)
 
-### Active (v1.9 — in progress)
+### Validated (v1.9)
 
-- [ ] 各ビューに再利用可能な共有ボタンを表示する（位置差し替え容易）
-- [ ] 共有ボタンで共有テキスト(定型文＋URL)をクリップボードにコピーし Substack Notes を新規タブで開く
-- [ ] 共有先ビューの状態（チームフィルタ等）をURLに保持して公開URLで復元できる
-- [ ] 共有対象ルートに動的OG画像（草／実績ビジュアル）とOGメタタグを生成する
-- [ ] 共有テキストの定型文・ハッシュタグを編集しやすい定数として管理する
-- [ ] 共有ボタンの表示対象をログイン済みのみ既定とし、全員表示へ切替容易にする
+- ✓ 各ビューに再利用可能な共有ボタン `<ShareButton>` を表示する（位置差し替え容易）— v1.9 (Phase 38, SHARE-01)
+- ✓ 共有ボタンで共有テキスト(定型文＋URL)をクリップボードにコピーし Substack Notes を新規タブで開く — v1.9 (Phase 38, SHARE-02/03)
+- ✓ コピー完了フィードバック（インライン）を表示する — v1.9 (Phase 38, SHARE-04)
+- ✓ 共有先ビューの状態（チームフィルタ・ym等）をURLに保持して公開URLで復元できる — v1.9 (Phase 37, URL-01)
+- ✓ 共有対象ルートに動的OG画像（草／実績ビジュアル）とOGメタタグを生成する — v1.9 (Phase 39, OGP-01/02)
+- ✓ 共有テキストの定型文・ハッシュタグを編集しやすい定数（`lib/share.ts`）として管理する — v1.9 (Phase 38, SHARE-05)
+- ✓ 共有ボタンの表示対象をログイン済みのみ既定とし、全員表示へ切替容易にする — v1.9 (Phase 38, SHARE-06)
 
 ### Active (Future)
 
@@ -243,6 +253,11 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 | 認証ガードを middleware.ts に集約（/my・/admin） | proxy.tsはユニットテスト専用維持、実ガードはmiddlewareへ | ✓ Good — v1.8 Phase 33、ただし二重化解消はbacklog |
 | Header/Footerを (main) Route Group の layout に分離 | root layoutは全ルートをラップするため、(auth)ページからHeader/Footerを外すにはRoute Group分割が必須 | ✓ Good — v1.8 quick 260611-ebu、URL不変・GAはrootに残しANLT-01維持 |
 | GA4はenv varガード（NODE_ENVチェック不使用） | NEXT_PUBLIC_GA_MEASUREMENT_ID未設定でdev自動無効、ビルド時インライン | ✓ Good — v1.8 Phase 35、ユーザー決定（D-10） |
+| 共有URLの絶対化はクライアント `window.location.origin`（ベースURL env 不使用） | ベースURL env が未定義、本番 keep-substack.com / dev を自動反映 | ✓ Good — v1.9 Phase 38、URL生成は Phase 37 `buildShareUrl` に委譲し重複なし |
+| 共有文面・ログインゲートを `lib/share.ts` 定数で一元管理 | 文面変更・全員表示切替をフラグ1か所に集約（SHARE-05/06） | ✓ Good — v1.9 Phase 38 |
+| 共有フィードバックは toast ライブラリ不使用・インライン表示 | KISS、新規依存ゼロ | ✓ Good — v1.9 Phase 38 |
+| OG画像は最終的にスクリーンショット方式（next/og 動的画像から転換） | 本番で next/og 動的画像が不安定 → スクショ方式で実物忠実なプレビューを安定化 | ✓ Good — v1.9 Phase 39（PR#10）、近似より実物忠実を優先 |
+| 共有URLビューは getUser() 参照で動的レンダリングへ移行 | ログイン依存の共有ボタン表示のため ISR キャッシュ無効化は妥当 | ⚠ Revisit — トラフィック増時にキャッシュ戦略を再検討 |
 
 ## Evolution
 
@@ -262,4 +277,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-14 after starting v1.9 milestone*
+*Last updated: 2026-06-17 after v1.9 milestone*
