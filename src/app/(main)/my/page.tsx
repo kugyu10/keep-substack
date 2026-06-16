@@ -7,7 +7,7 @@ import MyProfileForm from './MyProfileForm'
 import CommitScheduleModal from './CommitScheduleModal'
 import LogoutButton from '@/components/LogoutButton'
 
-export default async function MyPage({ searchParams }: { searchParams: Promise<{ handle?: string }> } = { searchParams: Promise.resolve({}) }) {
+export default async function MyPage({ searchParams }: { searchParams: Promise<{ handle?: string }> }) {
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/')
