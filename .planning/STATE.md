@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.8
-milestone_name: Debug, Stabilization & UI Polish
-status: Awaiting next milestone
-stopped_at: Completed 36-04-PLAN.md
-last_updated: "2026-06-11T13:12:08.957Z"
-last_activity: 2026-06-11 — Milestone v1.8 completed and archived
+milestone: v1.9
+milestone_name: ワンボタン Substack Note 共有
+status: planning
+stopped_at: context exhaustion at 76% (2026-06-13)
+last_updated: "2026-06-14T16:37:00.000Z"
+last_activity: 2026-06-14 — Phase 39（OGメタ + 動的OG画像）完了。OGP-01/02 充足、228 tests green、build OK
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 18
-  completed_plans: 18
+  total_phases: 3
+  completed_phases: 3
+  total_plans: 3
+  completed_plans: 3
   percent: 100
 ---
 
@@ -21,14 +21,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-11 — v1.8 shipped)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** Planning next milestone（/gsd:new-milestone）
+**Current focus:** v1.9 ロードマップ確定（Phases 37-39）。次は `/gsd:plan-phase 37`
 
 ## Current Position
 
-Phase: Milestone v1.8 complete
-Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-06-11 — Milestone v1.8 completed and archived
+Phase: 39 — リンクプレビュー（OGメタタグ + 動的OG画像）
+Plan: 01 — Complete
+Status: Phase 39 完了（OGP-01/02 充足）。v1.9 全フェーズ実装完了 → human-UAT（リンクデバッガ）待ち
+Last activity: 2026-06-14 — Phase 39 実装完了（next/og 動的OG画像 + OGメタ、228 tests green、build OK）
+
+### v1.9 Roadmap Summary
+
+| Phase | Goal | Requirements |
+|-------|------|--------------|
+| 37 — 共有URLの状態保持 | 対象4ビューが状態を含む復元可能な公開URLを持つ | URL-01 |
+| 38 — ワンボタン共有 | 共有ボタンで定型文+URLコピー & Substack Notes 起動 + toast | SHARE-01..06 |
+| 39 — リンクプレビュー | OGメタタグ + 動的OG画像（ImageResponse） | OGP-01..02 |
+
+**Coverage:** 9/9 v1.9 要件マップ済み（orphan 0）。Granularity=coarse。
 
 ### Quick Tasks Completed
 
@@ -77,6 +87,7 @@ Last activity: 2026-06-11 — Milestone v1.8 completed and archived
 | Phase 36 P02 | ~6min | 2 tasks | 2 files files |
 | Phase 36 P03 | ~10min | 4 tasks | 2 files |
 | Phase 36 P04 | ~3min | 2 tasks | 2 files |
+| Phase 39 P01 | 4min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -112,9 +123,9 @@ Last activity: 2026-06-11 — Milestone v1.8 completed and archived
 
 ## Session Continuity
 
-Last session: 2026-06-11
-Stopped at: Milestone v1.8 completed and archived
-Next step: 次マイルストーンを計画（`/gsd:new-milestone`）。先に本番デプロイ→下記 Deferred の本番手動確認を実施するのも可。
+Last session: 2026-06-14T16:37:00.000Z
+Stopped at: Completed 39-01-PLAN.md（Phase 39 OG メタ + 動的OG画像）
+Next step: Phase 39 human-UAT（本番/プレビューURLをリンクデバッガに貼り summary_large_image・/member 画像の草/記事数/ハンドル・JP グリフ描画可否を確認）。v1.9 全実装完了につき milestone close 判断も可。
 
 ## Deferred Items (v1.8 close — 2026-06-11)
 

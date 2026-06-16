@@ -1,19 +1,19 @@
 import { describe, it, expect, vi } from 'vitest'
 import type { ReactElement } from 'react'
 
-// Mock React's useState so CalendarGrid (client component) can be called
-// in a vitest/node environment without a DOM.
-vi.mock('react', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('react')>()
-  return {
-    ...actual,
-    useState: (initial: unknown) => [initial, vi.fn()],
-  }
-})
+// CalendarGrid は URL駆動（useState なし）になったため react モックは不要。
 
 // Stub HeatmapTooltip — not under test
 vi.mock('@/components/HeatmapTooltip', () => ({
   default: ({ children }: { children: unknown }) => children,
+}))
+
+// Stub next/link as a plain <a> so the element tree can be walked.
+vi.mock('next/link', () => ({
+  default: ({ children, href, ...rest }: { children: unknown; href: string }) => ({
+    type: 'a',
+    props: { href, children, ...rest },
+  }),
 }))
 
 import CalendarGrid from '../CalendarGrid'
@@ -62,6 +62,9 @@ describe('CalendarGrid — substackHandle profile link (Phase 27 PROF-02)', () =
     const el = CalendarGrid({
       memberName: 'Test Member',
       articleMap: [],
+      publicationId: 'test-pub',
+      year: 2026,
+      month: 6,
       substackHandle: '@hoge',
     })
 
@@ -77,6 +80,9 @@ describe('CalendarGrid — substackHandle profile link (Phase 27 PROF-02)', () =
     const el = CalendarGrid({
       memberName: 'Test Member',
       articleMap: [],
+      publicationId: 'test-pub',
+      year: 2026,
+      month: 6,
     })
 
     const links = findAllByTag(el, 'a')
@@ -91,6 +97,9 @@ describe('CalendarGrid — substackHandle profile link (Phase 27 PROF-02)', () =
     const el = CalendarGrid({
       memberName: 'Test Member',
       articleMap: [],
+      publicationId: 'test-pub',
+      year: 2026,
+      month: 6,
       substackHandle: '@hoge',
     })
 

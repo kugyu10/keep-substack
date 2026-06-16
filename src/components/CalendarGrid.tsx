@@ -1,7 +1,6 @@
-'use client'
-
-import { useState } from 'react'
+import Link from 'next/link'
 import { buildDayGrid } from '@/lib/calendarUtils'
+import { formatYmParam, buildShareUrl } from '@/lib/shareUrl'
 import { getIntensityClass } from '@/lib/heatmapUtils'
 import type { HeatmapArticle } from '@/lib/heatmapUtils'
 import HeatmapTooltip from '@/components/HeatmapTooltip'
@@ -9,34 +8,24 @@ import HeatmapTooltip from '@/components/HeatmapTooltip'
 type Props = {
   memberName: string
   articleMap: [string, HeatmapArticle[]][]
+  publicationId: string
+  year: number
+  month: number
   imageUrl?: string
   substackHandle?: string
 }
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土']
 
-export default function CalendarGrid({ memberName, articleMap, imageUrl, substackHandle }: Props) {
-  const now = new Date()
-  const [year, setYear] = useState(now.getFullYear())
-  const [month, setMonth] = useState(now.getMonth() + 1)
-
-  function prevMonth() {
-    if (month === 1) {
-      setYear(year - 1)
-      setMonth(12)
-    } else {
-      setMonth(month - 1)
-    }
-  }
-
-  function nextMonth() {
-    if (month === 12) {
-      setYear(year + 1)
-      setMonth(1)
-    } else {
-      setMonth(month + 1)
-    }
-  }
+export default function CalendarGrid({ memberName, articleMap, publicationId, year, month, imageUrl, substackHandle }: Props) {
+  // 表示月は URL(?ym=YYYY-MM) 駆動。月送りは next/link で ym を更新する（client 状態を持たない）。
+  const prevYm =
+    month === 1 ? formatYmParam(year - 1, 12) : formatYmParam(year, month - 1)
+  const nextYm =
+    month === 12 ? formatYmParam(year + 1, 1) : formatYmParam(year, month + 1)
+  // 公開URL生成は buildShareUrl に一元化（publicationId のエンコード規約を統一, WR-01）。
+  const prevHref = buildShareUrl({ type: 'member', publicationId, ym: prevYm })
+  const nextHref = buildShareUrl({ type: 'member', publicationId, ym: nextYm })
 
   const days = buildDayGrid(year, month)
   const map = new Map(articleMap)
@@ -74,21 +63,23 @@ export default function CalendarGrid({ memberName, articleMap, imageUrl, substac
       )}
 
       <div className="flex items-center justify-between mb-3">
-        <button
-          onClick={prevMonth}
+        <Link
+          href={prevHref}
+          aria-label="前の月"
           className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded"
         >
           ＜
-        </button>
+        </Link>
         <span className="text-sm font-medium">
           {year}年{month}月
         </span>
-        <button
-          onClick={nextMonth}
+        <Link
+          href={nextHref}
+          aria-label="次の月"
           className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded"
         >
           ＞
-        </button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-7 gap-1">
@@ -102,7 +93,7 @@ export default function CalendarGrid({ memberName, articleMap, imageUrl, substac
         ))}
 
         {days.map((day) => {
-          const dateKey = `${year}-${String(month).padStart(2, '0')}-${String(day.date).padStart(2, '0')}`
+          const dateKey = `${formatYmParam(year, month)}-${String(day.date).padStart(2, '0')}`
           const articles = map.get(dateKey) ?? []
           const count = articles.length
 

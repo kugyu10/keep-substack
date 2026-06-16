@@ -11,6 +11,7 @@
 - ✅ **v1.6 Team Roles + Member Self-Service** — Phases 22-26 (shipped 2026-05-30)
 - ✅ **v1.7 Commit & Goal View + Substack Profile Link** — Phases 27-31 (shipped 2026-06-06)
 - ✅ **v1.8 Debug, Stabilization & UI Polish** — Phases 32-36 (shipped 2026-06-11)
+- 🚧 **v1.9 ワンボタン Substack Note 共有** — Phases 37-39 (in progress)
 
 ## Phases
 
@@ -133,6 +134,53 @@ Full archive: `.planning/milestones/v1.8-ROADMAP.md`
 
 ---
 
+## Phases — v1.9 (active)
+
+**Milestone Goal:** ログイン済みユーザーが、見ているビューを1ボタンで自分の Substack Note に共有でき、「自慢」と Substack 内バイラル拡散を促進する。
+
+- [ ] **Phase 37: 共有URLの状態保持（公開URL化）** - 各対象ビューがチームフィルタ等の状態を含む復元可能な公開URLを持つ
+- [ ] **Phase 38: ワンボタン共有（クリップボード + Substack Notes 起動）** - 共有ボタンで定型文+URLをコピーしNotesを新規タブで開く
+- [ ] **Phase 39: リンクプレビュー（OGメタタグ + 動的OG画像）** - 共有リンクに草/実績が見える動的OGプレビューを出力する
+
+### Phase 37: 共有URLの状態保持（公開URL化）
+**Goal**: 各対象ビュー（トップ Commit&Goal / `/daily` / 個人カレンダー `/member/[id]` / チーム選択中ビュー）が、現在の表示状態（チームフィルタ等）をURLに反映し、そのURLから同じ表示を復元できる。共有テキストが指す先が「今見ている画面」と一致する土台を作る。
+**Depends on**: Phase 36（v1.8 完了, 既存トップ/`/daily`/`/member/[id]`/チームタブ）
+**Requirements**: URL-01
+**Success Criteria** (what must be TRUE):
+  1. トップ Commit&Goal でチームタブを切り替えるとURLにそのチーム状態が反映される（リロード・別タブで貼り直しても同じチームが選択された状態で開く）
+  2. `/daily` と 個人カレンダー `/member/[id]` が、状態を含む公開URLで誰でも（未ログインでも）同じ表示にアクセスできる
+  3. 対象4ビューすべてについて「現在表示中の状態を表す正規の公開URL」を1関数/規約で取得でき、Phase 38 の共有ボタンが参照できる
+**Plans**: 1 plan
+- [ ] 37-01-PLAN.md — 個人カレンダーを ?ym= 駆動URL化 + buildShareUrl 規約ヘルパ（top/daily は ?team= 既存確認）
+**UI hint**: yes
+
+### Phase 38: ワンボタン共有（クリップボード + Substack Notes 起動）
+**Goal**: ログイン済みユーザーが対象ビューの共有ボタンを押すと、定型文+ハッシュタグ+公開URLがクリップボードにコピーされ、Substack Notes コンポーザーが新規タブで開き、「貼り付けて投稿してください」のフィードバックが表示される。共有文は編集しやすい定数で一元管理する。
+**Depends on**: Phase 37（共有先の公開URLを参照するため）
+**Requirements**: SHARE-01, SHARE-02, SHARE-03, SHARE-04, SHARE-05, SHARE-06
+**Success Criteria** (what must be TRUE):
+  1. 対象4ビューに再利用可能な `<ShareButton>` が表示され、配置を1行差し替えで移動できる（SHARE-01）
+  2. 共有ボタンを押すと、定型文+ハッシュタグ+対象ビューの公開URLがクリップボードにコピーされ、続けて `https://substack.com/notes` が新規タブで開く（SHARE-02/03）
+  3. コピー完了とともに「貼り付けて投稿してください」を伝える toast 等のフィードバックが表示される（SHARE-04）
+  4. 共有テキストの定型文・ハッシュタグが `lib/share.ts` 等の定数として一元管理され、文面変更がそこ1か所で完結する（SHARE-05）
+  5. 共有ボタンは既定でログイン済みユーザーのみ表示され、全員表示へはフラグ1か所の変更で切り替えられる（SHARE-06）
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 39: リンクプレビュー（OGメタタグ + 動的OG画像）
+**Goal**: 共有された公開URLを Substack Notes / SNS に貼ると、その人の草・実績が見えるリッチなリンクプレビューが表示される。OGメタタグと Next.js `ImageResponse` による動的OG画像を出力する。
+**Depends on**: Phase 37（プレビュー対象となる公開URL）。Phase 38 と並行可だが、共有体験の総仕上げとして最後に置く。
+**Requirements**: OGP-01, OGP-02
+**Success Criteria** (what must be TRUE):
+  1. 共有対象ルートに `og:title` / `og:description` / `og:image` / Twitter Card が出力され、リンクデバッガ等でプレビューカードが正しく認識される（OGP-01）
+  2. 共有対象ルートに、対象メンバー/ビューの草・実績が見える動的OG画像が Next.js `ImageResponse`（`opengraph-image`）で生成され、`og:image` として配信される（OGP-02）
+  3. 個人ビュー `/member/[id]` を共有したとき、そのメンバー固有の内容を反映したOG画像がプレビューに表示される
+**Plans**: 1 plan
+- [x] 39-PLAN.md — OGメタタグ修正 + 純関数ヘルパ + 動的OG画像（メンバー専用 + サイト共通デフォルト） — completed 2026-06-14
+**UI hint**: yes
+
+---
+
 ## Phase Details (archived)
 
 Full phase details for shipped milestones live in their archives under `.planning/milestones/`.
@@ -178,3 +226,6 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 34. UI Polish バッチ | v1.8 | 5/5 | Complete    | 2026-06-08 |
 | 35. チーム可視性拡張 + Google Analytics | v1.8 | 3/3 | Complete    | 2026-06-08 |
 | 36. QA・UAT・検証ギャップ解消 | v1.8 | 4/4 | Complete    | 2026-06-08 |
+| 37. 共有URLの状態保持（公開URL化） | v1.9 | 0/0 | Not started | - |
+| 38. ワンボタン共有（クリップボード + Substack Notes 起動） | v1.9 | 0/0 | Not started | - |
+| 39. リンクプレビュー（OGメタタグ + 動的OG画像） | v1.9 | 1/1 | Complete | 2026-06-14 |

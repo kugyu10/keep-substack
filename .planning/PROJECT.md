@@ -3,7 +3,7 @@
 ## Current State
 
 **Shipped:** v1.8 Debug, Stabilization & UI Polish (2026-06-11)
-**Next:** TBD — run `/gsd:new-milestone` to plan the next cycle
+**Next:** v1.9 ワンボタン Substack Note 共有（in progress — Phase 37〜）
 
 残課題（次マイルストーンへ繰り越し）: Phase 33/35 の本番手動確認（RSS即時取得・prod RPC存在・Vercelリダイレクト・GA4リアルタイム計測）。コードはすべて検証済みで、本番デプロイ後の目視確認のみが残る。
 
@@ -59,6 +59,25 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 ## Core Value
 
 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること。
+
+## Current Milestone: v1.9 ワンボタン Substack Note 共有
+
+**Goal:** ログイン済みユーザーが、見ているビューを1ボタンで自分の Substack Note に共有でき、「自慢」と「Substack内バイラル拡散」を促進する。
+
+**Target features:**
+- 各ビュー（トップ Commit&Goal / `/daily` / 個人カレンダー `/member/[id]` / チーム選択中ビュー）に共有ボタン（位置はおまかせ・差し替え容易な再利用コンポーネント）
+- クリック→共有テキスト(定型文＋URL)をクリップボードにコピー→Substack Notes を新規タブで起動→toast案内
+- 共有先は状態をURLに持つ公開URL（チームフィルタ等を復元）
+- 動的OG画像（その人の草／実績が見えるOGPを Next.js `ImageResponse` で生成）＋OGメタタグ
+- 共有テキストは定型文＋ハッシュタグ＋URL（編集しやすい定数化）
+- 表示対象: まずログイン済みのみ（全員表示にコンポーネントで切替容易に）
+
+**Key context（v1.9 決定事項）:**
+- Substack公式の本文prefill URLは存在しない（Web/API調査済み）→ コピー＆Notes起動方式が現実解
+- 自走ルール: 設計分岐は最善判断で進め、根拠を Key Decisions / DECISIONS に記録
+- 着地点: develop→main の PR 作成・push まで（**マージは開発者が手動。Claudeはマージ禁止**）
+- ドメインリサーチ: skip（既存可視化の延長 + 共有方式は調査済み）
+- 表示対象「おまかせ」→ 既定はログイン済みのみ、`<ShareButton>` を全員表示へ切替容易な設計とする
 
 ## Requirements
 
@@ -136,6 +155,15 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 - ✓ /my ページ表示中はヘッダーの「マイページ」ボタンを非表示にする — v1.8 (Phase 34, UI-05)
 - ✓ Google Analytics(GA4) を全ページに導入する — v1.8 (Phase 35, ANLT-01/02)
 - ✓ private チームをトップビューのチームタブに表示し、ログイン不要で閲覧できるようにする — v1.8 (Phase 35, TEAM-01)
+
+### Active (v1.9 — in progress)
+
+- [ ] 各ビューに再利用可能な共有ボタンを表示する（位置差し替え容易）
+- [ ] 共有ボタンで共有テキスト(定型文＋URL)をクリップボードにコピーし Substack Notes を新規タブで開く
+- [ ] 共有先ビューの状態（チームフィルタ等）をURLに保持して公開URLで復元できる
+- [ ] 共有対象ルートに動的OG画像（草／実績ビジュアル）とOGメタタグを生成する
+- [ ] 共有テキストの定型文・ハッシュタグを編集しやすい定数として管理する
+- [ ] 共有ボタンの表示対象をログイン済みのみ既定とし、全員表示へ切替容易にする
 
 ### Active (Future)
 
@@ -234,4 +262,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-11 after v1.8 milestone*
+*Last updated: 2026-06-14 after starting v1.9 milestone*

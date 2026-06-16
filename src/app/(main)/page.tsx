@@ -1,11 +1,42 @@
+import type { Metadata } from 'next'
 import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import CommitGoalView from '@/components/CommitGoalView'
+import ShareButton from '@/components/ShareButton'
 import ViewTabs from '@/components/ViewTabs'
+import { SHARE_REQUIRE_LOGIN } from '@/lib/share'
+import { TOP_META } from '@/lib/ogMeta'
+import { buildOgImagePath, OG_WIDTH, OG_HEIGHT } from '@/lib/ogScreenshotUrl'
 import type { CommitSlot } from '@/lib/types'
 
 export const revalidate = 300
+
+// og:image はスクリーンショット型（/api/og）。metadataBase（= getSiteUrl）で
+// 絶対URL化される。team 別 OG は v1.9 では既定/All のみ（後で対応）。
+const TOP_OG_IMAGE = {
+  url: buildOgImagePath('goal'),
+  width: OG_WIDTH,
+  height: OG_HEIGHT,
+}
+
+export const metadata: Metadata = {
+  title: TOP_META.title,
+  description: TOP_META.description,
+  openGraph: {
+    title: TOP_META.title,
+    description: TOP_META.description,
+    url: '/',
+    images: [TOP_OG_IMAGE],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TOP_META.title,
+    description: TOP_META.description,
+    images: [TOP_OG_IMAGE.url],
+  },
+}
 
 type Props = {
   searchParams: Promise<{ team?: string }>
@@ -14,6 +45,14 @@ type Props = {
 export default async function Home({ searchParams }: Props) {
   const { team } = await searchParams
   const allMembers = await getMembers()
+
+  const supabase = await createSupabaseServerClient()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+  if (authError) console.error('[Home] auth.getUser error:', authError)
+  const showShare = SHARE_REQUIRE_LOGIN ? !!user : true
 
   const teams = [
     ...new Set(
@@ -49,7 +88,10 @@ export default async function Home({ searchParams }: Props) {
 
   return (
     <main className="max-w-[960px] mx-auto px-4 py-4">
-      <ViewTabs active="goal" />
+      <div className="flex items-center justify-between gap-2">
+        <ViewTabs active="goal" />
+        {showShare && <ShareButton view={{ type: 'goal', team }} />}
+      </div>
 
       {teams.length > 0 && (
         <div className="flex gap-2 mb-4 flex-wrap">
