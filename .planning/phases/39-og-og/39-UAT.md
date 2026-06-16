@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 39-og-og
 source: [39-01-SUMMARY.md]
 started: 2026-06-16T09:47:24Z
@@ -55,20 +55,28 @@ blocked: 0
 ## Gaps
 
 - truth: "/member/[publicationId]/opengraph-image を開くと 1200x630 の PNG（草・記事数・ハンドル）が描画される"
-  status: failed
+  status: not_a_bug
   reason: "User reported: 404"
   severity: major
   test: 3
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Phase 39 の opengraph-image.tsx は v1.9（コミット e697e03）でスクショ方式へ刷新時に削除済み。現行OGは /api/og?view=member&publicationId=<id> 経由。404は仕様どおりで実バグではない。UATテストケースが古い仕様に基づいていた"
+  artifacts:
+    - path: "src/app/(main)/member/[publicationId]/opengraph-image.tsx"
+      issue: "e697e03 で削除済み（存在しない）"
+    - path: "src/app/api/og/route.tsx"
+      issue: "現行のOG実装（スクショ方式）"
+  missing:
+    - "コード修正不要。UATテストを /api/og?view=... に差し替えて再検証"
+  debug_session: .planning/debug/og-image-404.md
 - truth: "/opengraph-image を開くとサイト共通デフォルトのブランドカード（Keep Substack + 草装飾）が描画される"
-  status: failed
+  status: not_a_bug
   reason: "User reported: 404"
   severity: major
   test: 4
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "同上。src/app/opengraph-image.tsx も e697e03 で削除済み。現行は /api/og?view=goal 等。404は仕様どおり"
+  artifacts:
+    - path: "src/app/opengraph-image.tsx"
+      issue: "e697e03 で削除済み（存在しない）"
+  missing:
+    - "コード修正不要。UATテストを /api/og?view=... に差し替えて再検証"
+  debug_session: .planning/debug/og-image-404.md
