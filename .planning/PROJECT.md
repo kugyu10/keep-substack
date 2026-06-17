@@ -3,9 +3,9 @@
 ## Current State
 
 **Shipped:** v1.9 ワンボタン Substack Note 共有 (2026-06-17)
-**Next:** 計画中（`/gsd:new-milestone` で次マイルストーンを定義）
+**Building:** v1.10 Substack Notes PoC（コメント可視化 & Note一覧取得）
 
-残課題（次マイルストーンへ繰り越し）: bookkeeping/過去マイルストーン繰り越し 16件（機能ギャップなし）。うち PR#5 指摘の 🔴 high 2件（admin role-check 検証 / 認証ガード二重化解消）は次マイルストーン候補。詳細は STATE.md Deferred Items。
+残課題（過去マイルストーンから繰り越し）: bookkeeping/過去繰り越し 16件（機能ギャップなし）。うち PR#5 指摘の 🔴 high 2件（admin role-check 検証 / 認証ガード二重化解消）は未消化。詳細は STATE.md Deferred Items。
 
 <details>
 <summary>Previous milestone: v1.9 ワンボタン Substack Note 共有 (shipped 2026-06-17)</summary>
@@ -69,24 +69,20 @@ Substack継続仲間コミュニティ向けの、メンバーの記事公開頻
 
 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること。
 
-## Current Milestone: v1.9 ワンボタン Substack Note 共有
+## Current Milestone: v1.10 Substack Notes PoC（コメント可視化 & Note一覧取得）
 
-**Goal:** ログイン済みユーザーが、見ているビューを1ボタンで自分の Substack Note に共有でき、「自慢」と「Substack内バイラル拡散」を促進する。
+**Goal:** Substack の Note 領域（コメント・投稿一覧）のデータ取得可否を PoC で検証し、コメント可視化と Note 一覧取得の2機能を試作する。
 
 **Target features:**
-- 各ビュー（トップ Commit&Goal / `/daily` / 個人カレンダー `/member/[id]` / チーム選択中ビュー）に共有ボタン（位置はおまかせ・差し替え容易な再利用コンポーネント）
-- クリック→共有テキスト(定型文＋URL)をクリップボードにコピー→Substack Notes を新規タブで起動→toast案内
-- 共有先は状態をURLに持つ公開URL（チームフィルタ等を復元）
-- 動的OG画像（その人の草／実績が見えるOGPを Next.js `ImageResponse` で生成）＋OGメタタグ
-- 共有テキストは定型文＋ハッシュタグ＋URL（編集しやすい定数化）
-- 表示対象: まずログイン済みのみ（全員表示にコンポーネントで切替容易に）
+- **機能1 コメント可視化（永続化あり）**: Note の URL/ID を手入力して対象を指定 → そのNoteの「コメント件数 / コメント本文一覧 / コメントした人の名前・アイコン」を表示。取得したコメントは Supabase にキャッシュ保存（再取得を避ける）
+- **機能2 Note一覧取得（永続化なし）**: いったん admin（開発者本人）が投稿した Note 一覧を取得して表示。永続化なし（毎回取得）
 
-**Key context（v1.9 決定事項）:**
-- Substack公式の本文prefill URLは存在しない（Web/API調査済み）→ コピー＆Notes起動方式が現実解
-- 自走ルール: 設計分岐は最善判断で進め、根拠を Key Decisions / DECISIONS に記録
+**Key context（v1.10 方針）:**
+- 両機能とも **PoC（試作・検証）**。完成度より「取得できるか・どう取れるか」の検証が主目的
+- **最大のリスク＝データ取得手段**: Substack には公式 Notes/コメント取得 API が無い。非公式エンドポイント（`substack.com/api/...`）等が使えるかは未確認 → 要件定義の前に**調査フェーズで取得可否を検証**する
+- 既存スタック（Next.js / Supabase / Vercel）に追加する形。機能2の対象は段階的に admin → メンバー → 任意ユーザーへ拡張余地あり
+- Out of Scope の「コメント・いいね機能」は **自前のコメント機能実装**を指す。本 PoC は Substack 上のコメントを**読み取り表示**するもので別物
 - 着地点: develop→main の PR 作成・push まで（**マージは開発者が手動。Claudeはマージ禁止**）
-- ドメインリサーチ: skip（既存可視化の延長 + 共有方式は調査済み）
-- 表示対象「おまかせ」→ 既定はログイン済みのみ、`<ShareButton>` を全員表示へ切替容易な設計とする
 
 ## Requirements
 
@@ -277,4 +273,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-17 after v1.9 milestone*
+*Last updated: 2026-06-18 after starting v1.10 milestone*
