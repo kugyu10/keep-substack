@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.10
 milestone_name: Substack Notes PoC
-status: planning
+status: executing
 stopped_at: Phase 41 context gathered
-last_updated: "2026-06-18T00:57:15.051Z"
-last_activity: 2026-06-18 — Phase 40 spike GO（無認証3エンドポイントが Vercel datacenter IP からも 200）
+last_updated: "2026-06-18T01:17:35.220Z"
+last_activity: 2026-06-18 -- Phase 41 planning complete
 progress:
   total_phases: 3
   completed_phases: 0
-  total_plans: 0
+  total_plans: 1
   completed_plans: 0
   percent: 0
 ---
@@ -27,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-06-11 — v1.8 shipped)
 
 Phase: 41 of 42 — 機能2 Note一覧（永続化なし）— Not started（Phase 40 完了）
 Plan: —
-Status: Phase 40 取得可否スパイク完了（001/002/003 すべて GO）。確定エンドポイントは .planning/spikes/MANIFEST.md「go/no-go 判定」参照。Phase 41 を plan/discuss する段階
-Last activity: 2026-06-18 — Phase 40 spike GO（無認証3エンドポイントが Vercel datacenter IP からも 200）
+Status: Ready to execute
+Last activity: 2026-06-18 -- Phase 41 planning complete
 
 ### 確定エンドポイント（Phase 41/42 で使用・すべて無認証サーバー側 fetch）
 
