@@ -62,6 +62,16 @@ CREATE TABLE IF NOT EXISTS member_commit_slots (
   UNIQUE (member_id, day_of_week)
 );
 
+-- note_comments — Note コメントのキャッシュ（Phase 42-1 / JSONB 1行保存）
+-- 本番反映は schema.sql が正規ソースだが、SQL Editor 経由のマイグレーション実行が必須。
+-- dev=otydhiumsdsyxepnjqjp / prod=xolhjcngrwwwqtklmoyk の SQL Editor で以下 DDL を実行すること。
+CREATE TABLE IF NOT EXISTS note_comments (
+  note_id       TEXT        PRIMARY KEY,              -- parseNoteId が返す正規化 ID（数字文字列）
+  comment_count INTEGER     NOT NULL,                 -- COMMENT-02: reader の children_count
+  comments      JSONB       NOT NULL,                 -- COMMENT-03/04: フラット CommentItem[] 配列
+  fetched_at    TIMESTAMPTZ NOT NULL DEFAULT now()    -- COMMENT-05: 鮮度判定（CACHE_TTL_MS=30分）
+);
+
 -- ============================================================
 -- 2. Row Level Security
 -- ============================================================
@@ -72,6 +82,7 @@ ALTER TABLE member_teams ENABLE ROW LEVEL SECURITY;
 ALTER TABLE articles     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE member_publications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE member_commit_slots ENABLE ROW LEVEL SECURITY;
+ALTER TABLE note_comments       ENABLE ROW LEVEL SECURITY;
 
 -- anon / authenticated: SELECT 全件許可（公開データ）
 CREATE POLICY "public select members"
@@ -91,6 +102,11 @@ CREATE POLICY "public select member_publications"
 
 CREATE POLICY "public select member_commit_slots"
   ON member_commit_slots FOR SELECT USING (true);
+
+-- note_comments: public select（公開 Note の公開コメント）。
+-- 書き込み（upsert）は service_role が BYPASSRLS で行うため write policy 不要。
+CREATE POLICY "public select note_comments"
+  ON note_comments FOR SELECT USING (true);
 
 CREATE POLICY "member write own commit slots"
   ON member_commit_slots
