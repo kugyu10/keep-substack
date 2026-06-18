@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.10
 milestone_name: Substack Notes PoC
 status: executing
-stopped_at: Phase 41 context gathered
-last_updated: "2026-06-18T01:27:44.214Z"
+stopped_at: Phase 41 complete (verified)
+last_updated: "2026-06-18T02:00:38.107Z"
 last_activity: 2026-06-18 -- Phase 41 planning complete
 progress:
   total_phases: 3
@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-06-11 — v1.8 shipped)
 
 ## Current Position
 
-Phase: 41 of 42 — 機能2 Note一覧（永続化なし）— Not started（Phase 40 完了）
-Plan: —
-Status: Ready to execute
+Phase: 41 of 42 — 機能2 Note一覧（永続化なし）— Complete ✓ (verified PASS 3/3)
+Plan: 41-01 ✓
+Status: Phase 41 complete — ready for Phase 42
 Last activity: 2026-06-18 -- Phase 41 planning complete
 
 ### 確定エンドポイント（Phase 41/42 で使用・すべて無認証サーバー側 fetch）
