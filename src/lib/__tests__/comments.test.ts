@@ -1,13 +1,38 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
   parseNoteId,
   parseComment,
   parseReplies,
   isFresh,
   CACHE_TTL_MS,
+  getNoteComments,
 } from '../comments'
 import readerFixture from './fixtures/comment_reader.json'
 import repliesFixture from './fixtures/comment_replies.json'
+
+// supabase clients をモック（fetch/DB 非依存でキャッシュ層を検証）。
+const selectMaybeSingle = vi.fn()
+const adminUpsert = vi.fn().mockResolvedValue({ error: null })
+
+vi.mock('@/lib/supabase/server', () => ({
+  createSupabaseServerClient: vi.fn(async () => ({
+    from: () => ({
+      select: () => ({
+        eq: () => ({
+          maybeSingle: selectMaybeSingle,
+        }),
+      }),
+    }),
+  })),
+}))
+
+vi.mock('@/lib/supabase/admin', () => ({
+  createSupabaseAdminClient: vi.fn(() => ({
+    from: () => ({
+      upsert: adminUpsert,
+    }),
+  })),
+}))
 
 describe('parseNoteId - 寛容パース（COMMENT-01）', () => {
   it('URL（c-付き）から数字 ID を抽出する', () => {
@@ -158,5 +183,173 @@ describe('isFresh - 鮮度判定（CACHE_TTL_MS=30分・COMMENT-05）', () => {
 
   it('不正な日付文字列 → false', () => {
     expect(isFresh('not-a-date')).toBe(false)
+  })
+})
+
+describe('getNoteComments - キャッシュ層 + fetch&retry（COMMENT-05/06/A2）', () => {
+  // reader: comment 本体（件数）/ replies: 一覧 を返す fetch モックを組む。
+  function mockFetchOk() {
+    return vi.spyOn(globalThis, 'fetch').mockImplementation((url) => {
+      const u = String(url)
+      if (u.endsWith('/replies')) {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve(repliesFixture) } as Response)
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve(readerFixture) } as Response)
+    })
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    selectMaybeSingle.mockReset()
+    adminUpsert.mockClear().mockResolvedValue({ error: null })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.restoreAllMocks()
+  })
+
+  it('parseNoteId が null → invalid_input（fetch も select もしない・COMMENT-01）', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch')
+    const result = await getNoteComments('garbage')
+    expect(result).toEqual({ status: 'invalid_input' })
+    expect(fetchSpy).not.toHaveBeenCalled()
+    expect(selectMaybeSingle).not.toHaveBeenCalled()
+  })
+
+  it('cache hit（fresh && !force）: select のみ・fetch しない・fromCache:true（COMMENT-05）', async () => {
+    selectMaybeSingle.mockResolvedValue({
+      data: {
+        comment_count: 4,
+        comments: [{ id: 1, name: 'a', body: 'x', photoUrl: null, date: '2026-06-15T22:00:00Z' }],
+        fetched_at: new Date(Date.now() - 60 * 1000).toISOString(),
+      },
+      error: null,
+    })
+    const fetchSpy = vi.spyOn(globalThis, 'fetch')
+    const result = await getNoteComments('c-276780760')
+    expect(fetchSpy).not.toHaveBeenCalled()
+    expect(result.status).toBe('ok')
+    if (result.status === 'ok') {
+      expect(result.fromCache).toBe(true)
+      expect(result.count).toBe(4)
+      expect(result.comments).toHaveLength(1)
+    }
+  })
+
+  it('cache miss: fetch → upsert → fromCache:false（件数=children_count）', async () => {
+    selectMaybeSingle.mockResolvedValue({ data: null, error: null })
+    mockFetchOk()
+    const promise = getNoteComments('276780760')
+    await vi.runAllTimersAsync()
+    const result = await promise
+    expect(result.status).toBe('ok')
+    if (result.status === 'ok') {
+      expect(result.fromCache).toBe(false)
+      expect(result.count).toBe(4) // reader children_count
+      expect(result.comments).toHaveLength(4) // replies branches
+    }
+    expect(adminUpsert).toHaveBeenCalledTimes(1)
+  })
+
+  it('stale cache（31分前）: fetch して更新・fromCache:false', async () => {
+    selectMaybeSingle.mockResolvedValue({
+      data: {
+        comment_count: 1,
+        comments: [],
+        fetched_at: new Date(Date.now() - 31 * 60 * 1000).toISOString(),
+      },
+      error: null,
+    })
+    mockFetchOk()
+    const promise = getNoteComments('276780760')
+    await vi.runAllTimersAsync()
+    const result = await promise
+    expect(result.status).toBe('ok')
+    if (result.status === 'ok') {
+      expect(result.fromCache).toBe(false)
+      expect(result.count).toBe(4)
+    }
+    expect(adminUpsert).toHaveBeenCalledTimes(1)
+  })
+
+  it('force: fresh cache でも fetch して更新・fromCache:false', async () => {
+    selectMaybeSingle.mockResolvedValue({
+      data: {
+        comment_count: 99,
+        comments: [],
+        fetched_at: new Date(Date.now() - 60 * 1000).toISOString(), // fresh
+      },
+      error: null,
+    })
+    mockFetchOk()
+    const promise = getNoteComments('276780760', { force: true })
+    await vi.runAllTimersAsync()
+    const result = await promise
+    expect(result.status).toBe('ok')
+    if (result.status === 'ok') {
+      expect(result.fromCache).toBe(false)
+      expect(result.count).toBe(4) // cache の 99 ではなく fetch 結果
+    }
+    expect(adminUpsert).toHaveBeenCalledTimes(1)
+  })
+
+  it('fetch 異常が2回続く → error。stale をフォールバック返却しない（A2/COMMENT-06）', async () => {
+    selectMaybeSingle.mockResolvedValue({
+      data: {
+        comment_count: 5,
+        comments: [{ id: 1, name: 'a', body: 'stale', photoUrl: null, date: '2026-06-15T22:00:00Z' }],
+        fetched_at: new Date(Date.now() - 31 * 60 * 1000).toISOString(), // stale
+      },
+      error: null,
+    })
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: false, status: 500 } as Response)
+    const promise = getNoteComments('276780760')
+    await vi.runAllTimersAsync()
+    const result = await promise
+    expect(result).toEqual({ status: 'error' }) // stale を返さない
+    expect(adminUpsert).not.toHaveBeenCalled()
+  })
+
+  it('1回目失敗 → 1秒待ち → 2回目成功 → ok（リトライ踏襲）', async () => {
+    selectMaybeSingle.mockResolvedValue({ data: null, error: null })
+    let call = 0
+    vi.spyOn(globalThis, 'fetch').mockImplementation((url) => {
+      call++
+      // 最初の2リクエスト（本体+replies の1試行目）を失敗させ、2試行目を成功させる
+      if (call <= 2) return Promise.resolve({ ok: false, status: 500 } as Response)
+      const u = String(url)
+      if (u.endsWith('/replies')) {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve(repliesFixture) } as Response)
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve(readerFixture) } as Response)
+    })
+    const promise = getNoteComments('276780760')
+    await vi.runAllTimersAsync()
+    const result = await promise
+    expect(result.status).toBe('ok')
+  })
+
+  it('0件（children_count===0 / commentBranches 空）: ok・count:0・comments:[]（error と区別・COMMENT-06）', async () => {
+    selectMaybeSingle.mockResolvedValue({ data: null, error: null })
+    vi.spyOn(globalThis, 'fetch').mockImplementation((url) => {
+      const u = String(url)
+      if (u.endsWith('/replies')) {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ commentBranches: [] }) } as Response)
+      }
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ item: { comment: { children_count: 0 } } }),
+      } as Response)
+    })
+    const promise = getNoteComments('276780760')
+    await vi.runAllTimersAsync()
+    const result = await promise
+    expect(result.status).toBe('ok')
+    if (result.status === 'ok') {
+      expect(result.count).toBe(0)
+      expect(result.comments).toEqual([])
+      expect(result.fromCache).toBe(false)
+    }
   })
 })

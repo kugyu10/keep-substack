@@ -93,3 +93,116 @@ export function isFresh(fetchedAt: string, now: number = Date.now()): boolean {
   if (Number.isNaN(t)) return false
   return now - t < CACHE_TTL_MS
 }
+
+// ============================================================
+// fetch ヘルパ（非公開・notes.ts と同じ no-store + timeout + 1秒1回リトライ）
+// ============================================================
+
+// MANIFEST 確定エンドポイント（spike 002 で検証済み）。
+function buildCommentUrl(noteId: string): string {
+  return `https://substack.com/api/v1/reader/comment/${noteId}`
+}
+function buildRepliesUrl(noteId: string): string {
+  return `https://substack.com/api/v1/reader/comment/${noteId}/replies`
+}
+
+// res.ok 不成立は throw（リトライ対象）。成功時 JSON を返す。
+async function fetchJson(url: string): Promise<unknown> {
+  const res = await fetch(url, {
+    cache: 'no-store', // 永続化なし（Pitfall 4）。キャッシュは note_comments 側で管理
+    headers: { Accept: 'application/json' },
+    signal: AbortSignal.timeout(TIMEOUT_MS),
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  return res.json()
+}
+
+// 2エンドポイント（本体＝件数 / replies＝一覧）を 1回の試行でまとめて取得。
+// A4: ページング非対応。件数は children_count（parseComment）を正とする。
+async function fetchOnce(noteId: string): Promise<{ count: number; comments: CommentItem[] }> {
+  const [commentJson, repliesJson] = await Promise.all([
+    fetchJson(buildCommentUrl(noteId)),
+    fetchJson(buildRepliesUrl(noteId)),
+  ])
+  return { count: parseComment(commentJson), comments: parseReplies(repliesJson) }
+}
+
+// notes.ts 踏襲: 1回目失敗→1秒待ち→1回リトライ→なお失敗で throw（stale フォールバックしない）。
+async function fetchWithRetry(noteId: string): Promise<{ count: number; comments: CommentItem[] }> {
+  try {
+    return await fetchOnce(noteId)
+  } catch (err) {
+    console.warn('[getNoteComments] 1回目の取得に失敗:', err)
+    await new Promise((r) => setTimeout(r, RETRY_DELAY_MS))
+    return await fetchOnce(noteId) // 2回目も失敗時は throw が呼び出し元へ伝播
+  }
+}
+
+// ============================================================
+// getNoteComments — キャッシュ hit/miss/stale/force + upsert
+// ============================================================
+
+// (1) parseNoteId→null なら invalid_input（fetch も select もしない・COMMENT-01）
+// (2) note_comments を select、(3) cache hit（fresh && !force）なら fromCache:true で返す（COMMENT-05）
+// (4) miss/stale/force なら 2エンドポイント fetch（失敗時 error・stale フォールバックしない＝A2/COMMENT-06）
+// (5) 成功時 service_role で upsert して fromCache:false で返す
+export async function getNoteComments(
+  input: string,
+  opts?: { force?: boolean }
+): Promise<CommentsResult> {
+  const noteId = parseNoteId(input)
+  if (noteId === null) {
+    return { status: 'invalid_input' }
+  }
+
+  const force = opts?.force === true
+
+  // (2) キャッシュ参照（anon/public select）
+  const supabase = await createSupabaseServerClient()
+  const { data: cached } = await supabase
+    .from('note_comments')
+    .select('comment_count, comments, fetched_at')
+    .eq('note_id', noteId)
+    .maybeSingle()
+
+  // (3) cache hit: fresh かつ force でない → fetch せず返す
+  if (cached && !force && isFresh(cached.fetched_at)) {
+    return {
+      status: 'ok',
+      count: cached.comment_count,
+      comments: (cached.comments ?? []) as CommentItem[],
+      fetchedAt: cached.fetched_at,
+      fromCache: true,
+    }
+  }
+
+  // (4) miss / stale / force: 外部 fetch。失敗時は error（stale を返さない＝A2）
+  let fresh: { count: number; comments: CommentItem[] }
+  try {
+    fresh = await fetchWithRetry(noteId)
+  } catch (err2) {
+    console.error('[getNoteComments] 2回目の取得に失敗:', err2)
+    return { status: 'error' }
+  }
+
+  // (5) service_role で upsert（note_id 衝突時 update）。fetched_at は now() で更新。
+  const fetchedAt = new Date().toISOString()
+  const admin = createSupabaseAdminClient()
+  await admin.from('note_comments').upsert(
+    {
+      note_id: noteId,
+      comment_count: fresh.count,
+      comments: fresh.comments,
+      fetched_at: fetchedAt,
+    },
+    { onConflict: 'note_id' }
+  )
+
+  return {
+    status: 'ok',
+    count: fresh.count,
+    comments: fresh.comments,
+    fetchedAt,
+    fromCache: false,
+  }
+}
