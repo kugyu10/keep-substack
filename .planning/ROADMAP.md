@@ -153,7 +153,7 @@ Full archive: `.planning/milestones/v1.9-ROADMAP.md`
 **Milestone Goal:** Substack の Note 領域（コメント・投稿一覧）のデータ取得可否を PoC で検証し、コメント可視化と Note 一覧取得の2機能を試作する。フィージビリティ・ゲート型 PoC — Phase 40 で取得可否を実測し go/no-go を判定する。
 
 - [ ] **Phase 40: 取得可否スパイク（go/no-go ゲート）** - 非公式エンドポイントから admin Note 一覧・特定 Note コメントを取得できるかを本番/preview Vercel から実測。取得可否レポート + 生 JSON サンプル + 採用エンドポイント表を成果物とする捨てスパイク。取得不可の負の結果も有効なクローズ（SPIKE-01, SPIKE-02）
-- [ ] **Phase 41: 機能2 Note一覧（永続化なし）** - `/admin/notes` の Server Component で admin の Note 一覧を都度 fetch し表示（本文プレビュー + 投稿日時 JST、永続化なし、失敗/0件状態表示）（NOTE-01..03）
+- [x] **Phase 41: 機能2 Note一覧（永続化なし）** - `/admin/notes` の Server Component で admin の Note 一覧を都度 fetch し表示（本文プレビュー + 投稿日時 JST、永続化なし、失敗/0件状態表示）（NOTE-01..03） (completed 2026-06-18)
 - [ ] **Phase 42: 機能1 コメント可視化（キャッシュ基盤 + 永続化）** - Note URL/ID 入力フォーム → コメント件数/本文/名前/アイコンを表示し、`note_comments` テーブルに Supabase キャッシュ（鮮度判定 + 手動 force 再取得、失敗/0件/キャッシュ無の状態表示）（COMMENT-01..06）
 
 ### Phase 40: 取得可否スパイク（go/no-go ゲート）
@@ -176,7 +176,7 @@ Full archive: `.planning/milestones/v1.9-ROADMAP.md`
   2. 各 Note に本文プレビューと投稿日時（JST）が表示される
   3. 取得失敗・0件の状態が画面に明示される
 **Plans**: 1 plan
-- [ ] 41-01-PLAN.md — 取得層 lib/notes.ts（fetchAdminNotes/parseNoteFeed・判別ユニオン）+ /admin/notes RSC ページ + env 設定
+- [x] 41-01-PLAN.md — 取得層 lib/notes.ts（fetchAdminNotes/parseNoteFeed・判別ユニオン）+ /admin/notes RSC ページ + env 設定
 **UI hint**: yes
 
 ### Phase 42: 機能1 コメント可視化（キャッシュ基盤 + 永続化）
@@ -242,5 +242,5 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 38. ワンボタン共有（クリップボード + Substack Notes 起動） | v1.9 | 1/1 | Complete | 2026-06-14 |
 | 39. リンクプレビュー（OGメタタグ + 動的OG画像） | v1.9 | 1/1 | Complete | 2026-06-14 |
 | 40. 取得可否スパイク（go/no-go ゲート） | v1.10 | 0/0 | Not started | - |
-| 41. 機能2 Note一覧（永続化なし） | v1.10 | 0/0 | Not started | - |
+| 41. 機能2 Note一覧（永続化なし） | v1.10 | 1/1 | Complete   | 2026-06-18 |
 | 42. 機能1 コメント可視化（キャッシュ基盤 + 永続化） | v1.10 | 0/0 | Not started | - |
