@@ -1,230 +1,180 @@
-# Feature Research: v1.5
+# Feature Research: v1.10
 
-**Domain:** Substack継続コミュニティ向けRSS活動可視化ツール
-**Milestone:** v1.5 Member Auth + Supabase Migration
-**Researched:** 2026-05-16
-**Overall confidence:** HIGH (Supabase公式ドキュメント + 既存コードベース実地確認)
+**Domain:** Substack Notes 領域の読み取り可視化（コメント可視化 / Note一覧取得）の PoC
+**Milestone:** v1.10 Substack Notes PoC（コメント可視化 & Note一覧取得）
+**Researched:** 2026-06-18
+**Confidence:** MEDIUM（データ形状は複数の非公式リバースエンジニアリング情報源で一致。ただし公式 API 不在のため全機能は「取得可否」に依存 — STACK 調査参照）
 
----
-
-## Context: 既存アーキテクチャ (再調査不要)
-
-v1.4時点の完成済み機能:
-- `Member` 型: `{ name, substackId, teamNames: string[], addedAt }` (KV JSON配列)
-- `kvMembers.ts`: `getMembers / addMember / deleteMember / updateMember`
-- `kvArticles.ts`: `saveArticles / getArticles` (key=`articles:{substackId}`)
-- 管理画面 `/admin`: Server Component + AdminAddForm + AdminMemberList (インライン編集)
-- チーム: `teamNames: string[]` (カンマ区切りテキスト入力で設定)
-- Basic Auth: `middleware.ts`（proxy.tsではなく実際にmiddleware.tsが現存）
-- データ永続化: Upstash Redis（KV）
+> **前提（最重要）**: Substack には Notes/コメント取得の公式 API が無い。本ドキュメントの全機能は非公式エンドポイント（`substack.com/api/v1/...`）でデータが取得できることが大前提であり、**取得可否の検証は STACK/調査フェーズの責務**。ここでは「取れた場合に何を表示するのが table-stakes か」を定義する。取得不能ならフィールド・機能を落とす（degrade）前提で設計する。これが最大かつ唯一の致命的依存。
 
 ---
 
-## Supabase Auth + Member Self-Management
+## 機能1: コメント可視化（永続化あり）
 
-### Table Stakes
+Note の URL/ID を手入力 → そのNoteのコメント件数・本文一覧・コメント者の名前/アイコンを表示。取得結果は Supabase にキャッシュ。
 
-メンバー自己管理を実現するために最低限必要な機能。欠けると「管理者依存から脱せない」。
+### Table Stakes (Users Expect These)
 
-| Feature | Why Expected | Complexity | 既存への依存 |
-|---------|--------------|------------|------------|
-| メールアドレスでのサインアップ/ログイン | パスワードレスのMagic Linkが最もFrictionが少ない。コミュニティ向けツールでパスワード管理は不要 | Med | `@supabase/ssr` 追加、middleware.ts更新 |
-| ログイン後に自分のSubstack URLを登録/編集できるプロフィールページ | 自己管理の核心。管理者が手動でメンバー追加する運用を廃止する | Med | `kvMembers.updateMember` または Supabase profilesテーブルに移行 |
-| ログイン後に自分のチーム所属を選択/変更できる | チーム管理の自律化。管理者の負担を直接減らす | Low-Med | 既存teamNamesフィールドの編集UIをメンバー向けに提供 |
-| ログアウト機能 | セッション管理の基本。公共の場でのログアウト忘れ防止 | Low | Supabase Auth signOut |
-| 未ログインユーザーはメンバー自己管理ページにアクセスできない | セキュリティの最低ライン。他人のSubstack URLを書き換えられてはならない | Low | middleware.tsのRoute保護 |
-| ログインしていない状態でも公開ページ（ヒートマップ等）は閲覧できる | 公開ページの認証なし閲覧はv1.0からの要件。壊してはならない | Low | 既存ISRページは認証不要を維持 |
-| 自分のデータのみ編集可能（他人のSubstack URLは変更不可） | 最小限のRow Level Security。substackIdと認証ユーザーの紐付けが必要 | Med | SupabaseのRLSポリシー or middleware側のチェック |
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Note URL/ID の手入力フォーム | 対象を指定する唯一の入口 | LOW | URL から ID 抽出（`/p/...` や `comment/{id}`）。パース失敗時のエラー表示が必須 |
+| コメント件数の表示 | 「何件ついたか」が一目で分かる最小価値 | LOW | `children` 配列長、または `comment_count` |
+| コメント本文一覧の表示 | 機能の本体。本文が見えないと意味がない | LOW | comment object の `body`（プレーンテキスト想定。リッチなら最小整形＋改行保持） |
+| コメント者の表示名 | 「誰が」が分かる | LOW | comment object の `name` |
+| コメント者のアイコン（avatar） | 視認性・実物忠実さ（本プロジェクトの強い要求） | MEDIUM | photo/avatar URL。**フィールド名は情報源で未確定**（要実データ確認）。欠損時はイニシャル/プレースホルダにフォールバック |
+| 取得結果の Supabase キャッシュ | 要件明記（再取得回避） | MEDIUM | note_id をキーに JSON 保存。再表示はキャッシュ優先 |
+| 取得失敗 / 0件 / キャッシュ無 の状態表示 | PoC でも空・失敗は必ず起きる | LOW | 「取得できませんでした」「コメントはまだありません」を明示 |
 
-### Differentiators
-
-あれば体験が向上するが、v1.5 MVPには必須でない。
+### Differentiators (Competitive Advantage)
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| メンバー登録申請フロー（管理者承認制） | 不正メンバー登録を防ぐ。コミュニティの「閉じた感」を維持 | High | `status: pending/approved` フィールドが必要。管理者の通知フローも必要。v1.5ではスコープ外推奨 |
-| Google/GitHub OAuthログイン | Magic Linkよりも手軽。ただし日本コミュニティではメールの方が馴染みやすい可能性 | Med | Supabase OAuth設定 + コールバックURL。メールMagic Linkで十分ならYAGNI |
-| プロフィールページでの記事統計表示（自分の投稿数等） | ログインした自分のデータを見るモチベーション | Med | 既存ヒートマップデータの再利用 |
+| コメント投稿日時の表示 | いつのコメントか分かり鮮度が伝わる | LOW | `date`。JST 表示（プロジェクト規約：全日時 JST 期待） |
+| リアクション（いいね/ハート）数 | 反応の盛り上がりが見える | LOW | `reactions`（絵文字→件数のマップ）。集計のみ表示 |
+| キャッシュ更新（手動リフレッシュ） | 古いキャッシュを意図的に取り直せる | LOW | 「再取得」ボタン1つ。自動再取得はしない（PoC） |
+| コメント者の Substack プロフィールリンク | 既存の @handle リンク文化と整合 | MEDIUM | handle が取れる場合のみ。取れなければ省略 |
 
-### Anti-Features (avoid)
+### Anti-Features (Commonly Requested, Often Problematic)
 
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| パスワード認証 | パスワード管理のUXコスト高。コミュニティツールでは不要。「パスワードを忘れた」サポートが管理者負担になる | Magic Link（メールOTP）のみ |
-| 管理者権限の全機能をメンバーに開放 | 他人の削除・substackId変更等は許可してはならない | RLSで自分のデータのみ編集可能に制限 |
-| 招待コードや承認フローのv1.5実装 | Complexity高。コミュニティが信頼ベースで運営されている場合は不要 | 管理者が最終的に不正ユーザーを削除できれば十分 |
-| Supabase AuthとBasic Authの二重管理 | 認証システムが2つ存在すると混乱。Basic Authは管理者専用に限定すべき | `/admin`はBasic Auth継続、メンバー自己管理は Supabase Auth |
-| メンバー自己削除機能 | コミュニティからの脱退はコミュニティ管理の問題。自動削除するとデータが消える | 管理者が削除する運用を維持 |
-
-### 依存関係と実装上の注意点
-
-```
-Supabase Auth (Magic Link)
-  → @supabase/ssr パッケージ追加
-  → middleware.ts: /member/settings/* ルート保護
-  → 認証ユーザー ↔ substackId の紐付けテーブル（Supabase profiles）
-  → プロフィール編集ページ /member/settings（新規）
-  → 既存管理者向け /admin は Basic Auth を継続
-
-データの紐付け方針（重要）:
-  - Supabase profilesテーブルに substackId を保持
-  - メンバーリスト（KV or Supabase members table）との整合性が必要
-  - v1.5スコープ: Supabase Authだけ先に導入し、membersデータはKVのまま可
-  - または Supabase完全移行（members → PostgreSQL table）と同時実施
-```
-
-**複雑度サマリー:** 全体としてMedium-High。Supabase Authの設定自体はLow-Medだが、KVとの整合性管理がボトルネック。
+| Feature | Why Requested | Why Problematic | Alternative |
+|---------|---------------|-----------------|-------------|
+| 返信スレッドのネスト表示 | `children` が階層構造なので再現したくなる | 再帰 UI・折り畳み・インデント設計で PoC が膨張。検証目的に不要 | PoC は**フラット表示**（トップレベルのみ、または全件平坦化して時系列）。ネストは将来 |
+| リアルタイム/自動ポーリング更新 | 新着コメントを追いたい | 永続化キャッシュ方針と矛盾。Vercel 負荷・非公式 API 連打のリスク | 手動「再取得」ボタンのみ |
+| ページネーション/無限スクロール | コメントが多いと欲しくなる | PoC では admin の少数 Note が対象。実装コストに見合わない | 全件一括取得・一括表示（件数上限だけ設ける） |
+| コメントへのリアクション/返信（書き込み） | 「コメント機能」と混同 | PROJECT Out of Scope（自前コメント機能）。本 PoC は**読み取り専用** | 表示のみ。書き込み導線を一切置かない |
+| リッチテキスト/画像/埋め込みの完全再現 | 実物忠実への欲求 | コメント本文の bodyJson 構造解析は重い | プレーンテキスト抽出 + 改行保持。画像/埋め込みは将来 |
 
 ---
 
-## Long-term Article History
+## 機能2: Note一覧取得（永続化なし）
 
-### Table Stakes
+admin（開発者本人）が投稿した Note 一覧を取得して表示。永続化なし（毎回取得）。
 
-1ヶ月以上の累積記事履歴を保存するための必須機能。欠けると「ヒートマップが直近7日しか見れない」問題が継続する。
+### Table Stakes (Users Expect These)
 
-| Feature | Why Expected | Complexity | 既存への依存 |
-|---------|--------------|------------|------------|
-| 記事データを日付付きで永続保存（append-only） | 現在のKV（`articles:{substackId}`）はすでにこのパターン。Supabase移行後も維持が必要 | Med | `kvArticles.saveArticles` のSupabase版実装 |
-| 同一記事のURLによるdeduplication | 既存KV実装で解決済み（`existingLinks` SetでURL一致チェック）。PostgreSQLでもUNIQUE制約で対応 | Low | PostgreSQL UNIQUE(substackId, articleUrl) |
-| Vercel Cronによる日次フィード取得継続 | v1.3から稼働中。移行後も日次でRSSを取得してDBに追記する仕組みを維持 | Low | Cron APIルートのDB書き込み先変更のみ |
-| 月間・年間ビューの表示対応（ヒートマップ期間拡張） | 蓄積データがあれば過去1ヶ月のヒートマップが初めて実現する | Med | calendarUtils.ts の期間計算拡張 |
-| 記事の公開日時（pubDate）の保存と時刻正規化 | 日本時間でのヒートマップ表示のため、タイムゾーン正規化が必要 | Low | 既存FeedItem.isoDateを使用、DBはUTC保存・表示時JST変換 |
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| admin の Note 一覧取得・表示 | 機能の本体 | MEDIUM | プロフィール feed エンドポイント（`api/v1/reader/feed/profile/{userId}` 等）。各 item が `comment` object を内包する形 |
+| 各 Note の本文（テキスト/プレビュー） | 「何を書いたか」が分かる最小価値 | LOW | note item 内 `body`。長文は冒頭プレビューに truncate |
+| 各 Note の投稿日時 | いつ投稿したか | LOW | `date`。JST 表示 |
+| 取得失敗 / 0件の状態表示 | 取得不能・無投稿は必ず起きる | LOW | 「取得できませんでした」「Note がありません」 |
 
-### Differentiators
+### Differentiators (Competitive Advantage)
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| 年間ヒートマップ（GitHub草型） | 長期継続の可視化。PROJECT.mdの "Active (Future)" 要件として記載済み | High | 365日分のデータが必要。UIコンポーネントも新規 |
-| 月間・週次の投稿数トレンドグラフ | 個人の成長が時系列で見える | Med | recharts等のライブラリが必要 |
-| 記事タイトル全文保存（現在はKVに保存済み） | 過去記事の検索・一覧表示に必要 | Low | 現行`FeedItem.title`をDBカラムに移行するだけ |
-| ストリーク（連続投稿日数）計算と表示 | PROJECT.mdの "Active (Future)" 要件。蓄積データがあれば計算可能 | Med | 日単位の投稿有無フラグが必要。記事の日付データから算出 |
+| いいね（リアクション）数 | エンゲージメントが見える | LOW | `reactions` / `reaction_count` |
+| 返信・コメント数 | 反応の規模が見える | LOW | reply/comment count（フィールド名は要実データ確認） |
+| リスタック（restack）数 | Note 特有の拡散指標 | LOW | `restacks`。取れれば差別化価値高 |
+| Note への直リンク（URL） | クリックで実物へ飛べる | LOW | item から canonical URL を構築。実物確認の導線 |
+| 取得時刻の表示 | 永続化なし＝鮮度を明示する意味 | LOW | 「YYYY-MM-DD HH:mm 時点」表示で「毎回取得」を伝える |
 
-### Anti-Features (avoid)
+### Anti-Features (Commonly Requested, Often Problematic)
 
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| 記事本文（content:encoded）のフル保存 | データ量が膨大。Supabase無料枠（500MB）をすぐに消費する | タイトル・URL・pubDate・サムネURLのみ保存 |
-| リアルタイム同期（WebSocket/Realtime） | ISR + Cronで十分。コミュニティツールに「今まさに書いた」の即時反映は不要 | Vercel Cron日次 + ISR 5分が継続 |
-| 記事の全文検索インデックス | PostgreSQLのfull-text searchはYAGNI。ヒートマップは日付ベースの可視化であり検索は不要 | 日付インデックスのみ（pubDate列にINDEX） |
-| Supabase Realtimeサブスクリプション | Vercel Cronとの二重管理になる。YAGNI | Cronが日次でbatchinsertする設計を維持 |
-| 記事データの履歴削除機能 | append-onlyがこの機能の価値。削除すると過去ヒートマップが壊れる | 削除は管理者がメンバーごとDBを直接操作（運用対応） |
-
-### データスキーマ（参考）
-
-```sql
--- Supabase PostgreSQL想定スキーマ
-CREATE TABLE articles (
-  id           BIGSERIAL PRIMARY KEY,
-  substack_id  TEXT NOT NULL,          -- 例: "careerkoumei"
-  title        TEXT,
-  link         TEXT NOT NULL,
-  pub_date     TIMESTAMPTZ NOT NULL,   -- UTC保存。表示時にJSTへ変換
-  thumbnail    TEXT,                   -- content:encodedから抽出済みのURL
-  created_at   TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE UNIQUE INDEX articles_link_idx ON articles(link);  -- dedup用
-CREATE INDEX articles_substack_pubdate_idx ON articles(substack_id, pub_date DESC);
-```
-
-**既存KVとの移行方針:** `kvArticles.getArticles` の全データをPostgreSQLに一括インポート後、KVを廃止。移行スクリプトは一回限りの実行。
-
----
-
-## Admin UI Team Management
-
-### Table Stakes
-
-チーム管理UIのカンマ区切りテキスト → チェックボックス化。管理者の操作ミスを減らす。
-
-| Feature | Why Expected | Complexity | 既存への依存 |
-|---------|--------------|------------|------------|
-| 既存チーム一覧をチェックボックスで表示 | チーム名のタイポが操作ミスの主因。選択式にすると根本解決 | Low | `getTeams()`（全メンバーからteamNamesをdedupe抽出）が必要 |
-| メンバー編集画面で複数チームをチェックボックスで選択 | `teamNames: string[]` の多対多を直感的に扱える | Low | AdminMemberList.tsx のEditモード更新 |
-| 現在の所属チームが編集開始時にチェック済みで表示 | 現在状態を正しく反映。チェックボックスのdefaultCheckedをmemberのteamNamesで初期化 | Low | `defaultChecked={m.teamNames.includes(team)}` |
-| チェックなし（チームなし）の状態を許容 | チームに属さないメンバーが存在できる。`teamNames: []`が有効な状態として維持 | Low | 既存スキーマは `string[]` なので変更不要 |
-
-### Anti-Features (avoid)
-
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| カンマ区切りテキスト入力のUI継続 | チーム名のタイポ・大文字小文字の不一致が発生する。v1.3から既知の問題 | 既存チーム名リストから選択するチェックボックスUIに置換 |
-| 新チーム名をここで新規作成する機能 | チーム名管理が複雑になる。YAGNI | チーム名は既存メンバーのteamNamesから自動収集。新チームは最初の1件を管理者がテキスト入力で作成し、以降はチェックボックスで選択 |
-| 動的なチェックボックスUI（全メンバーの変更を即時反映） | 管理画面はAdmin専用の内部ツール。リアルタイム同期はYAGNI | ページリロードで最新チーム一覧を反映すれば十分 |
-| チームの独立管理画面（CRUD）作成 | スコープ過剰。YAGNI | チームはメンバーのteamNamesから自動導出。専用テーブルは不要 |
-
-### 実装の詳細
-
-```
-既存フロー（カンマ区切りテキスト）:
-  AdminMemberList.tsx（editingId === m.substackId の場合）
-  → <input name="teamNames" defaultValue={m.teamNames.join(', ')} />
-  → updateMemberAction → teamNames.split(',').map(s => s.trim()).filter(Boolean)
-
-変更後フロー（チェックボックス）:
-  → 全チーム一覧を getTeams() で取得（page.tsx or AdminMemberList props）
-  → <input type="checkbox" name="teamNames" value={team} defaultChecked={...} />
-  → HTML checkboxの formDataは同名複数値をサポート → getAll('teamNames') で string[] 取得
-  → updateMemberAction の型変更不要（teamNames: string[] のまま）
-```
-
-**既存の `updateMemberAction` への影響:** Server ActionのFormData解析部分を `formData.get('teamNames')` から `formData.getAll('teamNames')` に変更するのみ。KISS原則に合致した最小変更。
+| Feature | Why Requested | Why Problematic | Alternative |
+|---------|---------------|-----------------|-------------|
+| Supabase 等への永続化 | キャッシュしたくなる | 要件で**永続化なし**と明記。機能1との責務分離が崩れる | 毎回フェッチ。キャッシュは機能1のみ |
+| 任意ユーザー/メンバー全員の Note 一覧 | 横展開したくなる | userId 解決・認証・スケールの未検証要素が増え PoC が散漫に | PoC は **admin 1人固定**。段階拡張（admin→メンバー→任意）は将来 |
+| ページネーション/cursor 全取得 | 全 Note を漏れなく取りたい | feed は cursor ページング。全件巡回は非公式 API 連打リスク | 最新 N 件（1ページ分）のみ。検証には十分 |
+| Note 本文のリッチ再現（画像/引用/埋め込み） | 実物忠実 | bodyJson 解析が重く PoC スコープ外 | テキスト + 改行のみ。リンクは URL で代替 |
+| Note の作成/投稿/編集 | 「Notes 連携」と混同 | 読み取り PoC のスコープ外。書き込みは別物 | 表示専用 |
 
 ---
 
 ## Feature Dependencies Map
 
 ```
-Supabase Auth (Magic Link)
-  → Supabase プロジェクト作成（SupabaseダッシュボードでOAuth設定）
-  → @supabase/ssr インストール
-  → middleware.ts 拡張（Basic Auth継続 + Supabase Authによる/member/settings/*保護）
-  → /member/settings ページ新規作成（プロフィール編集UI）
-  → Supabase profiles テーブル（auth.users.id ↔ substackId の紐付け）
+[非公式 API でのデータ取得可否]  ← 全機能の根（STACK 調査で検証）
+    ├──requires──> [機能1: コメント可視化]
+    │                   ├── Note URL/ID パース ──> コメント取得 ──> Supabase キャッシュ
+    │                   └── avatar/handle 表示（取得フィールド次第で degrade）
+    └──requires──> [機能2: Note一覧取得]
+                        └── admin userId 解決 ──> profile feed 取得（永続化なし）
 
-Long-term Article History
-  → Supabase PostgreSQL articles テーブル（↑とセットで同一プロジェクト）
-  → kvArticles.ts の Supabase版実装（saveArticles → upsertArticles to Supabase）
-  → Vercel Cron APIルートの書き込み先変更
-  → 既存KVデータの一括マイグレーションスクリプト（one-shot）
-  → calendarUtils.ts の期間拡張（7日間 → 任意期間）
-
-Admin UI Team Checkbox
-  → AdminMemberList.tsx のEditモード更新（テキスト入力 → チェックボックス）
-  → getTeams() ユーティリティ関数追加（全メンバーのteamNamesをdedupe）
-  → actions.ts の FormData解析を getAll('teamNames') に変更
+[機能2 の userId 解決ロジック] ──enhances──> [機能1]（コメント者→プロフィール解決の再利用余地）
+[永続化あり(機能1)] ──conflicts──> [永続化なし(機能2)]（責務を混ぜない）
 
 依存関係（実装順序の制約）:
-  Supabase Auth は Supabase PostgreSQL と同一プロジェクトを使う → 同時セットアップ推奨
-  Long-term Article History は Supabase DBが存在してから → Auth後またはAuth同時
-  Admin UI Team Checkbox は既存KVのまま実施可能 → 独立して先行実装できる（最も低リスク）
+  - 両機能とも「取得可否の検証フェーズ」が先行（STACK 調査の成否がゲート）
+  - 機能1 と 機能2 は独立実装可能（共通の取得基盤を共有しうるが PoC では無理に共通化しない）
+  - 取得できないフィールドは機能から落とす設計（avatar→プレースホルダ等）を前提にする
 ```
 
----
+### Dependency Notes
 
-## MVP Prioritization for v1.5
-
-**優先度高（先に実装すべき）:**
-
-1. Admin UI Team Checkbox — 既存KVで完結、依存なし、リスク最低。ユーザー体験の即時改善
-2. Supabase Auth + Member Self-Management — コアバリュー「管理者依存排除」の実現
-3. Long-term Article History + Supabase PostgreSQL — SupabaseプロジェクトはAuth導入時に同時作成するため、DBも同時に構築する
-
-**defer（v1.5スコープ外推奨）:**
-- 年間ヒートマップ: 蓄積データが溜まってから（最低1ヶ月以上必要）
-- 承認制メンバー登録フロー: 信頼ベースのコミュニティ運用で当面不要
-- ストリーク表示: データ蓄積後にv1.6で
+- **両機能 requires データ取得可否**: 公式 API が無いため、非公式エンドポイントが (a) 認証なし or cookie 認証で叩けるか、(b) 必要フィールド（特に avatar/handle/各種カウント）を返すかが未確定。**これが最大かつ唯一の致命的依存**。
+- **機能2 の userId 解決 enhances 機能1**: コメント者のプロフィール解決と admin の userId 解決は同じ仕組みを使い回せる可能性。ただし PoC では無理に共通化しない（YAGNI）。
+- **永続化あり/なしは意図的に分離**: 機能1=キャッシュで再取得回避、機能2=毎回取得で鮮度。混ぜると検証結果が読めなくなるので別実装に保つ。
 
 ---
+
+## MVP Definition
+
+### Launch With (v1.10 PoC)
+
+機能1:
+- [ ] Note URL/ID 入力フォーム — 対象指定の唯一の入口
+- [ ] コメント件数 + 本文一覧（フラット）+ コメント者名 — 機能の核
+- [ ] コメント者アイコン（取得できれば。欠損はプレースホルダ）— 視覚忠実さの要求
+- [ ] Supabase キャッシュ + 「再取得」ボタン — 要件（永続化あり）
+- [ ] 失敗/0件/キャッシュ無の状態表示 — PoC でも必須
+
+機能2:
+- [ ] admin の Note 一覧取得・表示（毎回取得）— 機能の核
+- [ ] 各 Note の本文プレビュー + 投稿日時(JST) — 最小価値
+- [ ] 取得失敗/0件の状態表示 — 必須
+
+### Add After Validation (取得可否が確認できたら)
+
+- [ ] コメントのリアクション数・投稿日時表示 — フィールドが取れると確認後
+- [ ] Note 一覧のいいね/返信/restack 数・直リンク — 同上
+- [ ] コメント者の Substack プロフィールリンク — handle が取れる場合
+
+### Future Consideration (PoC 後 / v2+)
+
+- [ ] 返信スレッドのネスト表示 — PoC ではフラットで十分、UI 設計コスト大
+- [ ] 機能2 の対象拡張（admin→メンバー→任意ユーザー）— userId 解決・認証の検証後
+- [ ] リッチテキスト/画像/埋め込みの再現 — bodyJson 解析が重い
+- [ ] ページネーション/全件取得 — 非公式 API 連打リスク、PoC に不要
+
+## Feature Prioritization Matrix
+
+| Feature | User Value | Implementation Cost | Priority |
+|---------|------------|---------------------|----------|
+| 機能1: URL入力→コメント本文/件数/名前表示 | HIGH | LOW | P1 |
+| 機能1: Supabase キャッシュ | MEDIUM | MEDIUM | P1 |
+| 機能1: コメント者アイコン | HIGH | MEDIUM | P1（degrade 可） |
+| 機能1: リアクション数/日時 | MEDIUM | LOW | P2 |
+| 機能2: admin Note 一覧 + 本文/日時 | HIGH | MEDIUM | P1 |
+| 機能2: いいね/返信/restack 数 + 直リンク | MEDIUM | LOW | P2 |
+| 返信ネスト表示（両機能） | LOW | HIGH | P3 |
+| 機能2 対象拡張 | MEDIUM | HIGH | P3 |
+
+**Priority key:** P1=Must have for PoC / P2=取得確認後に追加 / P3=将来
+
+---
+
+## データフィールド期待（非公式情報源の合意。要実データ確認）
+
+**コメント object**（comment endpoint / note の `children`）:
+- `id`, `body`（本文）, `name`（表示名）, `user_id`, `post_id`, `date`, `edited_at`, `reactions`（絵文字→件数）, `reaction`（自分の）, `children`（ネスト配列）
+- avatar/photo URL: **存在するがフィールド名が情報源で未確定**（要 DevTools 実測）→ 欠損前提で設計
+
+**Note 一覧（profile feed）item**:
+- 各 item が `comment` object を内包。`id`, `body`, `date`, `reactions` / `reaction_count`, `restacks`, reply/comment count、canonical URL 構築要素
+- ページングは `cursor`（PoC では使わず最新1ページ）
+
+> いずれも非公式・予告なく変更され得る。handle 変更で旧 ID が 404 になる既知挙動あり。**フィールド名・有無は実レスポンスで確定すること**（STACK/調査フェーズ）。
 
 ## Sources
 
-- [Supabase Auth with Next.js App Router](https://supabase.com/docs/guides/auth/server-side/nextjs) — @supabase/ssrパッケージ、Server Components対応、Middleware設定
-- [Supabase Passwordless Email (Magic Link)](https://supabase.com/docs/guides/auth/auth-email-passwordless) — Magic Link設定、60秒レート制限、1時間有効期限
-- [Supabase User Management Tutorial with Next.js](https://supabase.com/docs/guides/getting-started/tutorials/with-nextjs) — profiles テーブルパターン、RLS設定
-- [NN/g Checkboxes Design Guidelines](https://www.nngroup.com/articles/checkboxes-design-guidelines/) — チェックボックスはオプション数が少ない（<10）場合に最適
-- [Multi-select Input Pattern — UX Patterns](https://uxpatterns.dev/patterns/forms/multi-select-input) — タグ/テキスト入力 vs チェックボックスの使い分け
-- [Supabase TimescaleDB Extension](https://supabase.com/docs/guides/database/extensions/timescaledb) — 時系列データ保存（v1.5では標準PostgreSQLで十分）
-- 既存コードベース: `src/lib/kvArticles.ts`, `src/lib/kvMembers.ts`, `src/app/admin/AdminMemberList.tsx`, `src/lib/types.ts`
-- PROJECT.md — 要件履歴、制約、Out of Scope判断
+- [No official API? How I reverse-engineered Substack API — iam.slys.dev](https://iam.slys.dev/p/no-official-api-no-problem-how-i) — notes は comment エンドポイント経由、cookie(`connect.sid`) 認証、bodyJson 構造（MEDIUM）
+- [Developing a Custom Substack Front-end — Matt Hagy](https://matthagy.substack.com/p/developing-a-custom-substack-front) — comment object フィールド（id/body/name/date/reactions/children）、post/archive フィールド（MEDIUM-HIGH for field names）
+- [NHagar/substack_api (Python)](https://github.com/NHagar/substack_api) — 非公式ラッパー（MEDIUM）
+- [substack-api (TypeScript) docs](https://substack-api.readthedocs.io/api-reference/) — Post/Comment 型、comments() の AsyncIterable + ページング（MEDIUM）
+- WebSearch 集約: profile feed の各 item が `comment` object を内包し reactions/restacks/reply を持つ（LOW、要実測）
+- 既存: .planning/PROJECT.md — v1.10 方針、Out of Scope（自前コメント機能）、JST 規約、視覚忠実さ要求
+
+---
+*Feature research for: Substack Notes 読み取り可視化 PoC*
+*Researched: 2026-06-18*

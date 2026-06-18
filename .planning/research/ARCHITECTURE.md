@@ -1,703 +1,260 @@
-# Architecture Research: v1.5
+# Architecture Research
 
-**Domain:** RSS activity visualization — Supabase migration + Auth + long-term history
-**Researched:** 2026-05-16
-**Confidence:** HIGH (verified against Next.js 16.2.6 official docs, Supabase SSR Context7, official Supabase docs)
-
----
-
-## Critical Context: Next.js 16 Breaking Changes That Affect v1.5
-
-### 1. `middleware.ts` → `proxy.ts` (deprecated, not yet broken)
-
-The existing `src/middleware.ts` still works in Next.js 16.2.6 but produces deprecation warnings.
-When migrating middleware to Supabase Auth session handling, rename the file at the same time:
-
-```
-src/middleware.ts  →  src/proxy.ts
-export function middleware()  →  export function proxy()
-```
-
-The edge runtime is NOT supported in `proxy.ts`. The runtime is always `nodejs`.
-This means Supabase SSR session refresh (which requires Node.js) works correctly in `proxy.ts`.
-
-### 2. `revalidateTag` requires second argument in Next.js 16
-
-```typescript
-// Next.js 15 (current code in actions.ts)
-revalidatePath('/admin')  // still works, revalidatePath unchanged
-
-// Next.js 16 — revalidateTag now requires cacheLife profile
-revalidateTag('feeds')          // DEPRECATED — TypeScript error
-revalidateTag('feeds', 'max')   // CORRECT — 'max' means stale-while-revalidate
-updateTag('feeds')              // ALTERNATIVE — immediate expiration (Server Actions only)
-```
-
-The existing `revalidatePath('/admin')` calls in `actions.ts` are unaffected. Only `revalidateTag` changed.
-For v1.5, use `revalidatePath` (already used) or `updateTag` for immediate cache busting after Supabase writes.
-
-### 3. `unstable_cache` → `cacheLife` / `cacheTag` (stabilized)
-
-`unstable_cache` can be replaced with stable `use cache` + `cacheLife` + `cacheTag` in Next.js 16.
-v1.5 can continue using `unstable_cache` if keeping scope tight (YAGNI), but new Supabase query
-functions should use stable `cacheLife`/`cacheTag` APIs.
+**Domain:** Substack Notes PoC（コメント可視化＋Note一覧取得）を既存 Next.js App Router / Supabase / Vercel アプリへ追加統合
+**Researched:** 2026-06-18
+**Confidence:** HIGH（既存コードベース統合点）/ MEDIUM（Substack 非公式エンドポイント仕様）
 
 ---
 
-## Data Layer Migration: Redis → Supabase
+## 結論サマリー（最初に読む）
 
-### Why Supabase PostgreSQL over Redis for v1.5
+- **fetch はどこで起こすか:** サーバー側固定。Substack の非公式エンドポイント（`https://<pub>.substack.com/api/v1/...`）はブラウザから直叩きすると CORS で弾かれ、かつ認証 Cookie（`connect.sid`/`substack.sid`）が必要なため、**ブラウザからは絶対に呼べない**。既存の `fetchFeed.ts` と同じ「サーバーで `fetch()` → 整形して RSC/Action が返す」パターンを踏襲する。機能1は **Server Action**（Note URL/ID をフォーム入力 → fetch → キャッシュ書込 → 再表示）、機能2は **Server Component で fetch して描画**（永続化なし）。Cron/Route Handler は今回は不要（バックグラウンド更新が要件にないため）。
+- **コメントキャッシュ table:** 新規 `note_comments` 1テーブル（`note_id, comment_id (複合PK), author_name, author_avatar_url, body, comment_created_at, fetched_at`）。PoC なので TTL は「`fetched_at` が N時間以内ならキャッシュ採用、超過なら再取得」の単純戦略。
+- **build order:** ① 取得可否スパイク（最大リスク。STACK 参照）→ ② 機能2（永続化なし・最小・取得検証の延長）→ ③ `note_comments` スキーマ＋ `lib/noteComments.ts` → ④ 機能1（Action＋キャッシュ＋表示UI）。データ取得が通らなければ ② 以降は設計のみで止める。
 
-| Concern | Redis (current) | Supabase PostgreSQL (v1.5) |
-|---------|----------------|--------------------------|
-| Relational queries | No JOIN, manual denormalization | Native JOIN, date range queries |
-| Long-term article history | KV blob grows unbounded | Indexed rows, efficient range queries |
-| Auth integration | No native auth | `auth.users` table + RLS built-in |
-| Member self-management | Not possible | Row-level ownership via `user_id` |
-| Admin checkbox UI (teamNames) | JSON array in blob | Normalized or `text[]` column |
+---
 
-### Schema Design
+## Standard Architecture
 
-#### `public.members` table
+### System Overview
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                  Browser (Client / RSC payload)                    │
+│   ┌────────────────────┐        ┌──────────────────────────────┐  │
+│   │ /admin/notes (UI)  │        │ NoteCommentForm (client)     │  │
+│   │  - Note一覧表示    │        │  - URL/ID入力 → Action呼出   │  │
+│   └─────────┬──────────┘        └──────────────┬───────────────┘  │
+│  (RSC: SSR rendered)            (Server Action submit)             │
+├────────────┼───────────────────────────────────┼─────────────────┤
+│            ▼ server render                       ▼ "use server"    │
+│   ┌────────────────────┐        ┌──────────────────────────────┐  │
+│   │ Server Component   │        │ Server Action                │  │
+│   │ fetchAdminNotes()  │        │ fetchAndCacheComments()      │  │
+│   └─────────┬──────────┘        └──────┬─────────────────┬─────┘  │
+│             │                          │ cache hit?      │ miss    │
+│             ▼                          ▼                 ▼          │
+│   ┌──────────────────────────────────────┐   ┌──────────────────┐ │
+│   │     lib/notes.ts (server fetcher)     │   │ note_comments    │ │
+│   │  fetch(substack /api/v1/..) + 整形     │   │ (Supabase PG)    │ │
+│   └────────────────┬──────────────────────┘   └──────────────────┘ │
+├────────────────────┼───────────────────────────────────────────────┤
+│                     ▼ HTTPS (server-only, cookie auth)              │
+│              ┌──────────────────────────────┐                       │
+│              │  substack.com /api/v1/...     │ (非公式・未保証)      │
+│              └──────────────────────────────┘                       │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+### Component Responsibilities
+
+| Component | Responsibility | Typical Implementation |
+|-----------|----------------|------------------------|
+| `lib/notes.ts`（新規） | Substack 非公式エンドポイントへの **サーバー専用 fetch** ＋ JSON→型整形。`fetchFeed.ts` の双子。AbortSignal.timeout / Promise.allSettled / リトライを踏襲 | `fetch()` + cookie header（env `SUBSTACK_SESSION_COOKIE`） |
+| `lib/noteComments.ts`（新規） | `note_comments` への read/upsert／キャッシュ鮮度判定。`articles.ts` の双子 | `createSupabaseAdminClient()` + upsert(onConflict) |
+| Server Action `fetchAndCacheComments`（新規） | 機能1の制御フロー：キャッシュ参照→hitなら返す／missなら `lib/notes.ts` で取得→`note_comments` 書込→返す | `"use server"` action（admin guard 内） |
+| Server Component `/admin/notes`（新規 route） | 機能1/2の表示 RSC。機能2は描画時に `fetchAdminNotes()` 直呼び（永続化なし） | `app/(main)/admin/notes/page.tsx` |
+| `NoteCommentForm`（新規 client component） | Note URL/ID 入力フォーム。`AdminAddForm.tsx` のパターン踏襲（onClick+FormData手動構築の既存規約あり） | client component |
+| `middleware.ts`（既存・無変更） | `/admin/*` 配下なので既存認証ガードがそのまま効く | 変更不要 |
+
+---
+
+## Recommended Project Structure
+
+```
+src/
+├── app/(main)/admin/notes/
+│   ├── page.tsx              # 新規: 機能1+2の表示RSC（機能2はここでfetch）
+│   ├── actions.ts            # 新規: "use server" fetchAndCacheComments
+│   ├── NoteCommentForm.tsx   # 新規: Note URL/ID入力 client component
+│   └── NoteCommentList.tsx   # 新規: コメント一覧表示（件数/本文/名前/アイコン）
+├── lib/
+│   ├── notes.ts              # 新規: Substack非公式APIサーバーfetch（fetchFeed.tsの双子）
+│   ├── noteComments.ts       # 新規: note_comments read/upsert+鮮度判定（articles.tsの双子）
+│   └── types.ts              # 修正: NoteComment / AdminNote 型を追加
+├── app/(main)/admin/page.tsx # 修正: /admin/notes へのリンク1行追加（teams リンクと同様）
+supabase/
+└── schema.sql                # 修正: note_comments テーブル + RLS を追記（canonical source）
+```
+
+### Structure Rationale
+
+- **`/admin/notes` 配下に置く:** 既存 `middleware.ts` が `/admin/*` を認証ガード済み。PoC は admin（開発者本人）が対象なので追加のガード実装ゼロで保護される。機能2の対象が将来メンバー/任意ユーザーへ拡張しても route 移設で対応可。
+- **`lib/notes.ts` を `fetchFeed.ts` の双子として独立させる:** 既存の RSS フェッチと責務が完全に分離（RSS feed vs Notes/comments JSON API）。混ぜない。
+- **`lib/noteComments.ts` を `articles.ts` の双子に:** `createSupabaseAdminClient()` + upsert(onConflict) の既存パターンをそのまま再利用でき、レビュー負荷が低い。
+
+---
+
+## コメントキャッシュ table スキーマ（機能1・最小）
 
 ```sql
-create table public.members (
-  id           uuid primary key default gen_random_uuid(),
-  substack_id  text not null unique,           -- e.g. "example" from example.substack.com
-  name         text not null,
-  team_names   text[] not null default '{}',   -- matches existing teamNames: string[]
-  added_at     timestamptz not null default now(),
-  user_id      uuid references auth.users(id) on delete set null,
-  -- user_id is nullable: admin-added members have no auth account yet
-  -- when a member signs up with Supabase Auth, user_id is linked
-  image_url    text                             -- cached from RSS feed (moved from articles KV)
+-- 機能1: Note のコメントをキャッシュ（再取得回避）
+CREATE TABLE IF NOT EXISTS note_comments (
+  note_id            TEXT NOT NULL,           -- 対象 Note の識別子（URL/IDから正規化）
+  comment_id         TEXT NOT NULL,           -- Substack 側コメントID（冪等upsertキー）
+  author_name        TEXT,
+  author_avatar_url  TEXT,
+  body               TEXT,
+  comment_created_at TIMESTAMPTZ,             -- コメント自体の投稿日時（Substack側）
+  fetched_at         TIMESTAMPTZ NOT NULL DEFAULT now(),  -- このアプリが取得した時刻＝鮮度判定用
+  PRIMARY KEY (note_id, comment_id)           -- onConflict 冪等upsert
 );
 
-create index on public.members(substack_id);
-create index on public.members(user_id);
+CREATE INDEX IF NOT EXISTS idx_note_comments_note ON note_comments(note_id);
+
+ALTER TABLE note_comments ENABLE ROW LEVEL SECURITY;
+-- PoC: 表示は admin 配下（middlewareガード）。public select は付けず、
+-- 読み書きとも service_role（createSupabaseAdminClient）経由に閉じる。
+-- 既存 articles 同様に必要なら "public select" を後付け可能。
 ```
 
-#### `public.articles` table
+- **件数（comment count）** は `SELECT count(*) FROM note_comments WHERE note_id = ?` で導出（別カラム不要）。
+- **`comment_created_at` と `fetched_at` を分離**: 前者は「いつコメントされたか（表示用）」、後者は「いつ我々が取りに行ったか（TTL判定用）」。混同しない。
+- **`note_fetch_log`（任意・後付け可）**: `note_id, last_fetched_at, comment_count` を持てば「コメント0件の Note」もキャッシュ済みと判定できる（`note_comments` だけだと0件 Note を毎回再取得してしまう）。PoC では `note_comments` に行が無い＝未取得とみなす単純実装で開始し、0件問題が出たら追加。
 
-```sql
-create table public.articles (
-  id           bigint generated always as identity primary key,
-  substack_id  text not null references public.members(substack_id) on delete cascade,
-  title        text,
-  link         text not null unique,            -- dedup key (matches existing KV logic)
-  iso_date     timestamptz,
-  thumbnail    text,
-  created_at   timestamptz not null default now()
-);
+### Cache freshness strategy（PoC）
 
-create index on public.articles(substack_id, iso_date desc);
--- This index powers the heatmap query: WHERE substack_id = X AND iso_date BETWEEN a AND b
-create index on public.articles(iso_date);
--- This index powers date-range queries across all members
+```
+fetchAndCacheComments(noteId, force?):
+  rows = SELECT * FROM note_comments WHERE note_id = noteId
+  if !force AND rows.length > 0 AND max(fetched_at) within TTL (例: 6h):
+      return rows                       # キャッシュヒット
+  fresh = lib/notes.fetchComments(noteId)   # サーバーfetch
+  upsert note_comments (onConflict note_id,comment_id, fetched_at=now())
+  return fresh
 ```
 
-#### Row Level Security (RLS)
-
-```sql
--- Members table: public read, member can update their own row
-alter table public.members enable row level security;
-
-create policy "Anyone can read members"
-  on public.members for select using (true);
-
-create policy "Members can update own profile"
-  on public.members for update
-  to authenticated
-  using ((select auth.uid()) = user_id)
-  with check ((select auth.uid()) = user_id);
-
--- Admin inserts/deletes via service_role key (bypasses RLS)
-
--- Articles table: public read, Cron writes via service_role
-alter table public.articles enable row level security;
-
-create policy "Anyone can read articles"
-  on public.articles for select using (true);
--- INSERT/UPDATE/DELETE only via service_role (Cron job uses SUPABASE_SERVICE_ROLE_KEY)
-```
-
-### Migration Strategy: Redis → Supabase (Zero-Downtime)
-
-The migration must not break the live site. Use a parallel-run approach:
-
-**Phase A: Supabase schema + dual-write**
-1. Create Supabase tables (members + articles)
-2. Run one-time migration script: read all Redis keys → insert into Supabase
-3. Modify `saveArticles` and `getArticles` to write/read BOTH Redis and Supabase
-4. Verify Supabase data matches Redis for 1 Cron cycle
-
-**Phase B: Supabase primary, Redis fallback**
-1. Switch `getMembers` to read from Supabase first, Redis as fallback
-2. Switch `fetchAllFeedsCached` to read articles from Supabase
-3. Verify ISR heatmap still renders correctly with Supabase data
-
-**Phase C: Remove Redis**
-1. Remove `@upstash/redis` dependency
-2. Delete `src/lib/redis.ts`, `src/lib/kvMembers.ts`, `src/lib/kvArticles.ts`
-3. Remove `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` from Vercel env
-
-**Migration script** (one-shot, run via `tsx scripts/migrate-redis-to-supabase.ts`):
-
-```typescript
-// scripts/migrate-redis-to-supabase.ts
-// 1. getMembers() from Redis
-// 2. For each member: insert into public.members
-// 3. getArticles(substackId) from Redis
-// 4. For each article: insert into public.articles (ON CONFLICT DO NOTHING)
-```
+- TTL は env `NOTES_CACHE_TTL_SECONDS`（既存 `REVALIDATE_SECONDS` の流儀）で可変に。PoC 既定は長め（手動再取得が主目的なので 6〜24h で十分）。
+- 「強制再取得」ボタンを Action に渡す `force` フラグ1つで TTL を無視できるようにすると検証が楽（PoC として推奨）。
 
 ---
 
-## Auth Integration: Supabase Auth + Next.js App Router
+## Architectural Patterns
 
-### Package
+### Pattern 1: Server-only fetch wrapper（最重要）
 
-```bash
-npm install @supabase/supabase-js @supabase/ssr
-```
-
-`@supabase/ssr` is the correct package for Next.js App Router (NOT the deprecated `@supabase/auth-helpers-nextjs`).
-
-### New Library Files
-
-#### `src/lib/supabase/server.ts` — Server Component / Server Action client
+**What:** Substack 非公式 API を `lib/notes.ts` の中だけで `fetch()` する。client component からは呼ばない。
+**When to use:** 全 Substack データ取得。
+**Trade-offs:** CORS と認証 Cookie 漏洩を構造的に防げる（＋）／クライアント側の楽観更新はできない（PoC では不要）。
 
 ```typescript
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+// lib/notes.ts （サーバー専用。'server-only' import を付けて誤用を物理的に防ぐ）
+import 'server-only'
 
-export async function createSupabaseServerClient() {
-  const cookieStore = await cookies()
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (cookiesToSet) => {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
+const COOKIE = process.env.SUBSTACK_SESSION_COOKIE // connect.sid / substack.sid
+
+export async function fetchNoteComments(noteId: string): Promise<NoteComment[]> {
+  const res = await fetch(`https://substack.com/api/v1/.../${noteId}/comments`, {
+    headers: { Accept: 'application/json', Cookie: `connect.sid=${COOKIE}` },
+    signal: AbortSignal.timeout(8000),
+  })
+  if (!res.ok) throw new Error(`Substack ${res.status}`)
+  // ... JSON → NoteComment[] 整形
 }
 ```
 
-#### `src/lib/supabase/client.ts` — Client Component browser client
+### Pattern 2: Action-gated cache-aside（機能1）
 
-```typescript
-import { createBrowserClient } from '@supabase/ssr'
+**What:** Server Action がキャッシュ参照を先に行い、miss 時のみ外部 fetch。`articles.ts` の upsert(onConflict) を流用。
+**When to use:** 永続化ありの機能1。
+**Trade-offs:** Substack への request を最小化（＋・非公式APIのレート対策＝1req/s 推奨に効く）。
 
-export function createSupabaseBrowserClient() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-}
-```
+### Pattern 3: Ephemeral RSC fetch（機能2）
 
-#### `src/lib/supabase/admin.ts` — Service role client (Cron, migration)
+**What:** Server Component の描画中に `fetchAdminNotes()` を直接 await し、DB を一切経由しない。`dynamic = 'force-dynamic'` で毎回取得。
+**When to use:** 永続化なしの機能2。
+**Trade-offs:** 実装最小（＋）／毎回 Substack を叩く（PoC・1人運用なら許容）。
 
-```typescript
-import { createClient } from '@supabase/supabase-js'
+## Data Flow
 
-// Service role bypasses RLS — only use in server-side Cron/admin scripts
-export const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-```
-
-### Session Handling: Server/Client Split
-
-| Location | Client type | Purpose |
-|----------|-------------|---------|
-| `src/proxy.ts` (middleware) | `createServerClient` with request/response cookies | Session refresh before every page render, redirect unauthenticated users from `/my` |
-| Server Components / Server Actions | `createSupabaseServerClient()` | Read user, query Supabase with user context |
-| Client Components | `createSupabaseBrowserClient()` | Login/logout UI, email magic link trigger |
-
-### Protected Route Pattern: `/my` page
-
-```typescript
-// src/proxy.ts (renamed from middleware.ts)
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-
-export function proxy(request: NextRequest) {
-  const response = NextResponse.next()
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => request.cookies.getAll(),
-        setAll: (cookies) => {
-          cookies.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
-
-  // Refresh session — required for Server Components to see fresh auth state
-  // Note: do NOT await here in proxy, use getUser() in the page itself for protection
-  supabase.auth.getUser()
-
-  // Protect /my routes
-  // (actual redirect logic should check user in the page for security)
-  return response
-}
-
-export const config = {
-  // Keep /admin matcher (Basic Auth still active for admin)
-  // Add /my to refresh session cookies
-  matcher: ['/admin', '/admin/:path*', '/my', '/my/:path*'],
-}
-```
-
-**Important:** Per Supabase official docs, `getSession()` inside Server Components is NOT safe
-(does not revalidate token). Always use `getUser()` to protect pages — it sends a request to
-the Supabase Auth server every time to revalidate.
-
-```typescript
-// src/app/my/page.tsx
-import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-
-export default async function MyPage() {
-  const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) redirect('/login')
-
-  // Fetch this member's profile from members table
-  const { data: member } = await supabase
-    .from('members')
-    .select('*')
-    .eq('user_id', user.id)
-    .single()
-
-  return <div>...</div>
-}
-```
-
-### Auth Callback Route (PKCE flow for email magic link / OAuth)
-
-```typescript
-// src/app/auth/callback/route.ts
-import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { NextResponse } from 'next/server'
-
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const code = searchParams.get('code')
-
-  if (code) {
-    const supabase = await createSupabaseServerClient()
-    await supabase.auth.exchangeCodeForSession(code)
-  }
-
-  return NextResponse.redirect(new URL('/my', request.url))
-}
-```
-
-### Member Self-Link Flow
-
-When a member authenticates for the first time, their `auth.users.id` must be linked to
-the existing `members.user_id`. Options:
-
-**Option A: Automatic trigger (recommended for simplicity)**
-
-```sql
--- Supabase trigger: after a user signs up, try to match by email claim or manual link
--- NOT recommended for this app — members don't have emails stored in members table
-```
-
-**Option B: Self-link in `/my` page Server Action (KISS)**
-
-```typescript
-// src/app/my/actions.ts
-'use server'
-import { createSupabaseServerClient } from '@/lib/supabase/server'
-
-export async function linkMemberAccount(substackId: string) {
-  const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
-
-  // Member enters their substackId to claim their profile
-  await supabase
-    .from('members')
-    .update({ user_id: user.id })
-    .eq('substack_id', substackId)
-    .is('user_id', null) // prevent claiming already-linked profiles
-}
-```
-
-This keeps it simple: member logs in with email magic link, then enters their `substackId`
-to claim their profile. No complex trigger needed.
-
----
-
-## Long-term Article History
-
-### Data Flow: Cron → Supabase articles table
-
-Current flow (Redis):
-```
-Vercel Cron (UTC 20:00) → GET /api/cron
-  → getMembers() [Redis 'members' key]
-  → fetchWithRetry(feedUrl) [RSS fetch]
-  → saveArticles(substackId, items, imageUrl) [Redis articles:{substackId}]
-```
-
-New flow (Supabase):
-```
-Vercel Cron (UTC 20:00) → GET /api/cron
-  → getMembers() [Supabase members table, via service_role]
-  → fetchWithRetry(feedUrl) [RSS fetch — unchanged]
-  → saveArticles(substackId, items, imageUrl) [Supabase articles table, upsert on link]
-```
-
-The `saveArticles` signature stays identical (substackId, items, imageUrl).
-Internal implementation changes from Redis to Supabase insert with ON CONFLICT DO NOTHING on `link`.
-
-```typescript
-// src/lib/supabaseArticles.ts (new, replaces kvArticles.ts)
-export async function saveArticles(
-  substackId: string,
-  newItems: FeedItem[],
-  imageUrl?: string
-): Promise<void> {
-  if (newItems.length === 0) return
-
-  const rows = newItems.map((item) => ({
-    substack_id: substackId,
-    title: item.title ?? null,
-    link: item.link!,
-    iso_date: item.isoDate ? new Date(item.isoDate).toISOString() : null,
-    thumbnail: item.thumbnail ?? null,
-  }))
-
-  await supabaseAdmin
-    .from('articles')
-    .upsert(rows, { onConflict: 'link', ignoreDuplicates: true })
-
-  // Update image_url on member row
-  if (imageUrl) {
-    await supabaseAdmin
-      .from('members')
-      .update({ image_url: imageUrl })
-      .eq('substack_id', substackId)
-  }
-}
-```
-
-### Query Pattern for Heatmap (date range)
-
-The heatmap needs articles for all members within the last 7 days (weekly view).
-The `fetchAllFeedsCached` function currently merges live RSS + KV articles.
-After migration, Supabase replaces KV — live RSS fetch continues for freshness (ISR hybrid).
-
-```typescript
-// src/lib/supabaseArticles.ts
-export async function getArticles(substackId: string): Promise<StoredFeed> {
-  // Anon client is sufficient (RLS allows public read)
-  const supabase = await createSupabaseServerClient()
-  const { data } = await supabase
-    .from('articles')
-    .select('title, link, iso_date, thumbnail')
-    .eq('substack_id', substackId)
-    .order('iso_date', { ascending: false })
-    .limit(500)  // cap to avoid unbounded growth in memory
-
-  return {
-    items: (data ?? []).map((row) => ({
-      title: row.title ?? undefined,
-      link: row.link,
-      isoDate: row.iso_date ?? undefined,
-      thumbnail: row.thumbnail ?? undefined,
-    })),
-    imageUrl: undefined, // imageUrl now on members table
-  }
-}
-```
-
-For future year heatmap / streak features, use date range queries:
-
-```typescript
-// Date range query for heatmap: last N days
-const { data } = await supabase
-  .from('articles')
-  .select('substack_id, iso_date')
-  .gte('iso_date', startDate.toISOString())
-  .lte('iso_date', endDate.toISOString())
-  .order('iso_date', { ascending: false })
-```
-
-Supabase index on `(substack_id, iso_date desc)` makes this O(log n) — efficient even with
-months of history.
-
----
-
-## Admin UI: teamNames Checkbox
-
-Currently `AdminMemberList.tsx` uses a comma-separated text input for `teamNames`.
-v1.5 adds a checkbox UI. This requires knowing all available team names upfront.
-
-```typescript
-// Server Component: fetch all distinct team names from Supabase
-const { data } = await supabase
-  .from('members')
-  .select('team_names')
-
-const allTeams = [...new Set(data?.flatMap((m) => m.team_names ?? []) ?? [])]
-  .filter((t) => t !== 'chameleon')
-```
-
-The `team_names text[]` column in PostgreSQL maps directly to `string[]` in TypeScript.
-No schema change needed — the data model already supports it.
-
-The `updateMember` Server Action changes from accepting comma-separated string to
-accepting `string[]` directly (or multiple checkbox values via `formData.getAll('teamNames')`).
-
----
-
-## Component Map: New vs Modified
-
-### New Files
-
-| File | Type | Purpose |
-|------|------|---------|
-| `src/lib/supabase/server.ts` | Utility | Server-side Supabase client factory |
-| `src/lib/supabase/client.ts` | Utility | Browser-side Supabase client factory |
-| `src/lib/supabase/admin.ts` | Utility | Service role client for Cron/migration |
-| `src/lib/supabaseMembers.ts` | Data layer | Replaces `kvMembers.ts` |
-| `src/lib/supabaseArticles.ts` | Data layer | Replaces `kvArticles.ts` |
-| `src/app/auth/callback/route.ts` | Route Handler | PKCE code exchange for email/OAuth |
-| `src/app/login/page.tsx` | Page | Email magic link login form |
-| `src/app/my/page.tsx` | Page (Server) | Member self-management dashboard |
-| `src/app/my/actions.ts` | Server Action | Update own profile, link account |
-| `src/proxy.ts` | Middleware (renamed) | Session refresh + route protection |
-| `scripts/migrate-redis-to-supabase.ts` | Script | One-time data migration |
-| `supabase/migrations/001_initial_schema.sql` | DB migration | Schema definition |
-
-### Modified Files
-
-| File | Change | Why |
-|------|--------|-----|
-| `src/middleware.ts` | Rename to `src/proxy.ts`, export `proxy()` | Next.js 16 deprecation |
-| `src/lib/fetchFeed.ts` | `getArticles()` call → Supabase instead of Redis | Data layer swap |
-| `src/app/api/cron/route.ts` | `getMembers()` + `saveArticles()` → Supabase | Data layer swap |
-| `src/app/admin/actions.ts` | CRUD → Supabase, teamNames as `string[]` | Data layer swap |
-| `src/app/admin/page.tsx` | Read members from Supabase | Data layer swap |
-| `src/app/admin/AdminMemberList.tsx` | teamNames: checkbox UI instead of text input | v1.5 feature |
-| `src/app/layout.tsx` | Add login/logout nav link | Auth UI |
-| `src/lib/types.ts` | No change to `Member` type shape (backward compatible) | |
-
-### Removed Files (Phase C of migration)
-
-| File | Reason |
-|------|--------|
-| `src/lib/redis.ts` | Upstash Redis removed |
-| `src/lib/kvMembers.ts` | Replaced by supabaseMembers.ts |
-| `src/lib/kvArticles.ts` | Replaced by supabaseArticles.ts |
-
----
-
-## Build Order
-
-Dependencies flow: Supabase schema → data layer → auth → UI features.
-Each phase is independently deployable and testable.
-
-### Phase 1: Supabase Setup + Schema
-
-Deliverable: Supabase project created, schema deployed, env vars set.
-
-1. Create Supabase project (free tier: 500MB database, 50k monthly active users)
-2. Write `supabase/migrations/001_initial_schema.sql` (members + articles tables + RLS)
-3. Add env vars to Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
-4. Create `src/lib/supabase/server.ts`, `client.ts`, `admin.ts`
-
-No app changes yet. Existing Redis path still active.
-
-### Phase 2: Data Migration (Redis → Supabase)
-
-Deliverable: All existing data in Supabase, verified correct.
-
-1. Write `scripts/migrate-redis-to-supabase.ts`
-2. Run script: all members + articles transferred to Supabase
-3. Verify row counts match Redis keys
-4. Dual-write mode: new Cron writes to BOTH Redis and Supabase (1 Cron cycle for confidence)
-
-App still reads from Redis. Zero user impact.
-
-### Phase 3: Data Layer Swap (Supabase primary)
-
-Deliverable: App reads/writes Supabase, Redis unused.
-
-1. Create `src/lib/supabaseMembers.ts` (same interface as `kvMembers.ts`)
-2. Create `src/lib/supabaseArticles.ts` (same interface as `kvArticles.ts`)
-3. Swap import in `fetchFeed.ts`: `kvArticles` → `supabaseArticles`
-4. Swap import in `cron/route.ts`: `kvMembers` + `kvArticles` → Supabase equivalents
-5. Swap import in `admin/actions.ts`: `kvMembers` + `kvArticles` → Supabase equivalents
-6. Deploy + verify heatmap loads correctly
-7. Rename `middleware.ts` → `proxy.ts` (safe to do here, unrelated to auth)
-
-### Phase 4: Supabase Auth
-
-Deliverable: Email magic link login works, `/my` page accessible to logged-in members.
-
-1. Enable Email provider in Supabase Dashboard (Auth > Providers)
-2. Set `Site URL` and `Redirect URLs` in Supabase Dashboard
-3. Create `src/app/auth/callback/route.ts`
-4. Create `src/app/login/page.tsx` (email input + `signInWithOtp`)
-5. Create `src/app/my/page.tsx` (protected, shows member profile or "claim your profile" UI)
-6. Create `src/app/my/actions.ts` (`linkMemberAccount`, `updateOwnProfile`)
-7. Update `proxy.ts` config matcher to include `/my/:path*`
-8. Add login/logout links to `layout.tsx`
-
-### Phase 5: Admin UI Checkbox + Cleanup
-
-Deliverable: teamNames rendered as checkboxes, Redis fully removed.
-
-1. Update `AdminMemberList.tsx`: replace teamNames text input with checkbox group
-2. Update `updateMemberAction` in `admin/actions.ts`: accept `string[]` from checkboxes
-3. Remove Redis dependencies: `redis.ts`, `kvMembers.ts`, `kvArticles.ts`
-4. Remove `@upstash/redis` from `package.json`
-5. Remove Upstash env vars from Vercel
-
----
-
-## Environment Variables
-
-### New for v1.5
-
-| Variable | Where Set | Visible in Browser |
-|----------|-----------|-------------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Vercel env | YES (NEXT_PUBLIC_ prefix) |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Vercel env | YES (safe, RLS enforces access) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Vercel env | NO (server-only, bypasses RLS) |
-
-### Existing (keep until Phase 5 complete)
-
-| Variable | Status |
-|----------|--------|
-| `UPSTASH_REDIS_REST_URL` | Remove after Phase 5 |
-| `UPSTASH_REDIS_REST_TOKEN` | Remove after Phase 5 |
-| `ADMIN_PASSWORD` | Keep (Basic Auth for /admin) |
-| `CRON_SECRET` | Keep (Cron Bearer auth unchanged) |
-
----
-
-## Supabase Free Tier Fit
-
-| Resource | Free Limit | v1.5 Estimated Usage | Status |
-|----------|-----------|----------------------|--------|
-| Database storage | 500MB | ~5MB (50 members × 365 days × 3 articles/day) | Well within |
-| Monthly active users | 50K MAU | <100 members | Well within |
-| Auth emails | 3/hour (free), 100/day | <10/day (magic links) | Within limit |
-| API calls | Unlimited | Same as current ISR + Cron pattern | Fine |
-| Edge Functions | 500K invocations/month | Not used | N/A |
-
-Auth email rate limit (3/hour on free tier) is the only concern. Sufficient for a small community.
-If members sign up simultaneously at launch, they may hit the limit. Mitigate by using OAuth
-(GitHub/Google) as an alternative — one OAuth login = no email sent.
-
----
-
-## Data Flow Diagram (v1.5 Target State)
+### 機能1（コメント可視化・永続化あり）
 
 ```
-                     ┌─────────────────────────────────────────┐
-                     │  Supabase PostgreSQL                     │
-                     │  public.members (id, substack_id,        │
-                     │    name, team_names, user_id, image_url) │
-                     │  public.articles (substack_id, link,     │
-                     │    iso_date, title, thumbnail)           │
-                     │  auth.users (built-in)                   │
-                     └──────────┬──────────────────────────────┘
-                                │ @supabase/ssr (HTTP)
-        ┌───────────────────────┼───────────────────────────┐
-        │                       │                           │
-  ISR (revalidate=300)    Cron (UTC 20:00)          Server Actions
-        │                       │                           │
-  page.tsx (/)            /api/cron                  /admin/*
-  getMembers()            getMembers()               CRUD members
-  getArticles()           fetchWithRetry()           /my/*
-  fetchWithRetry()        saveArticles()             updateOwnProfile()
-  merge live+DB           (upsert on link)           linkMemberAccount()
-        │
-  WeeklyHeatmapGrid
-  (unchanged)
-
-  Auth flow:
-  /login → signInWithOtp → email → /auth/callback → exchangeCodeForSession → /my
+[admin が Note URL/ID 入力] → NoteCommentForm submit
+   ↓ ("use server")
+fetchAndCacheComments(noteId)
+   ↓ cache hit (fetched_at within TTL)? ── YES ─→ note_comments SELECT → 表示
+   ↓ NO
+lib/notes.fetchNoteComments() → substack.com/api/v1
+   ↓
+note_comments UPSERT (onConflict note_id,comment_id)
+   ↓
+NoteCommentList 再描画（件数=count, 本文, 名前, アイコン）
 ```
 
----
+### 機能2（Note一覧・永続化なし）
 
-## Anti-Patterns to Avoid (v1.5)
+```
+[admin が /admin/notes を開く] → Server Component 描画
+   ↓ await lib/notes.fetchAdminNotes()
+substack.com/api/v1/notes (cookie auth)
+   ↓ 整形
+そのまま JSX で一覧描画（DB書込なし）
+```
 
-### Anti-Pattern 1: `getSession()` in Server Components
+## Scaling Considerations
 
-**What goes wrong:** `getSession()` returns cached session without revalidating. An expired or
-revoked token appears valid. Security risk for the `/my` page.
+| Scale | Architecture Adjustments |
+|-------|--------------------------|
+| PoC（1 admin） | 現設計でそのまま。手動トリガ＋長めTTLで Substack 負荷ほぼゼロ |
+| メンバー全員に拡張 | 機能2にもキャッシュ（`note_comments` 同様の table か Cron 化）を導入。1req/s レート遵守のため Cron バッチ＋ジッタ |
+| 任意ユーザー公開 | `connect.sid` 共有は1アカウント上限＝ボトルネック。公開化前に取得手段（認証無しで取れる範囲）を再検証 |
 
-**Prevention:** Always use `supabase.auth.getUser()` in Server Components to protect routes.
-`getUser()` sends a network request to the Supabase Auth server every time.
+### Scaling Priorities
 
-### Anti-Pattern 2: Service Role Key in Client Components
+1. **First bottleneck:** Substack 非公式 API のレート制限（推奨 1req/s）と Cookie 失効。→ 取得は必ずサーバー集約＋キャッシュ＋手動/低頻度トリガ。
+2. **Second bottleneck:** ハンドル変更による 404。→ `note_id` は URL ではなく安定 ID で保存し、取得失敗を UI に明示。
 
-**What goes wrong:** `SUPABASE_SERVICE_ROLE_KEY` bypasses RLS. Exposing it to the browser
-gives anyone full database access.
+## Anti-Patterns
 
-**Prevention:** `supabaseAdmin` (service role) is ONLY used in `src/lib/supabase/admin.ts`,
-imported only by Cron route handler and migration scripts. Never import in Client Components.
+### Anti-Pattern 1: ブラウザから substack.com/api を直 fetch
+**What people do:** client component で `fetch('https://substack.com/api/...')`。
+**Why it's wrong:** CORS で必ず失敗し、成功しても `connect.sid` Cookie がクライアントに露出する重大なセキュリティ問題。
+**Do this instead:** `lib/notes.ts`（`server-only`）経由のサーバー fetch のみ。
 
-### Anti-Pattern 3: Removing Redis Before Supabase Data Verified
+### Anti-Pattern 2: 機能2をキャッシュテーブルに永続化する
+**What people do:** 「ついでに」Note 一覧も DB 保存。
+**Why it's wrong:** 要件は明示的に永続化なし。スキーマと同期ロジックが無駄に増え PoC が肥大化（YAGNI）。
+**Do this instead:** RSC 内で fetch して捨てる。
 
-**What goes wrong:** If Supabase data is incomplete, removing Redis leaves the app with no
-member/article data. Heatmap renders empty.
+### Anti-Pattern 3: 取得可否未検証のままスキーマ・UI を先に作る
+**What people do:** table と画面を先に組む。
+**Why it's wrong:** 最大リスクはデータ取得手段（STACK 参照）。取得不能なら全て手戻り。
+**Do this instead:** build order ① の取得スパイクを最優先。失敗時は設計のみで停止。
 
-**Prevention:** Follow the 3-phase migration. Only remove Redis (Phase C/5) after:
-- At least 2 Cron cycles have written to Supabase
-- Manual verification: article count in Supabase ≥ article count in Redis
+## Integration Points
 
-### Anti-Pattern 4: Skipping `proxy.ts` Session Refresh
+### External Services
 
-**What goes wrong:** Without session refresh in `proxy.ts`, Server Components receive stale
-tokens. The user appears logged out after token expiry even with valid refresh token.
+| Service | Integration Pattern | Notes |
+|---------|---------------------|-------|
+| Substack 非公式 API (`/api/v1/...`) | サーバー fetch + Cookie 認証（env `SUBSTACK_SESSION_COOKIE`） | 公式未保証・ハンドル変更で404・1req/s 推奨。Cookie は Vercel env に秘匿。詳細仕様は STACK / 取得スパイクで確定 |
+| Supabase Postgres | 既存 `createSupabaseAdminClient()` + upsert | `note_comments` のみ新規。RLS は service_role 経由に閉じる |
+| Vercel | 既存デプロイにそのまま乗る | Cron 不要（手動トリガ）。Server Action の実行時間は短く maxDuration 問題なし |
 
-**Prevention:** The `proxy.ts` must call `supabase.auth.getUser()` (which triggers token
-refresh) and pass updated cookies back in the response. This is the Supabase SSR pattern.
+### Internal Boundaries
 
-### Anti-Pattern 5: Storing `substackId` in auth.users Metadata Instead of members Table
+| Boundary | Communication | Notes |
+|----------|---------------|-------|
+| `/admin/notes` RSC ↔ `lib/notes.ts` | 直接 await（機能2） | DB 非経由 |
+| Server Action ↔ `lib/noteComments.ts` ↔ `lib/notes.ts` | cache-aside（機能1） | キャッシュ先行 |
+| 既存 `middleware.ts` ↔ `/admin/notes` | 認証ガード（無変更） | `/admin/*` 配下なので自動適用 |
 
-**What goes wrong:** User metadata in Supabase Auth is not queryable via SQL. Cannot JOIN
-to articles. Cannot filter by team.
+## Suggested Build Order
 
-**Prevention:** Keep `substack_id` in `public.members`. The link between auth and member
-is `members.user_id = auth.users.id`.
-
----
+1. **取得可否スパイク（最大リスク・先行必須）** — `lib/notes.ts` の素案で comments / notes 両エンドポイントを実 Cookie で叩き JSON 形を確認。失敗なら以降を設計のみで停止。
+2. **機能2（永続化なし）** — `/admin/notes` RSC ＋ `fetchAdminNotes()` ＋一覧 UI。取得検証の自然な延長で、DB 不要なので最小。
+3. **`note_comments` スキーマ ＋ `lib/noteComments.ts`** — schema.sql に追記、本番は SQL Editor で適用（既存運用）。
+4. **機能1（永続化あり）** — Server Action `fetchAndCacheComments`（cache-aside + TTL + force フラグ）＋ `NoteCommentForm` / `NoteCommentList`、`/admin` にリンク追加。
 
 ## Sources
 
-- [Next.js 16 Upgrade Guide — middleware to proxy, revalidateTag changes](https://nextjs.org/docs/app/guides/upgrading/version-16) — HIGH confidence, official docs, last updated 2026-05-13
-- [Supabase SSR — createServerClient for Next.js middleware, Server Components, Route Handlers](https://context7.com/supabase/ssr/llms.txt) — HIGH confidence, Context7
-- [Supabase Auth — getUser() vs getSession() in Server Components](https://supabase.com/docs/guides/auth/server-side/nextjs) — HIGH confidence, official docs
-- [Supabase Auth — PKCE flow, auth/callback route for Next.js](https://supabase.com/docs/guides/auth/quickstarts/nextjs) — HIGH confidence, official docs
-- [Supabase RLS — auth.uid() policy pattern](https://github.com/supabase/supabase/blob/master/apps/docs/content/guides/database/postgres/row-level-security.mdx) — HIGH confidence, Context7
-- [Supabase — profiles table + trigger pattern for linking auth.users to custom tables](https://context7.com/supabase/supabase/llms.txt) — HIGH confidence, Context7
-- [Next.js 16 proxy.ts — edge runtime NOT supported](https://nextjs.org/docs/messages/middleware-to-proxy) — HIGH confidence, official docs
+- 既存コードベース（HIGH）: `src/lib/fetchFeed.ts`, `src/lib/articles.ts`, `src/app/api/cron/route.ts`, `src/app/(main)/admin/page.tsx`, `supabase/schema.sql`, `src/middleware.ts`
+- [How I reverse-engineered Substack API](https://iam.slys.dev/p/no-official-api-no-problem-how-i)（MEDIUM）
+- [NHagar/substack_api (unofficial wrapper)](https://github.com/NHagar/substack_api)（MEDIUM）
+- [Automating Substack Notes](https://mostlypython.substack.com/p/automating-substack-notes)（MEDIUM — `/api/v1/comment/feed`, cookie 認証）
+- [Scraping Substack via undocumented API](https://medium.com/@hungcheungchan/scraping-substack-metadata-using-undocumented-unofficial-api-aee82786b507)（LOW）
+
+---
+*Architecture research for: Substack Notes PoC integration into existing Next.js/Supabase app*
+*Researched: 2026-06-18*
