@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.10
 milestone_name: Substack Notes PoC
 status: planning
-stopped_at: context exhaustion at 76% (2026-06-18)
-last_updated: "2026-06-18T00:24:16.190Z"
-last_activity: 2026-06-18 — v1.10 requirements + roadmap (Phases 40-42) defined
+stopped_at: Phase 40 spike GO 確定 — 次は Phase 41 plan/discuss
+last_updated: "2026-06-18T00:40:00.000Z"
+last_activity: 2026-06-18 — Phase 40 取得可否スパイク完了（001/002/003 すべて GO）
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 0
   completed_plans: 0
   percent: 0
@@ -21,14 +21,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-11 — v1.8 shipped)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** v1.10 ロードマップ確定（Phases 40-42）。次は Phase 40 取得可否スパイク（go/no-go ゲート）
+**Current focus:** Phase 40 スパイク **GO 確定**。次は Phase 41（機能2 Note一覧）の plan/discuss
 
 ## Current Position
 
-Phase: 40 of 42 — 取得可否スパイク（go/no-go ゲート）— Not started
+Phase: 41 of 42 — 機能2 Note一覧（永続化なし）— Not started（Phase 40 完了）
 Plan: —
-Status: Roadmap defined, ready to plan/discuss Phase 40
-Last activity: 2026-06-18 — v1.10 requirements + roadmap (Phases 40-42) defined
+Status: Phase 40 取得可否スパイク完了（001/002/003 すべて GO）。確定エンドポイントは .planning/spikes/MANIFEST.md「go/no-go 判定」参照。Phase 41 を plan/discuss する段階
+Last activity: 2026-06-18 — Phase 40 spike GO（無認証3エンドポイントが Vercel datacenter IP からも 200）
+
+### 確定エンドポイント（Phase 41/42 で使用・すべて無認証サーバー側 fetch）
+
+- 機能2 Note一覧: `GET https://substack.com/api/v1/reader/feed/profile/{user_id}`（`?types=note`、`nextCursor`）
+- 機能1 件数/本体: `GET https://substack.com/api/v1/reader/comment/{id}`（`children_count`=件数）
+- 機能1 返信ツリー: `GET https://substack.com/api/v1/reader/comment/{id}/replies`（`commentBranches[].comment`: name/photo_url/body）
+- フィクスチャ: user_id=`110584954`（@uojun）/ Note id=`276780760`
 
 ### v1.10 Roadmap Summary
 
