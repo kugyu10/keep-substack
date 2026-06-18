@@ -189,7 +189,7 @@ Full archive: `.planning/milestones/v1.9-ROADMAP.md`
   3. 取得したコメントが `note_comments` テーブルに Supabase キャッシュ保存され、`fetched_at` 鮮度判定で再取得が回避され、手動 force 再取得もできる
   4. 取得失敗・0件・キャッシュ無の状態が画面に明示される
 **Plans**: 2 plans
-- [ ] 42-01-PLAN.md — note_comments スキーマ追記 + キャッシュ層 lib/comments.ts（parse群/鮮度判定/fetch&retry/getNoteComments）+ vitest
+- [x] 42-01-PLAN.md — note_comments スキーマ追記 + キャッシュ層 lib/comments.ts（parse群/鮮度判定/fetch&retry/getNoteComments）+ vitest
 - [ ] 42-02-PLAN.md — 公開 /notes ページ（入力フォーム/件数/フラット一覧/名前+アイコン fallback/force/3状態）
 **UI hint**: yes
 
@@ -245,4 +245,4 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 39. リンクプレビュー（OGメタタグ + 動的OG画像） | v1.9 | 1/1 | Complete | 2026-06-14 |
 | 40. 取得可否スパイク（go/no-go ゲート） | v1.10 | 0/0 | Not started | - |
 | 41. 機能2 Note一覧（永続化なし） | v1.10 | 1/1 | Complete   | 2026-06-18 |
-| 42. 機能1 コメント可視化（キャッシュ基盤 + 永続化） | v1.10 | 0/2 | Not started | - |
+| 42. 機能1 コメント可視化（キャッシュ基盤 + 永続化） | v1.10 | 1/2 | In Progress | 2026-06-18 |

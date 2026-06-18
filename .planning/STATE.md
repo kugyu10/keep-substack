@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.10
 milestone_name: Substack Notes PoC
 status: executing
-stopped_at: Phase 41 complete (verified)
-last_updated: "2026-06-18T02:00:38.107Z"
-last_activity: 2026-06-18 -- Phase 41 planning complete
+stopped_at: Completed 42-1-01-PLAN.md (2026-06-18)
+last_updated: "2026-06-18T06:04:22.182Z"
+last_activity: 2026-06-18 -- Phase 42-1 Plan 01 実行完了（コメント取得＋キャッシュ層）
 progress:
   total_phases: 3
   completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
-  percent: 33
+  total_plans: 3
+  completed_plans: 3
+  percent: 44
 ---
 
 # Project State
@@ -25,10 +25,12 @@ See: .planning/PROJECT.md (updated 2026-06-11 — v1.8 shipped)
 
 ## Current Position
 
-Phase: 41 of 42 — 機能2 Note一覧（永続化なし）— Complete ✓ (verified PASS 3/3)
-Plan: 41-01 ✓
-Status: Phase 41 complete — ready for Phase 42
-Last activity: 2026-06-18 -- Phase 41 planning complete
+Phase: 42-1 — 機能1 コメント取得＋キャッシュ層 — Plan 01 Complete ✓ (vitest 30/30 green)
+Plan: 42-1-01 ✓（schema.sql note_comments + comments.ts + 30 ユニットテスト）
+Status: Ready for verification / next plan
+Last activity: 2026-06-18 -- Phase 42-1 Plan 01 実行完了
+
+⚠ 申し送り: note_comments DDL を本番(prod=xolhjcngrwwwqtklmoyk)/dev(otydhiumsdsyxepnjqjp) の SQL Editor で手動実行する必要あり（schema.sql 参照）
 
 ### 確定エンドポイント（Phase 41/42 で使用・すべて無認証サーバー側 fetch）
 
@@ -133,8 +135,8 @@ Last activity: 2026-06-18 -- Phase 41 planning complete
 
 ## Session Continuity
 
-Last session: 2026-06-18T01:27:38.950Z
-Stopped at: Phase 41 context gathered
+Last session: 2026-06-18T06:04:22.175Z
+Stopped at: context exhaustion at 75% (2026-06-18)
 Next step: `/gsd:plan-phase 40` — 取得可否スパイク（go/no-go ゲート）。最大リスク=本番 Vercel IP からの到達性を実測し go/no-go を出す。no-go なら negative-result 文書化でクローズ。
 
 ## Deferred Items (v1.9 close — 2026-06-17)
