@@ -3,10 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.10
 milestone_name: Substack Notes PoC
 status: planning
-last_updated: "2026-06-17T23:59:22.236Z"
-last_activity: 2026-06-17
+stopped_at: context exhaustion at 76% (2026-06-18)
+last_updated: "2026-06-18T00:24:16.190Z"
+last_activity: 2026-06-18 — v1.10 requirements + roadmap (Phases 40-42) defined
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,24 +21,26 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-11 — v1.8 shipped)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** v1.9 ロードマップ確定（Phases 37-39）。次は `/gsd:plan-phase 37`
+**Current focus:** v1.10 ロードマップ確定（Phases 40-42）。次は Phase 40 取得可否スパイク（go/no-go ゲート）
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 40 of 42 — 取得可否スパイク（go/no-go ゲート）— Not started
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-17 — Milestone v1.10 started
+Status: Roadmap defined, ready to plan/discuss Phase 40
+Last activity: 2026-06-18 — v1.10 requirements + roadmap (Phases 40-42) defined
 
-### v1.9 Roadmap Summary
+### v1.10 Roadmap Summary
+
+フィージビリティ・ゲート型 PoC。Phase 40 で取得可否を実測し go/no-go を判定。no-go なら負の結果を文書化してクローズ＝有効な PoC 成果。
 
 | Phase | Goal | Requirements |
 |-------|------|--------------|
-| 37 — 共有URLの状態保持 | 対象4ビューが状態を含む復元可能な公開URLを持つ | URL-01 |
-| 38 — ワンボタン共有 | 共有ボタンで定型文+URLコピー & Substack Notes 起動 + toast | SHARE-01..06 |
-| 39 — リンクプレビュー | OGメタタグ + 動的OG画像（ImageResponse） | OGP-01..02 |
+| 40 — 取得可否スパイク（go/no-go） | 非公式エンドポイントで Note 一覧/コメントが本番 Vercel から取れるかを実測（捨てスパイク、成果物=レポート+生JSON+エンドポイント表） | SPIKE-01, SPIKE-02 |
+| 41 — 機能2 Note一覧（永続化なし） | `/admin/notes` Server Component で admin の Note 一覧を都度 fetch・表示（本文プレビュー+投稿日時JST） | NOTE-01..03 |
+| 42 — 機能1 コメント可視化（キャッシュ+永続化） | Note URL/ID 入力 → コメント件数/本文/名前/アイコン表示 + `note_comments` Supabase キャッシュ（鮮度判定+force再取得） | COMMENT-01..06 |
 
-**Coverage:** 9/9 v1.9 要件マップ済み（orphan 0）。Granularity=coarse。
+**Coverage:** 11/11 v1.10 要件マップ済み（orphan 0）。Granularity=coarse（spike 単独 + cache 基盤は機能1へ統合し 3 フェーズ）。Ordering: 40(gate) → 41(永続化なし) → 42(取得+キャッシュ+表示)。40 が no-go なら以降は設計のみで停止し文書化クローズへ分岐。
 
 ### Quick Tasks Completed
 
@@ -122,9 +125,9 @@ Last activity: 2026-06-17 — Milestone v1.10 started
 
 ## Session Continuity
 
-Last session: 2026-06-16T22:33:47.697Z
-Stopped at: context exhaustion at 75% (2026-06-16)
-Next step: Phase 39 human-UAT（本番/プレビューURLをリンクデバッガに貼り summary_large_image・/member 画像の草/記事数/ハンドル・JP グリフ描画可否を確認）。v1.9 全実装完了につき milestone close 判断も可。
+Last session: 2026-06-18T00:24:15.952Z
+Stopped at: context exhaustion at 76% (2026-06-18)
+Next step: `/gsd:plan-phase 40` — 取得可否スパイク（go/no-go ゲート）。最大リスク=本番 Vercel IP からの到達性を実測し go/no-go を出す。no-go なら negative-result 文書化でクローズ。
 
 ## Deferred Items (v1.9 close — 2026-06-17)
 
@@ -216,4 +219,4 @@ PR #5（v1.8 Phase 32–36）マージ時のコードレビュー指摘。コー
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Plan the first v1.10 phase with `/gsd:plan-phase 40`（取得可否スパイク）
