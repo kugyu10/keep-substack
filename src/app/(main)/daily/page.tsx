@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
+import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'
 import ShareButton from '@/components/ShareButton'
@@ -8,6 +9,8 @@ import ViewTabs from '@/components/ViewTabs'
 import { SHARE_REQUIRE_LOGIN } from '@/lib/share'
 import { DAILY_META } from '@/lib/ogMeta'
 import { buildOgImagePath, OG_WIDTH, OG_HEIGHT } from '@/lib/ogScreenshotUrl'
+import { buildStatsById } from '@/lib/gamification'
+import type { CommitSlot } from '@/lib/types'
 
 export const revalidate = 300
 
@@ -64,7 +67,17 @@ export default async function Home({ searchParams }: Props) {
       )
     : allMembers.filter((m) => m.teams.every((t) => t.status !== 'hidden'))
 
+  // Fetch all commit slots for all members (gamification streak/level badges)
+  const admin = createSupabaseAdminClient()
+  const { data: slotsData, error: slotsError } = await admin
+    .from('member_commit_slots')
+    .select('member_id, day_of_week, hour')
+  if (slotsError) {
+    console.error('[Daily] member_commit_slots fetch error:', slotsError)
+  }
+
   const results = await fetchAllFeedsCached(filteredMembers)
+  const statsById = buildStatsById(results, (slotsData ?? []) as CommitSlot[])
 
   return (
     <main className="max-w-[600px] mx-auto px-3 py-4">
@@ -97,7 +110,7 @@ export default async function Home({ searchParams }: Props) {
         </div>
       )}
 
-      <WeeklyHeatmapGrid results={results} />
+      <WeeklyHeatmapGrid results={results} statsById={statsById} />
     </main>
   )
 }
