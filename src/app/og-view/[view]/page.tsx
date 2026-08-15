@@ -21,6 +21,7 @@ import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'
 import CalendarGrid from '@/components/CalendarGrid'
 import { parseYmParam } from '@/lib/shareUrl'
 import { OG_WIDTH, OG_HEIGHT } from '@/lib/ogScreenshotUrl'
+import { buildStatsById } from '@/lib/gamification'
 import type { CommitSlot } from '@/lib/types'
 
 export const revalidate = 300
@@ -126,7 +127,14 @@ async function DailyView() {
   const members = allMembers.filter((m) =>
     m.teams.every((t) => t.status !== 'hidden')
   )
+
+  const admin = createSupabaseAdminClient()
+  const { data: slotsData } = await admin
+    .from('member_commit_slots')
+    .select('member_id, day_of_week, hour')
+
   const results = await fetchAllFeedsCached(members)
+  const statsById = buildStatsById(results, (slotsData ?? []) as CommitSlot[])
 
   return (
     <Frame>
@@ -156,7 +164,7 @@ async function DailyView() {
             transformOrigin: 'top center',
           }}
         >
-          <WeeklyHeatmapGrid results={results} />
+          <WeeklyHeatmapGrid results={results} statsById={statsById} />
         </div>
       </div>
     </Frame>

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import type { Member } from '@/lib/types'
+import type { Member, MemberGameStats } from '@/lib/types'
 import type { HeatmapArticle } from '@/lib/heatmapUtils'
 import { getIntensityClass } from '@/lib/heatmapUtils'
 import HeatmapTooltip from './HeatmapTooltip'
@@ -9,9 +9,10 @@ type HeatmapRowProps = {
   articlesByDateEntries: [string, HeatmapArticle[]][]
   dates: string[]
   imageUrl?: string
+  stats?: MemberGameStats
 }
 
-export default function HeatmapRow({ member, articlesByDateEntries, dates, imageUrl }: HeatmapRowProps) {
+export default function HeatmapRow({ member, articlesByDateEntries, dates, imageUrl, stats }: HeatmapRowProps) {
   const articleMap = new Map(articlesByDateEntries)
 
   const totalCount = dates.reduce((sum, date) => sum + (articleMap.get(date)?.length ?? 0), 0)
@@ -33,8 +34,21 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
         ) : (
           <span className="w-10 h-10 rounded-full shrink-0 bg-gray-200 inline-block" aria-hidden="true" />
         )}
-        <div className="flex-1 min-w-0 text-xs font-semibold leading-snug truncate hidden sm:block">
-          {member.name}
+        <div className="flex-1 min-w-0 hidden sm:block">
+          <div className="text-xs font-semibold leading-snug truncate">{member.name}</div>
+          {stats && (
+            <div className="flex items-center gap-1 mt-0.5">
+              {stats.dailyStreak >= 1 && (
+                <span className="text-sm leading-none flex items-center gap-0.5">
+                  <span role="img" aria-label="連続投稿中">🔥</span>
+                  <span className="text-xs">{stats.dailyStreak}</span>
+                </span>
+              )}
+              <span className="text-xs leading-none px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
+                Lv{stats.level}
+              </span>
+            </div>
+          )}
         </div>
         <span className="shrink-0 text-gray-400 text-sm" aria-hidden="true">›</span>
       </Link>

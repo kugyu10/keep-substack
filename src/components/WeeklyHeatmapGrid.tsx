@@ -1,15 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import type { MemberFeedResult } from '@/lib/types'
+import type { MemberFeedResult, MemberGameStats } from '@/lib/types'
 import { buildHeatmapArticleMap, getRecentDays, sortByWeeklyCount } from '@/lib/heatmapUtils'
 import HeatmapRow from './HeatmapRow'
 
 type WeeklyHeatmapGridProps = {
   results: MemberFeedResult[]
+  statsById?: Record<string, MemberGameStats>
 }
 
-export default function WeeklyHeatmapGrid({ results }: WeeklyHeatmapGridProps) {
+export default function WeeklyHeatmapGrid({ results, statsById }: WeeklyHeatmapGridProps) {
   const [weekOffset, setWeekOffset] = useState(0)
   const dates = getRecentDays(weekOffset)
   const sorted = sortByWeeklyCount(results, dates)
@@ -61,6 +62,7 @@ export default function WeeklyHeatmapGrid({ results }: WeeklyHeatmapGridProps) {
           articlesByDateEntries={Array.from(buildHeatmapArticleMap(items).entries())}
           dates={dates}
           imageUrl={imageUrl}
+          stats={statsById?.[member.id]}
         />
       ))}
     </div>
