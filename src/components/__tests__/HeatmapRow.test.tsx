@@ -49,6 +49,32 @@ function findAllByRoleImg(node: unknown): AnyEl[] {
   return results
 }
 
+/**
+ * Find the ancestor chain (root -> ... -> target) leading to the first element
+ * whose collected text includes `needle`. Returns null if not found.
+ */
+function findAncestorChainContainingText(node: unknown, needle: string): AnyEl[] | null {
+  if (!isElement(node)) return null
+  if (collectText(node).join('').includes(needle)) {
+    const children = (node.props as { children?: unknown }).children
+    for (const child of flattenChildren(children)) {
+      const childChain = findAncestorChainContainingText(child, needle)
+      if (childChain) return [node, ...childChain]
+    }
+    return [node]
+  }
+  return null
+}
+
+/** True if any element in the chain has a className containing a `hidden` token (e.g. `hidden sm:block`). */
+function chainHasHiddenContainer(chain: AnyEl[]): boolean {
+  return chain.some((el) => {
+    const className = (el.props as { className?: unknown }).className
+    if (typeof className !== 'string') return false
+    return className.split(/\s+/).includes('hidden')
+  })
+}
+
 import HeatmapRow from '../HeatmapRow'
 
 // --- Fixtures ---
@@ -122,5 +148,22 @@ describe('HeatmapRow gamification badges', () => {
     const joined = collectText(el).join('')
     expect(joined).not.toContain('🔥')
     expect(joined).toContain('Lv5')
+  })
+
+  it('バッジ（🔥/Lv）は hidden 系クラスのコンテナ配下に無く、モバイル幅でも表示される', () => {
+    const el = HeatmapRow({
+      member: makeMember(),
+      articlesByDateEntries: [],
+      dates,
+      stats: makeStats({ dailyStreak: 3, level: 2 }),
+    })
+
+    const fireChain = findAncestorChainContainingText(el, '🔥')
+    expect(fireChain).not.toBeNull()
+    expect(chainHasHiddenContainer(fireChain!)).toBe(false)
+
+    const levelChain = findAncestorChainContainingText(el, 'Lv2')
+    expect(levelChain).not.toBeNull()
+    expect(chainHasHiddenContainer(levelChain!)).toBe(false)
   })
 })

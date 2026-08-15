@@ -36,19 +36,6 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
         )}
         <div className="flex-1 min-w-0 hidden sm:block">
           <div className="text-xs font-semibold leading-snug truncate">{member.name}</div>
-          {stats && (
-            <div className="flex items-center gap-1 mt-0.5">
-              {stats.dailyStreak >= 1 && (
-                <span className="text-sm leading-none flex items-center gap-0.5">
-                  <span role="img" aria-label="連続投稿中">🔥</span>
-                  <span className="text-xs">{stats.dailyStreak}</span>
-                </span>
-              )}
-              <span className="text-xs leading-none px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
-                Lv{stats.level}
-              </span>
-            </div>
-          )}
         </div>
         <span className="shrink-0 text-gray-400 text-sm" aria-hidden="true">›</span>
       </Link>
@@ -73,6 +60,23 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
             </HeatmapTooltip>
           )
         })}
+      </div>
+      {/* Achievement badges — independent column so it stays visible on mobile too
+          (mirrors CommitGoalRow's Column 3: w-14 shrink-0 flex-col, no `hidden` class)
+          🔥N = daily streak >= 1
+          Lv N = level pill, shown whenever stats are available */}
+      <div className="w-14 shrink-0 flex flex-col items-center justify-center gap-0.5">
+        {stats && stats.dailyStreak >= 1 && (
+          <span className="text-[10px] sm:text-sm leading-none flex items-center gap-0.5">
+            <span role="img" aria-label="連続投稿中">🔥</span>
+            <span className="text-[10px] sm:text-xs">{stats.dailyStreak}</span>
+          </span>
+        )}
+        {stats && (
+          <span className="text-[10px] sm:text-xs leading-none px-1 sm:px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
+            Lv{stats.level}
+          </span>
+        )}
       </div>
       <div className="w-10 shrink-0 text-xs text-right text-gray-500 font-semibold pr-1">
         {totalCount > 0 ? totalCount : ''}
