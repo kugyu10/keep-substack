@@ -33,3 +33,17 @@ export type CommitSlot = {
   day_of_week: number  // 1–7 (1=月〜7=日)
   hour: number  // 0–23
 }
+
+// ゲーミフィケーション: src/lib/gamification.ts が導出する1メンバー分の統計
+export type MemberGameStats = {
+  memberId: string
+  dailyStreak: number
+  weeklyStreak: number
+  postCount: number
+  achievedWeekCount: number
+  xp: number
+  level: number
+  currentLevelFloor: number
+  nextLevelXp: number
+  progressRatio: number // 0..1
+}
