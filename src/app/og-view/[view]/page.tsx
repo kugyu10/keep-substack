@@ -153,7 +153,11 @@ async function DailyView() {
           transform: scale で等比縮小（top center 起点）。member(820px×0.58, 丸径≈131px@2x)に
           対し daily の丸径を一致させるため、実 PNG 計測(member131px / daily(0.6)117px = 1.12)
           から scale=0.67 を採用（0.6→0.67 で丸径 117→≈131px@2x = member 同等）。
-          下端のメンバー行は見切れてよい。実物の見た目（比率・配置）は維持される。 */}
+          下端のメンバー行は見切れてよい。実物の見た目（比率・配置）は維持される。
+          幅の不変条件: グリッド利用可能幅 = width − 208(名前 w-52) − 56(バッジ w-14) − 40(計 w-10)
+          が校正時の 712px であること（丸径 = (712−gap24)/7 × 0.67 × 2 ≈ 131px@2x）。
+          ゲーミフィケーションのバッジ列(w-14=56px)追加に伴い 960px→1016px に拡幅して
+          712px を維持（scale は校正値のまま）。列構成を変えたら width を再調整すること。 */}
       <div
         style={{
           flex: 1,
@@ -165,7 +169,7 @@ async function DailyView() {
       >
         <div
           style={{
-            width: '960px',
+            width: '1016px',
             transform: 'scale(0.67)',
             transformOrigin: 'top center',
           }}
