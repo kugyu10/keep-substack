@@ -22,7 +22,6 @@ import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'
 import CalendarGrid from '@/components/CalendarGrid'
 import { parseYmParam } from '@/lib/shareUrl'
 import { OG_WIDTH, OG_HEIGHT } from '@/lib/ogScreenshotUrl'
-import { buildStatsById } from '@/lib/gamification'
 import type { CommitSlot } from '@/lib/types'
 
 export const revalidate = 300
