@@ -2,10 +2,14 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
+import { getArticles } from '@/lib/articles'
+import { buildGameStats } from '@/lib/gamification'
 import LinkMemberForm from './LinkMemberForm'
 import MyProfileForm from './MyProfileForm'
 import CommitScheduleModal from './CommitScheduleModal'
 import LogoutButton from '@/components/LogoutButton'
+import GameStatsPanel from '@/components/GameStatsPanel'
+import type { CommitSlot, Member, MemberGameStats } from '@/lib/types'
 
 export default async function MyPage({ searchParams }: { searchParams: Promise<{ handle?: string }> }) {
   const supabase = await createSupabaseServerClient()
@@ -30,8 +34,8 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
     .maybeSingle()
 
   const currentTeams: { name: string; status: string }[] = member
-    ? (member.member_teams as any[])
-        .map((mt: any) => mt.teams)
+    ? (member.member_teams as unknown as { teams: { name: string; status: string } | null }[])
+        .map((mt) => mt.teams)
         .filter(
           (t: unknown): t is { name: string; status: string } =>
             t !== null && typeof t === 'object' && 'name' in (t as object)
@@ -45,20 +49,37 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
     .order('name')
 
   const publicTeams: { name: string }[] = (publicTeamsData ?? []).map(
-    (t: any) => ({ name: t.name })
+    (t) => ({ name: t.name })
   )
 
-  const substackHandle = (member as any)?.substack_handle ?? null
+  const substackHandle = member?.substack_handle ?? null
 
   const { data: commitSlotsData } = member
     ? await admin
         .from('member_commit_slots')
         .select('id, day_of_week, hour')
-        .eq('member_id', (member as any).id)
+        .eq('member_id', member.id)
         .order('day_of_week')
     : { data: null }
 
   const commitSlots = (commitSlotsData ?? []) as { id: number; day_of_week: number; hour: number }[]
+
+  // ゲーミフィケーション統計（あなたの記録セクション用）。
+  // 取得や計算に失敗してもページ全体は落とさず、このセクションを出さないだけにする。
+  let gameStats: MemberGameStats | null = null
+  if (member) {
+    try {
+      const { data: gameSlotsData } = await admin
+        .from('member_commit_slots')
+        .select('member_id, day_of_week, hour')
+        .eq('member_id', member.id)
+      const gameSlots = (gameSlotsData ?? []) as CommitSlot[]
+      const { items } = await getArticles(member.publication_id)
+      gameStats = buildGameStats({ id: member.id } as Member, items, gameSlots)
+    } catch (err) {
+      console.error('[MyPage] gamification stats fetch error:', err)
+    }
+  }
 
   return (
     <main className="max-w-sm mx-auto px-4 py-8">
@@ -83,6 +104,12 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
             <h2 className="text-sm font-semibold mb-2">投稿スケジュール</h2>
             <CommitScheduleModal initialSlots={commitSlots} />
           </div>
+          {gameStats && (
+            <div className="mt-8">
+              <h2 className="text-sm font-semibold mb-2">あなたの記録</h2>
+              <GameStatsPanel stats={gameStats} />
+            </div>
+          )}
         </>
       )}
       <div className="mt-10 text-center">
