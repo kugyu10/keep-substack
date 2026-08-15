@@ -2,14 +2,15 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
-import { getArticles } from '@/lib/articles'
+import { getMembers } from '@/lib/members'
+import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { buildGameStats } from '@/lib/gamification'
 import LinkMemberForm from './LinkMemberForm'
 import MyProfileForm from './MyProfileForm'
 import CommitScheduleModal from './CommitScheduleModal'
 import LogoutButton from '@/components/LogoutButton'
 import GameStatsPanel from '@/components/GameStatsPanel'
-import type { CommitSlot, Member, MemberGameStats } from '@/lib/types'
+import type { CommitSlot, MemberGameStats } from '@/lib/types'
 
 export default async function MyPage({ searchParams }: { searchParams: Promise<{ handle?: string }> }) {
   const supabase = await createSupabaseServerClient()
@@ -65,6 +66,9 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
   const commitSlots = (commitSlotsData ?? []) as { id: number; day_of_week: number; hour: number }[]
 
   // ゲーミフィケーション統計（あなたの記録セクション用）。
+  // 一覧ビュー（/, /daily）と同じ fetchAllFeedsCached（live RSS ∪ DB全件）を
+  // データ源にして、Lv/XP/ストリークがページ間で食い違わないようにする
+  // （getArticles は DB のみで、cron 更新まで最大24時間古くなるため使わない）。
   // 取得や計算に失敗してもページ全体は落とさず、このセクションを出さないだけにする。
   let gameStats: MemberGameStats | null = null
   if (member) {
@@ -74,8 +78,12 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
         .select('member_id, day_of_week, hour')
         .eq('member_id', member.id)
       const gameSlots = (gameSlotsData ?? []) as CommitSlot[]
-      const { items } = await getArticles(member.publication_id)
-      gameStats = buildGameStats({ id: member.id } as Member, items, gameSlots)
+      const allMembers = await getMembers()
+      const fullMember = allMembers.find((m) => m.id === member.id)
+      if (fullMember) {
+        const [feedResult] = await fetchAllFeedsCached([fullMember])
+        gameStats = buildGameStats(fullMember, feedResult?.items ?? [], gameSlots)
+      }
     } catch (err) {
       console.error('[MyPage] gamification stats fetch error:', err)
     }
