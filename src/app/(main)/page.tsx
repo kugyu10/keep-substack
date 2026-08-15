@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
+import { buildStatsById } from '@/lib/gamification'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import CommitGoalView from '@/components/CommitGoalView'
@@ -79,6 +80,10 @@ export default async function Home({ searchParams }: Props) {
 
   const results = await fetchAllFeedsCached(filteredMembers)
 
+  // ゲーミフィケーション統計（無制限週ストリーク+Lv）は21日カットオフ前の
+  // 全履歴 results から計算する（カットオフ後の results21 では長期ストリークが壊れるため）。
+  const statsById = buildStatsById(results, (slotsData ?? []) as CommitSlot[])
+
   // Filter to 21-day window (3 weeks) for CommitGoalView (D-04)
   const cutoff = new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString()
   const results21 = results.map((r) => ({
@@ -117,7 +122,11 @@ export default async function Home({ searchParams }: Props) {
         </div>
       )}
 
-      <CommitGoalView results={results21} slots={(slotsData ?? []) as CommitSlot[]} />
+      <CommitGoalView
+        results={results21}
+        slots={(slotsData ?? []) as CommitSlot[]}
+        statsById={statsById}
+      />
     </main>
   )
 }

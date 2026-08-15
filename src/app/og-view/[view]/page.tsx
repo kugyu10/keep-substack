@@ -14,6 +14,7 @@ import { notFound } from 'next/navigation'
 import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { getArticles } from '@/lib/articles'
+import { buildStatsById } from '@/lib/gamification'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { buildHeatmapArticleMap } from '@/lib/heatmapUtils'
 import CommitGoalView from '@/components/CommitGoalView'
@@ -105,6 +106,8 @@ async function GoalView() {
     .select('member_id, day_of_week, hour')
 
   const results = await fetchAllFeedsCached(members)
+  // ゲーミフィケーション統計はカットオフ前の全履歴 results から計算する（本番 / と同様）。
+  const statsById = buildStatsById(results, (slotsData ?? []) as CommitSlot[])
   const cutoff = new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString()
   const results21 = results.map((r) => ({
     ...r,
@@ -115,7 +118,11 @@ async function GoalView() {
     <Frame>
       <Brand label="コミット & ゴール" />
       <div style={{ maxWidth: '960px', flex: 1, overflow: 'hidden' }}>
-        <CommitGoalView results={results21} slots={(slotsData ?? []) as CommitSlot[]} />
+        <CommitGoalView
+          results={results21}
+          slots={(slotsData ?? []) as CommitSlot[]}
+          statsById={statsById}
+        />
       </div>
     </Frame>
   )
