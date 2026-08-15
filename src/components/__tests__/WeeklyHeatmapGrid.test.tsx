@@ -106,3 +106,40 @@ describe('WeeklyHeatmapGrid statsById forwarding', () => {
     expect(rows[0].props.stats).toBeUndefined()
   })
 })
+
+describe('WeeklyHeatmapGrid header alignment', () => {
+  // HeatmapRow は [名前][7列グリッド][バッジ w-14][計 w-10] の4列構成。
+  // ヘッダー行にバッジ列ぶんの w-14 スペーサーが無いと日付ラベルがズレる（回帰ガード）。
+  function findHeaderRow(node: unknown): AnyEl | undefined {
+    // 「計」テキストを子孫に持つ flex 行のうち、HeatmapRow ではないものを探す
+    function containsText(n: unknown, text: string): boolean {
+      if (typeof n === 'string') return n === text
+      if (!isElement(n)) return false
+      const children = (n.props as { children?: unknown }).children
+      return flattenChildren(children).some((c) => containsText(c, text))
+    }
+    function walk(n: unknown): AnyEl | undefined {
+      if (!isElement(n)) return undefined
+      const cls = String((n.props as { className?: unknown }).className ?? '')
+      if (n.type === 'div' && cls.includes('flex') && containsText(n, '計')) return n
+      const children = (n.props as { children?: unknown }).children
+      for (const child of flattenChildren(children)) {
+        const hit = walk(child)
+        if (hit) return hit
+      }
+      return undefined
+    }
+    return walk(node)
+  }
+
+  it('ヘッダー行にバッジ列と揃う w-14 スペーサーがある', () => {
+    const member = makeMember('m1', 'pub-1')
+    const el = WeeklyHeatmapGrid({ results: [makeResult(member)] })
+    const header = findHeaderRow(el)
+    expect(header).toBeDefined()
+    const spacers = flattenChildren((header!.props as { children?: unknown }).children)
+      .filter(isElement)
+      .filter((c) => String((c.props as { className?: unknown }).className ?? '').includes('w-14'))
+    expect(spacers.length).toBe(1)
+  })
+})

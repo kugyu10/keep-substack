@@ -53,6 +53,8 @@ export default function WeeklyHeatmapGrid({ results, statsById }: WeeklyHeatmapG
             )
           })}
         </div>
+        {/* HeatmapRow のバッジ列 (w-14) と揃えるスペーサー */}
+        <div className="w-14 shrink-0" />
         <div className="w-10 shrink-0 text-xs text-right text-gray-400 pr-1">計</div>
       </div>
       {sorted.map(({ member, items, imageUrl }) => (
