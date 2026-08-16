@@ -78,7 +78,9 @@ function stats(overrides: Partial<MemberGameStats> = {}): MemberGameStats {
     dailyStreak: 0,
     weeklyStreak: 0,
     postCount: 0,
+    onTimeCount: 0,
     achievedWeekCount: 0,
+    xpBreakdown: { post: 0, onTime: 0, achieved: 0 },
     xp: 0,
     level: 1,
     currentLevelFloor: 0,
@@ -118,13 +120,36 @@ describe('GameStatsPanel: level and XP display', () => {
 })
 
 describe('GameStatsPanel: XP breakdown', () => {
-  it('shows postCount * 10 and achievedWeekCount * 20 breakdown lines', () => {
-    const el = GameStatsPanel({ stats: stats({ postCount: 7, achievedWeekCount: 3 }) })
+  it('shows post / on-time / achieved breakdown lines from xpBreakdown', () => {
+    const el = GameStatsPanel({
+      stats: stats({
+        postCount: 7,
+        onTimeCount: 4,
+        achievedWeekCount: 3,
+        xpBreakdown: { post: 70, onTime: 40, achieved: 90 },
+      }),
+    })
     const texts = collectText(el).join('')
-    expect(texts).toContain('7')
     expect(texts).toContain('70')
-    expect(texts).toContain('3')
-    expect(texts).toContain('60')
+    expect(texts).toContain('40')
+    expect(texts).toContain('90')
+  })
+
+  it('displays xpBreakdown values verbatim (no recomputation in the panel)', () => {
+    // パネル側が式を再計算していないことの回帰ガード。
+    // 内訳の出所は gamification.ts の calcXp ただ1つであるべき。
+    const el = GameStatsPanel({
+      stats: stats({
+        postCount: 1,
+        onTimeCount: 1,
+        achievedWeekCount: 1,
+        xpBreakdown: { post: 999, onTime: 888, achieved: 777 },
+      }),
+    })
+    const texts = collectText(el).join('')
+    expect(texts).toContain('999')
+    expect(texts).toContain('888')
+    expect(texts).toContain('777')
   })
 })
 

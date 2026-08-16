@@ -40,8 +40,15 @@ export type MemberGameStats = {
   dailyStreak: number
   weeklyStreak: number
   postCount: number
+  onTimeCount: number // コミット時刻の±1時間以内に投稿した件数
   achievedWeekCount: number
   xp: number
+  // XPの内訳。表示側で式を再計算しないための単一の出所
+  xpBreakdown: {
+    post: number
+    onTime: number
+    achieved: number
+  }
   level: number
   currentLevelFloor: number
   nextLevelXp: number

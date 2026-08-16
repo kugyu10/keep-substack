@@ -5,6 +5,7 @@ import {
   calcWeeklyGoalStreak,
   calcAchievedWeekCount,
   calcXp,
+  calcOnTimePostCount,
   calcLevel,
   buildGameStats,
   buildStatsById,
@@ -166,12 +167,85 @@ describe('calcAchievedWeekCount', () => {
 // calcXp
 // ─────────────────────────────────────────────────
 describe('calcXp', () => {
-  it('postCount*10 + achievedWeekCount*20 で計算する', () => {
-    expect(calcXp({ postCount: 5, achievedWeekCount: 3 })).toBe(110)
+  it('postCount*10 + onTimeCount*10 + achievedWeekCount*30 で計算する', () => {
+    expect(calcXp({ postCount: 5, onTimeCount: 2, achievedWeekCount: 3 })).toBe(160)
   })
 
-  it('両方0なら0', () => {
-    expect(calcXp({ postCount: 0, achievedWeekCount: 0 })).toBe(0)
+  it('オンタイム投稿は投稿XPが実質2倍になる', () => {
+    const base = calcXp({ postCount: 1, onTimeCount: 0, achievedWeekCount: 0 })
+    const onTime = calcXp({ postCount: 1, onTimeCount: 1, achievedWeekCount: 0 })
+    expect(onTime).toBe(base * 2)
+  })
+
+  it('すべて0なら0', () => {
+    expect(calcXp({ postCount: 0, onTimeCount: 0, achievedWeekCount: 0 })).toBe(0)
+  })
+})
+
+// ─────────────────────────────────────────────────
+// calcOnTimePostCount — コミット時刻 ±1時間
+// ─────────────────────────────────────────────────
+describe('calcOnTimePostCount', () => {
+  // 2026-06-05 は金曜（day_of_week=5）。UTC 00:30 = JST 09:30。
+  const fridaySlot: CommitSlot[] = [{ member_id: 'uuid-1', day_of_week: 5, hour: 10 }]
+
+  it('スロットが空なら0', () => {
+    expect(calcOnTimePostCount([feedItem('2026-06-05T00:30:00.000Z')], [])).toBe(0)
+  })
+
+  it('コミット時刻の30分前の投稿はオンタイム', () => {
+    expect(calcOnTimePostCount([feedItem('2026-06-05T00:30:00.000Z')], fridaySlot)).toBe(1)
+  })
+
+  it('ちょうど60分前は窓に入る（半開区間の下端は閉）', () => {
+    // JST 09:00 = UTC 00:00
+    expect(calcOnTimePostCount([feedItem('2026-06-05T00:00:00.000Z')], fridaySlot)).toBe(1)
+  })
+
+  it('ちょうど60分後は窓に入らない（半開区間の上端は開）', () => {
+    // JST 11:00 = UTC 02:00
+    expect(calcOnTimePostCount([feedItem('2026-06-05T02:00:00.000Z')], fridaySlot)).toBe(0)
+  })
+
+  it('曜日が違えばオンタイムにならない', () => {
+    // 2026-06-04 は木曜、JST 09:30
+    expect(calcOnTimePostCount([feedItem('2026-06-04T00:30:00.000Z')], fridaySlot)).toBe(0)
+  })
+
+  it('日跨ぎ・週跨ぎでも循環距離で拾う（月曜0:00スロット vs 日曜23:30の投稿）', () => {
+    const mondayMidnight: CommitSlot[] = [{ member_id: 'uuid-1', day_of_week: 1, hour: 0 }]
+    // 2026-06-07 は日曜。JST 23:30 = UTC 14:30
+    expect(calcOnTimePostCount([feedItem('2026-06-07T14:30:00.000Z')], mondayMidnight)).toBe(1)
+  })
+
+  it('同じ週の同じスロットに連投しても1回しか数えない', () => {
+    const items = [
+      feedItem('2026-06-05T00:30:00.000Z'), // JST 09:30
+      feedItem('2026-06-05T00:45:00.000Z'), // JST 09:45
+      feedItem('2026-06-05T01:00:00.000Z'), // JST 10:00
+    ]
+    expect(calcOnTimePostCount(items, fridaySlot)).toBe(1)
+  })
+
+  it('別の週なら同じスロットでも別々に数える', () => {
+    const items = [
+      feedItem('2026-06-05T00:30:00.000Z'),
+      feedItem('2026-05-29T00:30:00.000Z'), // 前週の金曜
+    ]
+    expect(calcOnTimePostCount(items, fridaySlot)).toBe(2)
+  })
+
+  it('窓が重なる2スロットがあっても1投稿は1回しか数えない', () => {
+    const overlapping: CommitSlot[] = [
+      { member_id: 'uuid-1', day_of_week: 5, hour: 10 },
+      { member_id: 'uuid-1', day_of_week: 5, hour: 11 },
+    ]
+    // JST 10:30 は 10:00 の窓にも 11:00 の窓にも入る
+    expect(calcOnTimePostCount([feedItem('2026-06-05T01:30:00.000Z')], overlapping)).toBe(1)
+  })
+
+  it('isoDate が無い記事は無視する', () => {
+    expect(calcOnTimePostCount([{ title: 'x', link: 'https://e.com' }], fridaySlot)).toBe(0)
   })
 })
 
@@ -183,35 +257,68 @@ describe('calcLevel', () => {
     const { level, currentLevelFloor, nextLevelXp, progressRatio } = calcLevel(0)
     expect(level).toBe(1)
     expect(currentLevelFloor).toBe(0)
-    expect(nextLevelXp).toBe(50)
+    expect(nextLevelXp).toBe(10)
     expect(progressRatio).toBe(0)
   })
 
-  it('xp=49 → Lv1（Lv2境界の直前）', () => {
-    const { level, progressRatio } = calcLevel(49)
-    expect(level).toBe(1)
-    expect(progressRatio).toBeCloseTo(49 / 50)
-  })
-
-  it('xp=50 → Lv2', () => {
-    const { level, currentLevelFloor, nextLevelXp, progressRatio } = calcLevel(50)
+  it('初投稿（xp=10）で Lv2 に上がる', () => {
+    const { level, currentLevelFloor, nextLevelXp, progressRatio } = calcLevel(10)
     expect(level).toBe(2)
-    expect(currentLevelFloor).toBe(50)
-    expect(nextLevelXp).toBe(200)
+    expect(currentLevelFloor).toBe(10)
+    expect(nextLevelXp).toBe(30)
     expect(progressRatio).toBe(0)
   })
 
-  it('xp=200 → Lv3', () => {
-    const { level, currentLevelFloor, nextLevelXp, progressRatio } = calcLevel(200)
-    expect(level).toBe(3)
-    expect(currentLevelFloor).toBe(200)
-    expect(nextLevelXp).toBe(450)
-    expect(progressRatio).toBe(0)
+  it('xp=9 → Lv1（Lv2境界の直前）', () => {
+    const { level, progressRatio } = calcLevel(9)
+    expect(level).toBe(1)
+    expect(progressRatio).toBeCloseTo(9 / 10)
+  })
+
+  it('助走期間（Lv10まで）の下限は 5n(n-1)', () => {
+    const expected: [number, number][] = [
+      [30, 3],
+      [60, 4],
+      [100, 5],
+      [150, 6],
+      [210, 7],
+      [280, 8],
+      [360, 9],
+      [450, 10],
+    ]
+    for (const [xp, level] of expected) {
+      expect(calcLevel(xp).level).toBe(level)
+      expect(calcLevel(xp).currentLevelFloor).toBe(xp)
+      expect(calcLevel(xp - 1).level).toBe(level - 1)
+    }
+  })
+
+  it('巡航期間（Lv11以降）の下限は 450 + 50(n-10)(n-9)', () => {
+    expect(calcLevel(550).level).toBe(11)
+    expect(calcLevel(549).level).toBe(10)
+    expect(calcLevel(750).level).toBe(12)
+    expect(calcLevel(1950).level).toBe(15)
+    expect(calcLevel(5950).level).toBe(20)
+  })
+
+  it('Lv10→11 の境界で増分が連続する（Lv9→10 が +90、Lv10→11 が +100）', () => {
+    expect(calcLevel(360).nextLevelXp - calcLevel(360).currentLevelFloor).toBe(90)
+    expect(calcLevel(450).nextLevelXp - calcLevel(450).currentLevelFloor).toBe(100)
+    expect(calcLevel(550).nextLevelXp - calcLevel(550).currentLevelFloor).toBe(200)
+  })
+
+  it('XPが増えてレベルが下がることはない（単調性）', () => {
+    let prev = 1
+    for (let xp = 0; xp <= 20000; xp += 7) {
+      const { level } = calcLevel(xp)
+      expect(level).toBeGreaterThanOrEqual(prev)
+      prev = level
+    }
   })
 
   it('Lv内の中間値では progressRatio が 0..1 の範囲に収まる', () => {
-    // xp=125 は Lv2 (floor=50, next=200) のちょうど中間
-    const { level, progressRatio } = calcLevel(125)
+    // xp=20 は Lv2 (floor=10, next=30) のちょうど中間
+    const { level, progressRatio } = calcLevel(20)
     expect(level).toBe(2)
     expect(progressRatio).toBeCloseTo(0.5)
     expect(progressRatio).toBeGreaterThanOrEqual(0)
@@ -219,7 +326,7 @@ describe('calcLevel', () => {
   })
 
   it('大きなxpでも progressRatio は 0..1 の範囲に収まる', () => {
-    const { progressRatio } = calcLevel(4690) // 毎日投稿+週達成1年相当 ≈ Lv10
+    const { progressRatio } = calcLevel(4690)
     expect(progressRatio).toBeGreaterThanOrEqual(0)
     expect(progressRatio).toBeLessThanOrEqual(1)
   })
@@ -256,11 +363,17 @@ describe('buildGameStats', () => {
     expect(stats.weeklyStreak).toBe(2)
     expect(stats.postCount).toBe(5)
     expect(stats.achievedWeekCount).toBe(2)
-    expect(stats.xp).toBe(90) // 5*10 + 2*20
-    expect(stats.level).toBe(2)
-    expect(stats.currentLevelFloor).toBe(50)
-    expect(stats.nextLevelXp).toBe(200)
-    expect(stats.progressRatio).toBeCloseTo(40 / 150)
+    // 金曜スロット10:00 に対し JST 09:30 の投稿が2件（別々の週）＝オンタイム2
+    expect(stats.onTimeCount).toBe(2)
+    expect(stats.xp).toBe(130) // 5*10 + 2*10 + 2*30
+    expect(stats.xpBreakdown).toEqual({ post: 50, onTime: 20, achieved: 60 })
+    expect(stats.xpBreakdown.post + stats.xpBreakdown.onTime + stats.xpBreakdown.achieved).toBe(
+      stats.xp
+    )
+    expect(stats.level).toBe(5)
+    expect(stats.currentLevelFloor).toBe(100)
+    expect(stats.nextLevelXp).toBe(150)
+    expect(stats.progressRatio).toBeCloseTo(30 / 50)
   })
 
   it('slots が空でも postCount/dailyStreak は計算される', () => {
@@ -271,8 +384,9 @@ describe('buildGameStats', () => {
     expect(stats.achievedWeekCount).toBe(0)
     expect(stats.postCount).toBe(1)
     expect(stats.dailyStreak).toBe(1)
+    expect(stats.onTimeCount).toBe(0) // スロットが無ければオンタイムも0
     expect(stats.xp).toBe(10)
-    expect(stats.level).toBe(1)
+    expect(stats.level).toBe(2) // 初投稿でLv2に上がる
   })
 })
 

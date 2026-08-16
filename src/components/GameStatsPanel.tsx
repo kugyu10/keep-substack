@@ -12,13 +12,13 @@ export default function GameStatsPanel({ stats }: GameStatsPanelProps) {
     nextLevelXp,
     progressRatio,
     postCount,
+    onTimeCount,
     achievedWeekCount,
+    xpBreakdown,
     dailyStreak,
     weeklyStreak,
   } = stats
 
-  const postXp = postCount * 10
-  const achievedXp = achievedWeekCount * 20
   const remainingXp = Math.max(0, nextLevelXp - xp)
   const progressPercent = Math.round(progressRatio * 100)
 
@@ -47,8 +47,9 @@ export default function GameStatsPanel({ stats }: GameStatsPanelProps) {
       </div>
 
       <div className="text-xs text-gray-600 space-y-0.5 mb-4">
-        <div>投稿 {postCount}件 × 10 = {postXp} XP</div>
-        <div>目標達成 {achievedWeekCount}週 × 20 = {achievedXp} XP</div>
+        <div>投稿 {postCount}件 × 10 = {xpBreakdown.post} XP</div>
+        <div>オンタイム投稿 {onTimeCount}件 × 10 = {xpBreakdown.onTime} XP</div>
+        <div>目標達成 {achievedWeekCount}週 × 30 = {xpBreakdown.achieved} XP</div>
       </div>
 
       <div className="flex gap-4 text-sm">
