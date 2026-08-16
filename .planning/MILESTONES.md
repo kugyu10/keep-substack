@@ -1,5 +1,21 @@
 # Milestones: Keep Substack
 
+## v1.9 ワンボタン Substack Note 共有 (Shipped: 2026-06-17)
+
+**Phases completed:** 3 phases (37-39), 3 plans
+**Git range:** v1.8..HEAD（48 commits, 2026-06-14 → 06-17）
+**Requirements:** 9/9 充足（URL-01 / SHARE-01..06 / OGP-01..02）
+
+**Key accomplishments:**
+
+- **Phase 37**: 個人カレンダー `/member/[id]` を `?ym=` 駆動の公開URL化し、`buildShareUrl` 規約ヘルパで対象4ビュー（top / daily / member / `?team=`）の正規公開URLを1関数で取得可能にした（URL-01）。
+- **Phase 38**: 再利用可能な `<ShareButton>` を4ビューに配置。押下で定型文＋ハッシュタグ＋公開URLをクリップボードへコピーし Substack Notes を新規タブで起動、インラインフィードバックを表示。共有文面は `lib/share.ts` 定数で一元管理、ログイン済み限定表示はフラグ1か所で切替可能（SHARE-01..06）。
+- **Phase 39**: 共有URL（top / daily / member）に `summary_large_image` の OG メタタグと next/og 動的OG画像を追加。メンバールートは草ストリップ＋記事数＋ハンドルを安価な Supabase クエリのみで描画（RSS フェッチ回避）。本番OGはスクリーンショット方式で安定化（PR#10）。
+
+**Known deferred items at close: 16**（機能ギャップなし — bookkeeping/過去マイルストーン繰り越し。詳細は STATE.md Deferred Items v1.9 close）
+
+---
+
 ## v1.8 Debug, Stabilization & UI Polish (Shipped: 2026-06-11)
 
 **Phases completed:** 5 phases, 18 plans, 30 tasks

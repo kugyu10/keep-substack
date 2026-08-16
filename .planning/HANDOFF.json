@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "timestamp": "2026-06-16T12:23:32.983Z",
+  "timestamp": "2026-06-16T15:44:49.002Z",
   "phase": "39",
   "phase_name": "og-og",
   "phase_dir": ".planning/phases/39-og-og",
@@ -9,26 +9,24 @@
   "total_tasks": null,
   "status": "paused",
   "completed_tasks": [
-    {"id": "debug", "name": "/api/og OOM + OGレイアウト見切れ修正", "status": "done", "commit": "54a3ba7"},
-    {"id": "uat", "name": "Phase 39 UAT 再開 (5 pass / 0 issue / 1 blocked)", "status": "done", "commit": "b603efe"}
+    {"id": "merge-pr9", "name": "PR #9 (v1.9) を本番マージ・デプロイ", "status": "done", "commit": "54c241c"},
+    {"id": "diagnose", "name": "本番OG画像が全view同一フォールバックになる原因特定（Turbopack が playwright-core/browsers.json を未トレース）", "status": "done"},
+    {"id": "fix", "name": "webpack build化 + outputFileTracingIncludes + PageProps型修正", "status": "done", "commit": "334b218"},
+    {"id": "merge-pr10", "name": "PR #10 を本番マージ・デプロイ", "status": "done", "commit": "610a2b5"},
+    {"id": "reverify", "name": "本番 /api/og 再検証: goal/daily で実物忠実な草・実績スクショ描画を確認", "status": "done"}
   ],
   "remaining_tasks": [
-    {"id": "deploy", "name": "PR #9 (v1.9) を開発者が手動マージ→本番デプロイ", "status": "not_started"},
-    {"id": "test5", "name": "デプロイ後 test5 (リンクデバッガ summary_large_image) 再検証→UAT complete", "status": "not_started"},
-    {"id": "milestone", "name": "v1.9 milestone close 判断 (/gsd:complete-milestone)", "status": "not_started"}
+    {"id": "uat-complete", "name": "39-UAT.md を complete に更新（test5 = PASS）", "status": "not_started"},
+    {"id": "close-milestone", "name": "/gsd:complete-milestone で v1.9 クローズ", "status": "not_started"}
   ],
-  "blockers": [
-    {"description": "test5 (リンクデバッガ) は /og-view + /api/og が本番/プレビュー未デプロイのため検証不可", "type": "external", "workaround": "PR #9 マージ→Vercel デプロイ後に再検証"}
-  ],
-  "human_actions_pending": [
-    {"action": "PR #9 (v1.9 develop) を内容確認の上 main へ手動マージ", "context": "CLAUDE.md 運用ルールでマージは開発者手動。Claude はマージ禁止", "blocking": true}
-  ],
+  "blockers": [],
+  "human_actions_pending": [],
   "decisions": [
-    {"decision": "OG OOM 真因は Turbopack dev リーク。dev を webpack 化 + predev kill で回避", "rationale": "対照実験で webpack 安定/Turbopack リーク確定。本番(Vercel)無影響", "phase": "39"},
-    {"decision": "スクショ方式は維持(satori戻し等の方式変更は不要)", "rationale": "クラッシュは方式でなく dev インフラ由来。忠実性要求も満たす", "phase": "39"},
-    {"decision": "OGフレーム収容は scale: member 0.58 / daily 0.67 (丸径を member に統一)", "rationale": "実コンポーネント不変で忠実性維持。daily は人数次第の見切れ許容(ユーザー方針)", "phase": "39"}
+    {"decision": "本番ビルドを next build --webpack に変更", "rationale": "Next.js 16 の Turbopack 本番ビルドは playwright-core の browsers.json 動的requireをトレースできず関数バンドルから脱落→本番でscreenshot失敗→fallback。webpack+nftで解決", "phase": "39"},
+    {"decision": "outputFileTracingIncludes['/api/og'] に playwright-core/** + @sparticuz/chromium/** 追加", "rationale": "nft動的require漏れの保険。webpack buildでのみ確実に効く。nft.jsonにbrowsers.json+chromium.br同梱を実地確認", "phase": "39"},
+    {"decision": "test5(リンクデバッガ) = PASS と判定", "rationale": "本番OGPは正常（opengraph.xyz + facebookexternalhit UA + og:image:width/height 1200x630 + summary_large_image 全て確認）。Substack Note内で小サムネイル表示になるのはSubstack側の固定レイアウト仕様でメタタグ制御不可。実装不足ではない", "phase": "39"}
   ],
-  "uncommitted_files": [".env.local (gitignore: NEXT_PUBLIC_SITE_URL=http://localhost:3000)", ".planning/STATE.md (本セッション前から M)"],
-  "next_action": "PR #9 を開発者がマージ→本番デプロイ後、/gsd:verify-work 39 で test5 を再検証し UAT を complete に。その後 /gsd:complete-milestone で v1.9 クローズ判断",
-  "context_notes": "v1.9 全実装完了。Phase 39 UAT は 5/6 pass、残1(test5)はデプロイ依存の blocked のみ=新規バグ無し。dev は今後 webpack で起動(npm run dev に predev kill 同梱)。.env.local の NEXT_PUBLIC_SITE_URL は他環境にも必要→.env.example/README 追記を次回検討。daily OG は人数増で下端見切れ(仕様許容)。"
+  "uncommitted_files": [".planning/STATE.md"],
+  "next_action": "39-UAT.md を complete に更新（test5 PASS）し、/gsd:complete-milestone で v1.9 をクローズする",
+  "context_notes": "v1.9 ワンボタンSubstack Note共有は実装・本番デプロイ・UAT全て完了。最後のtest5（動的OGカード）はデプロイ漏れ→OG画像バグを発見・修正済み。本番/api/ogは view別に実物忠実な草/実績スクショを描画（goal=1.1MB 23s, daily=244KB 13s, 旧fallback=54KB両view同一から改善）。Substack Note内の小サムネイル表示はSubstack仕様（X/opengraph.xyzでは大判カードで正常表示）。残るは事務的なUAT更新とmilestoneクローズのみ。ユーザー要望として『Substack内でも大きく見せたい』が出れば次マイルストーン候補（/gsd:captureで記録）。"
 }

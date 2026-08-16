@@ -36,6 +36,21 @@ export function isoToJSTDateKey(isoDate: string): string | null {
 }
 
 /**
+ * UTC の isoDate 文字列を JST（UTC+9）の曜日・時・分に分解する。
+ * dayOfWeek は ISO 8601 規則（1=月曜 〜 7=日曜）で、CommitSlot.day_of_week と揃える。
+ */
+export function isoToJSTParts(
+  isoDate: string
+): { dayOfWeek: number; hour: number; minute: number } | null {
+  const ms = Date.parse(isoDate)
+  if (isNaN(ms)) return null
+  const jst = new Date(ms + 9 * 60 * 60 * 1000)
+  // getUTCDay() は 0=日曜。ISO の 1=月〜7=日 に変換する。
+  const dayOfWeek = jst.getUTCDay() === 0 ? 7 : jst.getUTCDay()
+  return { dayOfWeek, hour: jst.getUTCHours(), minute: jst.getUTCMinutes() }
+}
+
+/**
  * 指定した年月の日付グリッド（DayInfo[]）を返す。
  * 1日目に colStart（曜日オフセット）をセットする。
  */

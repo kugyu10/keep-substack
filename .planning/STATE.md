@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.9
-milestone_name: ワンボタン Substack Note 共有
-status: planning
-stopped_at: context exhaustion at 76% (2026-06-13)
-last_updated: "2026-06-14T16:37:00.000Z"
-last_activity: 2026-06-14 — Phase 39（OGメタ + 動的OG画像）完了。OGP-01/02 充足、228 tests green、build OK
+milestone: v1.10
+milestone_name: Substack Notes PoC
+status: executing
+stopped_at: Completed 42-1-01-PLAN.md (2026-06-18)
+last_updated: "2026-06-18T06:04:22.182Z"
+last_activity: 2026-06-18 -- Phase 42-1 Plan 01 実行完了（コメント取得＋キャッシュ層）
 progress:
   total_phases: 3
-  completed_phases: 3
+  completed_phases: 1
   total_plans: 3
   completed_plans: 3
-  percent: 100
+  percent: 44
 ---
 
 # Project State
@@ -21,24 +21,35 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-11 — v1.8 shipped)
 
 **Core value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
-**Current focus:** v1.9 ロードマップ確定（Phases 37-39）。次は `/gsd:plan-phase 37`
+**Current focus:** Phase 40 スパイク **GO 確定**。次は Phase 41（機能2 Note一覧）の plan/discuss
 
 ## Current Position
 
-Phase: 39 — リンクプレビュー（OGメタタグ + 動的OG画像）
-Plan: 01 — Complete
-Status: Phase 39 完了（OGP-01/02 充足）。v1.9 全フェーズ実装完了 → human-UAT（リンクデバッガ）待ち
-Last activity: 2026-06-14 — Phase 39 実装完了（next/og 動的OG画像 + OGメタ、228 tests green、build OK）
+Phase: 42-1 — 機能1 コメント取得＋キャッシュ層 — Plan 01 Complete ✓ (vitest 30/30 green)
+Plan: 42-1-01 ✓（schema.sql note_comments + comments.ts + 30 ユニットテスト）
+Status: Ready for verification / next plan
+Last activity: 2026-06-18 -- Phase 42-1 Plan 01 実行完了
 
-### v1.9 Roadmap Summary
+⚠ 申し送り: note_comments DDL を本番(prod=xolhjcngrwwwqtklmoyk)/dev(otydhiumsdsyxepnjqjp) の SQL Editor で手動実行する必要あり（schema.sql 参照）
+
+### 確定エンドポイント（Phase 41/42 で使用・すべて無認証サーバー側 fetch）
+
+- 機能2 Note一覧: `GET https://substack.com/api/v1/reader/feed/profile/{user_id}`（`?types=note`、`nextCursor`）
+- 機能1 件数/本体: `GET https://substack.com/api/v1/reader/comment/{id}`（`children_count`=件数）
+- 機能1 返信ツリー: `GET https://substack.com/api/v1/reader/comment/{id}/replies`（`commentBranches[].comment`: name/photo_url/body）
+- フィクスチャ: user_id=`110584954`（@uojun）/ Note id=`276780760`
+
+### v1.10 Roadmap Summary
+
+フィージビリティ・ゲート型 PoC。Phase 40 で取得可否を実測し go/no-go を判定。no-go なら負の結果を文書化してクローズ＝有効な PoC 成果。
 
 | Phase | Goal | Requirements |
 |-------|------|--------------|
-| 37 — 共有URLの状態保持 | 対象4ビューが状態を含む復元可能な公開URLを持つ | URL-01 |
-| 38 — ワンボタン共有 | 共有ボタンで定型文+URLコピー & Substack Notes 起動 + toast | SHARE-01..06 |
-| 39 — リンクプレビュー | OGメタタグ + 動的OG画像（ImageResponse） | OGP-01..02 |
+| 40 — 取得可否スパイク（go/no-go） | 非公式エンドポイントで Note 一覧/コメントが本番 Vercel から取れるかを実測（捨てスパイク、成果物=レポート+生JSON+エンドポイント表） | SPIKE-01, SPIKE-02 |
+| 41 — 機能2 Note一覧（永続化なし） | `/admin/notes` Server Component で admin の Note 一覧を都度 fetch・表示（本文プレビュー+投稿日時JST） | NOTE-01..03 |
+| 42 — 機能1 コメント可視化（キャッシュ+永続化） | Note URL/ID 入力 → コメント件数/本文/名前/アイコン表示 + `note_comments` Supabase キャッシュ（鮮度判定+force再取得） | COMMENT-01..06 |
 
-**Coverage:** 9/9 v1.9 要件マップ済み（orphan 0）。Granularity=coarse。
+**Coverage:** 11/11 v1.10 要件マップ済み（orphan 0）。Granularity=coarse（spike 単独 + cache 基盤は機能1へ統合し 3 フェーズ）。Ordering: 40(gate) → 41(永続化なし) → 42(取得+キャッシュ+表示)。40 が no-go なら以降は設計のみで停止し文書化クローズへ分岐。
 
 ### Quick Tasks Completed
 
@@ -88,6 +99,7 @@ Last activity: 2026-06-14 — Phase 39 実装完了（next/og 動的OG画像 + O
 | Phase 36 P03 | ~10min | 4 tasks | 2 files |
 | Phase 36 P04 | ~3min | 2 tasks | 2 files |
 | Phase 39 P01 | 4min | 3 tasks | 10 files |
+| Phase 41-2-note P01 | 4 min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -123,9 +135,26 @@ Last activity: 2026-06-14 — Phase 39 実装完了（next/og 動的OG画像 + O
 
 ## Session Continuity
 
-Last session: 2026-06-14T16:37:00.000Z
-Stopped at: Completed 39-01-PLAN.md（Phase 39 OG メタ + 動的OG画像）
-Next step: Phase 39 human-UAT（本番/プレビューURLをリンクデバッガに貼り summary_large_image・/member 画像の草/記事数/ハンドル・JP グリフ描画可否を確認）。v1.9 全実装完了につき milestone close 判断も可。
+Last session: 2026-06-18T06:04:22.175Z
+Stopped at: context exhaustion at 75% (2026-06-18)
+Next step: `/gsd:plan-phase 40` — 取得可否スパイク（go/no-go ゲート）。最大リスク=本番 Vercel IP からの到達性を実測し go/no-go を出す。no-go なら negative-result 文書化でクローズ。
+
+## Deferred Items (v1.9 close — 2026-06-17)
+
+v1.9 マイルストーンクローズ時に Acknowledge して繰り越した項目（計16件）。v1.9-MILESTONE-AUDIT は
+9/9 要件 Complete・統合 5/5・status=passed。以下はいずれも機能ギャップではなく、bookkeeping
+（quick の status を監査が読めない）・過去マイルストーン繰り越し・検証アーティファクトのギャップ。
+
+| Category | Item | Status | 備考 |
+|----------|------|--------|------|
+| todo | 2026-06-08-verify-admin-role-check-middleware | pending 🔴 high | PR #5レビュー指摘。次マイルストーン候補 |
+| todo | 2026-06-08-dedupe-auth-guard-middleware-admin-guard | pending 🔴 high | PR #5レビュー指摘。次マイルストーン候補 |
+| todo | 2026-05-11 article-history / multi-team / supabase-migration ほか | pending | 長期backlog |
+| verification_gap | Phase 37 — 37-VERIFICATION.md | human_needed | 37-UAT 3/3 passed でカバー済（URL-01 充足） |
+| debug_session | og-image系 / schedule-save-fails-production | diagnosed / root_cause_found | 実質解決済（スクショ方式 / Phase 32-33）、status未更新 |
+| quick_task | 260515〜260611 の完了済みquick ×8（status missing/unknown）| bookkeeping | 完了済み、audit が status を読めないだけ |
+
+**Known deferred items at close: 16**（真の未消化＝PR#5指摘の 🔴 high 2件のみ。残りは解決済み/bookkeeping/UATカバー済）。
 
 ## Deferred Items (v1.8 close — 2026-06-11)
 
@@ -200,4 +229,4 @@ PR #5（v1.8 Phase 32–36）マージ時のコードレビュー指摘。コー
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Plan the first v1.10 phase with `/gsd:plan-phase 40`（取得可否スパイク）

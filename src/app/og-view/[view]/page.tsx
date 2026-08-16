@@ -14,6 +14,7 @@ import { notFound } from 'next/navigation'
 import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { getArticles } from '@/lib/articles'
+import { buildStatsById } from '@/lib/gamification'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 import { buildHeatmapArticleMap } from '@/lib/heatmapUtils'
 import CommitGoalView from '@/components/CommitGoalView'
@@ -105,6 +106,8 @@ async function GoalView() {
     .select('member_id, day_of_week, hour')
 
   const results = await fetchAllFeedsCached(members)
+  // ゲーミフィケーション統計はカットオフ前の全履歴 results から計算する（本番 / と同様）。
+  const statsById = buildStatsById(results, (slotsData ?? []) as CommitSlot[])
   const cutoff = new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString()
   const results21 = results.map((r) => ({
     ...r,
@@ -115,7 +118,11 @@ async function GoalView() {
     <Frame>
       <Brand label="コミット & ゴール" />
       <div style={{ maxWidth: '960px', flex: 1, overflow: 'hidden' }}>
-        <CommitGoalView results={results21} slots={(slotsData ?? []) as CommitSlot[]} />
+        <CommitGoalView
+          results={results21}
+          slots={(slotsData ?? []) as CommitSlot[]}
+          statsById={statsById}
+        />
       </div>
     </Frame>
   )
@@ -126,7 +133,14 @@ async function DailyView() {
   const members = allMembers.filter((m) =>
     m.teams.every((t) => t.status !== 'hidden')
   )
+
+  const admin = createSupabaseAdminClient()
+  const { data: slotsData } = await admin
+    .from('member_commit_slots')
+    .select('member_id, day_of_week, hour')
+
   const results = await fetchAllFeedsCached(members)
+  const statsById = buildStatsById(results, (slotsData ?? []) as CommitSlot[])
 
   return (
     <Frame>
@@ -139,7 +153,11 @@ async function DailyView() {
           transform: scale で等比縮小（top center 起点）。member(820px×0.58, 丸径≈131px@2x)に
           対し daily の丸径を一致させるため、実 PNG 計測(member131px / daily(0.6)117px = 1.12)
           から scale=0.67 を採用（0.6→0.67 で丸径 117→≈131px@2x = member 同等）。
-          下端のメンバー行は見切れてよい。実物の見た目（比率・配置）は維持される。 */}
+          下端のメンバー行は見切れてよい。実物の見た目（比率・配置）は維持される。
+          幅の不変条件: グリッド利用可能幅 = width − 208(名前 w-52) − 56(バッジ w-14) − 40(計 w-10)
+          が校正時の 712px であること（丸径 = (712−gap24)/7 × 0.67 × 2 ≈ 131px@2x）。
+          ゲーミフィケーションのバッジ列(w-14=56px)追加に伴い 960px→1016px に拡幅して
+          712px を維持（scale は校正値のまま）。列構成を変えたら width を再調整すること。 */}
       <div
         style={{
           flex: 1,
@@ -151,12 +169,12 @@ async function DailyView() {
       >
         <div
           style={{
-            width: '960px',
+            width: '1016px',
             transform: 'scale(0.67)',
             transformOrigin: 'top center',
           }}
         >
-          <WeeklyHeatmapGrid results={results} />
+          <WeeklyHeatmapGrid results={results} statsById={statsById} />
         </div>
       </div>
     </Frame>

@@ -1,69 +1,82 @@
-# Requirements: Keep Substack — v1.9 ワンボタン Substack Note 共有
+# Requirements: Keep Substack — v1.10 Substack Notes PoC
 
-**Defined:** 2026-06-14
-**Core Value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること。
+**Defined:** 2026-06-18
+**Core Value:** 仲間の書く頑張りが一目で見えて、継続のモチベーションにつながること
+**Milestone Goal:** Substack の Note 領域（コメント・投稿一覧）のデータ取得可否を PoC で検証し、コメント可視化と Note 一覧取得の2機能を試作する。
 
-## v1.9 Requirements
+> **PoC 性質:** 本マイルストーンは**フィージビリティ・ゲート型 PoC**。Substack に公式 Notes/コメント API は無く、全機能が非公式エンドポイント（`{pub}.substack.com/api/v1/...` + `substack.sid` cookie）への到達性に依存する。完成度より「取得できるか・どう取れるか」の検証が主目的。
 
-ログイン済みユーザーが、見ているビューを1ボタンで自分の Substack Note に共有でき、「自慢」と「Substack内バイラル拡散」を促進する。
+## v1 Requirements
 
-### Share（共有ボタン・Notes起動）
+### 取得可否検証 (SPIKE)
 
-- [ ] **SHARE-01**: ユーザーは対象ビューに表示される共有ボタンを押せる（再利用可能な `<ShareButton>` コンポーネント、配置を後から1行で差し替え可能）
-- [ ] **SHARE-02**: 共有ボタンを押すと、共有テキスト（定型文＋対象ビューの公開URL）がクリップボードにコピーされる
-- [ ] **SHARE-03**: コピー後、Substack Notes コンポーザー（`https://substack.com/notes`）が新規タブで開く
-- [ ] **SHARE-04**: コピー完了とともに「貼り付けて投稿してください」を伝える toast 等のフィードバックが表示される
-- [ ] **SHARE-05**: 共有テキストの定型文・ハッシュタグが編集しやすい定数（例: `lib/share.ts`）として一元管理される
-- [ ] **SHARE-06**: 共有ボタンは既定でログイン済みユーザーのみ表示し、全員表示へ切り替えやすい実装になっている
+<!-- 全機能の前提。捨て前提の取得スパイクで go/no-go を出す -->
 
-### URL（共有先の状態保持）
+- [ ] **SPIKE-01**: 開発者は、非公式エンドポイントから (a)admin の Note 一覧 (b)特定 Note のコメント を取得できるか（認証要否・**本番/preview Vercel からの到達性**・JSON 実フィールド名）を実測した go/no-go レポートと生 JSON サンプルを得られる
+- [ ] **SPIKE-02**: 取得が正当な手段で不可と判明した場合、その負の結果（不可の理由・試した手段）が文書化され、PoC が有効な成果としてクローズできる
 
-- [ ] **URL-01**: 各対象ビュー（トップ Commit&Goal / `/daily` / 個人カレンダー `/member/[id]` / チーム選択中ビュー）が、状態（チームフィルタ等）を含む公開URLで復元できる
+### Note一覧取得 — 機能2・永続化なし (NOTE)
 
-### OGP（リンクプレビュー）
+- [x] **NOTE-01**: admin は、自分が投稿した Substack Note の一覧を取得して画面で確認できる（毎回サーバー側取得・永続化なし）
+- [x] **NOTE-02**: 各 Note について本文プレビューと投稿日時(JST)が表示される
+- [x] **NOTE-03**: 取得失敗・0件の状態が画面に明示される
 
-- [x] **OGP-01**: 共有対象ルートに適切なOGメタタグ（`og:title` / `og:description` / `og:image` / Twitter Card）が出力される
-- [x] **OGP-02**: 共有対象ルートに、その人の草／実績が見える動的OG画像を Next.js `ImageResponse`（`opengraph-image`）で生成する
+### コメント可視化 — 機能1・永続化あり (COMMENT)
 
-## v2 Requirements
+- [x] **COMMENT-01**: ユーザーは Note の URL/ID を入力フォームで指定できる（寛容なパース）
+- [x] **COMMENT-02**: 指定 Note のコメント件数が表示される
+- [x] **COMMENT-03**: コメント本文の一覧（フラット）が表示される
+- [x] **COMMENT-04**: 各コメントにコメント者の名前とアイコンが表示される（アイコン取得不可時はイニシャル/プレースホルダにフォールバック）
+- [x] **COMMENT-05**: 取得したコメントが Supabase にキャッシュ保存され、再取得を避けられる（`fetched_at` 鮮度判定 + 手動 force 再取得）
+- [x] **COMMENT-06**: 取得失敗・0件・キャッシュ無の状態が画面に明示される
 
-将来。現マイルストーンのロードマップには含めない。
+## Future Requirements
 
-### Visualization
+将来送り（PoC の検証が済み、取得フィールドが確定してから）。
 
-- **VIZ-01**: 月間投稿数サマリーを表示する
-- **VIZ-02**: 年間ヒートマップ（GitHub草型）で長期活動を可視化する
+### コメント拡張
+
+- **COMMENT-07**: コメントの投稿日時(JST)・リアクション数表示（取得フィールド確認後）
+- **COMMENT-08**: コメント者の Substack プロフィールリンク（handle が取れる場合）
+- **COMMENT-09**: 返信スレッドのネスト表示（PoC はフラットで十分）
+
+### Note一覧拡張
+
+- **NOTE-04**: Note 一覧のいいね/返信/restack 数・直リンク・取得時刻表示
+- **NOTE-05**: 取得対象の拡張（admin → 登録メンバー → 任意ユーザー）
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Substack Note への自動投稿（プログラム投稿） | 公式prefill URLが無く、非公式APIは本人のSubstack認証が必要。Webアプリから非現実的 |
-| X/Threads等 他SNSへの共有 | スコープを Substack バイラルに絞る。YAGNI |
-| 共有実績の集計・ランキング | コミュニティの「ゆるさ」を壊す（既存方針） |
-| 共有テキストのユーザー個別カスタムUI | v1.9は定数管理で十分。編集UIは過剰 |
+| residential proxy / TLS フィンガープリント偽装での突破 | PoC スコープ外の over-engineering。正当な低頻度リクエストで取れなければ Fallback/負の結果で終える |
+| 自前のコメント・いいね機能の実装 | Substack 本体機能と重複。本 PoC は Substack 上のコメントを**読み取り表示**するのみ |
+| リッチテキスト/画像/埋め込みの完全再現・ページネーション/全件取得 | PoC は最小表示で十分 |
+| クライアント側からの Substack 直叩き | CORS + cookie 露出で不可。取得は必ずサーバー側 |
 
 ## Traceability
 
-ロードマップ作成時に gsd-roadmapper が記入。
+ロードマップ作成時に埋める。
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SHARE-01 | Phase 38 | Pending |
-| SHARE-02 | Phase 38 | Pending |
-| SHARE-03 | Phase 38 | Pending |
-| SHARE-04 | Phase 38 | Pending |
-| SHARE-05 | Phase 38 | Pending |
-| SHARE-06 | Phase 38 | Pending |
-| URL-01 | Phase 37 | Pending |
-| OGP-01 | Phase 39 | Complete |
-| OGP-02 | Phase 39 | Complete |
+| SPIKE-01 | Phase 40 | Pending |
+| SPIKE-02 | Phase 40 | Pending |
+| NOTE-01 | Phase 41 | Complete |
+| NOTE-02 | Phase 41 | Complete |
+| NOTE-03 | Phase 41 | Complete |
+| COMMENT-01 | Phase 42 | Complete |
+| COMMENT-02 | Phase 42 | Complete |
+| COMMENT-03 | Phase 42 | Complete |
+| COMMENT-04 | Phase 42 | Complete |
+| COMMENT-05 | Phase 42 | Complete |
+| COMMENT-06 | Phase 42 | Complete |
 
 **Coverage:**
-- v1.9 requirements: 9 total
-- Mapped to phases: 9（Phase 37 URL-01 / Phase 38 SHARE-01..06 / Phase 39 OGP-01..02）
+- v1 requirements: 11 total
+- Mapped to phases: 11 ✓（Phase 40: SPIKE-01/02 / Phase 41: NOTE-01..03 / Phase 42: COMMENT-01..06）
 - Unmapped: 0 ✓
 
 ---
-*Requirements defined: 2026-06-14*
-*Last updated: 2026-06-14 after roadmap creation (Phases 37-39 mapped)*
+*Requirements defined: 2026-06-18*
+*Last updated: 2026-06-18 after roadmap creation (phases 40-42 mapped)*

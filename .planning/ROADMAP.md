@@ -11,7 +11,8 @@
 - ✅ **v1.6 Team Roles + Member Self-Service** — Phases 22-26 (shipped 2026-05-30)
 - ✅ **v1.7 Commit & Goal View + Substack Profile Link** — Phases 27-31 (shipped 2026-06-06)
 - ✅ **v1.8 Debug, Stabilization & UI Polish** — Phases 32-36 (shipped 2026-06-11)
-- 🚧 **v1.9 ワンボタン Substack Note 共有** — Phases 37-39 (in progress)
+- ✅ **v1.9 ワンボタン Substack Note 共有** — Phases 37-39 (shipped 2026-06-17)
+- 🚧 **v1.10 Substack Notes PoC** — Phases 40-42 (in progress)
 
 ## Phases
 
@@ -132,51 +133,64 @@ Full archive: `.planning/milestones/v1.8-ROADMAP.md`
 
 </details>
 
----
-
-## Phases — v1.9 (active)
+<details>
+<summary>✅ v1.9 ワンボタン Substack Note 共有 (Phases 37-39) — SHIPPED 2026-06-17</summary>
 
 **Milestone Goal:** ログイン済みユーザーが、見ているビューを1ボタンで自分の Substack Note に共有でき、「自慢」と Substack 内バイラル拡散を促進する。
 
-- [ ] **Phase 37: 共有URLの状態保持（公開URL化）** - 各対象ビューがチームフィルタ等の状態を含む復元可能な公開URLを持つ
-- [ ] **Phase 38: ワンボタン共有（クリップボード + Substack Notes 起動）** - 共有ボタンで定型文+URLをコピーしNotesを新規タブで開く
-- [ ] **Phase 39: リンクプレビュー（OGメタタグ + 動的OG画像）** - 共有リンクに草/実績が見える動的OGプレビューを出力する
+- [x] **Phase 37: 共有URLの状態保持（公開URL化）** - `/member/[id]` を `?ym=` 駆動公開URL化 + `buildShareUrl` 規約ヘルパ（URL-01）— completed 2026-06-16
+- [x] **Phase 38: ワンボタン共有（クリップボード + Substack Notes 起動）** - `<ShareButton>` ×4ビュー / コピー + Notes起動 + フィードバック / `lib/share.ts` 定数管理（SHARE-01..06）— completed 2026-06-14
+- [x] **Phase 39: リンクプレビュー（OGメタタグ + 動的OG画像）** - summary_large_image OGメタ + next/og 動的画像（メンバー草/記事数/ハンドル）（OGP-01..02）— completed 2026-06-14
 
-### Phase 37: 共有URLの状態保持（公開URL化）
-**Goal**: 各対象ビュー（トップ Commit&Goal / `/daily` / 個人カレンダー `/member/[id]` / チーム選択中ビュー）が、現在の表示状態（チームフィルタ等）をURLに反映し、そのURLから同じ表示を復元できる。共有テキストが指す先が「今見ている画面」と一致する土台を作る。
-**Depends on**: Phase 36（v1.8 完了, 既存トップ/`/daily`/`/member/[id]`/チームタブ）
-**Requirements**: URL-01
-**Success Criteria** (what must be TRUE):
-  1. トップ Commit&Goal でチームタブを切り替えるとURLにそのチーム状態が反映される（リロード・別タブで貼り直しても同じチームが選択された状態で開く）
-  2. `/daily` と 個人カレンダー `/member/[id]` が、状態を含む公開URLで誰でも（未ログインでも）同じ表示にアクセスできる
-  3. 対象4ビューすべてについて「現在表示中の状態を表す正規の公開URL」を1関数/規約で取得でき、Phase 38 の共有ボタンが参照できる
-**Plans**: 1 plan
-- [ ] 37-01-PLAN.md — 個人カレンダーを ?ym= 駆動URL化 + buildShareUrl 規約ヘルパ（top/daily は ?team= 既存確認）
-**UI hint**: yes
+Full archive: `.planning/milestones/v1.9-ROADMAP.md`
 
-### Phase 38: ワンボタン共有（クリップボード + Substack Notes 起動）
-**Goal**: ログイン済みユーザーが対象ビューの共有ボタンを押すと、定型文+ハッシュタグ+公開URLがクリップボードにコピーされ、Substack Notes コンポーザーが新規タブで開き、「貼り付けて投稿してください」のフィードバックが表示される。共有文は編集しやすい定数で一元管理する。
-**Depends on**: Phase 37（共有先の公開URLを参照するため）
-**Requirements**: SHARE-01, SHARE-02, SHARE-03, SHARE-04, SHARE-05, SHARE-06
+</details>
+
+---
+
+## 🚧 v1.10 Substack Notes PoC (Phases 40-42) — IN PROGRESS
+
+**Milestone Goal:** Substack の Note 領域（コメント・投稿一覧）のデータ取得可否を PoC で検証し、コメント可視化と Note 一覧取得の2機能を試作する。フィージビリティ・ゲート型 PoC — Phase 40 で取得可否を実測し go/no-go を判定する。
+
+- [ ] **Phase 40: 取得可否スパイク（go/no-go ゲート）** - 非公式エンドポイントから admin Note 一覧・特定 Note コメントを取得できるかを本番/preview Vercel から実測。取得可否レポート + 生 JSON サンプル + 採用エンドポイント表を成果物とする捨てスパイク。取得不可の負の結果も有効なクローズ（SPIKE-01, SPIKE-02）
+- [x] **Phase 41: 機能2 Note一覧（永続化なし）** - `/admin/notes` の Server Component で admin の Note 一覧を都度 fetch し表示（本文プレビュー + 投稿日時 JST、永続化なし、失敗/0件状態表示）（NOTE-01..03） (completed 2026-06-18)
+- [ ] **Phase 42: 機能1 コメント可視化（キャッシュ基盤 + 永続化）** - Note URL/ID 入力フォーム → コメント件数/本文/名前/アイコンを表示し、`note_comments` テーブルに Supabase キャッシュ（鮮度判定 + 手動 force 再取得、失敗/0件/キャッシュ無の状態表示）（COMMENT-01..06）
+
+### Phase 40: 取得可否スパイク（go/no-go ゲート）
+**Goal**: 非公式 Substack エンドポイントで「(a)admin の Note 一覧 (b)特定 Note のコメント が、本番/preview Vercel から正当な手段で取得できるか・どう取れるか」を実測し、go/no-go を判定する。動く UI ではなく検証成果物を出す捨てスパイク。
+**Depends on**: Phase 39 (v1.9 完了)
+**Requirements**: SPIKE-01, SPIKE-02
 **Success Criteria** (what must be TRUE):
-  1. 対象4ビューに再利用可能な `<ShareButton>` が表示され、配置を1行差し替えで移動できる（SHARE-01）
-  2. 共有ボタンを押すと、定型文+ハッシュタグ+対象ビューの公開URLがクリップボードにコピーされ、続けて `https://substack.com/notes` が新規タブで開く（SHARE-02/03）
-  3. コピー完了とともに「貼り付けて投稿してください」を伝える toast 等のフィードバックが表示される（SHARE-04）
-  4. 共有テキストの定型文・ハッシュタグが `lib/share.ts` 等の定数として一元管理され、文面変更がそこ1か所で完結する（SHARE-05）
-  5. 共有ボタンは既定でログイン済みユーザーのみ表示され、全員表示へはフラグ1か所の変更で切り替えられる（SHARE-06）
+  1. 開発者は、admin Note 一覧 / 特定 Note コメントそれぞれについて、認証要否・**本番（または preview）Vercel からの到達性**・レスポンス JSON の実フィールド名（コメント本文・コメント者名・アバター URL・各種カウント）を記載した取得可否レポートを参照できる
+  2. 開発者は、実取得した生 JSON サンプルと採用エンドポイント表（URL・必要ヘッダー・cookie 要否）を成果物として参照できる
+  3. レポートに go（取得可・後続フェーズへ）/ no-go（取得不可）の明確な判断が記録されている
+  4. no-go の場合でも、不可の理由と試した手段が文書化され、PoC が**有効な成果としてクローズ**できる（負の結果が失敗ではなく正当な完了として扱われる）
 **Plans**: TBD
+
+### Phase 41: 機能2 Note一覧（永続化なし）
+**Goal**: go 判定後、admin（開発者本人）が投稿した Substack Note の一覧を、DB を経由せずサーバー側で都度取得して画面に表示できる。
+**Depends on**: Phase 40 (go 判定)
+**Requirements**: NOTE-01, NOTE-02, NOTE-03
+**Success Criteria** (what must be TRUE):
+  1. admin は `/admin/notes` で自分が投稿した Note の一覧を取得・表示できる（毎回サーバー側 fetch・永続化なし）
+  2. 各 Note に本文プレビューと投稿日時（JST）が表示される
+  3. 取得失敗・0件の状態が画面に明示される
+**Plans**: 1 plan
+- [x] 41-01-PLAN.md — 取得層 lib/notes.ts（fetchAdminNotes/parseNoteFeed・判別ユニオン）+ /admin/notes RSC ページ + env 設定
 **UI hint**: yes
 
-### Phase 39: リンクプレビュー（OGメタタグ + 動的OG画像）
-**Goal**: 共有された公開URLを Substack Notes / SNS に貼ると、その人の草・実績が見えるリッチなリンクプレビューが表示される。OGメタタグと Next.js `ImageResponse` による動的OG画像を出力する。
-**Depends on**: Phase 37（プレビュー対象となる公開URL）。Phase 38 と並行可だが、共有体験の総仕上げとして最後に置く。
-**Requirements**: OGP-01, OGP-02
+### Phase 42: 機能1 コメント可視化（キャッシュ基盤 + 永続化）
+**Goal**: ユーザーが Note の URL/ID を指定すると、その Note のコメント件数・本文一覧・コメント者の名前/アイコンが表示され、取得結果が Supabase にキャッシュされて再取得を避けられる。
+**Depends on**: Phase 40 (go 判定), Phase 41 (取得層 `lib/notes.ts` の安定化)
+**Requirements**: COMMENT-01, COMMENT-02, COMMENT-03, COMMENT-04, COMMENT-05, COMMENT-06
 **Success Criteria** (what must be TRUE):
-  1. 共有対象ルートに `og:title` / `og:description` / `og:image` / Twitter Card が出力され、リンクデバッガ等でプレビューカードが正しく認識される（OGP-01）
-  2. 共有対象ルートに、対象メンバー/ビューの草・実績が見える動的OG画像が Next.js `ImageResponse`（`opengraph-image`）で生成され、`og:image` として配信される（OGP-02）
-  3. 個人ビュー `/member/[id]` を共有したとき、そのメンバー固有の内容を反映したOG画像がプレビューに表示される
-**Plans**: 1 plan
-- [x] 39-PLAN.md — OGメタタグ修正 + 純関数ヘルパ + 動的OG画像（メンバー専用 + サイト共通デフォルト） — completed 2026-06-14
+  1. ユーザーは Note の URL/ID を入力フォームで指定でき（寛容なパース）、指定 Note のコメント件数が表示される
+  2. コメント本文の一覧（フラット）が、各コメント者の名前とアイコン付きで表示される（アイコン取得不可時はイニシャル/プレースホルダにフォールバック）
+  3. 取得したコメントが `note_comments` テーブルに Supabase キャッシュ保存され、`fetched_at` 鮮度判定で再取得が回避され、手動 force 再取得もできる
+  4. 取得失敗・0件・キャッシュ無の状態が画面に明示される
+**Plans**: 2 plans
+- [x] 42-01-PLAN.md — note_comments スキーマ追記 + キャッシュ層 lib/comments.ts（parse群/鮮度判定/fetch&retry/getNoteComments）+ vitest
+- [ ] 42-02-PLAN.md — 公開 /notes ページ（入力フォーム/件数/フラット一覧/名前+アイコン fallback/force/3状態）
 **UI hint**: yes
 
 ---
@@ -226,6 +240,9 @@ Full phase details for shipped milestones live in their archives under `.plannin
 | 34. UI Polish バッチ | v1.8 | 5/5 | Complete    | 2026-06-08 |
 | 35. チーム可視性拡張 + Google Analytics | v1.8 | 3/3 | Complete    | 2026-06-08 |
 | 36. QA・UAT・検証ギャップ解消 | v1.8 | 4/4 | Complete    | 2026-06-08 |
-| 37. 共有URLの状態保持（公開URL化） | v1.9 | 0/0 | Not started | - |
-| 38. ワンボタン共有（クリップボード + Substack Notes 起動） | v1.9 | 0/0 | Not started | - |
+| 37. 共有URLの状態保持（公開URL化） | v1.9 | 1/1 | Complete | 2026-06-16 |
+| 38. ワンボタン共有（クリップボード + Substack Notes 起動） | v1.9 | 1/1 | Complete | 2026-06-14 |
 | 39. リンクプレビュー（OGメタタグ + 動的OG画像） | v1.9 | 1/1 | Complete | 2026-06-14 |
+| 40. 取得可否スパイク（go/no-go ゲート） | v1.10 | 0/0 | Not started | - |
+| 41. 機能2 Note一覧（永続化なし） | v1.10 | 1/1 | Complete   | 2026-06-18 |
+| 42. 機能1 コメント可視化（キャッシュ基盤 + 永続化） | v1.10 | 1/2 | In Progress | 2026-06-18 |

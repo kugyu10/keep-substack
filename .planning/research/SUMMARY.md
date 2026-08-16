@@ -1,240 +1,152 @@
-# Research Summary: v1.5 Member Auth + Supabase Migration
+# Project Research Summary
 
-**Project:** keep-substack
-**Domain:** Substack継続コミュニティ向けRSS活動可視化ツール
-**Researched:** 2026-05-16
-**Confidence:** HIGH
+**Project:** keep-substack — v1.10 Substack Notes PoC（コメント可視化 & Note一覧取得）
+**Domain:** Substack Notes 領域の読み取り可視化（非公式エンドポイント経由のデータ取得）
+**Researched:** 2026-06-18
+**Confidence:** MEDIUM（ライブラリ／既存統合は HIGH、Substack 側の到達性・データ形状は LOW〜MEDIUM・実証必須）
 
 ## Executive Summary
 
-v1.5のコアテーマは「管理者依存の排除」と「データ基盤の刷新」の2軸を同時に進めることにある。Upstash RedisをSupabase PostgreSQLへ移行することでAuth統合・長期履歴・RLS（行レベルセキュリティ）が初めて実現し、メンバーが自律的にプロフィールを管理できるようになる。認証方式はMagic Link（メールOTP）一択とし、パスワード管理のUXコストを排除するKISS原則に合致した設計を採用する。新規追加パッケージは`@supabase/supabase-js ^2.105.4`と`@supabase/ssr ^0.10.3`の2つのみで、`@upstash/redis`を削除する。
+これは**フィージビリティ・ゲート型の PoC** である。Substack には Notes/コメントを取得する公式 API が存在しない（公式 Developer API は LinkedIn 連携プロフィール照会のみ）。本 PoC の全機能は、Substack web アプリが内部利用する**未文書化エンドポイント** `https://{pub}.substack.com/api/v1/...` に依存し、`substack.sid`（旧 `connect.sid`）セッション cookie 認証が前提になる。技術的な「取れるかどうか」自体が最大かつ唯一の致命的依存であり、UI・DB・要件確定はすべてその後に来る。
 
-移行戦略の最重要原則は「段階的デプロイ」である。RedisとSupabaseを並行稼働させ、データ整合性を確認しながら読み取り→書き込み→削除の順に切り替える3フェーズ移行を守ることで、ダウンタイムなしに本番環境を移行できる。既存の`getMembers`/`getArticles`等の関数シグネチャは変更せず、内部実装のみを差し替えることで呼び出し元への影響をゼロに抑える（v1.3のfetchAllFeedsCachedシグネチャ維持の教訓を踏襲する）。
+推奨アプローチは明確で、**捨てる前提の取得スパイクを最優先する**こと。`curl`／単発スクリプトで (a) 認証要否、(b) **本番 Vercel serverless IP からの到達性**、(c) レスポンス JSON の実フィールド名（特にコメント本文・コメント者名・アバター URL・件数）を実測し、go/no-go を出す。取得が通った後にのみ、機能2（admin の Note 一覧・永続化なし・Server Component で都度 fetch）→ `note_comments` スキーマ → 機能1（Server Action による cache-aside ＋ Supabase 永続化）の順で組む。実装は既存 `fetchFeed.ts`／`articles.ts` の双子として `lib/notes.ts`／`lib/noteComments.ts` を作り、`/admin/notes` 配下（既存 middleware ガード済み）に置く。新規ライブラリは TS ネイティブの `substack-api` が第一候補だが、PoC では生 `fetch` でも成立する。
 
-最大リスクはミドルウェア移行時の認証競合とCronタイムアウトの2点である。`middleware.ts`はNext.js 16対応で`proxy.ts`に改名が必要であり、既存のBasic Auth（/admin保護）とSupabase Auth（/my保護）を同一ファイルで合成する設計が求められる。またCronの並列フィードフェッチとSupabase INSERT追加でVercel Hobby枠の10秒タイムアウトに抵触するリスクがあり、`maxDuration`設定と`Promise.allSettled`による並列化を事前に対処する必要がある。
+最大リスクは**「ローカルでは取れるが本番 Vercel から 403/429 で取れない」**こと（データセンター IP・TLS フィンガープリント・anti-bot）。これに対し residential proxy 等で無理に突破するのは PoC のスコープ外であり明確な over-engineering。低頻度・ブラウザ相当ヘッダー・1 req/sec で正当に取れなければ、**「取得不可」を負の結果として文書化してクローズすること自体が有効な PoC 成果**である（v1.9 の Note prefill 不可確定と同じ価値）。この negative-result fallback を要件・成功条件に明記しておくことが、UI/DB の作り込みが無駄になるのを防ぐ。
 
----
+## Key Findings
 
-## Stack Additions
+### Recommended Stack
 
-### 追加するパッケージ
+公式 API は使えないため、非公式 `/api/v1` を叩く方針に一本化。ライブラリ層は TS ネイティブの `substack-api`（`profile.notes()` と `post.comments()` が PoC 2機能にほぼ 1:1 対応、内蔵レートリミッタあり）が有力だが、PoC では標準 `fetch` でも成立する。永続化は既存 Supabase をそのまま流用。取得は**必ずサーバー側**（cookie/token をクライアントに出さない、Node ランタイム推奨）。詳細は [STACK.md](./STACK.md)。
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| `@supabase/supabase-js` | `^2.105.4` | SupabaseクライアントDB操作・Auth |
-| `@supabase/ssr` | `^0.10.3` | Next.js App Router向けSSRセッション管理 |
+**Core technologies:**
+- `substack-api`（TS, 任意）または標準 `fetch`：Substack 非公式 API への型付き／素のアクセス — TS スタックに自然に乗り、`notes()`/`comments()` が要件に直結。PoC は生 fetch でも可
+- 既存 `@supabase/supabase-js` 2.x：機能1 のコメントキャッシュ永続化 — 新規依存ゼロ、`createSupabaseAdminClient()` + upsert の既存パターン流用
+- 既存 Next.js Server Action / Server Component（Node ランタイム）：サーバー専用フェッチ — `substack.sid` cookie を秘匿（env `SUBSTACK_SESSION_COOKIE`）
 
-```bash
-npm install @supabase/supabase-js @supabase/ssr
-npm uninstall @upstash/redis
-```
+### Expected Features
 
-### 削除するパッケージ
+詳細は [FEATURES.md](./FEATURES.md)。すべて「取れた場合に何を表示するか」を定義したもので、取れないフィールドは degrade（落とす）前提。
 
-| Package | 理由 |
-|---------|------|
-| `@upstash/redis` | Supabase PostgreSQLへ完全移行するため不要 |
+**Must have (table stakes):**
+- 機能1: Note URL/ID 入力フォーム（寛容なパース）+ コメント件数 + 本文一覧（フラット）+ コメント者名 — 機能の核
+- 機能1: Supabase キャッシュ（再取得回避）+ 取得失敗/0件/キャッシュ無の状態表示
+- 機能1: コメント者アイコン（取れれば。欠損はイニシャル/プレースホルダにフォールバック）— 視覚忠実さの要求
+- 機能2: admin の Note 一覧取得・表示（毎回取得・永続化なし）+ 本文プレビュー + 投稿日時(JST)
+- 機能2: 取得失敗/0件の状態表示
 
-### 追加しない（YAGNI）
+**Should have (competitive):**
+- コメントの投稿日時(JST)・リアクション数 — 取得フィールド確認後に追加
+- Note 一覧のいいね/返信/restack 数・直リンク・取得時刻表示 — 鮮度明示
+- コメント者の Substack プロフィールリンク — handle が取れる場合のみ
 
-- `@supabase/auth-helpers-nextjs` — 非推奨。`@supabase/ssr`で完全代替済み
-- Prisma / Drizzle ORM — Supabase JS Clientで十分
-- `react-hook-form` / `zod` — 既存パターンで対応可能
-- Supabase Storage / Real-time — ISR+Cronで十分
+**Defer (v2+):**
+- 返信スレッドのネスト表示（PoC はフラットで十分）
+- 機能2 の対象拡張（admin→メンバー→任意ユーザー）
+- リッチテキスト/画像/埋め込みの完全再現、ページネーション/全件取得
 
-### 新規環境変数
+### Architecture Approach
 
-| Variable | 公開 | 用途 |
-|----------|------|------|
-| `NEXT_PUBLIC_SUPABASE_URL` | YES | Supabaseプロジェクトエンドポイント |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | YES | RLSで制御、公開安全 |
-| `SUPABASE_SERVICE_ROLE_KEY` | NO | Cron・マイグレーション専用（RLSバイパス） |
+既存 Next.js App Router / Supabase / Vercel に最小追加。Substack 取得はサーバー側固定（ブラウザ直叩きは CORS + cookie 露出で不可）。機能1 は Server Action（cache-aside + TTL + force 再取得フラグ）、機能2 は Server Component で都度 fetch（DB 非経由）。`/admin/notes` 配下に置けば既存 `middleware.ts` の認証ガードがそのまま効く。詳細は [ARCHITECTURE.md](./ARCHITECTURE.md)。
 
----
+**Major components:**
+1. `lib/notes.ts`（新規, `server-only`）— Substack 非公式 API へのサーバー専用 fetch + JSON 整形。`fetchFeed.ts` の双子
+2. `lib/noteComments.ts`（新規）— `note_comments` の read/upsert + キャッシュ鮮度判定。`articles.ts` の双子
+3. Server Action `fetchAndCacheComments` + `/admin/notes` RSC + `NoteCommentForm`/`NoteCommentList` — 表示・制御フロー
+4. `note_comments` テーブル（複合 PK `note_id, comment_id`、`fetched_at` で鮮度判定、service_role 経由に閉じる）
 
-## Feature Table Stakes
+### Critical Pitfalls
 
-### Supabase Auth + メンバー自己管理（コア）
+[PITFALLS.md](./PITFALLS.md) より最重要を抜粋。
 
-| 機能 | 理由 |
-|------|------|
-| Magic Linkログイン（メールOTP） | パスワードUI不要、KISS原則に合致 |
-| ログイン後プロフィール編集（substackId・チーム） | 管理者依存排除の核心 |
-| ログアウト機能 | セッション管理の基本 |
-| 未ログインで/myにアクセス不可 | セキュリティ最低ライン |
-| 公開ページ（ヒートマップ）は認証なし閲覧可 | v1.0からの要件を壊さない |
-| 自分のデータのみ編集可（RLS） | 他人のプロフィール変更を防ぐ |
+1. **取得可否を検証する前に UI/DB を作り込む** — 最初を throwaway スパイクにし、生 JSON サンプル + 取得可否レポートが UI 着手前に存在することを必須にする
+2. **ローカルで動いたものが本番 Vercel IP から 403/429 でブロックされる** — Phase 1 で必ず preview/本番から実リクエストを撃つ。ブラウザ相当ヘッダー + 1 req/sec。解けなければ proxy で深追いせず Fallback へ
+3. **認証 cookie 要否の誤認** — 機能ごとに実測（機能1=公開コメント寄り / 機能2=admin 自身で認証必須寄り）。cookie 名は env 切替、フロント/NEXT_PUBLIC_ に絶対出さない
+4. **非公式エンドポイントの不安定性（ハンドル変更404・形状変更で全壊）** — 防御的パース（optional/try-catch）、安定 ID をキーに、URL/ヘッダーを定数1か所に集約、生 JSON 保存
+5. **PoC の過剰作り込み** — 成功条件を「取れるか・どう取れるかが分かること」に固定。proxy/TLS偽装/汎用化/全メンバー対応は非ゴール
 
-### 長期記事履歴
+## Implications for Roadmap
 
-| 機能 | 理由 |
-|------|------|
-| 記事をappend-onlyで永続保存 | 1ヶ月以上のヒートマップ実現 |
-| URLによるdeduplication | 既存ロジックをUNIQUE制約で維持 |
-| Vercel Cron日次フィード取得継続 | v1.3から稼働中、書き込み先変更のみ |
-| pubDateのUTC保存・JST表示 | タイムゾーン正規化 |
+Based on research, suggested phase structure（取得スパイク先行が研究全体の一貫した強い推奨）:
 
-### 管理画面チーム管理UI
+### Phase 1: 取得可否スパイク（go/no-go ゲート）
+**Rationale:** 全機能の根が「非公式 API で本当に取れるか」。机上では確定できない (a)認証要否 (b)本番 Vercel 到達性 (c)JSON 実形状 を実測しない限り、後続すべてが手戻りリスク。研究 4 本が口を揃えて最優先指定。
+**Delivers:** 動く UI ではなく **取得可否レポート + 生 JSON サンプル + 採用エンドポイント表 + go/no-go 判断**。本番 Vercel(または preview)からの実リクエスト結果を含む。
+**Addresses:** 全 table-stakes の前提検証（特にコメント本文・著者名・アバター URL・各種カウントのフィールド名確定）
+**Avoids:** Pitfall 1（検証前作り込み）/ Pitfall 4（本番 IP ブロック）/ Pitfall 3（認証要否誤認）
+**Includes negative-result fallback:** ここで「正当な手段では本番から取れない」と判明したら、(3)手入力フォールバックで可視化 UI のみ残す、または (4)**「取得不可」を文書化してクローズ** ＝ 有効な PoC 成果として終える分岐を用意する。
 
-| 機能 | 理由 |
-|------|------|
-| チェックボックスでチーム選択 | カンマ区切りタイポ問題の根本解決 |
-| 既存チーム名リストから選択 | タイポ・大文字小文字不一致を防ぐ |
-| チームなし状態を許容 | `teamNames: []`が有効な状態として維持 |
+### Phase 2: 機能2（Note 一覧・永続化なし）
+**Rationale:** go 判定後、DB 不要で最小。取得検証の自然な延長で、Server Component の都度 fetch だけで成立。機能1 より依存が少なく早く形になる。
+**Delivers:** `/admin/notes` RSC + `lib/notes.fetchAdminNotes()` + 一覧 UI（本文プレビュー + 投稿日時 JST + 取得時刻表示）
+**Uses:** `lib/notes.ts`（server-only fetch）, 既存 middleware ガード
+**Implements:** Architecture Pattern 3（Ephemeral RSC fetch、`force-dynamic`、DB 非経由）
 
-### Defer（v1.5スコープ外）
+### Phase 3: コメントキャッシュ基盤
+**Rationale:** 機能1 の永続化に必要な土台を、UI と分離して先に固める。schema.sql（正規ソース）追記 + 本番 SQL Editor 適用という既存運用に乗せる。
+**Delivers:** `note_comments` テーブル（複合 PK・`fetched_at` 鮮度・RLS service_role 限定）+ `lib/noteComments.ts`（read/upsert + 鮮度判定）
 
-- 年間ヒートマップ（GitHub草型） — データ蓄積1ヶ月以上が前提
-- 承認制メンバー登録フロー — 信頼ベースコミュニティで当面不要
-- ストリーク表示 — データ蓄積後にv1.6で対応
+### Phase 4: 機能1（コメント可視化・永続化あり）
+**Rationale:** 最も依存が多い（取得 + キャッシュ + 表示 + フォーム）ため最後。Phase 1〜3 が揃って初めて安全に組める。
+**Delivers:** Server Action `fetchAndCacheComments`（cache-aside + TTL + force 再取得）+ `NoteCommentForm` + `NoteCommentList`（件数/本文/名前/アイコン）+ `/admin` リンク追加
+**Addresses:** 機能1 の全 table-stakes（アイコンは degrade 可）
+**Avoids:** Pitfall 5（防御的パース・定数集約）/ Pitfall 6（素の `<img>` + onError フォールバック、remotePatterns 追加なし）/ Pitfall 7（fetched_at 表示 + 手動再取得）/ Security（cookie 秘匿・本文はエスケープ描画で XSS 防止）
 
----
+### Phase Ordering Rationale
 
-## Architecture Notes
+- **取得可否がすべての前提**：研究 4 本が一致して「スパイク先行・go/no-go ゲート」を要求。ここを飛ばすと最大の手戻りが発生する
+- **永続化なし(機能2) → 永続化あり(機能1) の順**：依存の少ない機能2 を先に出すことで、取得層 `lib/notes.ts` を低リスクで検証・安定化してから、キャッシュ層を重ねられる
+- **責務分離の厳守**：機能2 を永続化しない／機能1 のみキャッシュ、という方針を混ぜないことで検証結果が読める（Anti-Pattern 2）
+- **negative-result が一級市民**：Phase 1 で no-go なら以降は設計のみで停止し、文書化してクローズする経路を最初から持つ
 
-### Key Integration Patterns
+### Research Flags
 
-**Supabaseクライアント3種類の使い分け:**
+Phases likely needing deeper research during planning:
+- **Phase 1（取得可否スパイク）:** 最重要。非公式・未文書化 API のため、実 cookie での本番 Vercel 到達性とレスポンス実形状を実証する必要あり。`/gsd:plan-phase --research-phase 1` 相当の実測作業がフェーズ本体
+- **Phase 4（機能1）:** アバター URL のフィールド名・Note 自体のコメント取得可否（Post コメントより未成熟・UNCERTAIN）が未確定。Phase 1 の生 JSON 結果に依存して詳細が決まる
 
-| ファイル | クライアント種別 | 用途 |
-|---------|----------------|------|
-| `src/lib/supabase/server.ts` | `createServerClient`（anon key） | Server Component・Server Action |
-| `src/lib/supabase/client.ts` | `createBrowserClient`（anon key） | Client Component（ログインUIなど） |
-| `src/lib/supabase/admin.ts` | `createClient`（service role key） | Cron・マイグレーションのみ |
-
-**重要ルール:**
-- Server Componentでのユーザー確認は必ず`getUser()`を使う（`getSession()`はセキュリティホール）
-- `SUPABASE_SERVICE_ROLE_KEY`はClient Componentに絶対インポートしない
-- 公開ISRページ（`/`、`/member/[substackId]`）ではSupabase Authクライアントを使わない
-
-**認証ルートと公開ルートの完全分離:**
-
-```
-/                       ISR（revalidate=300）— 認証なし
-/member/[substackId]    ISR — 認証なし
-/my/*                   force-dynamic — Supabase Auth保護
-/admin/*                Basic Auth継続
-/login                  Static — ログインフォーム
-/auth/callback          Route Handler — PKCEコード交換
-```
-
-**メンバー自己リンクフロー（KISS選択）:**
-1. メンバーがMagic Linkでログイン
-2. `/my`ページで自分の`substackId`を入力してプロフィールを紐付け
-3. `members.user_id = auth.users.id`が確立される
-4. 以降は`user_id`でRLSが自分のデータのみ編集を許可
-
-**Next.js 16対応（必須変更）:**
-- `src/middleware.ts` → `src/proxy.ts`（`middleware()`→`proxy()`）にリネーム
-- Edge Runtimeは`proxy.ts`で非サポート（Node.js固定）→ Supabase SSRが正常動作
-
-### Build Order Recommendation
-
-依存関係に基づく実装順序（5フェーズ）:
-
-1. **Supabase Setup + Schema** — プロジェクト作成・テーブル定義・RLS・環境変数設定
-2. **Data Migration（Redis→Supabase）** — 移行スクリプト実行・デュアルライト1Cronサイクル検証
-3. **Data Layer Swap** — 読み取りをSupabaseに切り替え・確認後にRedisを廃止・proxy.tsリネーム
-4. **Supabase Auth** — Magic Linkログイン・`/my`ページ・メンバー自己リンク
-5. **Admin UI Checkbox + Cleanup** — チェックボックスUI・Redisパッケージ削除・不要ファイル削除
-
-Admin UI Team Checkboxは既存KVのままでも実施可能なため、最序盤（Phase 1前）に先行実装するとリスク分散になる。
-
----
-
-## Watch Out For
-
-### 1. デュアルライトなしの一括切り替え（最大リスク）
-
-**何が起きるか:** Redis→Supabaseを一括切り替えするとデプロイ瞬間にデータが空になる。ISRキャッシュが古いデータを返し続けるため一見動作するが、再ビルドで全404になる。
-
-**対策:** 必ず段階デプロイを守る。Supabaseデータ投入→読み取り先切替→書き込み先切替→Redis削除の順番を崩さない。少なくとも2Cronサイクル後にRedisを削除する。
-
-### 2. `getSession()`をサーバーサイドで使用（セキュリティホール）
-
-**何が起きるか:** `getSession()`はCookieを無検証で信頼する。攻撃者が偽造Cookieで認証済みのふりができる。
-
-**対策:** サーバーサイドでのユーザー確認は必ず`supabase.auth.getUser()`を使う。`getSession()`はClient Componentでの表示確認用のみ。
-
-### 3. ISRページにAuth処理が混入→CDNセッション漏洩
-
-**何が起きるか:** ISRページでセッションrefreshが起きると`Set-Cookie`ヘッダーがVercel CDNにキャッシュされ、別ユーザーのセッションが漏洩する。
-
-**対策:** 公開ページ（`/`、`/member/*`）ではSupabase Authクライアントを一切使わない。認証が必要なページには`export const dynamic = 'force-dynamic'`を設定する。
-
-### 4. middleware競合（Basic Auth + Supabase Auth）
-
-**何が起きるか:** Supabase推奨の広域matcherに書き換えると既存のBasic Authロジックが消えるか、無限リダイレクトループが発生する。
-
-**対策:** `proxy.ts`内でパスを明示的に分岐。`/admin`はBasic Auth、`/my`はSupabase Authセッション確認を合成する構造にする。matcherは広域を採用し内部でルート分岐させる。
-
-### 5. Cron 10秒タイムアウト（Vercel Hobby枠）
-
-**何が起きるか:** 50人フィードの逐次フェッチ（約10秒）にSupabase INSERT追加でVercel Hobby枠の10秒タイムアウトを超過する。
-
-**対策:** `export const maxDuration = 60`を`cron/route.ts`に設定し、フィードフェッチを`Promise.allSettled`で並列化する。Supabase接続枯渇との兼ね合いでTransaction Pooler（port 6543）必須。
-
----
-
-## Open Questions
-
-実装開始前に決定が必要な未解決事項。
-
-| 質問 | 影響範囲 | 推奨アクション |
-|------|---------|---------------|
-| メンバー自己リンクの「なりすまし」対策をどこまで行うか | `/my/actions.ts`の`linkMemberAccount` | `user_id is null`チェックのみで十分か検討。悪意ある上書きは管理者が手動削除で対応する方針なら実装シンプル化可 |
-| `proxy.ts`のNext.js 16移行タイミング | Phase 3 or Phase 4 | Auth追加前（Phase 3）に済ませると混乱が少ない。ARCHITECTURE.mdもPhase 3同時実施を推奨 |
-| Supabase Free Tier「7日間停止」をどう保証するか | Supabaseプロジェクト継続性 | Cronが毎日DB書き込みすれば自動回避。Cronが停止した場合のGitHub Actions ping設定を検討する |
-| Vercel `maxDuration = 60`はHobbyプランで機能するか | Cronタイムアウト対策 | Vercel Hobbyは最大60秒まで設定可能とされるが、Vercelダッシュボードで実際に確認する |
-| Magic Linkレート制限（3通/時間・60秒間隔）のUI告知 | `/login`ページ | ログインフォームに説明文を入れるだけでよい。実装コスト低 |
-
----
+Phases with standard patterns (skip research-phase):
+- **Phase 2（機能2）:** 既存 `fetchFeed.ts` の RSC fetch パターンの踏襲で、統合点は HIGH confidence
+- **Phase 3（キャッシュ基盤）:** 既存 `articles.ts` + Supabase upsert + schema.sql 運用の確立パターン
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | npm確認済み（2026-05-16）。バージョン確定。非推奨パッケージの特定完了 |
-| Features | HIGH | 既存コードベース実地確認 + Supabase公式ドキュメント。優先順位明確 |
-| Architecture | HIGH | Next.js 16公式・Supabase SSR Context7・公式ドキュメントで検証済み |
-| Pitfalls | HIGH | Supabase公式・Vercel公式・GitHub Discussion実例まで確認済み |
+| Stack | MEDIUM | ライブラリ層（`substack-api`）は Context7 検証で HIGH。Substack 側の安定性・認証は本質的に LOW |
+| Features | MEDIUM | データ形状は複数の逆解析情報源で一致。ただし全機能が「取得可否」に依存、アバター等フィールド名は未確定 |
+| Architecture | HIGH / MEDIUM | 既存コードベース統合点は HIGH（実コード参照）。Substack 非公式エンドポイント仕様は MEDIUM |
+| Pitfalls | MEDIUM | 非公式 API 挙動は要実証。法務（ToS）・Vercel IP の anti-bot は HIGH 寄りの確度 |
 
-**Overall confidence:** HIGH
+**Overall confidence:** MEDIUM（PoC 自体が「不確実性を解消する」ことを目的にしているため、この MEDIUM は想定どおり）
 
 ### Gaps to Address
 
-- **`maxDuration = 60`のHobbyプラン有効性:** Vercelダッシュボードで実際の設定値を確認する（Phase 1開始時）
-- **RLSポリシーの詳細設計:** スキーマ概要は確定しているが、自己リンクフロー中の権限遷移（user_id = null → user_id設定）のポリシー実装詳細は実装時に確認が必要
-- **Supabase Auth Emailレート制限（3通/時間）の体験影響:** ローンチ時に複数人が同時サインアップした場合の対応策（OAuth追加など）を要検討
-
----
+- **本番 Vercel からの到達性（最大ギャップ）:** ローカル成功 ≠ 本番成功。Phase 1 で preview/prod から実リクエストを撃って解消。解けなければ negative-result fallback で確定
+- **コメント者アバター URL の実フィールド名（`photo_url` 等）:** 情報源で未確定。Phase 1 の生 JSON 採取で確定。それまで欠損前提（プレースホルダ）で設計
+- **Note 自体のコメント取得可否:** Post コメントより未成熟・UNCERTAIN。取れなければ機能1 のスコープを「Post のコメント可視化」に読み替える分岐を要件で用意
+- **認証 cookie の機能別要否と失効運用:** Phase 1 で機能ごとに実測。失効時の 401 検知 UI を Phase 4 で用意
 
 ## Sources
 
-### Primary（HIGH confidence）
+### Primary (HIGH confidence)
+- Context7 `/jakub-k-slys/substack-api` — SubstackClient 設定、`profileForSlug`/`postForId`、`profile.notes()`/`post.comments()`、Comment/Note エンティティ定義
+- 既存コードベース — `src/lib/fetchFeed.ts`, `src/lib/articles.ts`, `src/app/(main)/admin/page.tsx`, `supabase/schema.sql`, `src/middleware.ts`
+- [Substack Developer API — support.substack.com](https://support.substack.com/hc/en-us/articles/45099095296916-Substack-Developer-API) — 公式 API は LinkedIn 連携プロフィールのみ＝Notes/コメント非対応
+- [Substack Terms of Use](https://substack.com/tos) — scraping/crawling/automated access/bulk copying を禁止
 
-- [@supabase/supabase-js npm](https://www.npmjs.com/package/@supabase/supabase-js) — v2.105.4確認済み（2026-05-16）
-- [@supabase/ssr npm](https://www.npmjs.com/package/@supabase/ssr) — v0.10.3確認済み（2026-05-16）
-- [Supabase SSR Context7](https://context7.com/supabase/ssr/llms.txt) — Next.js App Router統合パターン
-- [Supabase Auth Server-Side Next.js](https://supabase.com/docs/guides/auth/server-side/nextjs) — getUser()必須の根拠、middleware設定
-- [Supabase Auth Magic Link](https://supabase.com/docs/guides/auth/auth-email-passwordless) — signInWithOtp仕様、レート制限
-- [Next.js 16 Upgrade Guide](https://nextjs.org/docs/app/guides/upgrading/version-16) — middleware→proxy、revalidateTag変更（2026-05-13更新）
-- [Supabase Connect to Postgres](https://supabase.com/docs/guides/database/connecting-to-postgres) — Supavisor Transaction Mode、port 6543
-- [Supabase RLS GitHub](https://github.com/supabase/supabase/blob/master/apps/docs/content/guides/database/postgres/row-level-security.mdx) — auth.uid()ポリシーパターン
+### Secondary (MEDIUM confidence)
+- [No official API? How I reverse-engineered Substack API — slys.dev](https://iam.slys.dev/p/no-official-api-no-problem-how-i) — 生エンドポイント、cookie 認証、推奨ヘッダー、~1req/sec
+- [Developing a Custom Substack Front-end — Matt Hagy](https://matthagy.substack.com/p/developing-a-custom-substack-front) — comment object フィールド（id/body/name/date/reactions/children）
+- [NHagar/substack_api (Python)](https://github.com/NHagar/substack_api) — Limitations: API 予告なく変更/レート制限/ハンドル変更で旧エンドポイント404
+- [Why Serverless Functions Get Challenged by Cloudflare](https://medium.com/@ceamkrier/why-serverless-functions-get-challenged-by-cloudflare-581181433d67) — serverless データセンター IP が anti-bot に検知される
+- [403 Forbidden Web Scraping — Scrapfly](https://scrapfly.io/blog/posts/403-forbidden-web-scraping) — datacenter IP/JA3 TLS フィンガープリント/ヘッダーによる 403
 
-### Secondary（MEDIUM confidence）
-
-- [Supabase Free Tier Limits 2026](https://aiagencyplus.com/supabase-free-tier-limits/) — 接続数上限25〜30直接/200プーラー
-- [Vercel Functions Limitations](https://vercel.com/docs/functions/limitations) — Hobby 10秒タイムアウト
-- [GitHub Discussion #81445](https://github.com/vercel/next.js/discussions/81445) — cookies()非同期問題（未解決報告あり）
-- [Supabase Discussion #18986](https://github.com/orgs/supabase/discussions/18986) — 接続枯渇実例
-- [Supabase Troubleshooting Next.js Auth](https://supabase.com/docs/guides/troubleshooting/how-do-you-troubleshoot-nextjs---supabase-auth-issues-riMCZV) — ISRキャッシュ漏洩、CDNセッション問題
-
-### Tertiary（LOW confidence）
-
-- [Prevent Supabase Free Tier Pausing](https://shadhujan.medium.com/how-to-keep-supabase-free-tier-projects-active-d60fd4a17263) — 7日間停止回避策（実装時に公式で再確認推奨）
+### Tertiary (LOW confidence)
+- WebSearch 集約: profile feed の各 item が `comment` object を内包し reactions/restacks/reply を持つ（要実測）
+- コメント author の avatar 実フィールド名（`photo_url` 等）は未確定 — Phase 1 で生レスポンス採取が必要
+- 内部メモリ: reference-substack-note-no-prefill — 不可能の確定自体が価値という前例（v1.9）
 
 ---
-
-*Research completed: 2026-05-16*
+*Research completed: 2026-06-18*
 *Ready for roadmap: yes*

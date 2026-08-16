@@ -1,6 +1,6 @@
 // Server Component — do NOT add 'use client'
 import Link from 'next/link'
-import type { Member, FeedItem, CommitSlot } from '@/lib/types'
+import type { Member, FeedItem, CommitSlot, MemberGameStats } from '@/lib/types'
 import CommitGrid from './CommitGrid'
 
 type CommitGoalRowProps = {
@@ -10,9 +10,18 @@ type CommitGoalRowProps = {
   imageUrl?: string
   streak: number
   crownEarned: boolean
+  stats?: MemberGameStats
 }
 
-export default function CommitGoalRow({ member, items, slots, imageUrl, streak, crownEarned }: CommitGoalRowProps) {
+export default function CommitGoalRow({
+  member,
+  items,
+  slots,
+  imageUrl,
+  streak,
+  crownEarned,
+  stats,
+}: CommitGoalRowProps) {
   // Group C（hasUser=false）= 未登録: auth ユーザー未連携。淡色で控えめに見せる。
   // Group B（hasUser=true・slots なし）= 未コミットメント とは表示・濃度を分離する。
   const isUnregistered = !member.hasUser
@@ -56,24 +65,35 @@ export default function CommitGoalRow({ member, items, slots, imageUrl, streak, 
         </div>
       )}
 
-      {/* Column 3: Achievement icon
-          👑 = today's week fully complete (crownEarned)
-          🔥 = 2+ consecutive completed weeks (streak >= 2, independent of this week) */}
-      {!crownEarned && streak < 2 ? (
-        <div className="w-10 shrink-0" aria-hidden="true" />
-      ) : crownEarned && streak < 2 ? (
-        <div className="w-10 shrink-0 flex items-center justify-center">
-          <span role="img" aria-label="今週達成" className="text-sm leading-none">👑</span>
-        </div>
-      ) : crownEarned && streak >= 2 ? (
-        <div className="w-10 shrink-0 flex items-center justify-center">
-          <span role="img" aria-label="連続達成" className="text-sm leading-none">👑🔥</span>
-        </div>
-      ) : (
-        <div className="w-10 shrink-0 flex items-center justify-center">
-          <span role="img" aria-label="連続継続中" className="text-sm leading-none">🔥</span>
-        </div>
-      )}
+      {/* Column 3: Achievement badges
+          👑 = today's week fully complete (crownEarned) — unchanged
+          🔥N = weekly streak >= 1 (uncapped; N = consecutive completed weeks)
+          Lv N = level pill, shown whenever stats are available */}
+      <div className="w-14 shrink-0 flex flex-col items-center justify-center gap-0.5">
+        {(crownEarned || streak >= 1) && (
+          <div className="flex items-center justify-center gap-0.5">
+            {crownEarned && (
+              <span role="img" aria-label="今週達成" className="text-sm leading-none">
+                👑
+              </span>
+            )}
+            {streak >= 1 && (
+              <span
+                role="img"
+                aria-label={`連続${streak}週達成`}
+                className="text-sm leading-none"
+              >
+                {`🔥${streak}`}
+              </span>
+            )}
+          </div>
+        )}
+        {stats && (
+          <span className="text-xs px-1.5 rounded-full bg-primary/10 text-primary font-medium leading-tight">
+            {`Lv${stats.level}`}
+          </span>
+        )}
+      </div>
     </div>
   )
 }
