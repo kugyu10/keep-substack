@@ -58,6 +58,32 @@ describe('parseNoteId - 寛容パース（COMMENT-01）', () => {
     expect(parseNoteId('   ')).toBeNull()
   })
 
+  // 回帰ガード: 共有ボタンが吐く URL はクエリに数字を含むので、
+  // 「最後の数字列」を拾う実装だと r=1abc2 の "2" を ID と誤認していた。
+  it('共有 URL（utm_source + r クエリ付き）から正しい ID を抽出する', () => {
+    expect(
+      parseNoteId(
+        'https://substack.com/@uojun/note/c-276780760?utm_source=notes-share-action&r=1abc2'
+      )
+    ).toBe('276780760')
+  })
+
+  it('r クエリのみ付いた共有 URL でも正しい ID を抽出する', () => {
+    expect(parseNoteId('https://substack.com/@uojun/note/c-276780760?r=4xk9z')).toBe('276780760')
+  })
+
+  it('フラグメント付き URL でも正しい ID を抽出する', () => {
+    expect(parseNoteId('https://substack.com/@uojun/note/c-276780760#comment-1')).toBe('276780760')
+  })
+
+  it('末尾スラッシュを許容する', () => {
+    expect(parseNoteId('https://substack.com/@uojun/note/c-276780760/')).toBe('276780760')
+  })
+
+  it('c- も裸の数字末尾も無い URL → null', () => {
+    expect(parseNoteId('https://open.substack.com/pub/uojun/p/hello-world?r=4xk9z')).toBeNull()
+  })
+
   it('数字を含まない文字列 → null', () => {
     expect(parseNoteId('garbage')).toBeNull()
     expect(parseNoteId('c-')).toBeNull()

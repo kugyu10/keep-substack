@@ -34,11 +34,23 @@ export function parseNoteId(input: unknown): string | null {
   if (typeof input !== 'string') return null
   const trimmed = input.trim()
   if (trimmed === '') return null
-  // URL / パス末尾 / c- 接頭辞いずれからも「c-」付きまたは裸の数字 ID を拾う。
-  // 例: https://substack.com/.../note/c-276780760 / c-276780760 / 276780760
-  const match = trimmed.match(/(?:c-)?(\d+)(?!.*\d)/)
-  if (!match) return null
-  return match[1]
+
+  // (0) クエリ/フラグメントを捨てる。Substack の共有ボタンが吐く URL は
+  //     ?utm_source=notes-share-action&r=1abc2 のように末尾に数字を含むので、
+  //     これを残したまま「最後の数字列」を拾うと r= の数字を ID と誤認する。
+  const path = trimmed.split(/[?#]/)[0]
+  if (path === '') return null
+
+  // (1) c- 接頭辞つきを最優先（Note の ID は URL 上で必ず c- が付く）。
+  //     例: https://substack.com/.../note/c-276780760
+  const withPrefix = path.match(/c-(\d+)/)
+  if (withPrefix) return withPrefix[1]
+
+  // (2) c- が無い場合は、末尾セグメント全体が数字のときだけ裸の ID とみなす。
+  //     例: 276780760 / https://.../276780760
+  const lastSegment = path.replace(/\/+$/, '').split('/').pop() ?? ''
+  const bare = lastSegment.match(/^(\d+)$/)
+  return bare ? bare[1] : null
 }
 
 // reader レスポンス（item.comment.children_count）を件数として取り出す型ガード付き純関数。
@@ -159,11 +171,22 @@ export async function getNoteComments(
 
   // (2) キャッシュ参照（anon/public select）
   const supabase = await createSupabaseServerClient()
-  const { data: cached } = await supabase
+  const { data: cached, error: selErr } = await supabase
     .from('note_comments')
     .select('comment_count, comments, fetched_at')
     .eq('note_id', noteId)
     .maybeSingle()
+
+  // select 失敗はキャッシュミス扱いで続行するが、黙って毎回 Substack を叩き続ける
+  // 状態（マイグレーション未実行・RLS 拒否など）に気づけるようログには残す。
+  if (selErr) {
+    console.warn('[getNoteComments] note_comments の select に失敗（キャッシュミス扱いで続行）:', {
+      noteId,
+      message: selErr.message,
+      code: selErr.code,
+      details: selErr.details,
+    })
+  }
 
   // (3) cache hit: fresh かつ force でない → fetch せず返す
   if (cached && !force && isFresh(cached.fetched_at)) {
@@ -188,7 +211,7 @@ export async function getNoteComments(
   // (5) service_role で upsert（note_id 衝突時 update）。fetched_at は now() で更新。
   const fetchedAt = new Date().toISOString()
   const admin = createSupabaseAdminClient()
-  await admin.from('note_comments').upsert(
+  const { error: upsertErr } = await admin.from('note_comments').upsert(
     {
       note_id: noteId,
       comment_count: fresh.count,
@@ -197,6 +220,16 @@ export async function getNoteComments(
     },
     { onConflict: 'note_id' }
   )
+  // upsert 失敗でもレスポンス自体は返せる（取得済みデータは手元にある）ので落とさないが、
+  // 失敗が続くとキャッシュが永久に効かないため必ずログに残す。
+  if (upsertErr) {
+    console.error('[getNoteComments] note_comments の upsert に失敗（キャッシュ未保存）:', {
+      noteId,
+      message: upsertErr.message,
+      code: upsertErr.code,
+      details: upsertErr.details,
+    })
+  }
 
   return {
     status: 'ok',
