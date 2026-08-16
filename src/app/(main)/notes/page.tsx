@@ -1,10 +1,17 @@
+import type { Metadata } from 'next'
 import { getNoteComments } from '@/lib/comments'
 
 // fetch の no-store と二重で永続化なしを担保（admin/notes/page.tsx 踏襲・Pitfall 4）
 export const dynamic = 'force-dynamic'
 
-// D-公開ルート: middleware matcher は /admin・/my のみのため /notes は素通り
-// （認証ガード不要・LogoutButton も置かない）。
+// 認証必須ルート（middleware matcher に /notes を含める）。未認証で叩けると
+// substack.com への外向き fetch と note_comments への行挿入を第三者が
+// 無制限に誘発できてしまうため（?force=1 はキャッシュを丸ごとバイパスする）。
+// クローラに ?id=N&force=1 を辿らせないよう noindex も付ける。
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+}
+
 // Next.js 16 では searchParams は Promise なので await する。
 type Props = {
   searchParams: Promise<{ id?: string; force?: string }>
@@ -86,6 +93,7 @@ async function renderComments(id: string, force: boolean) {
         {/* force 再取得（COMMENT-05）: 現在の id を保持して force=1 で GET */}
         <a
           href={`/notes?id=${encodeURIComponent(id)}&force=1`}
+          rel="nofollow"
           className="text-blue-600 hover:underline text-sm"
         >
           再取得
