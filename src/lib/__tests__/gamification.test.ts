@@ -247,6 +247,26 @@ describe('calcOnTimePostCount', () => {
   it('isoDate が無い記事は無視する', () => {
     expect(calcOnTimePostCount([{ title: 'x', link: 'https://e.com' }], fridaySlot)).toBe(0)
   })
+
+  // 回帰ガード: 重複判定キーを「投稿の週」で作っていた頃は、同じスロット出現
+  // （月曜0:00）に対する日曜23:30の投稿と翌月曜0:30の投稿が別々に数えられていた。
+  it('週跨ぎで同じスロット出現にマッチした2投稿は1回しか数えない', () => {
+    const mondayMidnight: CommitSlot[] = [{ member_id: 'uuid-1', day_of_week: 1, hour: 0 }]
+    const items = [
+      feedItem('2026-06-07T14:30:00.000Z'), // 日曜 JST 23:30（6/1週）
+      feedItem('2026-06-07T15:30:00.000Z'), // 月曜 JST 00:30（6/8週）
+    ]
+    expect(calcOnTimePostCount(items, mondayMidnight)).toBe(1)
+  })
+
+  it('週跨ぎでもスロット出現が別なら別々に数える', () => {
+    const mondayMidnight: CommitSlot[] = [{ member_id: 'uuid-1', day_of_week: 1, hour: 0 }]
+    const items = [
+      feedItem('2026-06-07T15:30:00.000Z'), // 月曜 JST 00:30（6/8 の出現）
+      feedItem('2026-05-31T15:30:00.000Z'), // 月曜 JST 00:30（6/1 の出現）
+    ]
+    expect(calcOnTimePostCount(items, mondayMidnight)).toBe(2)
+  })
 })
 
 // ─────────────────────────────────────────────────

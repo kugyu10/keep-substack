@@ -74,6 +74,23 @@ function buildPostDateKeySet(items: FeedItem[]): Set<string> {
 }
 
 /**
+ * XPの母数になる「有効な投稿」件数を数える。
+ *
+ * isoDate を持たない／JST日付に変換できない要素は、ヒートマップ・ストリーク・
+ * 達成週など他のすべての計算から除外されている。XPだけ items.length を使うと
+ * 「投稿 N件 × 10」がヒートマップ上の実績と食い違うため、ここでも同じ条件で絞る。
+ */
+function countValidPosts(items: FeedItem[]): number {
+  let count = 0
+  for (const item of items) {
+    if (!item.isoDate) continue
+    if (!isoToJSTDateKey(item.isoDate)) continue
+    count++
+  }
+  return count
+}
+
+/**
  * items の中で最も古い記事の JST 日付キーを返す（1件もなければ null）。
  */
 function earliestPostDateKey(items: FeedItem[]): string | null {
@@ -187,8 +204,8 @@ export function calcOnTimePostCount(items: FeedItem[], slots: CommitSlot[]): num
     if (!parts || !dateKey) continue
 
     const postMinutes = (parts.dayOfWeek - 1) * 24 * 60 + parts.hour * 60 + parts.minute
-    // その投稿が属する週の月曜。(スロット, 週) の重複判定に使う
-    const weekKey = shiftDateKey(dateKey, -(parts.dayOfWeek - 1))
+    // その投稿が属する週の月曜
+    const postWeekKey = shiftDateKey(dateKey, -(parts.dayOfWeek - 1))
 
     for (const slot of slots) {
       const slotMinutes = (slot.day_of_week - 1) * 24 * 60 + slot.hour * 60
@@ -198,7 +215,15 @@ export function calcOnTimePostCount(items: FeedItem[], slots: CommitSlot[]): num
       const offset = (((diff + half) % MINUTES_PER_WEEK) + MINUTES_PER_WEEK) % MINUTES_PER_WEEK - half
       if (offset < -ON_TIME_WINDOW_MINUTES || offset >= ON_TIME_WINDOW_MINUTES) continue
 
-      const key = `${weekKey}:${slot.day_of_week}:${slot.hour}`
+      // 重複判定は「投稿の週」ではなく「マッチしたスロット出現の週」で行う。
+      // 週跨ぎでマッチした場合（例: 月曜0:00スロットに対する日曜23:30の投稿と
+      // 翌月曜0:30の投稿）、投稿の週は別々でもスロット出現は同一なので、
+      // 投稿の週をキーにすると同じ出現を2回数えてしまう。
+      // diff - offset は必ず ±MINUTES_PER_WEEK の整数倍になる（0 = 同一週）。
+      const weekShiftDays = ((diff - offset) / MINUTES_PER_WEEK) * 7
+      const occurrenceWeekKey = shiftDateKey(postWeekKey, weekShiftDays)
+
+      const key = `${occurrenceWeekKey}:${slot.day_of_week}:${slot.hour}`
       if (!counted.has(key)) counted.add(key)
       // 1投稿は1スロット分までしか数えない（窓が重なるスロットでの二重取り防止）
       break
@@ -278,7 +303,7 @@ export function buildGameStats(
 
   const dailyStreak = calcDailyStreak(postDateKeys, todayKey)
   const weeklyStreak = calcWeeklyGoalStreak(slots, items, now)
-  const postCount = items.length
+  const postCount = countValidPosts(items)
   const onTimeCount = calcOnTimePostCount(items, slots)
   const achievedWeekCount = calcAchievedWeekCount(slots, items, now)
   const xp = calcXp({ postCount, onTimeCount, achievedWeekCount })
