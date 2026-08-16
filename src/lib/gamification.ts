@@ -1,3 +1,15 @@
+/**
+ * ゲーミフィケーション（ストリーク・XP・レベル）の計算層。
+ *
+ * XPは導出型で、articles 履歴と現在の member_commit_slots から毎回計算する。
+ *
+ * 既知の制約（承知の上で許容している。恒久対応は別リリース）:
+ * スロットに履歴が無いため、過去の週もオンタイム判定も「現在のスロット設定」で
+ * 再評価される。したがってスロットを変更するとXPが減り、レベルが下がりうる
+ * （実測: 1年継続ユーザーがスロットを1枠追加すると Lv16 → Lv12）。
+ * 恒久対応は member_commit_slots に effective_from を持たせ、各週を当時の
+ * スロットで判定すること。それまでは「スロットは頻繁に変えない」前提で運用する。
+ */
 import { isoToJSTDateKey, isoToJSTParts } from './calendarUtils'
 import {
   buildArticleDateMap,
