@@ -62,10 +62,13 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
         })}
       </div>
       {/* Achievement badges — independent column so it stays visible on mobile too
-          (mirrors CommitGoalRow's Column 3: w-14 shrink-0 flex-col, no `hidden` class)
+          (mirrors CommitGoalRow's Column 3: shrink-0 flex-col, no `hidden` class)
+          モバイルは w-10(40px) に絞る。360px 幅では 7日グリッドの取り分が
+          w-14(56px) だと 176px まで痩せて丸が小さくなりすぎるため。
+          sm 以上は w-14 のままなので og-view の幅計算（56px 前提）には影響しない。
           🔥N = daily streak >= 1
           Lv N = level pill, shown whenever stats are available */}
-      <div className="w-14 shrink-0 flex flex-col items-center justify-center gap-0.5">
+      <div className="w-10 sm:w-14 shrink-0 flex flex-col items-center justify-center gap-0.5">
         {stats && stats.dailyStreak >= 1 && (
           <span className="text-[10px] sm:text-sm leading-none flex items-center gap-0.5">
             <span role="img" aria-label="連続投稿中">🔥</span>

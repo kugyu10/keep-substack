@@ -53,8 +53,8 @@ export default function WeeklyHeatmapGrid({ results, statsById }: WeeklyHeatmapG
             )
           })}
         </div>
-        {/* HeatmapRow のバッジ列 (w-14) と揃えるスペーサー */}
-        <div className="w-14 shrink-0" />
+        {/* HeatmapRow のバッジ列 (w-10 sm:w-14) と揃えるスペーサー */}
+        <div className="w-10 sm:w-14 shrink-0" />
         <div className="w-10 shrink-0 text-xs text-right text-gray-400 pr-1">計</div>
       </div>
       {sorted.map(({ member, items, imageUrl }) => (
@@ -64,7 +64,9 @@ export default function WeeklyHeatmapGrid({ results, statsById }: WeeklyHeatmapG
           articlesByDateEntries={Array.from(buildHeatmapArticleMap(items).entries())}
           dates={dates}
           imageUrl={imageUrl}
-          stats={statsById?.[member.id]}
+          // stats は「今日」基準の値なので、過去週を表示中は出さない
+          // （先週のヒートマップの横に今日のストリーク/Lvが並ぶと、その週の記録に見えるため）
+          stats={weekOffset === 0 ? statsById?.[member.id] : undefined}
         />
       ))}
     </div>
