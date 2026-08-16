@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
-import { getMembers } from '@/lib/members'
 import { fetchAllFeedsCached } from '@/lib/fetchFeed'
 import { buildGameStats } from '@/lib/gamification'
 import LinkMemberForm from './LinkMemberForm'
@@ -10,7 +9,7 @@ import MyProfileForm from './MyProfileForm'
 import CommitScheduleModal from './CommitScheduleModal'
 import LogoutButton from '@/components/LogoutButton'
 import GameStatsPanel from '@/components/GameStatsPanel'
-import type { CommitSlot, MemberGameStats } from '@/lib/types'
+import type { CommitSlot, Member, MemberGameStats } from '@/lib/types'
 
 export default async function MyPage({ searchParams }: { searchParams: Promise<{ handle?: string }> }) {
   const supabase = await createSupabaseServerClient()
@@ -27,6 +26,7 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
       name,
       publication_id,
       substack_handle,
+      added_at,
       member_teams (
         teams (name, status)
       )
@@ -78,12 +78,19 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
         .select('member_id, day_of_week, hour')
         .eq('member_id', member.id)
       const gameSlots = (gameSlotsData ?? []) as CommitSlot[]
-      const allMembers = await getMembers()
-      const fullMember = allMembers.find((m) => m.id === member.id)
-      if (fullMember) {
-        const [feedResult] = await fetchAllFeedsCached([fullMember])
-        gameStats = buildGameStats(fullMember, feedResult?.items ?? [], gameSlots)
+      // 既に取得済みの members 行から Member を組み立てる。
+      // 自分1人ぶんが欲しいだけなので getMembers()（全件取得）は使わない。
+      const self: Member = {
+        id: member.id,
+        name: member.name,
+        publicationId: member.publication_id,
+        teams: currentTeams,
+        addedAt: member.added_at,
+        substackHandle,
+        hasUser: true,
       }
+      const [feedResult] = await fetchAllFeedsCached([self])
+      gameStats = buildGameStats(self, feedResult?.items ?? [], gameSlots)
     } catch (err) {
       console.error('[MyPage] gamification stats fetch error:', err)
     }
