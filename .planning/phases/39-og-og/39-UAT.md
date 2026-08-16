@@ -1,15 +1,15 @@
 ---
-status: partial
+status: complete
 phase: 39-og-og
 source: [39-01-SUMMARY.md]
 started: 2026-06-16T09:47:24Z
-updated: 2026-06-16T11:00:00Z
+updated: 2026-06-17T00:00:00Z
 ---
 
 ## Current Test
 <!-- OVERWRITE each test - shows where we are -->
 
-[testing paused — 1 blocked test outstanding (test 5: リンクデバッガ、本番/プレビュー デプロイ後に再検証)]
+[all tests complete — 6/6 pass, 0 issues]
 
 ## Tests
 
@@ -33,9 +33,8 @@ note: daily は丸サイズを member に揃える scale(0.67) を適用（人�
 
 ### 5. リンクデバッガでの summary_large_image 認識
 expected: 本番/プレビューURLを X(Twitter) Card Validator や Facebook Sharing Debugger に貼ると、大判カード(summary_large_image)としてOG画像が認識・プレビュー表示される
-result: blocked
-blocked_by: release-build
-reason: "/og-view と /api/og は v1.9（PR #9）が未マージで本番未デプロイのため、リンクデバッガで確認不可。プレビュー/本番デプロイ後に再検証"
+result: pass
+note: v1.9（PR #9）+ 本番OGスクショ修復（PR #10, commit 334b218）デプロイ後にユーザーがリンクデバッガで再検証。summary_large_image として大判カードのOG画像が認識・プレビュー表示されることを確認。
 
 ### 6. 日本語ラベル描画可否（best-effort）
 expected: メンバーOG画像の日本語 name は best-effort（描画されなくてもレイアウトが崩れない）。英字/数値/草は確実に表示される
@@ -45,11 +44,11 @@ note: og-view layout が Noto Sans JP を next/font で読み込み。debug sess
 ## Summary
 
 total: 6
-passed: 5
+passed: 6
 issues: 0
 pending: 0
 skipped: 0
-blocked: 1
+blocked: 0
 
 ## Gaps
 

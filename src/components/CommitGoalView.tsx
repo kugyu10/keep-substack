@@ -1,14 +1,17 @@
 // Server Component — do NOT add 'use client'
-import type { MemberFeedResult, CommitSlot } from '@/lib/types'
+import type { MemberFeedResult, CommitSlot, MemberGameStats } from '@/lib/types'
 import { sortMembersForCommitView, consecutiveWeekStreak, isThisWeekComplete } from '@/lib/commitUtils'
 import CommitGoalRow from './CommitGoalRow'
 
 type CommitGoalViewProps = {
   results: MemberFeedResult[]
   slots: CommitSlot[]
+  // 無制限週ストリーク+レベル統計（member.id キー）。未指定時は従来どおり
+  // consecutiveWeekStreak（表示上限3週）で後方互換動作する。
+  statsById?: Record<string, MemberGameStats>
 }
 
-export default function CommitGoalView({ results, slots }: CommitGoalViewProps) {
+export default function CommitGoalView({ results, slots, statsById }: CommitGoalViewProps) {
   if (results.length === 0) return null
 
   const sorted = sortMembersForCommitView(results, slots)
@@ -31,12 +34,15 @@ export default function CommitGoalView({ results, slots }: CommitGoalViewProps) 
             <span className="text-[10px] text-gray-500 font-medium">今週</span>
           </div>
         </div>
-        {/* Spacer matching achievement placeholder */}
-        <div className="w-10 shrink-0" />
+        {/* Spacer matching achievement badge column (CommitGoalRow: w-14) */}
+        <div className="w-14 shrink-0" />
       </div>
       {sorted.map(({ member, items, imageUrl }) => {
         const memberSlots = slots.filter((s) => s.member_id === member.id)
-        const streak = consecutiveWeekStreak(memberSlots, items)
+        const stats = statsById?.[member.id]
+        // statsById があれば無制限ストリーク（weeklyStreak）、無ければ従来の
+        // consecutiveWeekStreak（表示上限3週）にフォールバックする。
+        const streak = stats ? stats.weeklyStreak : consecutiveWeekStreak(memberSlots, items)
         const crownEarned = isThisWeekComplete(memberSlots, items)
         return (
           <CommitGoalRow
@@ -47,6 +53,7 @@ export default function CommitGoalView({ results, slots }: CommitGoalViewProps) 
             imageUrl={imageUrl}
             streak={streak}
             crownEarned={crownEarned}
+            stats={stats}
           />
         )
       })}

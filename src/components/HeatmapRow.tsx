@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import type { Member } from '@/lib/types'
+import type { Member, MemberGameStats } from '@/lib/types'
 import type { HeatmapArticle } from '@/lib/heatmapUtils'
 import { getIntensityClass } from '@/lib/heatmapUtils'
 import HeatmapTooltip from './HeatmapTooltip'
@@ -9,9 +9,10 @@ type HeatmapRowProps = {
   articlesByDateEntries: [string, HeatmapArticle[]][]
   dates: string[]
   imageUrl?: string
+  stats?: MemberGameStats
 }
 
-export default function HeatmapRow({ member, articlesByDateEntries, dates, imageUrl }: HeatmapRowProps) {
+export default function HeatmapRow({ member, articlesByDateEntries, dates, imageUrl, stats }: HeatmapRowProps) {
   const articleMap = new Map(articlesByDateEntries)
 
   const totalCount = dates.reduce((sum, date) => sum + (articleMap.get(date)?.length ?? 0), 0)
@@ -33,8 +34,8 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
         ) : (
           <span className="w-10 h-10 rounded-full shrink-0 bg-gray-200 inline-block" aria-hidden="true" />
         )}
-        <div className="flex-1 min-w-0 text-xs font-semibold leading-snug truncate hidden sm:block">
-          {member.name}
+        <div className="flex-1 min-w-0 hidden sm:block">
+          <div className="text-xs font-semibold leading-snug truncate">{member.name}</div>
         </div>
         <span className="shrink-0 text-gray-400 text-sm" aria-hidden="true">›</span>
       </Link>
@@ -59,6 +60,26 @@ export default function HeatmapRow({ member, articlesByDateEntries, dates, image
             </HeatmapTooltip>
           )
         })}
+      </div>
+      {/* Achievement badges — independent column so it stays visible on mobile too
+          (mirrors CommitGoalRow's Column 3: shrink-0 flex-col, no `hidden` class)
+          モバイルは w-10(40px) に絞る。360px 幅では 7日グリッドの取り分が
+          w-14(56px) だと 176px まで痩せて丸が小さくなりすぎるため。
+          sm 以上は w-14 のままなので og-view の幅計算（56px 前提）には影響しない。
+          🔥N = daily streak >= 1
+          Lv N = level pill, shown whenever stats are available */}
+      <div className="w-10 sm:w-14 shrink-0 flex flex-col items-center justify-center gap-0.5">
+        {stats && stats.dailyStreak >= 1 && (
+          <span className="text-[10px] sm:text-sm leading-none flex items-center gap-0.5">
+            <span role="img" aria-label="連続投稿中">🔥</span>
+            <span className="text-[10px] sm:text-xs">{stats.dailyStreak}</span>
+          </span>
+        )}
+        {stats && (
+          <span className="text-[10px] sm:text-xs leading-none px-1 sm:px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
+            Lv{stats.level}
+          </span>
+        )}
       </div>
       <div className="w-10 shrink-0 text-xs text-right text-gray-500 font-semibold pr-1">
         {totalCount > 0 ? totalCount : ''}

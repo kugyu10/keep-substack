@@ -5,10 +5,12 @@ import type { CommitSlot, FeedItem, Member, MemberFeedResult } from './types'
  * Returns an array of 7 date strings ['YYYY-MM-DD', ...] for the Monday-start week
  * in JST. index 0 = Monday, index 6 = Sunday.
  * mondayOffsetWeeks=0 → current week, =-1 → last week, =-2 → two weeks ago.
+ * now: optional injection point for the current instant (defaults to real "now").
+ * Existing call sites omit it, so behavior is unchanged.
  */
-export function getWeekDates(mondayOffsetWeeks: number): string[] {
+export function getWeekDates(mondayOffsetWeeks: number, now: Date = new Date()): string[] {
   // JST: UTC+9
-  const nowJST = new Date(Date.now() + 9 * 60 * 60 * 1000)
+  const nowJST = new Date(now.getTime() + 9 * 60 * 60 * 1000)
 
   // ISO 8601 weekday: 1=Mon ... 6=Sat, 0=Sun → treat 0 as 7
   const utcDay = nowJST.getUTCDay()
@@ -52,9 +54,9 @@ export function matchArticleToSlot(
 
 /**
  * Builds a Map from JST date key ('YYYY-MM-DD') to FeedItem[] from the given items array.
- * Internal helper — not exported.
+ * Exported (promoted from internal helper) so gamification.ts can reuse it.
  */
-function buildArticleDateMap(items: FeedItem[]): Map<string, FeedItem[]> {
+export function buildArticleDateMap(items: FeedItem[]): Map<string, FeedItem[]> {
   const map = new Map<string, FeedItem[]>()
   for (const item of items) {
     if (!item.isoDate) continue
@@ -102,13 +104,17 @@ export function isThisWeekComplete(slots: CommitSlot[], items: FeedItem[]): bool
  * Returns true if any slot's day has already passed this week (strictly before today
  * in JST) and has no article. Used to distinguish "slot day not yet arrived" from
  * "slot day passed and missed".
+ * Exported (promoted from internal helper) so gamification.ts can reuse it.
+ * now: optional injection point for the current instant (defaults to real "now").
+ * Existing call sites omit it, so behavior is unchanged.
  */
-function hasWeekFailed(
+export function hasWeekFailed(
   slots: CommitSlot[],
   weekDates: string[],
-  articleDateMap: Map<string, FeedItem[]>
+  articleDateMap: Map<string, FeedItem[]>,
+  now: Date = new Date()
 ): boolean {
-  const nowJST = new Date(Date.now() + 9 * 60 * 60 * 1000)
+  const nowJST = new Date(now.getTime() + 9 * 60 * 60 * 1000)
   const todayKey = `${nowJST.getUTCFullYear()}-${String(nowJST.getUTCMonth() + 1).padStart(2, '0')}-${String(nowJST.getUTCDate()).padStart(2, '0')}`
   return slots.some((slot) => {
     const dateKey = weekDates[slot.day_of_week - 1]

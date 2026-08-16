@@ -30,6 +30,14 @@ vi.mock('@/components/LogoutButton', () => ({
   default: () => null,
 }))
 
+// ゲーミフィケーション統計は「あなたの記録」セクション専用で、この read path テストの
+// 対象外。実 RSS を叩かせないよう空フィードを返すスタブに差し替える。
+vi.mock('@/lib/fetchFeed', () => ({
+  fetchAllFeedsCached: vi.fn(async (members: { id: string }[]) =>
+    members.map((member) => ({ member, items: [], imageUrl: undefined }))
+  ),
+}))
+
 // Supabase admin client (service role) → table reads
 const mockAdminFrom = vi.fn()
 vi.mock('@/lib/supabase/admin', () => ({
@@ -128,7 +136,7 @@ describe('MyPage RSC — read path (SELF-01 / SELF-03 / T-23-05 / T-23-06)', () 
     mockGetUser.mockResolvedValue({ data: { user: null } })
     setupAdminMock({ member: null })
 
-    await expect(MyPage()).rejects.toThrow(`${REDIRECT_SIGNAL}:/`)
+    await expect(MyPage({ searchParams: Promise.resolve({}) })).rejects.toThrow(`${REDIRECT_SIGNAL}:/`)
 
     expect(mockRedirect).toHaveBeenCalledWith('/')
     // The thrown redirect must short-circuit before any service-role read.
@@ -148,7 +156,7 @@ describe('MyPage RSC — read path (SELF-01 / SELF-03 / T-23-05 / T-23-06)', () 
       ],
     })
 
-    const el = await MyPage()
+    const el = await MyPage({ searchParams: Promise.resolve({}) })
     const form = findByType(el, MyProfileForm)
     expect(form).not.toBeNull()
 
@@ -176,7 +184,7 @@ describe('MyPage RSC — read path (SELF-01 / SELF-03 / T-23-05 / T-23-06)', () 
       publicTeams: [{ id: 't-alpha', name: 'Alpha' }],
     })
 
-    const el = await MyPage()
+    const el = await MyPage({ searchParams: Promise.resolve({}) })
     const form = findByType(el, MyProfileForm)
     expect(form).not.toBeNull()
 
@@ -201,7 +209,7 @@ describe('MyPage RSC — read path (SELF-01 / SELF-03 / T-23-05 / T-23-06)', () 
       publicTeams: [],
     })
 
-    await MyPage()
+    await MyPage({ searchParams: Promise.resolve({}) })
 
     // The sole authorization gate: .eq('user_id', user.id) — never another user.
     expect(membersEqSpy).toHaveBeenCalledWith('user_id', USER_ID)
@@ -210,7 +218,7 @@ describe('MyPage RSC — read path (SELF-01 / SELF-03 / T-23-05 / T-23-06)', () 
   it('no member → LinkMemberForm (regression guard), not MyProfileForm', async () => {
     setupAdminMock({ member: null, publicTeams: [{ id: 't-a', name: 'Alpha' }] })
 
-    const el = await MyPage()
+    const el = await MyPage({ searchParams: Promise.resolve({}) })
 
     expect(findByType(el, LinkMemberForm)).not.toBeNull()
     expect(findByType(el, MyProfileForm)).toBeNull()

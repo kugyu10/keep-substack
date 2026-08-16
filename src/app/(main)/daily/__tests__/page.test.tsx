@@ -38,6 +38,16 @@ vi.mock('@/lib/supabase/server', () => ({
   })),
 }))
 
+// Mock Supabase admin client — page.tsx calls createSupabaseAdminClient() to
+// SELECT member_commit_slots (gamification badges). Return a minimal no-op stub.
+vi.mock('@/lib/supabase/admin', () => ({
+  createSupabaseAdminClient: vi.fn(() => ({
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({ data: [], error: null })),
+    })),
+  })),
+}))
+
 import Home from '../page'
 import WeeklyHeatmapGrid from '@/components/WeeklyHeatmapGrid'
 

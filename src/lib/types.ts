@@ -33,3 +33,24 @@ export type CommitSlot = {
   day_of_week: number  // 1–7 (1=月〜7=日)
   hour: number  // 0–23
 }
+
+// ゲーミフィケーション: src/lib/gamification.ts が導出する1メンバー分の統計
+export type MemberGameStats = {
+  memberId: string
+  dailyStreak: number
+  weeklyStreak: number
+  postCount: number
+  onTimeCount: number // コミット時刻の±1時間以内に投稿した件数
+  achievedWeekCount: number
+  xp: number
+  // XPの内訳。表示側で式を再計算しないための単一の出所
+  xpBreakdown: {
+    post: number
+    onTime: number
+    achieved: number
+  }
+  level: number
+  currentLevelFloor: number
+  nextLevelXp: number
+  progressRatio: number // 0..1
+}

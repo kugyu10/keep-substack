@@ -40,7 +40,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // /my: ログイン必須。未認証の場合は /login?next=<currentPath> へリダイレクト
-  if (pathname.startsWith('/my')) {
+  // /notes: 同上。未認証で叩けると substack.com への外向き fetch と
+  //         note_comments への行挿入を第三者が無制限に誘発できてしまうため
+  //         （?force=1 はキャッシュを丸ごとバイパスする）。
+  if (pathname.startsWith('/my') || pathname.startsWith('/notes')) {
     if (!user) {
       const url = request.nextUrl.clone()
       const next = encodeURIComponent(pathname)
@@ -54,5 +57,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin', '/admin/:path*', '/my', '/my/:path*'],
+  matcher: ['/admin', '/admin/:path*', '/my', '/my/:path*', '/notes', '/notes/:path*'],
 }

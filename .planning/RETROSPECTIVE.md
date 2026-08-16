@@ -302,6 +302,36 @@
 
 ---
 
+## Milestone: v1.9 — ワンボタン Substack Note 共有
+
+**Shipped:** 2026-06-17
+**Phases:** 3 (37-39) | **Plans:** 3
+
+### What Was Built
+見ているビューを1ボタンで自分の Substack Note に共有する体験。`/member/[id]` の `?ym=` 公開URL化 + `buildShareUrl` 規約（37）、再利用可能な `<ShareButton>`（コピー+Notes起動+フィードバック、`lib/share.ts` 定数管理）（38）、summary_large_image OGメタ + next/og 動的OG画像（39）。
+
+### What Worked
+- Phase 37 で URL 生成を1関数に集約 → Phase 38 が重複なく委譲でき、レイヤー分離が綺麗に効いた。
+- 監査（audit-milestone）が 9/9 passed で、クローズ判断材料が事前に揃っていた。
+- KISS 徹底（toast ライブラリ回避・インラインフィードバック）。
+
+### What Was Inefficient
+- Phase 39 の OG 画像が next/og 動的生成で本番不安定 → スクショ方式へ転換（PR#10, fix 複数回）。本番ランタイム制約の事前検証が薄かった。
+- Phase 38 SUMMARY.md がクローズ時まで未作成（文書ギャップ）。
+
+### Patterns Established
+- 共有URL/文面/ゲートを `lib/share.ts` 1か所に集約（フラグ切替）。
+- 「近似より実物忠実」をユーザー要求として OG 画像でスクショ方式採用。
+
+### Key Lessons
+- 外部サービス（Substack）連携は本文prefill不可など制約を先に確定させると設計が早い。
+- 動的OG画像はサーバーランタイム（Vercel）制約を早期に検証すべき。
+
+### Cost Observations
+- 主に opus。context exhaustion で複数セッションに跨り、Phase 39 は paused→resume を経た。
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import type { ReactElement } from 'react'
-import type { Member, CommitSlot, FeedItem } from '@/lib/types'
+import type { Member, CommitSlot, MemberGameStats } from '@/lib/types'
 
 // --- Element-tree helpers (no jsdom: inspect the React element object tree) ---
 
@@ -93,12 +93,29 @@ function makeSlot(day_of_week: number): CommitSlot {
   return { member_id: '00000000-0000-0000-0000-000000000001', day_of_week, hour: 10 }
 }
 
-// ─────────────────────────────────────────────
+function makeStats(overrides: Partial<MemberGameStats> = {}): MemberGameStats {
+  return {
+    memberId: '00000000-0000-0000-0000-000000000001',
+    dailyStreak: 0,
+    weeklyStreak: 0,
+    postCount: 0,
+    onTimeCount: 0,
+    achievedWeekCount: 0,
+    xpBreakdown: { post: 0, onTime: 0, achieved: 0 },
+    xp: 0,
+    level: 1,
+    currentLevelFloor: 0,
+    nextLevelXp: 50,
+    progressRatio: 0,
+    ...overrides,
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
 // CommitGoalRow streak=0: アイコンなし
-// ─────────────────────────────────────────────
-// ─────────────────────────────────────────────
-// アイコンなし: 未達成 (crownEarned=false, streak<2)
-// ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// アイコンなし: 未達成 (crownEarned=false, streak=0)
+// ─────────────────────────────────────────────────────────────
 describe('CommitGoalRow アイコンなし: 未達成', () => {
   it('crownEarned=false + streak=0 のとき 👑 も 🔥 も表示しない', () => {
     const el = CommitGoalRow({
@@ -114,16 +131,16 @@ describe('CommitGoalRow アイコンなし: 未達成', () => {
   })
 })
 
-// ─────────────────────────────────────────────
-// 👑 のみ: 今週達成・連続なし (ACHIEV-01)
-// ─────────────────────────────────────────────
-describe('CommitGoalRow 👑 のみ: 今週達成・連続なし (ACHIEV-01)', () => {
-  it('crownEarned=true + streak=1 のとき 👑 が表示され 🔥 は表示しない', () => {
+// ─────────────────────────────────────────────────────────────
+// 👑 のみ: 今週達成・週ストリークなし (ACHIEV-01)
+// ─────────────────────────────────────────────────────────────
+describe('CommitGoalRow 👑 のみ: 今週達成・週ストリークなし (ACHIEV-01)', () => {
+  it('crownEarned=true + streak=0 のとき 👑 が表示され 🔥 は表示しない', () => {
     const el = CommitGoalRow({
       member: makeMember(),
       items: [],
       slots: [makeSlot(1)],
-      streak: 1,
+      streak: 0,
       crownEarned: true,
     })
     const joined = collectText(el).join('')
@@ -132,11 +149,54 @@ describe('CommitGoalRow 👑 のみ: 今週達成・連続なし (ACHIEV-01)', (
   })
 })
 
-// ─────────────────────────────────────────────
-// 👑🔥: 今週達成 + 連続2週以上 (ACHIEV-01 + ACHIEV-02)
-// ─────────────────────────────────────────────
-describe('CommitGoalRow 👑🔥: 今週達成 + 連続2週以上', () => {
-  it('crownEarned=true + streak=2 のとき 👑 と 🔥 の両方が表示される', () => {
+// ─────────────────────────────────────────────────────────────
+// 🔥N: weeklyStreak >= 1 で数字付きバッジ表示（上限なし）
+// ─────────────────────────────────────────────────────────────
+describe('CommitGoalRow 🔥N: weeklyStreak >= 1 で数字付きバッジ（上限なし）', () => {
+  it('crownEarned=false + streak=1 のとき 🔥1 のみ表示、👑 は表示しない', () => {
+    const el = CommitGoalRow({
+      member: makeMember(),
+      items: [],
+      slots: [makeSlot(1)],
+      streak: 1,
+      crownEarned: false,
+    })
+    const joined = collectText(el).join('')
+    expect(joined).not.toContain('👑')
+    expect(joined).toContain('🔥1')
+  })
+
+  it('streak=3 (旧上限=3) のとき 🔥3 と表示される', () => {
+    const el = CommitGoalRow({
+      member: makeMember(),
+      items: [],
+      slots: [makeSlot(1)],
+      streak: 3,
+      crownEarned: false,
+    })
+    const joined = collectText(el).join('')
+    expect(joined).toContain('🔥3')
+  })
+
+  it('streak=12 (旧上限3週を超える) のとき 🔥12 と数字がそのまま表示される（上限なし）', () => {
+    const el = CommitGoalRow({
+      member: makeMember(),
+      items: [],
+      slots: [makeSlot(1)],
+      streak: 12,
+      crownEarned: false,
+    })
+    const joined = collectText(el).join('')
+    expect(joined).toContain('🔥12')
+    expect(joined).not.toContain('🔥1週') // 桁の取り違えがないことの簡易確認
+  })
+})
+
+// ─────────────────────────────────────────────────────────────
+// 👑🔥N: 今週達成 + 週ストリーク併存 (ACHIEV-01 + ACHIEV-02)
+// ─────────────────────────────────────────────────────────────
+describe('CommitGoalRow 👑🔥N: 今週達成 + 週ストリーク併存', () => {
+  it('crownEarned=true + streak=2 のとき 👑 と 🔥2 の両方が表示される', () => {
     const el = CommitGoalRow({
       member: makeMember(),
       items: [],
@@ -146,31 +206,58 @@ describe('CommitGoalRow 👑🔥: 今週達成 + 連続2週以上', () => {
     })
     const joined = collectText(el).join('')
     expect(joined).toContain('👑')
-    expect(joined).toContain('🔥')
+    expect(joined).toContain('🔥2')
   })
 })
 
-// ─────────────────────────────────────────────
-// 🔥 のみ: 先週以前連続 + 今週スロット日未到来 (ACHIEV-02)
-// ─────────────────────────────────────────────
-describe('CommitGoalRow 🔥 のみ: 先週まで連続達成・今週スロット日未到来', () => {
-  it('crownEarned=false + streak=2 のとき 🔥 のみ表示、👑 は表示しない', () => {
+// ─────────────────────────────────────────────────────────────
+// Lv バッジ: stats 有無で表示が分かれる
+// ─────────────────────────────────────────────────────────────
+describe('CommitGoalRow Lv バッジ: stats 有無で表示が分かれる', () => {
+  it('stats が渡されないとき Lv バッジは表示されない（後方互換）', () => {
     const el = CommitGoalRow({
       member: makeMember(),
       items: [],
       slots: [makeSlot(1)],
-      streak: 2,
+      streak: 1,
       crownEarned: false,
     })
     const joined = collectText(el).join('')
+    expect(joined).not.toMatch(/Lv\d/)
+  })
+
+  it('stats が渡されるとき Lv{level} バッジが表示される', () => {
+    const el = CommitGoalRow({
+      member: makeMember(),
+      items: [],
+      slots: [makeSlot(1)],
+      streak: 1,
+      crownEarned: false,
+      stats: makeStats({ level: 7 }),
+    })
+    const joined = collectText(el).join('')
+    expect(joined).toContain('Lv7')
+  })
+
+  it('streak=0 かつ crownEarned=false でも stats があれば Lv バッジは表示される', () => {
+    const el = CommitGoalRow({
+      member: makeMember(),
+      items: [],
+      slots: [makeSlot(1)],
+      streak: 0,
+      crownEarned: false,
+      stats: makeStats({ level: 2 }),
+    })
+    const joined = collectText(el).join('')
+    expect(joined).not.toContain('🔥')
     expect(joined).not.toContain('👑')
-    expect(joined).toContain('🔥')
+    expect(joined).toContain('Lv2')
   })
 })
 
-// ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 // スロット未設定: 未登録 / 未コミットメント の表示分離
-// ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 describe('CommitGoalRow スロット未設定の表示分離', () => {
   it('hasUser=false + slots なし のとき「未登録」を表示する', () => {
     const el = CommitGoalRow({
