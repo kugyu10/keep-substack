@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { FeedItem } from '../types'
 
 // createSupabaseAdminClient をモックして upsert 呼び出しを捕捉する
-const upsertMock = vi.fn(() => ({ error: null }))
+const upsertMock = vi.fn((_rows: unknown, _opts?: unknown) => ({ error: null }))
 const eqMock = vi.fn(() => ({ error: null }))
 const updateMock = vi.fn(() => ({ eq: eqMock }))
 

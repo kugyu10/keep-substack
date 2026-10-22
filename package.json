@@ -17,11 +17,12 @@
     "@sparticuz/chromium": "^149.0.0",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",
-    "next": "16.2.6",
+    "next": "16.4.1",
     "playwright-core": "^1.60.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "rss-parser": "^3.13.0"
+    "rss-parser": "^3.13.0",
+    "sharp": "0.35.5"
   },
   "devDependencies": {
     "@playwright/test": "1.60.0",
@@ -31,7 +32,7 @@
     "@types/react-dom": "^19",
     "dotenv": "^17.4.2",
     "eslint": "^9",
-    "eslint-config-next": "16.2.6",
+    "eslint-config-next": "16.4.1",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5",
