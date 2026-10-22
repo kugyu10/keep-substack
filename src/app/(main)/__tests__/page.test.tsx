@@ -128,7 +128,7 @@ describe('Home RSC — slotsError graceful degradation', () => {
       from: vi.fn(() => ({
         select: vi.fn(() => ({ data: null, error: { message: 'DB error', code: '500' } })),
       })),
-    } as ReturnType<typeof createSupabaseAdminClient>)
+    } as unknown as ReturnType<typeof createSupabaseAdminClient>)
 
     const el = await Home({ searchParams: Promise.resolve({}) })
     expect(el).not.toBeNull()
