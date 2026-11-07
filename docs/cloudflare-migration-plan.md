@@ -23,7 +23,7 @@ Cloudflare 製品の仕様・料金は公開ドキュメントの参照時点（
 | ミドルウェア | `src/middleware.ts`（`@supabase/ssr` で毎回 `auth.getUser()`）。`/admin` `/my` `/notes` を保護 | OpenNext は Node ランタイム middleware 未対応の旨（§4.1 要確認）。Next 16 の `proxy.ts` 化も要検討 |
 | Cron | Vercel Cron `0 18 * * *`（UTC 18:00 = JST 03:00）で `GET /api/cron`（`CRON_SECRET` Bearer 認証）。全メンバーの Substack RSS を `Promise.allSettled` で取得し `articles` に upsert | Cron Triggers の `scheduled` ハンドラへ（§4.4） |
 | OG 画像 | `/api/og` が `playwright-core` + `@sparticuz/chromium`（Lambda 向け Chromium）で同一オリジンの `/og-view/<view>` を 1200x630 撮影。失敗時は `next/og` の `ImageResponse` でフォールバック。`revalidate=300`、CDN キャッシュ | Workers では Chromium を同梱できない。Browser Rendering に置換（§4.5） |
-| 外向き fetch | Substack RSS（`fetchFeed.ts`）、Substack Note/コメント API（`notes.ts` `comments.ts`） | Workers の subrequest 上限内か確認（上限値は 2026-02 の changelog で変更があり最新値は**要確認**。従来値は無料 50 / 有料 1000）。cron だけでなく**ページ表示でも効く**（「ページの動的性」行） |
+| 外向き fetch | Substack RSS（`fetchFeed.ts`）、Substack Note/コメント API（`notes.ts` `comments.ts`） | Workers の subrequest 上限（公式 limits ページ: 1 呼び出しあたり Free 50 / Paid 10,000）内か確認。cron だけでなく**ページ表示でも効く**（「ページの動的性」行） |
 | Next.js 機能 | `next/font/google`、`next/image`（`PrBanner` のみ）、`next/og`、`next/headers`、`revalidatePath`（admin のみ）、Server Actions、`force-dynamic`、`revalidate=300`（`/api/og` `(main)/page.tsx` `daily` `member/[publicationId]` `admin/teams/[teamName]` `og-view/[view]`）。`unstable_cache` / `use cache` は不使用 | ISR/キャッシュは最小。OpenNext のキャッシュ層（R2/KV）はほぼ不要の見込み |
 | 画像 | ローカル静的画像のみ（`next/image` は1箇所） | Cloudflare Images 不要。必要なら `images.unoptimized` かアダプタの設定で対応 |
 | ページの動的性 | `/` `/daily` `/member/[id]` `/admin/teams/[teamName]` `/og-view/*` `/my` は `fetchAllFeedsCached(members)` で**リクエストごとに全メンバーの Substack RSS を live fetch**し、メンバーごとに `getArticles`（articles + members の2クエリ）を投げる（`fetchFeed.ts:72-`）。`createSupabaseServerClient()` で cookie を読むため `revalidate = 300` があっても実際は毎回動的描画の見込み（**ビルド出力で未確認**）。一括取得の `getArticlesForMembers` は存在するが `fetchAllFeedsCached` は使っていない | 1表示 = メンバー数 × (RSS fetch + DB クエリ2) のサブリクエストと RSS パース CPU。§4 のコストの本体 |
@@ -45,7 +45,7 @@ Cloudflare 製品の仕様・料金は公開ドキュメントの参照時点（
 
 注意点（PoC で必ず確認）:
 - **Node ランタイムの middleware**: OpenNext 公式は Node Middleware（Next 15.2+）を「未対応」としている（要確認: 現行バージョンで解消済みか）。本アプリの middleware は Edge 相当の書き方なので動く見込みだが、Next 16 の `proxy.ts` 移行との関係を確認する。
-- Worker のサイズ上限: 従来値は無料 3 MiB / 有料 10 MiB だが、2026-09 の changelog で引き上げがあり**最新値は要確認**。`@sparticuz/chromium` と `playwright-core` を除去すれば収まる見込み。
+- Worker のサイズ上限: 従来値は無料 3 MiB / 有料 10 MiB。公式 limits ページでは Free/Paid とも 64 MiB と読めるが、圧縮前か圧縮後かは**原文で要確認**。`@sparticuz/chromium` と `playwright-core` を除去すれば収まる見込み。
 - `next/og`（`ImageResponse`）は Workers で動く（WASM）。フォント同梱方法のみ確認。
 - ビルドは Linux/macOS（Windows 不可）。現行の `--webpack` は維持できるか確認。
 
@@ -53,7 +53,7 @@ Cloudflare 製品の仕様・料金は公開ドキュメントの参照時点（
 
 | 案 | 判定 | 理由 |
 |---|---|---|
-| **D1（SQLite）** | **採用** | 追加サービス無し、Workers バインディングで直接クエリ、レイテンシ最小、小規模なら込みの料金で収まる見込み（無料枠・Paid 込み量は**要確認**） |
+| **D1（SQLite）** | **採用** | 追加サービス無し、Workers バインディングで直接クエリ、レイテンシ最小、インデックスを張れば小規模なら込みの料金で収まる見込み（Free 5M 読み/日・Paid 25B 読み/月込み。§4.1） |
 | Postgres 継続 + Hyperdrive | 不採用 | スキーマ流用は楽だが DB 費用が別に発生し、DB を Cloudflare に寄せて費用を下げる目的に合わない |
 | Supabase 無料枠で継続 | 不採用 | 最小工数だが、Auth/DB を Supabase に残す前提で「完全移行」に反する |
 
@@ -66,14 +66,15 @@ Cloudflare 製品の仕様・料金は公開ドキュメントの参照時点（
 | 3 | `JSONB`（`note_comments.comments`） | CommentItem[] を1行で保存し丸ごと読む | `TEXT` に `JSON.stringify`、読む側で `JSON.parse`。DB 内で JSON 演算はしていないので `json_extract` は不要 | `comments.ts` の読み書き |
 | 4 | `now()` / 日付演算 | `DEFAULT now()` のみ。JST 計算は全てアプリ側（`commitUtils.ts` `gamification.ts` `shareUrl.ts` の +9h） | DB は **UTC で保持**（JST は表示層で維持）。`DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))` で同形式の UTC 文字列を生成。`datetime('now')` は `Z` 無しなので使わない | スキーマ DEFAULT のみ |
 | 5 | `BIGINT GENERATED ALWAYS AS IDENTITY` | `member_commit_slots.id` | `INTEGER PRIMARY KEY AUTOINCREMENT` | スキーマのみ |
-| 6 | `CHECK` / `UNIQUE` / 部分ユニーク index | `teams.status` CHECK、`member_commit_slots` の CHECK、`(member_id, day_of_week)` UNIQUE、`uq_member_publications_one_primary`（`WHERE is_primary`） | SQLite も同等に対応（BOOLEAN は `INTEGER 0/1`）。外部キーの有効化（`PRAGMA foreign_keys`）と `ON DELETE CASCADE` の挙動は**要確認**で、PoC で検証 | スキーマ、`is_primary` の true/false → 1/0 |
-| 7 | トリガー `sync_member_publications` | members の INSERT/UPDATE で primary 行を同期。INSERT は `ON CONFLICT (publication_id) DO NOTHING` | **SQLite トリガーで移植する案を第一候補**（D1 のトリガー対応は**要確認**）。`AFTER INSERT` と `AFTER UPDATE OF publication_id` の2本に分け、`IS DISTINCT FROM` は `IS NOT`、`ON CONFLICT DO NOTHING` は `INSERT OR IGNORE`。不可なら members を書く全経路（`admin/actions.ts` `auth/callback` `my/actions.ts`）で同じ `db.batch()` に含める | スキーマ、またはその3経路 |
+| 6 | `CHECK` / `UNIQUE` / 部分ユニーク index | `teams.status` CHECK、`member_commit_slots` の CHECK、`(member_id, day_of_week)` UNIQUE、`uq_member_publications_one_primary`（`WHERE is_primary`） | SQLite も同等に対応（BOOLEAN は `INTEGER 0/1`）。D1 は外部キーを既定で強制し `ON DELETE CASCADE` も使える（公式 foreign-keys ページ）。投入順が崩れる場合のみ `PRAGMA defer_foreign_keys = on` | スキーマ、`is_primary` の true/false → 1/0 |
+| 7 | トリガー `sync_member_publications` | members の INSERT/UPDATE で primary 行を同期。INSERT は `ON CONFLICT (publication_id) DO NOTHING` | **SQLite トリガーで移植する案を第一候補**（D1 のトリガー対応は**要確認**）。`AFTER INSERT` と `AFTER UPDATE OF publication_id` の2本に分け、`IS DISTINCT FROM` は `IS NOT`、INSERT は `ON CONFLICT(publication_id) DO NOTHING` のまま（SQLite 3.24+ の UPSERT。`INSERT OR IGNORE` は NOT NULL・CHECK 違反も黙って無視するため使わない）。不可なら members を書く全経路（`admin/actions.ts` `auth/callback` `my/actions.ts`）で同じ `db.batch()` に含める | スキーマ、またはその3経路 |
 | 8 | RPC `replace_member_commit_slots`（DELETE→INSERT） | `my/actions.ts:175` が `.rpc()` で呼ぶ | `db.batch([DELETE, INSERT…])`（batch は暗黙のトランザクションで原子的、**要確認**）。空配列なら DELETE のみ | `my/actions.ts` |
 | 9 | 一意制約違反コード `23505` | `auth/callback/route.ts:55`、`admin/actions.ts:110`、`admin/teams/actions.ts:21`、`my/actions.ts:77` で分岐 | D1 は `SQLITE_CONSTRAINT`（メッセージ `UNIQUE constraint failed: <table>.<col>`）。**判定用の共通関数を1つ作り**、列名（`substack_handle` / `publication_id` / `name`）で分岐 | 上記4箇所 |
 | 10 | `upsert(onConflict)` | `articles`（`link`、`ignoreDuplicates` あり）、`note_comments`（`note_id`）、`teams`（`name`）計6箇所 | `INSERT … ON CONFLICT(col) DO UPDATE` / `DO NOTHING`（`ignoreDuplicates` は後者）。多行は `db.batch()` | `articles.ts:108,122` `comments.ts:214` `members.ts:62,131` |
 | 11 | RLS | 公開 SELECT 全許可、`member_commit_slots` のみ `auth.uid()` | **廃止。アプリ層で認可**（下の一覧） | 全 Server Action / route |
 | 12 | マイグレーション運用 | `supabase/schema.sql` を正規とし SQL Editor で手流し | `wrangler d1 migrations`（`migrations/NNNN_*.sql`）。**dev 用と本番用の D1 を分ける**（今の dev/prod Supabase に対応）。`schema.sql` は廃止し migrations を正とする | リポジトリ構成、手順書 |
 | 13 | クエリ層（`.from()` 46箇所 + `.rpc` 1 + `auth.*`） | `supabase-js`（PostgREST）。生 SQL は無い | 素の `env.DB.prepare().bind()` か Drizzle 等。**選択は #16 の論点**。Drizzle は型が付き書き換えが機械的だが、バンドルサイズは PoC で確認 | `src/lib/*.ts`（members 12 / articles 8）、`my/*`、`auth/callback`、`og-view`、`admin/*`、一部コンポーネント |
+| 14 | インデックス（**現行に無い**） | `articles.publication_id` は FK だが Postgres は FK に自動でインデックスを張らず、`schema.sql` と `migrations/` の INDEX は `uq_member_publications_one_primary` のみ（`link` は UNIQUE なので有り）。`getArticles`（`articles.ts:8-13`）は `.eq('publication_id').order('pub_date' desc)` でメンバーごとに1回引く | D1 の migrations で `CREATE INDEX idx_articles_publication_pub_date ON articles(publication_id, pub_date DESC)` を**必ず入れる**。D1 の rows read は走査行で数えるため、無いと全件スキャンになる（§4.1） | D1 スキーマ（現行 Postgres への追加は本計画の範囲外） |
 
 #### RLS 廃止後の認可一覧（アプリ層で必ず検証し、テストを追加する）
 
@@ -135,9 +136,9 @@ Chromium 同梱は Workers で不可。選択肢:
 ### 4.1 コストを決める構造（§2「ページの動的性」）
 
 1表示あたり「メンバー数 N × (Substack RSS fetch + D1 クエリ2)」と、N 件の RSS XML パースの CPU がかかる。N は数十〜百人規模（要確認）。
-- **サブリクエスト**: 1表示で N 件超。上限（最新値**要確認**）に近づくと、メンバー増加で表示自体が壊れる。
-- **CPU 時間**: Workers Free は 10ms/リクエスト。数十件の RSS パース＋SSR が収まる見込みは低い（**要実測**）。
-- **D1 rows read**: 1表示で N × (その人の articles 行数 + 1)。想定 PV と掛けて概算する（無料枠・Paid 込み量は**要確認**）。
+- **サブリクエスト**: 1表示で N 件超。上限は 1 呼び出しあたり Free 50 / Paid 10,000（公式 limits ページ）。Free では N が数十で壊れる。Paid では当面起きない。
+- **CPU 時間**: Workers Free は 10ms/リクエスト（Paid は既定 30 秒、`cpu_ms` で最大 5 分）。数十件の RSS パース＋SSR が収まる見込みは低い（**要実測**）。
+- **D1 rows read**（走査した行数で数える）: インデックスあり = N × (その人の articles 行数 + 1)。**なし = N × articles 全件**。例: N=100・articles 5,000 件（仮置き）なら 1表示 50 万行で、Free の 5M/日は 1日10表示で尽き、Paid の 25B/月込みも約 5 万表示/月で超える（超過 $0.001/百万行、10 万表示/月で約 $25 増）。差分表 #14 のインデックスで防ぐ。公式値（pricing ページ）: Free 5M 読み/日・100k 書き/日・5GB、Paid 25B 読み/月・50M 書き/月込み、超過 読み $0.001/百万行・書き $1/百万行。
 - 改善余地: `fetchAllFeedsCached` が既存の `getArticlesForMembers`（一括取得）を使えば D1 クエリは 2N → 2 に減らせる。表示時に RSS を取らず cron 結果（articles）だけで描画すれば、サブリクエストと CPU が激減する（挙動変更なので別 Issue で判断）。
 
 ### 4.2 比較表
@@ -146,14 +147,15 @@ Chromium 同梱は Workers で不可。選択肢:
 |---|---|---|
 | 現状（Vercel + Supabase） | **$40（確定）** | - |
 | Workers Free + D1 Free | $0 | CPU 10ms/リクエストと subrequest 上限に収まる場合のみ。現構造では**収まらない可能性が高い**（要実測） |
-| Workers Paid + D1 | **$5〜（Paid 最低）** + 従量 | Workers Paid は $5/月（1,000万リクエスト・3,000万 CPU ms 込み、超過 $0.30/百万リクエスト）。D1・R2 は小規模なら込みの範囲に収まる見込み（**要確認**）。→ **見立て（< $20）は成り立つ見込み** |
+| Workers Paid + D1 | **$5〜（Paid 最低）** + 従量 | Workers Paid は $5/月（1,000万リクエスト・3,000万 CPU ms 込み、超過 $0.30/百万リクエスト）。D1 は Paid で 25B 読み/月・50M 書き/月込み。インデックスありなら小規模は込みの範囲に収まる見込み（なしだと崩れる、§4.1）。→ **見立て（< $20）は成り立つ見込み** |
 | + Browser Rendering | Paid に 10 時間/月込み、超過 $0.09/時間 | OG を R2 キャッシュすれば込みの範囲 |
 | + メール送信 | Resend 無料枠等（**要確認**） | Magic Link は少量 |
 
 ### 4.3 見立てが崩れる条件
 
 - 表示ごとの RSS 取得で Paid の CPU 込み量（3,000万 ms/月）を超える: 1表示 50ms と仮定すると月 60 万表示で到達。通常は超えない見込みだが実測しないと分からない。
-- subrequest 上限でページが壊れる（メンバー増加）: 費用ではなく設計変更（上の改善余地）が必要になる。
+- subrequest 上限でページが壊れる（メンバー増加）: Free（50）では N が数十で起きる。Paid（10,000）では当面起きない。起きた場合は費用ではなく設計変更（上の改善余地）が必要。
+- **D1 のインデックスを張り忘れて全件スキャンになる**（差分表 #14）: rows read が桁違いに増え、Paid 込み量を超えて D1 だけで数十ドル増えうる。
 - OG 撮影が頻繁に再実行され、Browser Rendering が込み 10 時間を超える。
 
 結論: **「$20 未満」は Workers Paid $5 + 従量でほぼ確実。「フロント無料（Free）」は現構造では厳しい**。フェーズ1 の完了条件に実測を入れる（§5）。
@@ -165,7 +167,7 @@ D1 への移行を前提に、**旧環境（Vercel/Supabase）を最終フェー
 | フェーズ | 内容 | 完了条件 | ロールバック |
 |---|---|---|---|
 | 0. 実態調査 | 使用量（メンバー数、articles 件数、月間 PV）確認、判断事項（UAT #16）の確定、Cloudflare アカウント準備 | Auth 方式・クエリ層が決まる | 不要 |
-| 1. PoC | 別ブランチで OpenNext（と vinext）ビルド、`wrangler dev` / preview。D1（dev）にスキーマ投入、Auth 候補で Magic Link ログイン、middleware、Server Actions、`next/og` を確認。**計測**: 1表示あたりの CPU ms・サブリクエスト数・D1 rows read、OG 1枚あたりの Browser Rendering 秒数、Worker サイズ | 計測値が §4 の前提を満たし、GO/NO-GO を docs に追記 | ブランチ破棄のみ |
+| 1. PoC | 別ブランチで OpenNext（と vinext）ビルド、`wrangler dev` / preview。D1（dev）にスキーマ投入、Auth 候補で Magic Link ログイン、middleware、Server Actions、`next/og` を確認。**計測**: 1表示あたりの CPU ms・サブリクエスト数・D1 rows read（クエリ結果の `meta.rows_read` で測る。インデックス有無の両方）、OG 1枚あたりの Browser Rendering 秒数、Worker サイズ | 計測値が §4 の前提を満たし、GO/NO-GO を docs に追記 | ブランチ破棄のみ |
 | 2. アプリ移植 | クエリ層を D1 向けに書き換え、Auth 置換、Vercel 固有 env の除去、cron の `scheduled` 化、OG の Browser Rendering 化、`wrangler.jsonc`・CI 追加。**別 PR に小分け**。RLS 廃止分の認可テスト（§3.2）を同時に追加 | preview URL で E2E 合格、認可テスト全通過 | Vercel/Supabase は無改変で稼働継続 |
 | 3. ステージング | `*.workers.dev` で、本番データのコピーを入れた D1 で確認。Magic Link の到達性を確認 | 手動 UAT 合格 | URL を使わなくなるだけ |
 | 4. DNS（2段階） | §5.1 | 各段階で正常 | §5.1 |
@@ -191,7 +193,7 @@ Workers の Custom Domain は Cloudflare の zone にあるドメインにしか
 3. **凍結**: cron を止め、`/admin`・`/my` からの書き込みを止める（メンテ表示。深夜、cron 実行後）。
 4. **export**: 各テーブルを SELECT して JSON/CSV に出す。`pg_dump --data-only` の出力は D1 にそのまま入らないため、変換スクリプトを使う。`auth.users` は service_role の Admin API、または SQL Editor で SELECT して取り出す（`id`, `email`, `created_at`, `email_confirmed_at`, **`role`**）。
 5. **変換**: UUID → TEXT（値は保持）、TIMESTAMPTZ → UTC ISO8601 `Z` 付き TEXT（§3.2 #2）、JSONB → TEXT、BOOLEAN → 0/1。`INSERT` 文を生成。D1 の1回あたりの文・サイズ上限は**要確認**なので分割して投入する。
-6. **投入**: `wrangler d1 migrations apply`（スキーマ）→ `wrangler d1 execute --file`（データ）。順序は FK に従う（`members` → `teams` → `member_teams` / `articles` / `member_publications` / `member_commit_slots` / `note_comments`）。Auth の user 表へは `id` を保持して投入し、**`role='admin'` を新 admin 判定に反映**する。
+6. **投入**: `wrangler d1 migrations apply`（スキーマ）→ `wrangler d1 execute --file`（データ）。順序は FK に従う（Auth の user 表 → `members` → `teams` → `member_teams` / `articles` / `member_publications` / `member_commit_slots` / `note_comments`）。user 表へは `id` を保持して投入し（`members.user_id` が参照するため最初。順が崩れる場合は `PRAGMA defer_foreign_keys = on`）、**`role='admin'` を新 admin 判定に反映**する。
 7. **突き合わせ**: 各テーブルの件数、主キー集合、`articles.link` の一意性、admin ユーザーが `/admin` に入れること、`members.user_id` の参照先が全て存在することを確認。差分があればここで中止（旧環境は無傷）。
 8. **切替**: §5.1 の Custom Domain を割り当て、Vercel Cron を停止して Cron Triggers を有効化。
 9. **切り戻し期限の起点**を記録する（§6.5）。
