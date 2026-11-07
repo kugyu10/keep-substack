@@ -119,7 +119,8 @@ Chromium 同梱は Workers で不可。選択肢:
 2. `next/og` の `ImageResponse` だけで描画（現フォールバックを本採用）: 最安・最速だが**見た目が実物と変わる**ため、既存の「忠実さ優先」方針と衝突。
 3. 撮影を cron 時に事前生成して R2 に置く: 同時実行・コールドスタートの問題を回避できる。
 
-推奨: 1+R2 キャッシュ（OG は SNS クローラが叩くだけでアクセス頻度が低い見込み）。撮影対象は同一オリジンの `/og-view/*` で、Worker から自分自身へ到達する経路を PoC で確認。`/og-view/*` も `fetchAllFeedsCached` を呼ぶため、撮影1回ごとに全 RSS fetch が走る点が時間・コストに効く。SSRF 対策（`isAllowedOgHost`）は維持。
+**確定（開発者回答 2026-11-07、#18）: 簡素化（案2）**。まず既存フォールバックをそのまま採用（全 view 共通の固定画像。個別の草は出ない）して期限を優先し、view ごとの描画（`ImageResponse`）や撮影方式（案1）は移行後に必要なら足す。R2 は使わない。詳細は `docs/cloudflare-phase0-decisions.md` §3。
+（参考・旧推奨: 1+R2 キャッシュ。撮影対象は `/og-view/*` で、撮影1回ごとに全 RSS fetch が走る点が時間・コストに効く。）
 
 ### 3.6 その他
 
@@ -162,7 +163,7 @@ Chromium 同梱は Workers で不可。選択肢:
 
 ## 5. 段階的な移行フェーズとロールバック
 
-D1 への移行を前提に、**旧環境（Vercel/Supabase）を最終フェーズまで稼働させる**。各フェーズは独立して戻せるようにする。
+D1 への移行を前提とする。**確定（#18）: 現行環境（Vercel）は既に完全停止しており、並行稼働も切り戻しも無い**。期限は 11/10（できれば 11/8 中）。フェーズ3〜6 は短縮して進め、旧環境側のロールバック欄は適用しない。バックアップ（`pg_dump`）の取得だけは必須。
 
 | フェーズ | 内容 | 完了条件 | ロールバック |
 |---|---|---|---|
@@ -171,10 +172,10 @@ D1 への移行を前提に、**旧環境（Vercel/Supabase）を最終フェー
 | 2. アプリ移植 | クエリ層を D1 向けに書き換え、Auth 置換、Vercel 固有 env の除去、cron の `scheduled` 化、OG の Browser Rendering 化、`wrangler.jsonc`・CI 追加。**別 PR に小分け**。RLS 廃止分の認可テスト（§3.2）を同時に追加 | preview URL で E2E 合格、認可テスト全通過 | Vercel/Supabase は無改変で稼働継続 |
 | 3. ステージング | `*.workers.dev` で、本番データのコピーを入れた D1 で確認。Magic Link の到達性を確認 | 手動 UAT 合格 | URL を使わなくなるだけ |
 | 4. DNS（2段階） | §5.1 | 各段階で正常 | §5.1 |
-| 5. データ移行とカットオーバー | §6（D1 移行は必須工程） | 件数・整合性一致 | §6.5 |
-| 6. 旧環境撤去 | 切り戻し期限（§6.5）経過後に Vercel 停止、Supabase 停止。撤去前に `pg_dump` を保管 | 請求が下がったことを確認 | バックアップから復元 |
+| 5. データ移行とカットオーバー | §6（D1 移行は必須工程） | 件数・整合性一致 | なし（再投入で直す。§6.5） |
+| 6. 旧環境撤去 | 突き合わせ完了後に Supabase 等を解約。解約前に `pg_dump` を保管 | 請求が下がったことを確認 | バックアップから復元 |
 
-重要: **cron の二重実行を避ける**（Vercel Cron と Cron Triggers を同時に有効にしない。切替日に Vercel 側を先に止める）。`articles.link` が UNIQUE なので二重でも壊れはしないが、外向き fetch が倍になる。
+Vercel は停止済みのため cron の二重実行は起きない（Cron Triggers だけ有効にする）。
 
 ### 5.1 DNS 切替（2段階）
 
@@ -190,20 +191,18 @@ Workers の Custom Domain は Cloudflare の zone にあるドメインにしか
 
 1. **告知**: 再ログインが必要になることとメンテ時間を利用者に告知。
 2. **バックアップ**: 本番（prod=xolhjcngrwwwqtklmoyk）の `pg_dump` を取得し、安全な場所に保管。
-3. **凍結**: cron を止め、`/admin`・`/my` からの書き込みを止める（メンテ表示。深夜、cron 実行後）。
+3. ~~凍結~~: 旧環境が停止済みで書き込みは発生しないため不要。
 4. **export**: 各テーブルを SELECT して JSON/CSV に出す。`pg_dump --data-only` の出力は D1 にそのまま入らないため、変換スクリプトを使う。`auth.users` は service_role の Admin API、または SQL Editor で SELECT して取り出す（`id`, `email`, `created_at`, `email_confirmed_at`, **`role`**）。
 5. **変換**: UUID → TEXT（値は保持）、TIMESTAMPTZ → UTC ISO8601 `Z` 付き TEXT（§3.2 #2）、JSONB → TEXT、BOOLEAN → 0/1。`INSERT` 文を生成。D1 の1回あたりの文・サイズ上限は**要確認**なので分割して投入する。
 6. **投入**: `wrangler d1 migrations apply`（スキーマ）→ `wrangler d1 execute --file`（データ）。順序は FK に従う（Auth の user 表 → `members` → `teams` → `member_teams` / `articles` / `member_publications` / `member_commit_slots` / `note_comments`）。user 表へは `id` を保持して投入し（`members.user_id` が参照するため最初。順が崩れる場合は `PRAGMA defer_foreign_keys = on`）、**`role='admin'` を新 admin 判定に反映**する。
-7. **突き合わせ**: 各テーブルの件数、主キー集合、`articles.link` の一意性、admin ユーザーが `/admin` に入れること、`members.user_id` の参照先が全て存在することを確認。差分があればここで中止（旧環境は無傷）。
-8. **切替**: §5.1 の Custom Domain を割り当て、Vercel Cron を停止して Cron Triggers を有効化。
-9. **切り戻し期限の起点**を記録する（§6.5）。
+7. **突き合わせ**: 各テーブルの件数、主キー集合、`articles.link` の一意性、admin ユーザーが `/admin` に入れること、`members.user_id` の参照先が全て存在することを確認。差分があれば中止せず、D1 を空にして変換・再投入する（スクリプトは冪等にする）。
+8. **切替**: §5.1 の Custom Domain を割り当て、Cron Triggers を有効化。
 
-### 6.5 切り戻しの扱い（切替後の書き込み分）
+### 6.5 切り戻しの扱い
 
-D1 に切り替えた後の書き込み（cron の `articles`、`member_commit_slots`、members の claim、`note_comments`）は旧 Supabase に無い。
-- **切り戻し期限を 1〜2 週間と決め**、期限内は旧 Supabase を読み取り専用で保持する。
-- 切り戻す場合は D1 から該当テーブルを export して Postgres に INSERT し直す（§6 の逆変換スクリプトを事前に用意する）。`articles` は cron で再取得できるので優先度は低く、**戻す価値があるのは `member_commit_slots` と `members`（claim）**。
-- 期限を過ぎたら旧環境を撤去（フェーズ6）。
+**確定（#18）: 切り戻しなし**。現行環境が完全停止中のため、切替後の書き込み分を旧 Supabase に戻す逆変換スクリプトも、切り戻し期限も作らない。データ損失への備えは次の2点:
+- 投入前に `pg_dump` と付録 A の SQL 結果を保管する（Supabase が一時停止中なら先に再開して取得。停止しているのが何かは要確認）。
+- 突き合わせで差分が出たら D1 を作り直して再投入する。
 
 ## 7. リスク
 
@@ -212,25 +211,23 @@ D1 に切り替えた後の書き込み（cron の `articles`、`member_commit_s
 | OpenNext/vinext と Next 16.4 / middleware / Server Actions の非互換 | 移植不能 | フェーズ1 の PoC で GO/NO-GO。ダメなら Vercel 継続＋Supabase 見直しのみに縮小 |
 | 表示ごとの全メンバー RSS fetch が CPU/subrequest 上限に当たる | 表示失敗、有料化 | PoC で計測。`getArticlesForMembers` 利用や cron 結果のみで描画する設計変更を検討 |
 | OG 撮影が Browser Rendering で再現しない/高コスト | SNS シェア画像の劣化 | R2 キャッシュ、フォールバック画像の維持（既存の 500 回避設計を踏襲） |
-| Auth 置換でログイン不能・管理者が入れない | 運用停止 | `role` を移行手順に含め、突き合わせで admin ログインを確認。旧環境を切り戻し期限まで保持 |
+| Auth 置換でログイン不能・管理者が入れない | 運用停止 | `role` を移行手順に含め、突き合わせで admin ログインを確認。`pg_dump` と突き合わせで admin を確認 |
 | Magic Link メール到達性の悪化 | ログイン不能 | SPF/DKIM/DMARC、ステージングで到達確認 |
 | RLS 喪失による認可漏れ | データ漏えい・改ざん | §3.2 の認可一覧どおり実装し、各行にテストを追加 |
 | SQLite 化で型・時刻形式が崩れ、並べ替えや鮮度判定が壊れる | 表示不整合 | 時刻は UTC ISO8601 `Z` 付きに固定、変換後に突き合わせ |
 | DNS 切替の不整合 | 一時的に停止 | §5.1 の2段階化、Redirect URL に新旧を併記 |
 | cron の subrequest/実行時間上限 | 一部メンバー未更新 | 件数が上限に近づいたら分割。`allSettled` の失敗件数をログ化 |
 | Vercel 固有 env 依存の取りこぼし | 誤った OG ホスト判定 | `grep VERCEL src` で全洗い出し |
-| 不可逆な移行でのデータ破損 | 最悪データ喪失 | バックアップ、旧 DB 読み取り専用保持、突合手順、切り戻し期限 |
+| 不可逆な移行でのデータ破損 | 最悪データ喪失 | `pg_dump` 保管、冪等な再投入スクリプト、突合手順（切り戻しなし） |
 
-## 8. 未決事項（人の判断が必要）
+## 8. 確定事項（旧: 未決事項）
 
-確定済み: 現行月額 $40（Supabase $20 + Vercel $20）、DB は D1。
-UAT #16 に集約。残りの論点:
-1. 許容する月額の上限（見立て: $20 未満）。
-2. Auth 方式（§3.3 のおすすめは Better Auth。最終判断）。
-3. D1 のクエリ層（素の SQL / Drizzle 等）。
-4. OG 画像: 実ページ撮影の維持（Browser Rendering）か簡素化か。
-5. 「完全移行」の期限と、切り戻し期限（§6.5）。
-6. `keep-substack.com` のネームサーバを Cloudflare へ移管する可否とタイミング（§5.1）。
+確定: 現行月額 $40、DB は D1、Auth は Better Auth（#15）。クエリ層は Drizzle。以下は #18 の開発者回答（2026-11-07）で確定。詳細は `docs/cloudflare-phase0-decisions.md`。
+1. 月額上限: $20 未満。
+2. D1 クエリ層: Drizzle（PoC #19 で不可なら素の SQL）。
+3. OG 画像: 簡素化（既存フォールバックで先行）。
+4. 期限: 11/10 まで（できれば 11/8 中）。切り戻しなし。
+5. `keep-substack.com` の NS 移管: 11/7 中に開発者が実施。
 
 ## 9. 次のアクション
 
