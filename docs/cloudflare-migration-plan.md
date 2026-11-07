@@ -87,7 +87,7 @@ Cloudflare 製品の仕様・料金は公開ドキュメントの参照時点（
 | member の claim / 自動作成（`auth/callback`） | service_role + 検証 | 同じ検証（`isValidPublicationId`、`user_id` 未設定のみ claim）を維持 | claim 済み member を奪えない |
 | cron の articles / note_comments 書き込み | `CRON_SECRET` | 同じ（`scheduled` は外部から叩けない。HTTP 経路を残すなら Bearer を維持） | 認証なしの `/api/cron` が 401 |
 
-### 3.3 認証（置換対象。方式は未決 → #16 で判断）
+### 3.3 認証（置換対象。Better Auth に決定、§8）
 
 「完全移行」のため Supabase Auth も置き換える。現状は Magic Link のみ（パスワード無し）なので、ユーザー移行は比較的容易。
 
@@ -98,7 +98,7 @@ Cloudflare 製品の仕様・料金は公開ドキュメントの参照時点（
 | C. 自前 Magic Link | トークンを D1（または KV）に保存、署名 Cookie（JWT）でセッション | 依存が最小 | レート制限・トークン失効・メール到達性の責任を全部負う。1人開発で保守が重い |
 | D. 外部 IdP（Clerk 等） | マネージド | 運用ゼロ | 無料枠は MAU 依存（**要確認**）。コスト削減目的に反しうる。ユーザー情報が外部に出る |
 
-**おすすめ: A（Better Auth）**。認証の「作り込みで事故る部分」を自作せずに済み、DB を D1 に寄せる決定とも整合する。PoC で Workers 上の動作、Magic Link の送信、`/auth/callback` 相当の流れを確認し、動かなければ B → C の順に落とす。**最終判断は #16 に残す**。
+**おすすめ: A（Better Auth）**。認証の「作り込みで事故る部分」を自作せずに済み、DB を D1 に寄せる決定とも整合する。PoC で Workers 上の動作、Magic Link の送信、`/auth/callback` 相当の流れを確認し、動かなければ B → C の順に落とす。**決定済み（#16）**。
 
 どの案でも決めておくこと:
 - **admin 判定**: 今は `auth.users.role='admin'`。新 user 表に `role` 列（または admin の user id を env）を持たせ、`isAdmin()` / `requireAdmin()` / middleware を差し替える。移行手順に「`role` を引き継ぐ」を含める（§6）。`SUBSTACK_ADMIN_USER_ID` は Substack の profile id なので触らない。
@@ -149,7 +149,7 @@ Chromium 同梱は Workers で不可。選択肢:
 | 現状（Vercel + Supabase） | **$40（確定）** | - |
 | Workers Free + D1 Free | $0 | CPU 10ms/リクエストと subrequest 上限に収まる場合のみ。現構造では**収まらない可能性が高い**（要実測） |
 | Workers Paid + D1 | **$5〜（Paid 最低）** + 従量 | Workers Paid は $5/月（1,000万リクエスト・3,000万 CPU ms 込み、超過 $0.30/百万リクエスト）。D1 は Paid で 25B 読み/月・50M 書き/月込み。インデックスありなら小規模は込みの範囲に収まる見込み（なしだと崩れる、§4.1）。→ **見立て（< $20）は成り立つ見込み** |
-| + Browser Rendering | Paid に 10 時間/月込み、超過 $0.09/時間 | OG を R2 キャッシュすれば込みの範囲 |
+| + Browser Rendering（OG を A 案にする場合のみ） | Paid に 10 時間/月込み、超過 $0.09/時間 | B1 採用なら不要 |
 | + メール送信 | Resend 無料枠等（**要確認**） | Magic Link は少量 |
 
 ### 4.3 見立てが崩れる条件
@@ -157,7 +157,7 @@ Chromium 同梱は Workers で不可。選択肢:
 - 表示ごとの RSS 取得で Paid の CPU 込み量（3,000万 ms/月）を超える: 1表示 50ms と仮定すると月 60 万表示で到達。通常は超えない見込みだが実測しないと分からない。
 - subrequest 上限でページが壊れる（メンバー増加）: Free（50）では N が数十で起きる。Paid（10,000）では当面起きない。起きた場合は費用ではなく設計変更（上の改善余地）が必要。
 - **D1 のインデックスを張り忘れて全件スキャンになる**（差分表 #14）: rows read が桁違いに増え、Paid 込み量を超えて D1 だけで数十ドル増えうる。
-- OG 撮影が頻繁に再実行され、Browser Rendering が込み 10 時間を超える。
+- （OG を A 案にした場合のみ）OG 撮影が頻繁に再実行され、Browser Rendering が込み 10 時間を超える。
 
 結論: **「$20 未満」は Workers Paid $5 + 従量でほぼ確実。「フロント無料（Free）」は現構造では厳しい**。フェーズ1 の完了条件に実測を入れる（§5）。
 
@@ -168,10 +168,10 @@ D1 への移行を前提とする。**確定（#18）: 現行環境（Vercel）�
 | フェーズ | 内容 | 完了条件 | ロールバック |
 |---|---|---|---|
 | 0. 実態調査 | 使用量（メンバー数、articles 件数、月間 PV）確認、判断事項（UAT #16）の確定、Cloudflare アカウント準備 | Auth 方式・クエリ層が決まる | 不要 |
-| 1. PoC | 別ブランチで OpenNext（と vinext）ビルド、`wrangler dev` / preview。D1（dev）にスキーマ投入、Auth 候補で Magic Link ログイン、middleware、Server Actions、`next/og` を確認。**計測**: 1表示あたりの CPU ms・サブリクエスト数・D1 rows read（クエリ結果の `meta.rows_read` で測る。インデックス有無の両方）、OG 1枚あたりの Browser Rendering 秒数、Worker サイズ | 計測値が §4 の前提を満たし、GO/NO-GO を docs に追記 | ブランチ破棄のみ |
-| 2. アプリ移植 | クエリ層を D1 向けに書き換え、Auth 置換、Vercel 固有 env の除去、cron の `scheduled` 化、OG の Browser Rendering 化、`wrangler.jsonc`・CI 追加。**別 PR に小分け**。RLS 廃止分の認可テスト（§3.2）を同時に追加 | preview URL で E2E 合格、認可テスト全通過 | Vercel/Supabase は無改変で稼働継続 |
+| 1. PoC | 別ブランチで OpenNext（と vinext）ビルド、`wrangler dev` / preview。D1（dev）にスキーマ投入、Auth 候補で Magic Link ログイン、middleware、Server Actions、`next/og` を確認。**計測**: 1表示あたりの CPU ms・サブリクエスト数・D1 rows read（クエリ結果の `meta.rows_read` で測る。インデックス有無の両方）、Worker サイズ。`next/og`（`ImageResponse`）が Workers で動くことの確認 | 計測値が §4 の前提を満たし、GO/NO-GO を docs に追記 | ブランチ破棄のみ |
+| 2. アプリ移植 | クエリ層を D1 向けに書き換え、Auth 置換、Vercel 固有 env の除去、cron の `scheduled` 化、OG は既存 `fallbackImage()` に一本化し `playwright-core` / `@sparticuz/chromium` と `vercel.json` の `/api/og` 設定を撤去（phase0 文書 §3 の B1）、`wrangler.jsonc`・CI 追加。**別 PR に小分け**。RLS 廃止分の認可テスト（§3.2）を同時に追加 | preview URL で E2E 合格、認可テスト全通過 | ブランチ破棄のみ（旧環境は停止済み） |
 | 3. ステージング | `*.workers.dev` で、本番データのコピーを入れた D1 で確認。Magic Link の到達性を確認 | 手動 UAT 合格 | URL を使わなくなるだけ |
-| 4. DNS（2段階） | §5.1 | 各段階で正常 | §5.1 |
+| 4. DNS（2段階） | §5.1。**4-1（zone 移管）は先行してよいが、4-2（Custom Domain 割当）はフェーズ5 の突き合わせ（§6 手順7）後** | 各段階で正常 | §5.1 |
 | 5. データ移行とカットオーバー | §6（D1 移行は必須工程） | 件数・整合性一致 | なし（再投入で直す。§6.5） |
 | 6. 旧環境撤去 | 突き合わせ完了後に Supabase 等を解約。解約前に `pg_dump` を保管 | 請求が下がったことを確認 | バックアップから復元 |
 
@@ -182,7 +182,7 @@ Vercel は停止済みのため cron の二重実行は起きない（Cron Trigg
 Workers の Custom Domain は Cloudflare の zone にあるドメインにしか割り当てられない。`keep-substack.com` はレジストラでネームサーバを Cloudflare に変える作業になり、NS の委譲は TLD 側の TTL に従うため「TTL を短縮すれば数分で戻せる」は成り立たない。そこで分ける。
 
 1. **zone 移管**: Cloudflare に zone を作り、取り込んだ DNS レコードは**今の Vercel 向けのまま**にしてネームサーバを切り替える。この段階でサービスの挙動は変わらない。ネームサーバ変更は戻しにくい前提で、余裕を持って実施する。
-2. **Custom Domain 割当**: 安定してから Worker に Custom Domain を割り当てる。既存の CNAME があるホスト名には作れないので、そのレコードを先に外す手順を用意する。**ロールバックは Cloudflare の DNS 上で Custom Domain を外し、Vercel 向けレコードに戻す**（レコード TTL の範囲で戻せる。事前に TTL を短縮しておく）。
+2. **Custom Domain 割当**: 安定してから Worker に Custom Domain を割り当てる。既存の CNAME があるホスト名には作れないので、そのレコードを先に外す手順を用意する。**この段階は §6 手順7（突き合わせ）の完了後に行う**（空の D1 のアプリを本番ドメインで公開しない）。戻し先は無い（Vercel は停止済み）。Custom Domain の不具合は Worker 側を直して対応する。
 - Magic Link のリンク先（Redirect URL）は、切替前に新旧両方を許可しておく。
 
 ## 6. データ移行とカットオーバー手順（D1・時系列）
@@ -196,7 +196,7 @@ Workers の Custom Domain は Cloudflare の zone にあるドメインにしか
 5. **変換**: UUID → TEXT（値は保持）、TIMESTAMPTZ → UTC ISO8601 `Z` 付き TEXT（§3.2 #2）、JSONB → TEXT、BOOLEAN → 0/1。`INSERT` 文を生成。D1 の1回あたりの文・サイズ上限は**要確認**なので分割して投入する。
 6. **投入**: `wrangler d1 migrations apply`（スキーマ）→ `wrangler d1 execute --file`（データ）。順序は FK に従う（Auth の user 表 → `members` → `teams` → `member_teams` / `articles` / `member_publications` / `member_commit_slots` / `note_comments`）。user 表へは `id` を保持して投入し（`members.user_id` が参照するため最初。順が崩れる場合は `PRAGMA defer_foreign_keys = on`）、**`role='admin'` を新 admin 判定に反映**する。
 7. **突き合わせ**: 各テーブルの件数、主キー集合、`articles.link` の一意性、admin ユーザーが `/admin` に入れること、`members.user_id` の参照先が全て存在することを確認。差分があれば中止せず、D1 を空にして変換・再投入する（スクリプトは冪等にする）。
-8. **切替**: §5.1 の Custom Domain を割り当て、Cron Triggers を有効化。
+8. **切替**: 手順7 の完了後に、§5.1 段階2 の Custom Domain を割り当て、Cron Triggers を有効化。
 
 ### 6.5 切り戻しの扱い
 
@@ -208,10 +208,10 @@ Workers の Custom Domain は Cloudflare の zone にあるドメインにしか
 
 | リスク | 影響 | 対策 |
 |---|---|---|
-| OpenNext/vinext と Next 16.4 / middleware / Server Actions の非互換 | 移植不能 | フェーズ1 の PoC で GO/NO-GO。ダメなら Vercel 継続＋Supabase 見直しのみに縮小 |
+| OpenNext/vinext と Next 16.4 / middleware / Server Actions の非互換 | 移植不能 | フェーズ1 の PoC で GO/NO-GO。NO-GO の場合、Workers 化を取りやめて別ホスティング（Vercel Pro 再開など）で一時復旧するかは**要判断**（開発者、UAT #16）。旧環境は停止中で自動の逃げ道は無い |
 | 表示ごとの全メンバー RSS fetch が CPU/subrequest 上限に当たる | 表示失敗、有料化 | PoC で計測。`getArticlesForMembers` 利用や cron 結果のみで描画する設計変更を検討 |
-| OG 撮影が Browser Rendering で再現しない/高コスト | SNS シェア画像の劣化 | R2 キャッシュ、フォールバック画像の維持（既存の 500 回避設計を踏襲） |
-| Auth 置換でログイン不能・管理者が入れない | 運用停止 | `role` を移行手順に含め、突き合わせで admin ログインを確認。`pg_dump` と突き合わせで admin を確認 |
+| B1 で個別の草が OG に出ない | SNS シェア画像が全 view 共通になる | UAT で許容を確認。不可なら B2（Satori で描き直し）→ A（撮影）の順で足す（phase0 文書 §3） |
+| Auth 置換でログイン不能・管理者が入れない | 運用停止 | `role` を移行手順に含め、`pg_dump` と突き合わせて admin ログインを確認 |
 | Magic Link メール到達性の悪化 | ログイン不能 | SPF/DKIM/DMARC、ステージングで到達確認 |
 | RLS 喪失による認可漏れ | データ漏えい・改ざん | §3.2 の認可一覧どおり実装し、各行にテストを追加 |
 | SQLite 化で型・時刻形式が崩れ、並べ替えや鮮度判定が壊れる | 表示不整合 | 時刻は UTC ISO8601 `Z` 付きに固定、変換後に突き合わせ |
@@ -231,7 +231,7 @@ Workers の Custom Domain は Cloudflare の zone にあるドメインにしか
 
 ## 9. 次のアクション
 
-- 上記 1〜3 の回答後、フェーズ1（PoC）用の Issue を別途起票する（本 PR のスコープ外）。
+- フェーズ1（PoC）は #19 に着手する。
 
 ## 参考（公式ドキュメント）
 
